@@ -1,0 +1,165 @@
+{
+  "NotFound": {
+    "title": "Страница не найдена",
+    "body": "Мы не нашли то, что вы искали.",
+    "home": "На главную"
+  },
+  "Nav": {
+    "home": "Главная",
+    "listings": "Объявления",
+    "publish": "Разместить",
+    "admin": "Админ",
+    "account": "Аккаунт",
+    "login": "Вход"
+  },
+  "Home": {
+    "title": "Простая локальная площадка",
+    "subtitle": "Ищите объявления или публикуйте бесплатно.",
+    "browse": "Смотреть объявления",
+    "publish": "Разместить объявление"
+  },
+  "Listings": {
+    "title": "Объявления",
+    "empty": "Нет объявлений по выбранным фильтрам.",
+    "categories": "Категории",
+    "allCategories": "Все категории",
+    "filters": {
+      "title": "Фильтры",
+      "city": "Город",
+      "min": "Цена от (RON)",
+      "max": "Цена до (RON)",
+      "apply": "Применить",
+      "reset": "Сбросить"
+    }
+  },
+  "ListingDetail": {
+    "specsTitle": "Характеристики",
+    "factsTitle": "Детали",
+    "city": "Локация",
+    "condition": "Состояние",
+    "phone": "Телефон",
+    "conditionNew": "Новое",
+    "conditionUsed": "Б/у",
+    "conditionNA": "Н/П",
+    "negotiable": "Торг уместен",
+    "copyLink": "Копировать ссылку",
+    "copied": "Скопировано!",
+    "moderation": "Модерация",
+    "spec": {
+      "brand": "Марка",
+      "model": "Модель",
+      "year": "Год",
+      "mileageKm": "Пробег",
+      "rooms": "Комнаты",
+      "areaSqm": "Площадь (м²)"
+    },
+    "specExtra": {
+      "fuel": "Топливо",
+      "transmission": "Коробка",
+      "color": "Цвет",
+      "floor": "Этаж",
+      "storage_gb": "Память (ГБ)",
+      "ram_gb": "ОЗУ (ГБ)",
+      "experience_years": "Опыт (лет)",
+      "service_radius_km": "Радиус (км)"
+    }
+  },
+  "Auth": {
+    "loginTitle": "Вход",
+    "registerTitle": "Регистрация",
+    "email": "Email",
+    "password": "Пароль",
+    "passwordMin": "Пароль (мин. 8 символов)",
+    "nameOptional": "Имя (необязательно)",
+    "login": "Войти",
+    "register": "Создать аккаунт",
+    "logout": "Выход",
+    "emailTaken": "Этот email уже занят.",
+    "validationError": "Некорректные данные.",
+    "registerSuccess": "Аккаунт создан. Можно войти."
+  },
+  "Account": {
+    "title": "Аккаунт",
+    "subtitle": "Войдите или создайте аккаунт.",
+    "signedInAs": "Вы вошли как {email}."
+  },
+  "Publish": {
+    "title": "Разместить объявление",
+    "subtitle": "Заполните поля ниже.",
+    "noCategories": "Категории не настроены."
+  },
+  "Admin": {
+    "title": "Админ-панель",
+    "subtitle": "Список объявлений (быстрая модерация).",
+    "empty": "Объявлений пока нет.",
+    "delete": "Удалить",
+    "deleting": "Удаление…",
+    "confirmDelete": "Удалить это объявление?",
+    "forbidden": "Нет прав.",
+    "notFound": "Объявление не найдено.",
+    "deleteError": "Не удалось удалить."
+  },
+  "ListingForm": {
+    "category": "Категория",
+    "title": "Заголовок",
+    "description": "Описание",
+    "price": "Цена (RON)",
+    "negotiable": "Торг",
+    "city": "Город",
+    "district": "Район (необязательно)",
+    "phone": "Телефон (необязательно)",
+    "condition": "Состояние",
+    "conditionNew": "Новое",
+    "conditionUsed": "Б/у",
+    "conditionNA": "Н/П",
+    "brand": "Марка",
+    "model": "Модель",
+    "year": "Год выпуска",
+    "mileage": "Пробег",
+    "rooms": "Комнаты",
+    "areaSqm": "Площадь (м²)",
+    "images": "Изображения",
+    "imagesHint": "Минимум 1, максимум 8 URL (по одному в строке). Можно загрузить файлы.",
+    "upload": "Загрузить",
+    "imageCount": "{count} / {max} изображений",
+    "uploadTooMany": "Слишком много изображений (макс. 8).",
+    "submit": "Опубликовать",
+    "submitting": "Публикация…",
+    "success": "Объявление опубликовано.",
+    "serverUnauthorized": "Нужно войти в аккаунт.",
+    "serverValidation": "Проверьте поля и попробуйте снова.",
+    "serverCategory": "Неверная категория (выберите подкатегорию).",
+    "serverSession": "Сессия недействительна.",
+    "detailOptional": "— необязательно —",
+    "fuel": {
+      "petrol": "Бензин",
+      "diesel": "Дизель",
+      "electric": "Электро",
+      "hybrid": "Гибрид",
+      "lpg": "Газ"
+    },
+    "transmission": {
+      "manual": "Механика",
+      "automatic": "Автомат"
+    },
+    "detail": {
+      "fuel": { "label": "Топливо" },
+      "transmission": { "label": "Коробка" },
+      "floor": { "label": "Этаж" },
+      "storage_gb": { "label": "Память (ГБ)" },
+      "ram_gb": { "label": "ОЗУ (ГБ)" },
+      "experience_years": { "label": "Опыт (лет)" },
+      "service_radius_km": { "label": "Радиус (км)" }
+    },
+    "validation": {
+      "errCategory": "Выберите категорию.",
+      "errTitle": "Заголовок: 3–160 символов.",
+      "errDescription": "Описание слишком длинное.",
+      "errPrice": "Неверная цена.",
+      "errCity": "Неверный город.",
+      "errCondition": "Неверное состояние.",
+      "errImages": "Неверные URL или количество (1–8).",
+      "errImagesRequired": "Добавьте хотя бы один корректный URL изображения."
+    }
+  }
+}

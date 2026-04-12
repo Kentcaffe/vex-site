@@ -1,0 +1,462 @@
+"use client";
+
+import { useActionState, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { createListing, type CreateListingState } from "@/app/actions/listings";
+import {
+  getDetailFieldsForSlug,
+  getDetailFormName,
+  type DetailField,
+} from "@/lib/listing-detail-config";
+import { LISTING_MAX_IMAGES, parseImageLines } from "@/lib/listing-form-schema";
+import {
+  validateListingFormClient,
+  type ListingFormFieldId,
+  type ListingFormValidationMessages,
+} from "@/lib/listing-form-client-validation";
+
+export type CategoryOption = { id: string; slug: string; path: string };
+
+type Props = {
+  locale: string;
+  categoryOptions: CategoryOption[];
+};
+
+function slugFlags(slug: string) {
+  const isVeh = slug === "auto" || slug === "moto";
+  const isRe = slug === "apartamente" || slug === "case";
+  const isBrandish = ["piese-auto", "telefoane", "laptop", "haine"].includes(slug);
+  return { isVeh, isRe, isBrandish };
+}
+
+export function ListingForm({ locale, categoryOptions }: Props) {
+  const t = useTranslations("ListingForm");
+  const tVal = useTranslations("ListingForm.validation");
+
+  const msg: ListingFormValidationMessages = useMemo(
+    () => ({
+      errCategory: tVal("errCategory"),
+      errTitle: tVal("errTitle"),
+      errDescription: tVal("errDescription"),
+      errPrice: tVal("errPrice"),
+      errCity: tVal("errCity"),
+      errCondition: tVal("errCondition"),
+      errImages: tVal("errImages"),
+      errImagesRequired: tVal("errImagesRequired"),
+    }),
+    [tVal],
+  );
+
+  const [state, formAction, isPending] = useActionState(
+    createListing,
+    undefined as CreateListingState | undefined,
+  );
+  const [categoryId, setCategoryId] = useState(categoryOptions[0]?.id ?? "");
+  const [imagesRaw, setImagesRaw] = useState("");
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [clientErrors, setClientErrors] = useState<Partial<Record<ListingFormFieldId, string>>>({});
+
+  const selectedSlug = useMemo(() => {
+    return categoryOptions.find((c) => c.id === categoryId)?.slug ?? "";
+  }, [categoryId, categoryOptions]);
+
+  const { isVeh, isRe, isBrandish } = slugFlags(selectedSlug);
+  const detailFields = useMemo(() => getDetailFieldsForSlug(selectedSlug), [selectedSlug]);
+
+  function detailLabel(field: DetailField): string {
+    return t(`detail.${field.id}.label`);
+  }
+
+  function selectOptionLabel(field: DetailField, value: string): string {
+    if (field.id === "fuel") {
+      return t(`fuel.${value}` as never);
+    }
+    if (field.id === "transmission") {
+      return t(`transmission.${value}` as never);
+    }
+    return value;
+  }
+
+  function handleSubmit(formData: FormData) {
+    formData.set("imagesRaw", imagesRaw);
+    formData.set("locale", locale);
+    const v = validateListingFormClient(formData, msg);
+    if (!v.ok) {
+      setClientErrors(v.errors);
+      return;
+    }
+    setClientErrors({});
+    formAction(formData);
+  }
+
+  async function onPickImages(files: FileList | null) {
+    if (!files?.length) {
+      return;
+    }
+    setUploadError(null);
+    const fd = new FormData();
+    for (const f of Array.from(files)) {
+      fd.append("files", f);
+    }
+    const lines = parseImageLines(imagesRaw);
+    if (lines.length + files.length > LISTING_MAX_IMAGES) {
+      setUploadError(t("uploadTooMany"));
+      return;
+    }
+    const res = await fetch("/api/listings/upload-images", {
+      method: "POST",
+      body: fd,
+    });
+    const data = (await res.json()) as { urls?: string[]; error?: string };
+    if (!res.ok) {
+      setUploadError(data.error ?? "upload");
+      return;
+    }
+    const urls = data.urls ?? [];
+    const next = [...lines, ...urls].join("\n");
+    setImagesRaw(next);
+  }
+
+  const serverMsg =
+    state?.ok === false
+      ? state.error === "unauthorized"
+        ? t("serverUnauthorized")
+        : state.error === "category"
+          ? t("serverCategory")
+          : state.error === "session"
+            ? t("serverSession")
+            : t("serverValidation")
+      : null;
+
+  return (
+    <form
+      action={handleSubmit}
+      className="mx-auto max-w-2xl space-y-5 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+    >
+      <input type="hidden" name="locale" value={locale} />
+
+      <div id="field-categoryId">
+        <label className="block text-sm font-medium" htmlFor="categoryId">
+          {t("category")}
+        </label>
+        <select
+          id="categoryId"
+          name="categoryId"
+          required
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+        >
+          {categoryOptions.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.path}
+            </option>
+          ))}
+        </select>
+        {clientErrors.categoryId ? <p className="mt-1 text-sm text-red-600">{clientErrors.categoryId}</p> : null}
+      </div>
+
+      <div id="field-title">
+        <label className="block text-sm font-medium" htmlFor="title">
+          {t("title")}
+        </label>
+        <input
+          id="title"
+          name="title"
+          required
+          maxLength={160}
+          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+        />
+        {clientErrors.title ? <p className="mt-1 text-sm text-red-600">{clientErrors.title}</p> : null}
+      </div>
+
+      <div id="field-description">
+        <label className="block text-sm font-medium" htmlFor="description">
+          {t("description")}
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          rows={6}
+          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+        />
+        {clientErrors.description ? <p className="mt-1 text-sm text-red-600">{clientErrors.description}</p> : null}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2" id="field-price">
+        <div>
+          <label className="block text-sm font-medium" htmlFor="price">
+            {t("price")}
+          </label>
+          <input
+            id="price"
+            name="price"
+            type="number"
+            inputMode="numeric"
+            min={0}
+            required
+            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          />
+          {clientErrors.price ? <p className="mt-1 text-sm text-red-600">{clientErrors.price}</p> : null}
+        </div>
+        <div className="flex items-end pb-1">
+          <label className="flex items-center gap-2 text-sm">
+            <input name="negotiable" type="checkbox" className="rounded border-zinc-400" />
+            {t("negotiable")}
+          </label>
+        </div>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div id="field-city">
+          <label className="block text-sm font-medium" htmlFor="city">
+            {t("city")}
+          </label>
+          <input
+            id="city"
+            name="city"
+            required
+            maxLength={80}
+            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          />
+          {clientErrors.city ? <p className="mt-1 text-sm text-red-600">{clientErrors.city}</p> : null}
+        </div>
+        <div>
+          <label className="block text-sm font-medium" htmlFor="district">
+            {t("district")}
+          </label>
+          <input
+            id="district"
+            name="district"
+            maxLength={80}
+            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium" htmlFor="phone">
+          {t("phone")}
+        </label>
+        <input
+          id="phone"
+          name="phone"
+          maxLength={30}
+          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+        />
+      </div>
+
+      <div id="field-condition">
+        <label className="block text-sm font-medium" htmlFor="condition">
+          {t("condition")}
+        </label>
+        <select
+          id="condition"
+          name="condition"
+          required
+          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+        >
+          <option value="new">{t("conditionNew")}</option>
+          <option value="used">{t("conditionUsed")}</option>
+          <option value="not_applicable">{t("conditionNA")}</option>
+        </select>
+        {clientErrors.condition ? <p className="mt-1 text-sm text-red-600">{clientErrors.condition}</p> : null}
+      </div>
+
+      {isVeh ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium" htmlFor="brand">
+              {t("brand")}
+            </label>
+            <input
+              id="brand"
+              name="brand"
+              maxLength={80}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium" htmlFor="modelName">
+              {t("model")}
+            </label>
+            <input
+              id="modelName"
+              name="modelName"
+              maxLength={80}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium" htmlFor="year">
+              {t("year")}
+            </label>
+            <input
+              id="year"
+              name="year"
+              type="number"
+              inputMode="numeric"
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium" htmlFor="mileageKm">
+              {t("mileage")}
+            </label>
+            <input
+              id="mileageKm"
+              name="mileageKm"
+              type="number"
+              inputMode="numeric"
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {isRe ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium" htmlFor="rooms">
+              {t("rooms")}
+            </label>
+            <input
+              id="rooms"
+              name="rooms"
+              maxLength={40}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium" htmlFor="areaSqm">
+              {t("areaSqm")}
+            </label>
+            <input
+              id="areaSqm"
+              name="areaSqm"
+              type="number"
+              inputMode="numeric"
+              min={1}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {isBrandish && !isVeh ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className="block text-sm font-medium" htmlFor="brand2">
+              {t("brand")}
+            </label>
+            <input
+              id="brand2"
+              name="brand"
+              maxLength={80}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium" htmlFor="modelName2">
+              {t("model")}
+            </label>
+            <input
+              id="modelName2"
+              name="modelName"
+              maxLength={80}
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {detailFields.map((field) => {
+        const fname = getDetailFormName(field);
+        return (
+          <div key={field.id}>
+            <label className="block text-sm font-medium" htmlFor={fname}>
+              {detailLabel(field)}
+            </label>
+            {field.input === "select" && field.selectValues ? (
+              <select
+                id={fname}
+                name={fname}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              >
+                <option value="">{t("detailOptional")}</option>
+                {field.selectValues.map((v) => (
+                  <option key={v} value={v}>
+                    {selectOptionLabel(field, v)}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+            {field.input === "text" ? (
+              <input
+                id={fname}
+                name={fname}
+                maxLength={field.maxLength ?? 80}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              />
+            ) : null}
+            {field.input === "number" ? (
+              <input
+                id={fname}
+                name={fname}
+                type="number"
+                inputMode="numeric"
+                min={field.min}
+                max={field.max}
+                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              />
+            ) : null}
+          </div>
+        );
+      })}
+
+      <div id="field-imagesRaw">
+        <label className="block text-sm font-medium" htmlFor="imagesRaw">
+          {t("images")}
+        </label>
+        <p className="mt-1 text-xs text-zinc-500">{t("imagesHint")}</p>
+        <textarea
+          id="imagesRaw"
+          name="imagesRaw"
+          value={imagesRaw}
+          onChange={(e) => setImagesRaw(e.target.value)}
+          rows={4}
+          className="mt-2 w-full rounded-lg border border-zinc-300 px-3 py-2 font-mono text-xs dark:border-zinc-600 dark:bg-zinc-950"
+          placeholder="https://..."
+        />
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <label className="cursor-pointer rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium hover:bg-zinc-50 dark:border-zinc-600 dark:hover:bg-zinc-800">
+            {t("upload")}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+              className="hidden"
+              onChange={(e) => void onPickImages(e.target.files)}
+            />
+          </label>
+          <span className="text-xs text-zinc-500">
+            {t("imageCount", { count: parseImageLines(imagesRaw).length, max: LISTING_MAX_IMAGES })}
+          </span>
+        </div>
+        {uploadError ? <p className="mt-1 text-sm text-red-600">{uploadError}</p> : null}
+        {clientErrors.imagesRaw ? <p className="mt-1 text-sm text-red-600">{clientErrors.imagesRaw}</p> : null}
+      </div>
+
+      {serverMsg ? <p className="text-sm text-red-600">{serverMsg}</p> : null}
+      {state?.ok === true ? <p className="text-sm text-emerald-700 dark:text-emerald-400">{t("success")}</p> : null}
+
+      <button
+        type="submit"
+        disabled={isPending}
+        className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+      >
+        {isPending ? t("submitting") : t("submit")}
+      </button>
+    </form>
+  );
+}

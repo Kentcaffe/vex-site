@@ -1,0 +1,165 @@
+{
+  "NotFound": {
+    "title": "Page not found",
+    "body": "We could not find what you were looking for.",
+    "home": "Back home"
+  },
+  "Nav": {
+    "home": "Home",
+    "listings": "Listings",
+    "publish": "Post ad",
+    "admin": "Admin",
+    "account": "Account",
+    "login": "Sign in"
+  },
+  "Home": {
+    "title": "A simple local marketplace",
+    "subtitle": "Browse listings or post for free.",
+    "browse": "Browse listings",
+    "publish": "Post an ad"
+  },
+  "Listings": {
+    "title": "Listings",
+    "empty": "No listings match your filters.",
+    "categories": "Categories",
+    "allCategories": "All categories",
+    "filters": {
+      "title": "Filters",
+      "city": "City",
+      "min": "Min price (RON)",
+      "max": "Max price (RON)",
+      "apply": "Apply",
+      "reset": "Reset"
+    }
+  },
+  "ListingDetail": {
+    "specsTitle": "Specifications",
+    "factsTitle": "Facts",
+    "city": "Location",
+    "condition": "Condition",
+    "phone": "Phone",
+    "conditionNew": "New",
+    "conditionUsed": "Used",
+    "conditionNA": "N/A",
+    "negotiable": "Negotiable price",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "moderation": "Moderation",
+    "spec": {
+      "brand": "Brand",
+      "model": "Model",
+      "year": "Year",
+      "mileageKm": "Mileage",
+      "rooms": "Rooms",
+      "areaSqm": "Area (m²)"
+    },
+    "specExtra": {
+      "fuel": "Fuel",
+      "transmission": "Transmission",
+      "color": "Color",
+      "floor": "Floor",
+      "storage_gb": "Storage (GB)",
+      "ram_gb": "RAM (GB)",
+      "experience_years": "Experience (years)",
+      "service_radius_km": "Service radius (km)"
+    }
+  },
+  "Auth": {
+    "loginTitle": "Sign in",
+    "registerTitle": "Create account",
+    "email": "Email",
+    "password": "Password",
+    "passwordMin": "Password (min. 8 characters)",
+    "nameOptional": "Name (optional)",
+    "login": "Sign in",
+    "register": "Create account",
+    "logout": "Sign out",
+    "emailTaken": "This email is already registered.",
+    "validationError": "Invalid data.",
+    "registerSuccess": "Account created. You can sign in now."
+  },
+  "Account": {
+    "title": "Account",
+    "subtitle": "Sign in or create an account.",
+    "signedInAs": "Signed in as {email}."
+  },
+  "Publish": {
+    "title": "Post an ad",
+    "subtitle": "Fill in the fields below.",
+    "noCategories": "No categories configured."
+  },
+  "Admin": {
+    "title": "Admin",
+    "subtitle": "All listings (quick moderation).",
+    "empty": "No listings yet.",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "confirmDelete": "Delete this listing?",
+    "forbidden": "You do not have permission.",
+    "notFound": "Listing no longer exists.",
+    "deleteError": "Could not delete."
+  },
+  "ListingForm": {
+    "category": "Category",
+    "title": "Title",
+    "description": "Description",
+    "price": "Price (RON)",
+    "negotiable": "Negotiable",
+    "city": "City",
+    "district": "District (optional)",
+    "phone": "Phone (optional)",
+    "condition": "Condition",
+    "conditionNew": "New",
+    "conditionUsed": "Used",
+    "conditionNA": "N/A",
+    "brand": "Brand",
+    "model": "Model",
+    "year": "Year",
+    "mileage": "Mileage",
+    "rooms": "Rooms",
+    "areaSqm": "Area (m²)",
+    "images": "Images",
+    "imagesHint": "Minimum 1, maximum 8 URLs (one per line). You can upload files.",
+    "upload": "Upload images",
+    "imageCount": "{count} / {max} images",
+    "uploadTooMany": "Too many images (max 8).",
+    "submit": "Publish",
+    "submitting": "Publishing…",
+    "success": "Listing published successfully.",
+    "serverUnauthorized": "You must be signed in.",
+    "serverValidation": "Please check the fields and try again.",
+    "serverCategory": "Invalid category (pick a leaf subcategory).",
+    "serverSession": "Invalid session.",
+    "detailOptional": "— optional —",
+    "fuel": {
+      "petrol": "Petrol",
+      "diesel": "Diesel",
+      "electric": "Electric",
+      "hybrid": "Hybrid",
+      "lpg": "LPG"
+    },
+    "transmission": {
+      "manual": "Manual",
+      "automatic": "Automatic"
+    },
+    "detail": {
+      "fuel": { "label": "Fuel" },
+      "transmission": { "label": "Transmission" },
+      "floor": { "label": "Floor" },
+      "storage_gb": { "label": "Storage (GB)" },
+      "ram_gb": { "label": "RAM (GB)" },
+      "experience_years": { "label": "Experience (years)" },
+      "service_radius_km": { "label": "Service radius (km)" }
+    },
+    "validation": {
+      "errCategory": "Pick a category.",
+      "errTitle": "Title must be 3–160 characters.",
+      "errDescription": "Description is too long.",
+      "errPrice": "Invalid price.",
+      "errCity": "Invalid city.",
+      "errCondition": "Invalid condition.",
+      "errImages": "Invalid image URLs or wrong count (1–8).",
+      "errImagesRequired": "Add at least one valid image URL per line."
+    }
+  }
+}
