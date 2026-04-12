@@ -1,12 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { routing } from "@/i18n/routing";
 
 type Props = {
-  params: Promise<{ locale: string }>;
+  params?: Promise<{ locale?: string }>;
 };
 
 export default async function NotFoundPage({ params }: Props) {
-  const { locale } = await params;
+  const p = params ? await params : {};
+  const raw = p?.locale;
+  const locale =
+    raw && (routing.locales as readonly string[]).includes(raw) ? raw : routing.defaultLocale;
   setRequestLocale(locale);
   const t = await getTranslations("NotFound");
 
