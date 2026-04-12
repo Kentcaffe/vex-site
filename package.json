@@ -12,6 +12,7 @@
     "build": "prisma db push && next build",
     "build:render": "npm run build",
     "start": "next start",
+    "start:render": "prisma db push && next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
     "db:seed": "npx tsx prisma/seed.ts"

@@ -4,8 +4,9 @@ services:
   - type: web
     name: anunturi-web
     runtime: node
+    # db push la build + la start: aceeași DATABASE_URL ca în Environment (altfel SQLite rămâne gol la runtime).
     buildCommand: npm ci && npm run build:render
-    startCommand: npm start
+    startCommand: npm run start:render
     envVars:
       - key: NODE_VERSION
         value: "20"
