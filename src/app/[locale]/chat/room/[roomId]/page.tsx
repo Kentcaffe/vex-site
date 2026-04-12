@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { ChatRoomView, type ChatBootstrap } from "@/components/chat/ChatRoomView";
 import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
@@ -71,10 +71,8 @@ export default async function ChatRoomPage({ params }: Props) {
     maxBodyLength: CHAT_MESSAGE_MAX,
   };
 
-  const t = await getTranslations("Chat");
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
-      <h1 className="mb-6 text-xl font-bold text-zinc-900 dark:text-zinc-50">{t("title")}</h1>
+    <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
       <ChatRoomView bootstrap={bootstrap} currentUserId={userId} />
     </div>
   );
