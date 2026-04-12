@@ -13,7 +13,9 @@
     "admin": "Админ",
     "account": "Аккаунт",
     "login": "Вход",
-    "favorites": "Избранное"
+    "favorites": "Избранное",
+    "notifications": "Уведомления",
+    "reportContent": "Жалоба"
   },
   "Chat": {
     "title": "Переписка",
@@ -238,7 +240,29 @@
     "title": "Аккаунт",
     "subtitle": "Войдите или создайте аккаунт.",
     "signedInAs": "Вы вошли как {email}.",
-    "linkFavorites": "Избранные объявления"
+    "linkFavorites": "Избранные объявления",
+    "linkNotifications": "Уведомления",
+    "linkReportContent": "Пожаловаться на контент"
+  },
+  "Notifications": {
+    "title": "Уведомления",
+    "subtitle": "Сообщения модераторов по вашим жалобам.",
+    "empty": "Нет уведомлений.",
+    "markRead": "Прочитано",
+    "markAllRead": "Отметить все прочитанными",
+    "backToAccount": "Назад в аккаунт"
+  },
+  "ReportOther": {
+    "pageTitle": "Жалоба на контент",
+    "pageSubtitle": "Сообщите о проблеме, не связанной с конкретным объявлением (страница, текст, ссылка).",
+    "subjectLabel": "О чём речь",
+    "subjectPlaceholder": "Кратко опишите проблему",
+    "urlLabel": "Ссылка (необязательно)",
+    "submit": "Отправить жалобу",
+    "sending": "Отправка…",
+    "success": "Жалоба принята. Модераторы её проверят.",
+    "errorValidation": "Проверьте поля (тема от 3 символов, корректный URL при заполнении).",
+    "backToAccount": "Назад в аккаунт"
   },
   "Publish": {
     "title": "Разместить объявление",
@@ -255,6 +279,7 @@
     "navDashboard": "Обзор",
     "navListings": "Объявления",
     "navReports": "Жалобы",
+    "navComplaints": "Жалобы",
     "navUsers": "Пользователи",
     "dashboardTitle": "Обзор",
     "dashboardSubtitle": "Сразу видно, что требует внимания, и быстрый переход в разделы.",
@@ -291,6 +316,16 @@
     "filterReviewed": "Рассмотрено",
     "filterDismissed": "Отклонено",
     "reportsSummaryHint": "Сначала обрабатывайте ожидающие; удалить объявление можно в любом статусе.",
+    "complaintsTitle": "Жалобы",
+    "complaintsSubtitle": "Все жалобы (объявления и другой контент), статус и опциональное сообщение автору жалобы.",
+    "complaintFilterType": "Тип",
+    "complaintTypeAll": "Все",
+    "complaintTypeListing": "Объявление",
+    "complaintTypeOther": "Другой контент",
+    "complaintsHint": "После решения автор жалобы получает уведомление в аккаунте и письмо (если настроен Resend).",
+    "resolutionNoteModerator": "Сообщение автору (необязательно)",
+    "resolutionNotePlaceholder": "Напр.: объявление удалено / нарушений не найдено…",
+    "resolutionNotePublic": "Ответ модерации",
     "reportsEmpty": "Жалоб пока нет.",
     "reportFrom": "Отправитель",
     "reportReason": "Причина",

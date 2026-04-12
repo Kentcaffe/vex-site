@@ -1,6 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
+import { otherContentReport } from "@/lib/prisma-delegates";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -11,13 +12,19 @@ export default async function AdminDashboardPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("Admin");
 
-  const [listingCount, userCount, pendingReports, reviewedReports, dismissedReports] = await Promise.all([
+  const [listingCount, userCount, lp, lr, ld, op, or, od] = await Promise.all([
     prisma.listing.count(),
     prisma.user.count(),
     prisma.listingReport.count({ where: { status: "PENDING" } }),
     prisma.listingReport.count({ where: { status: "REVIEWED" } }),
     prisma.listingReport.count({ where: { status: "DISMISSED" } }),
+    otherContentReport.count({ where: { status: "PENDING" } }),
+    otherContentReport.count({ where: { status: "REVIEWED" } }),
+    otherContentReport.count({ where: { status: "DISMISSED" } }),
   ]);
+  const pendingReports = lp + op;
+  const reviewedReports = lr + or;
+  const dismissedReports = ld + od;
 
   return (
     <div>
@@ -31,7 +38,7 @@ export default async function AdminDashboardPage({ params }: Props) {
             {t("dashboardAttentionDesc", { count: pendingReports })}
           </p>
           <Link
-            href="/admin/reports?filter=pending"
+            href="/admin/reclamatii?status=pending"
             className="mt-3 inline-flex text-sm font-semibold text-amber-900 underline underline-offset-2 hover:text-amber-950 dark:text-amber-200 dark:hover:text-amber-50"
           >
             {t("dashboardOpenQueue")} →
@@ -62,7 +69,7 @@ export default async function AdminDashboardPage({ params }: Props) {
         </li>
         <li>
           <Link
-            href="/admin/reports?filter=pending"
+            href="/admin/reclamatii?status=pending"
             className="block h-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-amber-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-amber-800"
           >
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{t("statPendingReports")}</p>
@@ -72,7 +79,7 @@ export default async function AdminDashboardPage({ params }: Props) {
         </li>
         <li>
           <Link
-            href="/admin/reports?filter=reviewed"
+            href="/admin/reclamatii?status=reviewed"
             className="block h-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-emerald-400/60 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-700"
           >
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{t("statResolvedReports")}</p>
@@ -82,7 +89,7 @@ export default async function AdminDashboardPage({ params }: Props) {
         </li>
         <li>
           <Link
-            href="/admin/reports?filter=dismissed"
+            href="/admin/reclamatii?status=dismissed"
             className="block h-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-zinc-400 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
           >
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{t("statDismissedReports")}</p>

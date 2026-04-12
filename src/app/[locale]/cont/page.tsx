@@ -23,10 +23,22 @@ export default async function ContPage({ params }: Props) {
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link
+            href="/cont/notificari"
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          >
+            {t("linkNotifications")}
+          </Link>
+          <Link
             href="/cont/favorite"
             className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
           >
             {t("linkFavorites")}
+          </Link>
+          <Link
+            href="/cont/raporteaza"
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          >
+            {t("linkReportContent")}
           </Link>
           <SignOutButton />
         </div>

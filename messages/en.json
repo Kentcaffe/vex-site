@@ -13,7 +13,9 @@
     "admin": "Admin",
     "account": "Account",
     "login": "Sign in",
-    "favorites": "Saved ads"
+    "favorites": "Saved ads",
+    "notifications": "Notifications",
+    "reportContent": "Report"
   },
   "Chat": {
     "title": "Conversation",
@@ -238,7 +240,29 @@
     "title": "Account",
     "subtitle": "Sign in or create an account.",
     "signedInAs": "Signed in as {email}.",
-    "linkFavorites": "Saved ads"
+    "linkFavorites": "Saved ads",
+    "linkNotifications": "Notifications",
+    "linkReportContent": "Report content"
+  },
+  "Notifications": {
+    "title": "Notifications",
+    "subtitle": "Updates from moderators about your reports.",
+    "empty": "No notifications yet.",
+    "markRead": "Mark as read",
+    "markAllRead": "Mark all as read",
+    "backToAccount": "Back to account"
+  },
+  "ReportOther": {
+    "pageTitle": "Report content",
+    "pageSubtitle": "Flag an issue that is not tied to a specific listing (page, text, external link, etc.).",
+    "subjectLabel": "What is this about",
+    "subjectPlaceholder": "Short description of the issue",
+    "urlLabel": "Link (optional)",
+    "submit": "Submit report",
+    "sending": "Sending…",
+    "success": "We received your report. Moderators will review it.",
+    "errorValidation": "Check the fields (subject at least 3 characters, valid URL if provided).",
+    "backToAccount": "Back to account"
   },
   "Publish": {
     "title": "Post an ad",
@@ -255,6 +279,7 @@
     "navDashboard": "Overview",
     "navListings": "Listings",
     "navReports": "Reports",
+    "navComplaints": "Complaints",
     "navUsers": "Users",
     "dashboardTitle": "Overview",
     "dashboardSubtitle": "See what needs attention at a glance and jump into each area.",
@@ -291,6 +316,16 @@
     "filterReviewed": "Reviewed",
     "filterDismissed": "Dismissed",
     "reportsSummaryHint": "Pending reports should be handled first; you can delete a listing from any status.",
+    "complaintsTitle": "Complaints",
+    "complaintsSubtitle": "All reports (listings and other content), with status and an optional message to the reporter after resolution.",
+    "complaintFilterType": "Type",
+    "complaintTypeAll": "All",
+    "complaintTypeListing": "Listing",
+    "complaintTypeOther": "Other content",
+    "complaintsHint": "When you resolve a case, the reporter gets an in-app notification and an email (if Resend is configured).",
+    "resolutionNoteModerator": "Message to reporter (optional)",
+    "resolutionNotePlaceholder": "e.g. listing removed / no violation found…",
+    "resolutionNotePublic": "Moderation reply",
     "reportsEmpty": "No reports yet.",
     "reportFrom": "Reporter",
     "reportReason": "Reason",

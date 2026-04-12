@@ -13,7 +13,9 @@
     "admin": "Admin",
     "account": "Cont",
     "login": "Autentificare",
-    "favorites": "Salvate"
+    "favorites": "Salvate",
+    "notifications": "Notificări",
+    "reportContent": "Raportează"
   },
   "Chat": {
     "title": "Conversație",
@@ -238,7 +240,29 @@
     "title": "Cont",
     "subtitle": "Autentifică-te sau creează un cont.",
     "signedInAs": "Ești autentificat ca {email}.",
-    "linkFavorites": "Anunțuri salvate"
+    "linkFavorites": "Anunțuri salvate",
+    "linkNotifications": "Notificări",
+    "linkReportContent": "Raportează conținut"
+  },
+  "Notifications": {
+    "title": "Notificări",
+    "subtitle": "Mesaje de la moderatori despre reclamațiile tale.",
+    "empty": "Nu ai notificări.",
+    "markRead": "Marchează citit",
+    "markAllRead": "Marchează toate citite",
+    "backToAccount": "Înapoi la cont"
+  },
+  "ReportOther": {
+    "pageTitle": "Raportează conținut",
+    "pageSubtitle": "Semnalează o problemă care nu ține de un anunț anume (pagină, text, link sau alt situație).",
+    "subjectLabel": "Despre ce este vorba",
+    "subjectPlaceholder": "Ex.: descriere scurtă a problemei",
+    "urlLabel": "Link (opțional)",
+    "submit": "Trimite reclamația",
+    "sending": "Se trimite…",
+    "success": "Am înregistrat reclamația. Moderatorii o vor verifica.",
+    "errorValidation": "Verifică câmpurile (subiect minim 3 caractere, URL valid dacă îl completezi).",
+    "backToAccount": "Înapoi la cont"
   },
   "Publish": {
     "title": "Publică anunț",
@@ -255,6 +279,7 @@
     "navDashboard": "Rezumat",
     "navListings": "Anunțuri",
     "navReports": "Raportări",
+    "navComplaints": "Reclamații",
     "navUsers": "Utilizatori",
     "dashboardTitle": "Rezumat",
     "dashboardSubtitle": "Vezi dintr-o privire ce necesită atenție și intră rapid în fiecare zonă.",
@@ -291,6 +316,16 @@
     "filterReviewed": "Revizuite",
     "filterDismissed": "Respinse",
     "reportsSummaryHint": "Raportările în așteptare au prioritate; poți șterge anunțul din orice stare.",
+    "complaintsTitle": "Reclamații",
+    "complaintsSubtitle": "Toate raportările (anunțuri și alt conținut), cu stare și mesaj opțional pentru raportor după rezolvare.",
+    "complaintFilterType": "Tip",
+    "complaintTypeAll": "Toate",
+    "complaintTypeListing": "Anunț",
+    "complaintTypeOther": "Alt conținut",
+    "complaintsHint": "La rezolvare, raportorul primește notificare în cont și email (dacă e configurat Resend).",
+    "resolutionNoteModerator": "Mesaj pentru raportor (opțional)",
+    "resolutionNotePlaceholder": "Ex.: am eliminat anunțul / nu s-a confirmat încălcarea…",
+    "resolutionNotePublic": "Răspuns moderare",
     "reportsEmpty": "Nu există raportări.",
     "reportFrom": "Raportat de",
     "reportReason": "Motiv",

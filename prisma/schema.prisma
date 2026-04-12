@@ -29,8 +29,10 @@ model User {
   chatMessages  ChatMessage[]
   chatReadStates ChatReadState[]
   listingReports ListingReport[] @relation("ReportAuthor")
+  otherContentReports OtherContentReport[] @relation("OtherReportAuthor")
   favorites     ListingFavorite[]
   passwordResetTokens PasswordResetToken[]
+  notifications UserNotification[]
   createdAt     DateTime       @default(now())
 }
 
@@ -98,12 +100,47 @@ model ListingReport {
   reason     String
   details    String?
   status     ReportStatus @default(PENDING)
+  /** Mesaj pentru raportor: ce s-a decis / acțiune (opțional). */
+  resolutionNote String?
   createdAt  DateTime     @default(now())
   resolvedAt DateTime?
 
   @@unique([listingId, reporterId])
   @@index([status])
   @@index([createdAt])
+}
+
+/** Raport pentru conținut care nu e anunț (pagină, text, link extern etc.). */
+model OtherContentReport {
+  id             String       @id @default(cuid())
+  reporterId     String
+  reporter       User         @relation("OtherReportAuthor", fields: [reporterId], references: [id], onDelete: Cascade)
+  subject        String
+  contextUrl     String?
+  reason         String
+  details        String?
+  status         ReportStatus @default(PENDING)
+  resolutionNote String?
+  createdAt      DateTime     @default(now())
+  resolvedAt     DateTime?
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model UserNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String
+  refId     String
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }
 
 model ListingFavorite {

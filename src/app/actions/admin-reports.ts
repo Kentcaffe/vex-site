@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { isStaff } from "@/lib/auth-roles";
 import { localizedHref } from "@/lib/paths";
+import { notifyListingReportResolved } from "@/lib/report-notifications";
 import { prisma } from "@/lib/prisma";
 import type { ReportStatus } from "@prisma/client";
 import { routing } from "@/i18n/routing";
@@ -12,16 +13,23 @@ export type AdminReportResult =
   | { ok: true }
   | { ok: false; error: "unauthorized" | "forbidden" | "not_found" };
 
-async function revalidateAdminAndListing(listingId: string) {
+async function revalidateComplaintPaths(listingId?: string) {
   for (const locale of routing.locales) {
-    revalidatePath(localizedHref(locale, "/admin"));
+    revalidatePath(localizedHref(locale, "/admin/reclamatii"));
     revalidatePath(localizedHref(locale, "/admin/reports"));
-    revalidatePath(localizedHref(locale, `/anunturi/${listingId}`));
-    revalidatePath(localizedHref(locale, "/anunturi"));
+    revalidatePath(localizedHref(locale, "/cont/notificari"));
+    if (listingId) {
+      revalidatePath(localizedHref(locale, `/anunturi/${listingId}`));
+      revalidatePath(localizedHref(locale, "/anunturi"));
+    }
   }
 }
 
-export async function setReportStatus(reportId: string, status: ReportStatus): Promise<AdminReportResult> {
+export async function setReportStatus(
+  reportId: string,
+  status: ReportStatus,
+  resolutionNote?: string | null,
+): Promise<AdminReportResult> {
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, error: "unauthorized" };
@@ -30,23 +38,44 @@ export async function setReportStatus(reportId: string, status: ReportStatus): P
     return { ok: false, error: "forbidden" };
   }
 
-  const row = await prisma.listingReport.findUnique({
+  const prev = await prisma.listingReport.findUnique({
     where: { id: reportId },
-    select: { listingId: true },
+    include: {
+      reporter: { select: { id: true, email: true } },
+      listing: { select: { id: true, title: true } },
+    },
   });
-  if (!row) {
+  if (!prev) {
     return { ok: false, error: "not_found" };
   }
 
+  const note = resolutionNote?.trim() || null;
+
   await prisma.listingReport.update({
     where: { id: reportId },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- resolutionNote exists in schema; some IDE caches omit it from Prisma input types
     data: {
       status,
+      resolutionNote: note,
       resolvedAt: status === "PENDING" ? null : new Date(),
-    },
+    } as any,
   });
 
-  await revalidateAdminAndListing(row.listingId);
+  const shouldNotify =
+    prev.status === "PENDING" && (status === "REVIEWED" || status === "DISMISSED") && prev.reporter.email;
+
+  if (shouldNotify) {
+    await notifyListingReportResolved({
+      reporterId: prev.reporter.id,
+      reporterEmail: prev.reporter.email,
+      listingTitle: prev.listing.title,
+      status,
+      resolutionNote: note,
+      reportId: prev.id,
+    });
+  }
+
+  await revalidateComplaintPaths(prev.listing.id);
   return { ok: true };
 }
 
@@ -74,6 +103,7 @@ export async function deleteListingFromReport(reportId: string): Promise<AdminRe
     revalidatePath(localizedHref(locale, "/anunturi"));
     revalidatePath(localizedHref(locale, "/admin"));
     revalidatePath(localizedHref(locale, "/admin/listings"));
+    revalidatePath(localizedHref(locale, "/admin/reclamatii"));
     revalidatePath(localizedHref(locale, "/admin/reports"));
     revalidatePath(localizedHref(locale, `/anunturi/${row.listingId}`));
   }

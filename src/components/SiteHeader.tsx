@@ -3,17 +3,21 @@ import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { isStaff } from "@/lib/auth-roles";
 import { getActiveListingCount } from "@/lib/listing-stats";
+import { userNotification } from "@/lib/prisma-delegates";
 import { ChatInboxLink } from "@/components/chat/ChatInboxLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
 
 export async function SiteHeader() {
   const session = await auth();
-  const [t, tm, tf, listingCount] = await Promise.all([
+  const [t, tm, tf, listingCount, unreadNotifications] = await Promise.all([
     getTranslations("Nav"),
     getTranslations("Home.marketplace"),
     getTranslations("Footer"),
     getActiveListingCount(),
+    session?.user?.id
+      ? userNotification.count({ where: { userId: session.user.id, read: false } })
+      : Promise.resolve(0),
   ]);
 
   return (
@@ -50,10 +54,27 @@ export async function SiteHeader() {
               </Link>
               <ChatInboxLink />
               <Link
+                href="/cont/notificari"
+                className="relative text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                {t("notifications")}
+                {unreadNotifications > 0 ? (
+                  <span className="absolute -right-1.5 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-0.5 text-[9px] font-bold text-white">
+                    {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                  </span>
+                ) : null}
+              </Link>
+              <Link
                 href="/cont/favorite"
                 className="text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
               >
                 {t("favorites")}
+              </Link>
+              <Link
+                href="/cont/raporteaza"
+                className="hidden text-sm text-zinc-600 hover:text-zinc-900 md:inline dark:text-zinc-400 dark:hover:text-zinc-100"
+              >
+                {t("reportContent")}
               </Link>
             </>
           ) : null}

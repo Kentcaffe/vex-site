@@ -5,6 +5,7 @@ import { hash } from "bcryptjs";
 import { z } from "zod";
 import { localizedHref } from "@/lib/paths";
 import { isMailConfigured, sendPasswordResetEmail } from "@/lib/mail";
+import { passwordResetToken } from "@/lib/prisma-delegates";
 import { prisma } from "@/lib/prisma";
 
 export type RequestResetState =
@@ -53,13 +54,13 @@ export async function requestPasswordReset(
     return genericOk;
   }
 
-  await prisma.passwordResetToken.deleteMany({ where: { userId: user.id } });
+  await passwordResetToken.deleteMany({ where: { userId: user.id } });
 
   const rawToken = randomBytes(32).toString("hex");
   const tokenHash = hashToken(rawToken);
   const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 h
 
-  await prisma.passwordResetToken.create({
+  await passwordResetToken.create({
     data: {
       userId: user.id,
       tokenHash,
@@ -87,7 +88,7 @@ export async function requestPasswordReset(
 
   const sent = await sendPasswordResetEmail(user.email, subject, html);
   if (!sent.ok) {
-    await prisma.passwordResetToken.deleteMany({ where: { tokenHash } });
+    await passwordResetToken.deleteMany({ where: { tokenHash } });
     return { ok: false, error: "sendFailed" };
   }
 
@@ -120,7 +121,7 @@ export async function completePasswordReset(
   }
 
   const tokenHash = hashToken(token);
-  const row = await prisma.passwordResetToken.findUnique({
+  const row = await passwordResetToken.findUnique({
     where: { tokenHash },
     include: { user: true },
   });
@@ -129,7 +130,7 @@ export async function completePasswordReset(
     return { ok: false, error: "invalidToken" };
   }
   if (row.expiresAt.getTime() < Date.now()) {
-    await prisma.passwordResetToken.delete({ where: { id: row.id } });
+    await passwordResetToken.delete({ where: { id: row.id } });
     return { ok: false, error: "expired" };
   }
 
@@ -138,7 +139,7 @@ export async function completePasswordReset(
       where: { id: row.userId },
       data: { passwordHash: await hash(password, 12) },
     }),
-    prisma.passwordResetToken.deleteMany({ where: { userId: row.userId } }),
+    passwordResetToken.deleteMany({ where: { userId: row.userId } }),
   ]);
 
   return { ok: true };

@@ -1,4 +1,4 @@
-/** Returns true if password-reset emails can be sent (configure on Render). */
+/** Returns true if transactional emails can be sent (configure on Render). */
 export function isMailConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
 }
@@ -6,9 +6,9 @@ export function isMailConfigured(): boolean {
 type SendResult = { ok: true } | { ok: false; error: string };
 
 /**
- * Sends transactional email via Resend (HTTPS). Set RESEND_API_KEY + EMAIL_FROM in env.
+ * Sends email via Resend. Set RESEND_API_KEY + EMAIL_FROM in env.
  */
-export async function sendPasswordResetEmail(to: string, subject: string, html: string): Promise<SendResult> {
+export async function sendTransactionalEmail(to: string, subject: string, html: string): Promise<SendResult> {
   const key = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!key || !from) {
@@ -36,4 +36,8 @@ export async function sendPasswordResetEmail(to: string, subject: string, html: 
   }
 
   return { ok: true };
+}
+
+export async function sendPasswordResetEmail(to: string, subject: string, html: string): Promise<SendResult> {
+  return sendTransactionalEmail(to, subject, html);
 }
