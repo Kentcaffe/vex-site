@@ -1,8 +1,20 @@
 "use server";
 
 import { hash } from "bcryptjs";
+import { redirect } from "next/navigation";
 import { z } from "zod";
+import { signOut } from "@/auth";
+import { routing } from "@/i18n/routing";
+import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
+
+/** Folosește server action în loc de `signOut` din `next-auth/react` (evită erori CSRF / JSON pe producție). */
+export async function logout(formData: FormData) {
+  const raw = String(formData.get("locale") ?? routing.defaultLocale);
+  const locale = (routing.locales as readonly string[]).includes(raw) ? raw : routing.defaultLocale;
+  await signOut({ redirect: false });
+  redirect(localizedHref(locale, "/"));
+}
 
 export type RegisterState = { ok: true } | { ok: false; error: "validation" | "emailTaken" };
 
