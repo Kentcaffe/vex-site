@@ -115,7 +115,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     session({ session, token }) {
       if (session.user) {
-        session.user.id = (token.id as string) ?? token.sub ?? "";
+        // Never use `token.sub` as DB user id — it's the OAuth provider subject, not our User.id.
+        // Using it caused FK violations (P2003) on reports/notifications keyed by User.id.
+        const id = typeof token.id === "string" && token.id.length > 0 ? token.id : "";
+        session.user.id = id;
         session.user.role = (token.role as UserRole) ?? "USER";
       }
       return session;

@@ -30,6 +30,14 @@ export async function submitListingReport(
     return { ok: false, error: "unauthorized" };
   }
 
+  const reporter = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true },
+  });
+  if (!reporter) {
+    return { ok: false, error: "unauthorized" };
+  }
+
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
     select: { id: true, userId: true },
@@ -37,7 +45,7 @@ export async function submitListingReport(
   if (!listing) {
     return { ok: false, error: "not_found" };
   }
-  if (listing.userId === session.user.id) {
+  if (listing.userId === reporter.id) {
     return { ok: false, error: "own_listing" };
   }
 
@@ -54,7 +62,7 @@ export async function submitListingReport(
     await prisma.listingReport.create({
       data: {
         listingId,
-        reporterId: session.user.id,
+        reporterId: reporter.id,
         reason,
         details: trimmed || null,
       },
@@ -80,6 +88,14 @@ export async function submitOtherContentReport(
 ): Promise<SubmitOtherReportResult> {
   const session = await auth();
   if (!session?.user?.id) {
+    return { ok: false, error: "unauthorized" };
+  }
+
+  const reporter = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true },
+  });
+  if (!reporter) {
     return { ok: false, error: "unauthorized" };
   }
 
@@ -115,7 +131,7 @@ export async function submitOtherContentReport(
 
   await otherContentReport.create({
     data: {
-      reporterId: session.user.id,
+      reporterId: reporter.id,
       subject: parsed.data.subject,
       contextUrl,
       reason,
