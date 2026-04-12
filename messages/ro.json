@@ -1,0 +1,232 @@
+{
+  "NotFound": {
+    "title": "Pagina nu există",
+    "body": "Resursa pe care o cauți nu a fost găsită.",
+    "home": "Înapoi acasă"
+  },
+  "Nav": {
+    "home": "Acasă",
+    "listings": "Anunțuri",
+    "publish": "Publică",
+    "admin": "Admin",
+    "account": "Cont",
+    "login": "Autentificare"
+  },
+  "Home": {
+    "title": "Marketplace local pentru anunțuri și vânzări",
+    "subtitle": "Autoturisme, imobiliare, electronice și servicii — totul într-un singur loc. Publică gratuit sau găsește rapid ce cauți.",
+    "browse": "Vezi anunțuri",
+    "publish": "Publică anunț",
+    "badge": "Anunțuri & vânzări",
+    "stat1Label": "Catalog",
+    "stat1Value": "Actualizat continuu",
+    "stat2Label": "Acoperire",
+    "stat2Value": "Local & regional",
+    "stat3Label": "Pentru vânzători",
+    "stat3Value": "Publicare gratuită",
+    "exploreTitle": "Explorează categoriile",
+    "exploreSubtitle": "Alege domeniul care te interesează — filtrele se aplică automat pe listă.",
+    "cat_vehicule": "Vehicule",
+    "cat_imobiliare": "Imobiliare",
+    "cat_electronice": "Electronice",
+    "cat_moda": "Modă",
+    "cat_servicii": "Servicii",
+    "howTitle": "Cum funcționează",
+    "how1Title": "Caută sau publică",
+    "how1Body": "Răsfoiește anunțurile după categorie și oraș sau creează un cont și publică în câteva minute.",
+    "how2Title": "Contact direct",
+    "how2Body": "Vorbești cu vânzătorul sau cumpărătorul — telefon sau detaliile din anunț, fără comisioane obligatorii platformei.",
+    "how3Title": "Moderare și claritate",
+    "how3Body": "Anunțurile respectă regulile comunității; poți raporta conținut abuziv (funcție în evoluție în panoul admin).",
+    "trustTitle": "De ce merită să folosești platforma",
+    "trust1Title": "Pentru cumpărători",
+    "trust1Body": "Filtrare clară, prețuri afișate în RON și detalii structurate pe categorii (vehicule, imobiliare, electronice).",
+    "trust2Title": "Pentru vânzători",
+    "trust2Body": "Publicare ghidată, imagini multiple și vizibilitate în listă — ideal pentru vânzări locale rapide.",
+    "trust3Title": "Performanță",
+    "trust3Body": "Interfață rapidă, optimizată pentru desktop și mobil, cu suport pentru mai multe limbi.",
+    "ctaTitle": "Gata să începi?",
+    "ctaSubtitle": "Intră în listă sau publică primul anunț — durează doar câteva minute."
+  },
+  "Footer": {
+    "siteName": "VEX",
+    "tagline": "Marketplace pentru anunțuri și vânzări locale. Conectăm cumpărători și vânzători fără pași inutili.",
+    "explore": "Explorează",
+    "legal": "Legal",
+    "terms": "Termeni și condiții",
+    "privacy": "Confidențialitate",
+    "linkListings": "Toate anunțurile",
+    "linkPublish": "Publică anunț",
+    "linkAccount": "Cont",
+    "rights": "© {year} VEX. Toate drepturile rezervate.",
+    "disclaimer": "Platforma facilitează afișarea anunțurilor; tranzacțiile au loc între utilizatori. Verifică mereu produsul sau serviciul înainte de plată."
+  },
+  "Legal": {
+    "terms": {
+      "back": "Înapoi",
+      "title": "Termeni și condiții",
+      "updated": "Ultima actualizare: aprilie 2026",
+      "p1": "Prin accesarea și utilizarea acestui site accepți acești termeni. Dacă nu ești de acord, te rugăm să nu folosești serviciul.",
+      "p2": "Ești responsabil pentru conținutul anunțurilor pe care le publici: veridicitatea informațiilor, drepturile asupra imaginilor și respectarea legii. Ne rezervăm dreptul de a șterge sau modera anunțuri care încalcă regulile sau legea.",
+      "p3": "Site-ul este oferit ca intermediar tehnic între utilizatori. Nu garantăm disponibilitatea continuă și nu suntem parte în tranzacțiile dintre utilizatori. Orice litigiu privind bunurile sau serviciile se soluționează între părți.",
+      "p4": "Putem actualiza acești termeni; versiunea publicată pe site face drept referință. Continuarea utilizării după modificări înseamnă acceptarea noilor termeni.",
+      "p5": "Pentru utilizatorii din UE/SEE se aplică prevederile relevante privind protecția consumatorilor și protecția datelor, în măsura în care sunt aplicabile.",
+      "p6": "Pentru întrebări despre acești termeni, folosește datele de contact publicate de operatorul site-ului (actualizează-le în producție)."
+    },
+    "privacy": {
+      "back": "Înapoi",
+      "title": "Politica de confidențialitate",
+      "updated": "Ultima actualizare: aprilie 2026",
+      "p1": "Prelucrăm date cu caracter personal (ex.: adresă de email la crearea contului) pentru a furniza autentificare, publicare de anunțuri și administrare tehnică a platformei.",
+      "p2": "Temeiul prelucrării poate fi executarea unui contract (cont), interesul legitim (securitate, prevenire abuz) sau consimțământul acolo unde este necesar.",
+      "p3": "Păstrăm datele pe perioada necesară îndeplinirii scopurilor sau conform obligațiilor legale. Poți solicita acces, rectificare, ștergere sau restricționare în limitele legii.",
+      "p4": "Putem folosi furnizori tehnici (găzduire, email tranzacțional) care prelucrează date în numele nostru, cu măsuri contractuale adecvate.",
+      "p5": "Cookie-uri: folosim cookie-uri esențiale pentru sesiune și funcționare. Dacă adaugi analităță opțională, afișează un banner și documentează alegerile utilizatorului.",
+      "p6": "Pentru exercitarea drepturilor GDPR sau întrebări despre date, contactează operatorul site-ului la adresa publicată (înlocuiește cu email real în producție)."
+    }
+  },
+  "Listings": {
+    "title": "Anunțuri",
+    "empty": "Nu există anunțuri care să corespundă filtrelor.",
+    "categories": "Categorii",
+    "allCategories": "Toate categoriile",
+    "filters": {
+      "title": "Filtre",
+      "city": "Oraș",
+      "min": "Preț min (RON)",
+      "max": "Preț max (RON)",
+      "apply": "Aplică",
+      "reset": "Resetează"
+    }
+  },
+  "ListingDetail": {
+    "specsTitle": "Specificații",
+    "factsTitle": "Detalii",
+    "city": "Locație",
+    "condition": "Stare",
+    "phone": "Telefon",
+    "conditionNew": "Nou",
+    "conditionUsed": "Folosit",
+    "conditionNA": "N/A",
+    "negotiable": "Preț negociabil",
+    "copyLink": "Copiază link",
+    "copied": "Copiat!",
+    "moderation": "Moderare",
+    "spec": {
+      "brand": "Marcă",
+      "model": "Model",
+      "year": "An",
+      "mileageKm": "Kilometraj",
+      "rooms": "Camere",
+      "areaSqm": "Suprafață (m²)"
+    },
+    "specExtra": {
+      "fuel": "Combustibil",
+      "transmission": "Transmisie",
+      "color": "Culoare",
+      "floor": "Etaj",
+      "storage_gb": "Stocare (GB)",
+      "ram_gb": "RAM (GB)",
+      "experience_years": "Experiență (ani)",
+      "service_radius_km": "Rază servicii (km)"
+    }
+  },
+  "Auth": {
+    "loginTitle": "Autentificare",
+    "registerTitle": "Înregistrare",
+    "email": "Email",
+    "password": "Parolă",
+    "passwordMin": "Parolă (min. 8 caractere)",
+    "nameOptional": "Nume (opțional)",
+    "login": "Intră în cont",
+    "register": "Creează cont",
+    "logout": "Ieșire",
+    "emailTaken": "Acest email este deja folosit.",
+    "validationError": "Date invalide.",
+    "registerSuccess": "Cont creat. Te poți autentifica."
+  },
+  "Account": {
+    "title": "Cont",
+    "subtitle": "Autentifică-te sau creează un cont.",
+    "signedInAs": "Ești autentificat ca {email}."
+  },
+  "Publish": {
+    "title": "Publică anunț",
+    "subtitle": "Completează câmpurile de mai jos.",
+    "noCategories": "Nu există categorii configurate."
+  },
+  "Admin": {
+    "title": "Panou admin",
+    "subtitle": "Lista anunțurilor (modificare rapidă).",
+    "empty": "Nu există anunțuri.",
+    "delete": "Șterge",
+    "deleting": "Se șterge…",
+    "confirmDelete": "Sigur ștergi acest anunț?",
+    "forbidden": "Nu ai permisiune.",
+    "notFound": "Anunțul nu mai există.",
+    "deleteError": "Nu s-a putut șterge."
+  },
+  "ListingForm": {
+    "category": "Categorie",
+    "title": "Titlu",
+    "description": "Descriere",
+    "price": "Preț (RON)",
+    "negotiable": "Preț negociabil",
+    "city": "Oraș",
+    "district": "Cartier (opțional)",
+    "phone": "Telefon (opțional)",
+    "condition": "Stare",
+    "conditionNew": "Nou",
+    "conditionUsed": "Folosit",
+    "conditionNA": "N/A",
+    "brand": "Marcă",
+    "model": "Model",
+    "year": "An fabricație",
+    "mileage": "Kilometraj",
+    "rooms": "Camere",
+    "areaSqm": "Suprafață (m²)",
+    "images": "Imagini",
+    "imagesHint": "Minim 1, maxim 8 URL-uri (una pe linie). Poți încărca fișiere locale.",
+    "upload": "Încarcă imagini",
+    "imageCount": "{count} / {max} imagini",
+    "uploadTooMany": "Prea multe imagini (max. 8).",
+    "submit": "Publică anunțul",
+    "submitting": "Se publică…",
+    "success": "Anunț publicat cu succes.",
+    "serverUnauthorized": "Trebuie să fii autentificat.",
+    "serverValidation": "Verifică câmpurile și încearcă din nou.",
+    "serverCategory": "Categorie invalidă (alege o subcategorie).",
+    "serverSession": "Sesiune invalidă.",
+    "detailOptional": "— opțional —",
+    "fuel": {
+      "petrol": "Benzină",
+      "diesel": "Motorină",
+      "electric": "Electric",
+      "hybrid": "Hibrid",
+      "lpg": "GPL"
+    },
+    "transmission": {
+      "manual": "Manuală",
+      "automatic": "Automată"
+    },
+    "detail": {
+      "fuel": { "label": "Combustibil" },
+      "transmission": { "label": "Transmisie" },
+      "floor": { "label": "Etaj" },
+      "storage_gb": { "label": "Stocare (GB)" },
+      "ram_gb": { "label": "RAM (GB)" },
+      "experience_years": { "label": "Experiență (ani)" },
+      "service_radius_km": { "label": "Rază servicii (km)" }
+    },
+    "validation": {
+      "errCategory": "Alege o categorie.",
+      "errTitle": "Titlul trebuie să aibă 3–160 caractere.",
+      "errDescription": "Descrierea este prea lungă.",
+      "errPrice": "Preț invalid.",
+      "errCity": "Oraș invalid.",
+      "errCondition": "Stare invalidă.",
+      "errImages": "URL-uri de imagini invalide sau număr incorect (1–8).",
+      "errImagesRequired": "Adaugă cel puțin o imagine (URL valid pe linie)."
+    }
+  }
+}
