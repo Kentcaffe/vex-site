@@ -30,7 +30,19 @@ model User {
   chatReadStates ChatReadState[]
   listingReports ListingReport[] @relation("ReportAuthor")
   favorites     ListingFavorite[]
+  passwordResetTokens PasswordResetToken[]
   createdAt     DateTime       @default(now())
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model Category {

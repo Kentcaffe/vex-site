@@ -16,6 +16,21 @@ async function placeholderPasswordHash(): Promise<string> {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: process.env.AUTH_SECRET,
+  /** Do not log noisy "failed login" as server errors (UI shows a friendly message instead). */
+  logger: {
+    error(error) {
+      const text =
+        typeof error === "string"
+          ? error
+          : error instanceof Error
+            ? `${error.name} ${error.message}`
+            : String(error);
+      if (/CredentialsSignin/i.test(text)) {
+        return;
+      }
+      console.error(error);
+    },
+  },
   providers: [
     Credentials({
       id: "credentials",
@@ -34,7 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
         const user = await prisma.user.findUnique({
-          where: { email: parsed.data.email },
+          where: { email: parsed.data.email.trim().toLowerCase() },
         });
         if (!user?.passwordHash) {
           return null;
@@ -72,7 +87,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, account }) {
       if (user && account) {
         if (account.provider === "google" || account.provider === "facebook") {
-          const email = user.email;
+          const email = user.email?.trim().toLowerCase();
           if (!email) {
             return token;
           }

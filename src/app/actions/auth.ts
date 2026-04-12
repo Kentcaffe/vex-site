@@ -26,8 +26,9 @@ export async function registerUser(
     return { ok: false, error: "validation" };
   }
 
+  const email = parsed.data.email.trim().toLowerCase();
   const existing = await prisma.user.findUnique({
-    where: { email: parsed.data.email },
+    where: { email },
   });
   if (existing) {
     return { ok: false, error: "emailTaken" };
@@ -35,7 +36,7 @@ export async function registerUser(
 
   await prisma.user.create({
     data: {
-      email: parsed.data.email,
+      email,
       passwordHash: await hash(parsed.data.password, 12),
       name: parsed.data.name?.trim() || null,
     },

@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useLocale, useTranslations } from "next-intl";
 import { registerUser, type RegisterState } from "@/app/actions/auth";
+import { Link, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
 export type OauthAvailability = {
@@ -18,16 +19,30 @@ type Props = {
 export function AuthForms({ oauth }: Props) {
   const t = useTranslations("Auth");
   const locale = useLocale();
+  const router = useRouter();
   const [regState, regAction, regPending] = useActionState(registerUser, undefined as RegisterState | undefined);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [loginPending, setLoginPending] = useState(false);
 
   const callbackUrl = locale === routing.defaultLocale ? "/anunturi" : `/${locale}/anunturi`;
 
   async function onLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLoginError(null);
+    setLoginPending(true);
     const fd = new FormData(e.currentTarget);
-    const email = String(fd.get("email") ?? "");
+    const email = String(fd.get("email") ?? "").trim().toLowerCase();
     const password = String(fd.get("password") ?? "");
-    await signIn("credentials", { email, password, redirect: true, callbackUrl });
+    const res = await signIn("credentials", { email, password, redirect: false, callbackUrl });
+    setLoginPending(false);
+    if (res?.error) {
+      setLoginError(t("loginInvalid"));
+      return;
+    }
+    if (res?.ok) {
+      router.push(callbackUrl);
+      router.refresh();
+    }
   }
 
   const showGoogle = oauth?.google;
@@ -102,12 +117,23 @@ export function AuthForms({ oauth }: Props) {
               autoComplete="current-password"
               className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
             />
+            <p className="mt-2 text-right">
+              <Link href="/cont/forgot-password" className="text-xs font-medium text-emerald-700 hover:underline dark:text-emerald-400">
+                {t("forgotPassword")}
+              </Link>
+            </p>
           </div>
+          {loginError ? (
+            <p className="text-sm text-red-600 dark:text-red-400" role="alert">
+              {loginError}
+            </p>
+          ) : null}
           <button
             type="submit"
-            className="w-full rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700"
+            disabled={loginPending}
+            className="w-full rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
           >
-            {t("loginEmail")}
+            {loginPending ? t("loginPending") : t("loginEmail")}
           </button>
         </form>
         {!showOAuth ? <p className="mt-3 text-xs text-zinc-500 dark:text-zinc-400">{t("oauthConfigureHint")}</p> : null}
