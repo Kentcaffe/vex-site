@@ -6,11 +6,29 @@
   },
   "Nav": {
     "home": "Главная",
+    "categories": "Категории",
     "listings": "Объявления",
     "publish": "Разместить",
+    "messages": "Сообщения",
     "admin": "Админ",
     "account": "Аккаунт",
-    "login": "Вход"
+    "login": "Вход",
+    "favorites": "Избранное"
+  },
+  "Chat": {
+    "title": "Переписка",
+    "inboxTitle": "Сообщения",
+    "inboxSubtitle": "Ваши диалоги с покупателями и продавцами.",
+    "inboxEmpty": "Пока нет сообщений. Напишите продавцу со страницы объявления.",
+    "contactSeller": "Написать продавцу",
+    "contactLogin": "Войдите, чтобы написать",
+    "with": "С {name}",
+    "live": "Онлайн",
+    "connecting": "Подключение…",
+    "typing": "печатает…",
+    "seen": "Прочитано",
+    "placeholder": "Введите сообщение…",
+    "send": "Отправить"
   },
   "Home": {
     "title": "Локальная площадка объявлений и продаж",
@@ -40,13 +58,25 @@
     "how3Body": "Объявления соответствуют правилам сообщества; оскорбительный контент может быть удалён (админ-инструменты развиваются).",
     "trustTitle": "Почему эта площадка",
     "trust1Title": "Покупателям",
-    "trust1Body": "Понятные фильтры, цены в местной валюте и структурированные поля по категориям.",
+    "trust1Body": "Понятные фильтры, цены в MDL или EUR (настраивается) и структурированные поля по категориям.",
     "trust2Title": "Продавцам",
     "trust2Body": "Пошаговая публикация, несколько фото и видимость в ленте — удобно для быстрых локальных сделок.",
     "trust3Title": "Скорость",
     "trust3Body": "Быстрый интерфейс на ПК и мобильных, поддержка нескольких языков.",
     "ctaTitle": "Готовы начать?",
-    "ctaSubtitle": "Откройте список или разместите первое объявление — это займёт всего несколько минут."
+    "ctaSubtitle": "Откройте список или разместите первое объявление — это займёт всего несколько минут.",
+    "marketplace": {
+      "banner": "Добро пожаловать на VEX — локальные объявления, быстро и просто.",
+      "regionTag": "Молдова",
+      "activeListings": "{count} активных объявлений",
+      "gridTitle": "Недавние объявления",
+      "viewAll": "Все объявления",
+      "categoriesTitle": "Категории",
+      "empty": "Пока нет объявлений. Разместите первым!",
+      "promo2Title": "Бесплатное размещение",
+      "promo2Body": "Создайте аккаунт и добавьте объявление за несколько минут — с фото и подробностями.",
+      "promo2Cta": "Разместить объявление"
+    }
   },
   "Footer": {
     "siteName": "VEX",
@@ -90,14 +120,24 @@
     "empty": "Нет объявлений по выбранным фильтрам.",
     "categories": "Категории",
     "allCategories": "Все категории",
+    "browseAllCategories": "Полное дерево категорий",
+    "openCategoryMap": "Карта категорий",
     "filters": {
       "title": "Фильтры",
+      "search": "Поиск по объявлениям",
       "city": "Город",
       "min": "Цена от (RON)",
       "max": "Цена до (RON)",
+      "minWithCurrency": "Цена от ({currency})",
+      "maxWithCurrency": "Цена до ({currency})",
       "apply": "Применить",
       "reset": "Сбросить"
     }
+  },
+  "CategoriesPage": {
+    "searchPlaceholder": "Поиск объявлений по ключевым словам…",
+    "search": "Найти",
+    "sidebarTitle": "Категории"
   },
   "ListingDetail": {
     "specsTitle": "Характеристики",
@@ -112,6 +152,10 @@
     "copyLink": "Копировать ссылку",
     "copied": "Скопировано!",
     "moderation": "Модерация",
+    "favoritesHint": "Сохраните объявление, чтобы быстро найти его позже.",
+    "favoritesLogin": "Нужен аккаунт, чтобы сохранять объявления. Войдите и вернитесь на эту страницу.",
+    "favoritesCtaLogin": "Войти, чтобы сохранить",
+    "reportHint": "Что-то не так? Сообщите модераторам.",
     "spec": {
       "brand": "Марка",
       "model": "Модель",
@@ -128,7 +172,26 @@
       "storage_gb": "Память (ГБ)",
       "ram_gb": "ОЗУ (ГБ)",
       "experience_years": "Опыт (лет)",
-      "service_radius_km": "Радиус (км)"
+      "service_radius_km": "Радиус (км)",
+      "body_type": "Кузов",
+      "drivetrain": "Привод",
+      "engine_cc": "Объём (см³)",
+      "power_hp": "Мощность (л.с.)",
+      "doors": "Двери",
+      "furnished": "Меблировка",
+      "building_type": "Тип здания",
+      "land_area_sqm": "Площадь участка (м²)",
+      "battery_health": "Состояние батареи (%)",
+      "screen_inch": "Диагональ (дюйм)",
+      "processor": "Процессор",
+      "part_number": "Код / OEM",
+      "compatibility": "Совместимость",
+      "employment_type": "Тип занятости",
+      "salary_from": "Зарплата от",
+      "salary_to": "Зарплата до",
+      "size_label": "Размер",
+      "age_months": "Возраст (мес.)",
+      "vaccinated": "Прививки"
     }
   },
   "Auth": {
@@ -139,6 +202,11 @@
     "passwordMin": "Пароль (мин. 8 символов)",
     "nameOptional": "Имя (необязательно)",
     "login": "Войти",
+    "loginEmail": "Войти по email",
+    "continueGoogle": "Продолжить с Google",
+    "continueFacebook": "Продолжить с Facebook",
+    "oauthDivider": "или email и пароль",
+    "oauthConfigureHint": "Google / Facebook появятся после добавления ключей в .env — см. .env.example.",
     "register": "Создать аккаунт",
     "logout": "Выход",
     "emailTaken": "Этот email уже занят.",
@@ -148,7 +216,8 @@
   "Account": {
     "title": "Аккаунт",
     "subtitle": "Войдите или создайте аккаунт.",
-    "signedInAs": "Вы вошли как {email}."
+    "signedInAs": "Вы вошли как {email}.",
+    "linkFavorites": "Избранные объявления"
   },
   "Publish": {
     "title": "Разместить объявление",
@@ -156,8 +225,40 @@
     "noCategories": "Категории не настроены."
   },
   "Admin": {
+    "shellTitle": "Администрирование",
     "title": "Админ-панель",
     "subtitle": "Список объявлений (быстрая модерация).",
+    "navDashboard": "Обзор",
+    "navListings": "Объявления",
+    "navReports": "Жалобы",
+    "dashboardTitle": "Обзор",
+    "dashboardSubtitle": "Ключевые показатели и быстрый доступ.",
+    "statListings": "Опубликованные объявления",
+    "statUsers": "Зарегистрированные пользователи",
+    "statPendingReports": "Жалобы в ожидании",
+    "statResolvedReports": "Рассмотренные жалобы",
+    "openSection": "Открыть",
+    "listingsTitle": "Все объявления",
+    "listingsSubtitle": "Быстрая модерация — открыть или удалить.",
+    "reportsTitle": "Жалобы на объявления",
+    "reportsSubtitle": "Проверьте жалобы и примите меры.",
+    "reportsEmpty": "Жалоб пока нет.",
+    "reportFrom": "Отправитель",
+    "reportReason": "Причина",
+    "reportDetails": "Детали",
+    "markReviewed": "Отметить рассмотренным",
+    "dismiss": "Отклонить",
+    "deleteListing": "Удалить объявление",
+    "confirmDeleteListingFromReport": "Удалить это объявление с сайта? Действие необратимо.",
+    "reportActionError": "Не удалось выполнить действие.",
+    "status_PENDING": "Ожидает",
+    "status_REVIEWED": "Рассмотрено",
+    "status_DISMISSED": "Отклонено",
+    "reason_spam": "Спам / вводит в заблуждение",
+    "reason_fraud": "Мошенничество",
+    "reason_inappropriate": "Неприемлемый контент",
+    "reason_duplicate": "Дубликат",
+    "reason_other": "Другое",
     "empty": "Объявлений пока нет.",
     "delete": "Удалить",
     "deleting": "Удаление…",
@@ -166,11 +267,49 @@
     "notFound": "Объявление не найдено.",
     "deleteError": "Не удалось удалить."
   },
+  "Report": {
+    "cta": "Пожаловаться на объявление",
+    "reasonLabel": "Причина",
+    "detailsLabel": "Детали (необязательно)",
+    "detailsPlaceholder": "Контекст для модераторов…",
+    "send": "Отправить жалобу",
+    "sending": "Отправка…",
+    "cancel": "Отмена",
+    "success": "Спасибо — модераторы проверят.",
+    "errorUnauthorized": "Войдите, чтобы пожаловаться.",
+    "errorOwn": "Нельзя жаловаться на своё объявление.",
+    "errorDuplicate": "Вы уже отправляли жалобу.",
+    "errorGeneric": "Не удалось отправить жалобу.",
+    "reasonSpam": "Спам / вводит в заблуждение",
+    "reasonFraud": "Мошенничество",
+    "reasonInappropriate": "Неприемлемый контент",
+    "reasonDuplicate": "Дубликат",
+    "reasonOther": "Другое"
+  },
+  "Favorites": {
+    "title": "Избранное",
+    "subtitle": "Сохранённые объявления.",
+    "empty": "Пока ничего нет. Откройте объявление и нажмите «Сохранить».",
+    "save": "Сохранить",
+    "saved": "Сохранено",
+    "toggleError": "Не удалось обновить. Если ошибка повторяется, проверьте базу на сервере (prisma db push).",
+    "loginRequired": "Войдите, чтобы сохранять объявления."
+  },
   "ListingForm": {
     "category": "Категория",
+    "formSectionCategory": "Категория объявления",
+    "formSectionListing": "Текст и цена",
+    "formSectionSpecs": "Детали по категории",
+    "formSectionMedia": "Фото",
+    "categorySelectedLabel": "Категория",
+    "categoryBreadcrumbRoot": "Все категории",
+    "categoryBack": "Назад",
+    "categorySearchPlaceholder": "Фильтр по названию…",
+    "categoryEmptyFilter": "Ничего не найдено — смените запрос или уровень.",
     "title": "Заголовок",
     "description": "Описание",
-    "price": "Цена (RON)",
+    "price": "Цена",
+    "priceWithCurrency": "Цена ({currency})",
     "negotiable": "Торг",
     "city": "Город",
     "district": "Район (необязательно)",
@@ -209,6 +348,53 @@
       "manual": "Механика",
       "automatic": "Автомат"
     },
+    "body_type": {
+      "sedan": "Седан",
+      "hatchback": "Хэтчбек",
+      "suv": "Внедорожник",
+      "mpv": "Минивэн",
+      "coupe": "Купе",
+      "convertible": "Кабриолет",
+      "wagon": "Универсал",
+      "pickup": "Пикап",
+      "van": "Фургон",
+      "other": "Другое"
+    },
+    "drivetrain": {
+      "fwd": "Передний",
+      "rwd": "Задний",
+      "awd": "Полный (AWD)",
+      "4wd": "4×4"
+    },
+    "doors": {
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5"
+    },
+    "furnished": {
+      "yes": "С мебелью",
+      "no": "Без мебели",
+      "partial": "Частично"
+    },
+    "building_type": {
+      "block": "Многоквартирный дом",
+      "house": "Частный дом",
+      "new_build": "Новостройка",
+      "other": "Другое"
+    },
+    "employment_type": {
+      "full_time": "Полная занятость",
+      "part_time": "Частичная",
+      "contract": "Контракт",
+      "remote": "Удалённо",
+      "internship": "Стажировка"
+    },
+    "vaccinated": {
+      "yes": "Да",
+      "no": "Нет",
+      "unknown": "Неизвестно"
+    },
     "detail": {
       "fuel": { "label": "Топливо" },
       "transmission": { "label": "Коробка" },
@@ -216,7 +402,27 @@
       "storage_gb": { "label": "Память (ГБ)" },
       "ram_gb": { "label": "ОЗУ (ГБ)" },
       "experience_years": { "label": "Опыт (лет)" },
-      "service_radius_km": { "label": "Радиус (км)" }
+      "service_radius_km": { "label": "Радиус (км)" },
+      "color": { "label": "Цвет" },
+      "body_type": { "label": "Кузов" },
+      "drivetrain": { "label": "Привод" },
+      "engine_cc": { "label": "Объём (см³)" },
+      "power_hp": { "label": "Мощность (л.с.)" },
+      "doors": { "label": "Двери" },
+      "furnished": { "label": "Меблировка" },
+      "building_type": { "label": "Тип здания" },
+      "land_area_sqm": { "label": "Площадь участка (м²)" },
+      "battery_health": { "label": "Состояние батареи (%)" },
+      "screen_inch": { "label": "Диагональ (дюйм)" },
+      "processor": { "label": "Процессор" },
+      "part_number": { "label": "Код / OEM" },
+      "compatibility": { "label": "Совместимость (модель / годы)" },
+      "employment_type": { "label": "Тип занятости" },
+      "salary_from": { "label": "Зарплата от (в валюте объявления)" },
+      "salary_to": { "label": "Зарплата до" },
+      "size_label": { "label": "Размер (напр. M, 42)" },
+      "age_months": { "label": "Возраст (мес.)" },
+      "vaccinated": { "label": "Прививки" }
     },
     "validation": {
       "errCategory": "Выберите категорию.",

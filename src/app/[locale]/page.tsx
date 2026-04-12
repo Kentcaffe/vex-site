@@ -9,5 +9,5 @@ export default async function HomePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <HomeLanding />;
+  return <HomeLanding locale={locale} />;
 }

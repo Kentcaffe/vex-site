@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ListingForm } from "@/components/ListingForm";
-import { getLeafCategoryOptions } from "@/lib/category-queries";
+import { getCategoryTreeForPicker } from "@/lib/category-queries";
 import { localizedHref } from "@/lib/paths";
 
 type Props = {
@@ -18,9 +18,9 @@ export default async function PublicaPage({ params }: Props) {
   }
 
   const t = await getTranslations("Publish");
-  const categoryOptions = await getLeafCategoryOptions(locale);
+  const categoryTree = await getCategoryTreeForPicker(locale);
 
-  if (categoryOptions.length === 0) {
+  if (categoryTree.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-10">
         <p className="text-zinc-600 dark:text-zinc-400">{t("noCategories")}</p>
@@ -33,7 +33,7 @@ export default async function PublicaPage({ params }: Props) {
       <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">{t("subtitle")}</p>
       <div className="mt-8">
-        <ListingForm locale={locale} categoryOptions={categoryOptions} />
+        <ListingForm locale={locale} categoryTree={categoryTree} />
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { cache } from "react";
+import type { CategoryTreeNode } from "@/lib/category-tree";
 import { prisma } from "@/lib/prisma";
 
 export type CategoryRow = {
@@ -26,6 +27,14 @@ const loadAllCategoriesFromDb = unstable_cache(
 
 /** Categories change rarely; cached across requests + deduped within a request. */
 export const getAllCategories = cache(async (): Promise<CategoryRow[]> => loadAllCategoriesFromDb());
+
+/** Top-level categories for sidebar (e.g. homepage). */
+export async function getRootCategories(): Promise<CategoryRow[]> {
+  const all = await getAllCategories();
+  return all
+    .filter((c) => c.parentId === null)
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.slug.localeCompare(b.slug));
+}
 
 export function categoryPathLabels(all: CategoryRow[], categoryId: string, locale: string): string {
   const byId = new Map(all.map((c) => [c.id, c]));
@@ -96,4 +105,34 @@ export async function getLeafCategoryOptions(locale: string): Promise<{ id: stri
     slug: c.slug,
     path: categoryPathLabels(all, c.id, locale),
   }));
+}
+
+function categoryLabelFromRow(c: CategoryRow, locale: string): string {
+  try {
+    const L = JSON.parse(c.labels) as LabelJson;
+    const loc = locale as keyof LabelJson;
+    return L[loc] ?? L.ro ?? c.slug;
+  } catch {
+    return c.slug;
+  }
+}
+
+/** Full category tree for drill-down UI (roots → … → leaves). */
+export async function getCategoryTreeForPicker(locale: string): Promise<CategoryTreeNode[]> {
+  const all = await getAllCategories();
+  function build(parentId: string | null): CategoryTreeNode[] {
+    const kids = all
+      .filter((c) => c.parentId === parentId)
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.slug.localeCompare(b.slug));
+    return kids.map((c) => {
+      const sub = build(c.id);
+      return {
+        id: c.id,
+        slug: c.slug,
+        label: categoryLabelFromRow(c, locale),
+        children: sub.length > 0 ? sub : null,
+      };
+    });
+  }
+  return build(null);
 }

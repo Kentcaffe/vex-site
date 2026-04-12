@@ -6,11 +6,29 @@
   },
   "Nav": {
     "home": "Acasă",
+    "categories": "Categorii",
     "listings": "Anunțuri",
     "publish": "Publică",
+    "messages": "Mesaje",
     "admin": "Admin",
     "account": "Cont",
-    "login": "Autentificare"
+    "login": "Autentificare",
+    "favorites": "Salvate"
+  },
+  "Chat": {
+    "title": "Conversație",
+    "inboxTitle": "Mesaje",
+    "inboxSubtitle": "Conversațiile tale cu cumpărători și vânzători.",
+    "inboxEmpty": "Nu ai încă mesaje. Contactează un vânzător de pe pagina unui anunț.",
+    "contactSeller": "Contactează vânzătorul",
+    "contactLogin": "Autentifică-te pentru a scrie",
+    "with": "Cu {name}",
+    "live": "Conexiune activă",
+    "connecting": "Se conectează…",
+    "typing": "scrie…",
+    "seen": "Văzut",
+    "placeholder": "Scrie un mesaj…",
+    "send": "Trimite"
   },
   "Home": {
     "title": "Marketplace local pentru anunțuri și vânzări",
@@ -40,13 +58,25 @@
     "how3Body": "Anunțurile respectă regulile comunității; poți raporta conținut abuziv (funcție în evoluție în panoul admin).",
     "trustTitle": "De ce merită să folosești platforma",
     "trust1Title": "Pentru cumpărători",
-    "trust1Body": "Filtrare clară, prețuri afișate în RON și detalii structurate pe categorii (vehicule, imobiliare, electronice).",
+    "trust1Body": "Filtrare clară, prețuri în MDL sau EUR (configurabil) și detalii structurate pe categorii.",
     "trust2Title": "Pentru vânzători",
     "trust2Body": "Publicare ghidată, imagini multiple și vizibilitate în listă — ideal pentru vânzări locale rapide.",
     "trust3Title": "Performanță",
     "trust3Body": "Interfață rapidă, optimizată pentru desktop și mobil, cu suport pentru mai multe limbi.",
     "ctaTitle": "Gata să începi?",
-    "ctaSubtitle": "Intră în listă sau publică primul anunț — durează doar câteva minute."
+    "ctaSubtitle": "Intră în listă sau publică primul anunț — durează doar câteva minute.",
+    "marketplace": {
+      "banner": "Bine ai venit pe VEX — anunțuri locale, simple și rapide.",
+      "regionTag": "Republica Moldova",
+      "activeListings": "{count} anunțuri active",
+      "gridTitle": "Anunțuri recente",
+      "viewAll": "Toate anunțurile",
+      "categoriesTitle": "Categorii",
+      "empty": "Încă nu există anunțuri. Fii primul care publică!",
+      "promo2Title": "Publică gratuit",
+      "promo2Body": "Creează un cont și adaugă anunțul în câteva minute — cu fotografii și detalii clare.",
+      "promo2Cta": "Publică un anunț"
+    }
   },
   "Footer": {
     "siteName": "VEX",
@@ -90,14 +120,24 @@
     "empty": "Nu există anunțuri care să corespundă filtrelor.",
     "categories": "Categorii",
     "allCategories": "Toate categoriile",
+    "browseAllCategories": "Vezi toate categoriile (structură completă)",
+    "openCategoryMap": "Hartă categorii",
     "filters": {
       "title": "Filtre",
+      "search": "Caută în anunțuri",
       "city": "Oraș",
       "min": "Preț min (RON)",
       "max": "Preț max (RON)",
+      "minWithCurrency": "Preț min ({currency})",
+      "maxWithCurrency": "Preț max ({currency})",
       "apply": "Aplică",
       "reset": "Resetează"
     }
+  },
+  "CategoriesPage": {
+    "searchPlaceholder": "Caută în anunțuri după cuvinte cheie…",
+    "search": "Caută",
+    "sidebarTitle": "Categorii"
   },
   "ListingDetail": {
     "specsTitle": "Specificații",
@@ -112,6 +152,10 @@
     "copyLink": "Copiază link",
     "copied": "Copiat!",
     "moderation": "Moderare",
+    "favoritesHint": "Salvează anunțul ca să îl găsești rapid mai târziu.",
+    "favoritesLogin": "Ai nevoie de cont pentru a salva anunțuri. Autentifică-te, apoi revino la această pagină.",
+    "favoritesCtaLogin": "Autentifică-te ca să salvezi",
+    "reportHint": "Ceva nu e în regulă? Semnalează pentru moderare.",
     "spec": {
       "brand": "Marcă",
       "model": "Model",
@@ -128,7 +172,26 @@
       "storage_gb": "Stocare (GB)",
       "ram_gb": "RAM (GB)",
       "experience_years": "Experiență (ani)",
-      "service_radius_km": "Rază servicii (km)"
+      "service_radius_km": "Rază servicii (km)",
+      "body_type": "Caroserie",
+      "drivetrain": "Tracțiune",
+      "engine_cc": "Cilindree (cm³)",
+      "power_hp": "Putere (CP)",
+      "doors": "Uși",
+      "furnished": "Mobilat",
+      "building_type": "Tip imobil",
+      "land_area_sqm": "Suprafață teren (m²)",
+      "battery_health": "Sănătate baterie (%)",
+      "screen_inch": "Diagonală ecran (inch)",
+      "processor": "Procesor",
+      "part_number": "Cod piesă / OEM",
+      "compatibility": "Compatibilitate",
+      "employment_type": "Tip angajare",
+      "salary_from": "Salariu de la",
+      "salary_to": "Salariu până la",
+      "size_label": "Mărime",
+      "age_months": "Vârstă (luni)",
+      "vaccinated": "Vaccinat"
     }
   },
   "Auth": {
@@ -139,6 +202,11 @@
     "passwordMin": "Parolă (min. 8 caractere)",
     "nameOptional": "Nume (opțional)",
     "login": "Intră în cont",
+    "loginEmail": "Intră cu email și parolă",
+    "continueGoogle": "Continuă cu Google",
+    "continueFacebook": "Continuă cu Facebook",
+    "oauthDivider": "sau cu email și parolă",
+    "oauthConfigureHint": "Google / Facebook apar aici după ce adaugi chei în .env — vezi .env.example.",
     "register": "Creează cont",
     "logout": "Ieșire",
     "emailTaken": "Acest email este deja folosit.",
@@ -148,7 +216,8 @@
   "Account": {
     "title": "Cont",
     "subtitle": "Autentifică-te sau creează un cont.",
-    "signedInAs": "Ești autentificat ca {email}."
+    "signedInAs": "Ești autentificat ca {email}.",
+    "linkFavorites": "Anunțuri salvate"
   },
   "Publish": {
     "title": "Publică anunț",
@@ -156,8 +225,40 @@
     "noCategories": "Nu există categorii configurate."
   },
   "Admin": {
+    "shellTitle": "Administrare",
     "title": "Panou admin",
     "subtitle": "Lista anunțurilor (modificare rapidă).",
+    "navDashboard": "Rezumat",
+    "navListings": "Anunțuri",
+    "navReports": "Raportări",
+    "dashboardTitle": "Rezumat",
+    "dashboardSubtitle": "Indicatori și acces rapid.",
+    "statListings": "Anunțuri publicate",
+    "statUsers": "Utilizatori înregistrați",
+    "statPendingReports": "Raportări în așteptare",
+    "statResolvedReports": "Raportări revizuite",
+    "openSection": "Deschide",
+    "listingsTitle": "Toate anunțurile",
+    "listingsSubtitle": "Modificare rapidă — deschide sau șterge un anunț.",
+    "reportsTitle": "Anunțuri raportate",
+    "reportsSubtitle": "Verifică raportările și ia măsuri.",
+    "reportsEmpty": "Nu există raportări.",
+    "reportFrom": "Raportat de",
+    "reportReason": "Motiv",
+    "reportDetails": "Detalii",
+    "markReviewed": "Marchează revizuit",
+    "dismiss": "Respinge",
+    "deleteListing": "Șterge anunțul",
+    "confirmDeleteListingFromReport": "Ștergi acest anunț de pe site? Acțiunea nu poate fi anulată.",
+    "reportActionError": "Acțiunea a eșuat. Încearcă din nou.",
+    "status_PENDING": "În așteptare",
+    "status_REVIEWED": "Revizuit",
+    "status_DISMISSED": "Respins",
+    "reason_spam": "Spam / înșelător",
+    "reason_fraud": "Fraudă / escrocherie",
+    "reason_inappropriate": "Conținut nepotrivit",
+    "reason_duplicate": "Anunț duplicat",
+    "reason_other": "Altele",
     "empty": "Nu există anunțuri.",
     "delete": "Șterge",
     "deleting": "Se șterge…",
@@ -166,11 +267,49 @@
     "notFound": "Anunțul nu mai există.",
     "deleteError": "Nu s-a putut șterge."
   },
+  "Report": {
+    "cta": "Raportează anunțul",
+    "reasonLabel": "Motiv",
+    "detailsLabel": "Detalii (opțional)",
+    "detailsPlaceholder": "Adaugă context pentru moderatori…",
+    "send": "Trimite raportul",
+    "sending": "Se trimite…",
+    "cancel": "Anulează",
+    "success": "Mulțumim — moderatorii vor verifica.",
+    "errorUnauthorized": "Autentifică-te pentru a raporta.",
+    "errorOwn": "Nu poți raporta propriul anunț.",
+    "errorDuplicate": "Ai raportat deja acest anunț.",
+    "errorGeneric": "Nu s-a putut trimite raportul.",
+    "reasonSpam": "Spam / înșelător",
+    "reasonFraud": "Fraudă / escrocherie",
+    "reasonInappropriate": "Conținut nepotrivit",
+    "reasonDuplicate": "Anunț duplicat",
+    "reasonOther": "Altele"
+  },
+  "Favorites": {
+    "title": "Anunțuri salvate",
+    "subtitle": "Anunțurile pe care le-ai salvat.",
+    "empty": "Niciun anunț salvat. Deschide un anunț și apasă Salvează.",
+    "save": "Salvează",
+    "saved": "Salvat",
+    "toggleError": "Nu s-a putut actualiza. Dacă persistă, verifică baza de date pe server (prisma db push).",
+    "loginRequired": "Autentifică-te pentru a salva anunțuri."
+  },
   "ListingForm": {
     "category": "Categorie",
+    "formSectionCategory": "Unde se încadrează anunțul",
+    "formSectionListing": "Text și preț",
+    "formSectionSpecs": "Detalii specifice categoriei",
+    "formSectionMedia": "Imagini",
+    "categorySelectedLabel": "Categorie",
+    "categoryBreadcrumbRoot": "Toate categoriile",
+    "categoryBack": "Nivel anterior",
+    "categorySearchPlaceholder": "Filtrează după nume…",
+    "categoryEmptyFilter": "Nicio potrivire — încearcă alt termen sau alt nivel.",
     "title": "Titlu",
     "description": "Descriere",
-    "price": "Preț (RON)",
+    "price": "Preț",
+    "priceWithCurrency": "Preț ({currency})",
     "negotiable": "Preț negociabil",
     "city": "Oraș",
     "district": "Cartier (opțional)",
@@ -209,6 +348,53 @@
       "manual": "Manuală",
       "automatic": "Automată"
     },
+    "body_type": {
+      "sedan": "Sedan",
+      "hatchback": "Hatchback",
+      "suv": "SUV",
+      "mpv": "Monovolum",
+      "coupe": "Coupe",
+      "convertible": "Decapotabilă",
+      "wagon": "Break",
+      "pickup": "Pick-up",
+      "van": "Furgonetă",
+      "other": "Altul"
+    },
+    "drivetrain": {
+      "fwd": "Față",
+      "rwd": "Spate",
+      "awd": "Integrală (AWD)",
+      "4wd": "4×4"
+    },
+    "doors": {
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5"
+    },
+    "furnished": {
+      "yes": "Mobilat",
+      "no": "Nemobilat",
+      "partial": "Parțial mobilat"
+    },
+    "building_type": {
+      "block": "Bloc",
+      "house": "Casă",
+      "new_build": "Construcție nouă",
+      "other": "Altul"
+    },
+    "employment_type": {
+      "full_time": "Normă întreagă",
+      "part_time": "Cu jumătate de normă",
+      "contract": "Contract",
+      "remote": "Remote",
+      "internship": "Internship / practică"
+    },
+    "vaccinated": {
+      "yes": "Da",
+      "no": "Nu",
+      "unknown": "Necunoscut"
+    },
     "detail": {
       "fuel": { "label": "Combustibil" },
       "transmission": { "label": "Transmisie" },
@@ -216,7 +402,27 @@
       "storage_gb": { "label": "Stocare (GB)" },
       "ram_gb": { "label": "RAM (GB)" },
       "experience_years": { "label": "Experiență (ani)" },
-      "service_radius_km": { "label": "Rază servicii (km)" }
+      "service_radius_km": { "label": "Rază servicii (km)" },
+      "color": { "label": "Culoare" },
+      "body_type": { "label": "Caroserie" },
+      "drivetrain": { "label": "Tracțiune" },
+      "engine_cc": { "label": "Cilindree (cm³)" },
+      "power_hp": { "label": "Putere (CP)" },
+      "doors": { "label": "Uși" },
+      "furnished": { "label": "Mobilat" },
+      "building_type": { "label": "Tip imobil" },
+      "land_area_sqm": { "label": "Suprafață teren (m²)" },
+      "battery_health": { "label": "Sănătate baterie (%)" },
+      "screen_inch": { "label": "Diagonală ecran (inch)" },
+      "processor": { "label": "Procesor" },
+      "part_number": { "label": "Cod piesă / OEM" },
+      "compatibility": { "label": "Compatibilitate (model / ani)" },
+      "employment_type": { "label": "Tip angajare" },
+      "salary_from": { "label": "Salariu de la (în moneda afișată)" },
+      "salary_to": { "label": "Salariu până la" },
+      "size_label": { "label": "Mărime (ex. M, 42)" },
+      "age_months": { "label": "Vârstă (luni)" },
+      "vaccinated": { "label": "Vaccinat" }
     },
     "validation": {
       "errCategory": "Alege o categorie.",

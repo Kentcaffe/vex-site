@@ -34,6 +34,9 @@ export async function deleteListingAsStaff(listingId: string): Promise<DeleteLis
     revalidatePath(localizedHref(locale, "/"));
     revalidatePath(localizedHref(locale, "/anunturi"));
     revalidatePath(localizedHref(locale, `/anunturi/${listingId}`));
+    revalidatePath(localizedHref(locale, "/admin"));
+    revalidatePath(localizedHref(locale, "/admin/listings"));
+    revalidatePath(localizedHref(locale, "/admin/reports"));
   }
 
   return { ok: true };

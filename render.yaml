@@ -1,0 +1,19 @@
+# Render Blueprint — setează Build Command dacă nu folosești YAML din dashboard.
+# În Environment: DATABASE_URL, AUTH_SECRET, NEXT_PUBLIC_APP_URL (obligatoriu pentru producție).
+services:
+  - type: web
+    name: anunturi-web
+    runtime: node
+    buildCommand: npm ci && npm run build:render
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        sync: false
+      - key: AUTH_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: NEXT_PUBLIC_PRICE_CURRENCY
+        value: MDL

@@ -7,11 +7,23 @@ type Props = {
   defaultCity?: string;
   defaultMin?: string;
   defaultMax?: string;
+  defaultSearch?: string;
   category?: string;
 };
 
-export function AnunturiFilters({ defaultCity = "", defaultMin = "", defaultMax = "", category }: Props) {
+function filterCurrency(): "EUR" | "MDL" {
+  return process.env.NEXT_PUBLIC_PRICE_CURRENCY?.trim().toUpperCase() === "EUR" ? "EUR" : "MDL";
+}
+
+export function AnunturiFilters({
+  defaultCity = "",
+  defaultMin = "",
+  defaultMax = "",
+  defaultSearch = "",
+  category,
+}: Props) {
   const t = useTranslations("Listings.filters");
+  const cur = filterCurrency();
 
   return (
     <form
@@ -20,6 +32,18 @@ export function AnunturiFilters({ defaultCity = "", defaultMin = "", defaultMax 
     >
       {category ? <input type="hidden" name="category" value={category} /> : null}
       <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{t("title")}</h2>
+      <div className="mt-3">
+        <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-search">
+          {t("search")}
+        </label>
+        <input
+          id="flt-search"
+          name="search"
+          type="search"
+          defaultValue={defaultSearch}
+          className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+        />
+      </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         <div>
           <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-city">
@@ -34,7 +58,7 @@ export function AnunturiFilters({ defaultCity = "", defaultMin = "", defaultMax 
         </div>
         <div>
           <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-min">
-            {t("min")}
+            {t("minWithCurrency", { currency: cur })}
           </label>
           <input
             id="flt-min"
@@ -48,7 +72,7 @@ export function AnunturiFilters({ defaultCity = "", defaultMin = "", defaultMax 
         </div>
         <div>
           <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-max">
-            {t("max")}
+            {t("maxWithCurrency", { currency: cur })}
           </label>
           <input
             id="flt-max"

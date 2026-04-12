@@ -11,7 +11,7 @@ import { prisma } from "@/lib/prisma";
 
 type Props = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ category?: string; city?: string; min?: string; max?: string }>;
+  searchParams: Promise<{ category?: string; city?: string; min?: string; max?: string; search?: string }>;
 };
 
 export default async function AnunturiListPage({ params, searchParams }: Props) {
@@ -21,6 +21,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const t = await getTranslations("Listings");
 
   const categorySlug = sp.category?.trim() || undefined;
+  const searchQ = sp.search?.trim() || undefined;
   const city = sp.city?.trim() || undefined;
   const minRaw = sp.min?.trim();
   const maxRaw = sp.max?.trim();
@@ -38,6 +39,10 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
 
   if (city) {
     where.city = { contains: city };
+  }
+
+  if (searchQ) {
+    where.OR = [{ title: { contains: searchQ } }, { description: { contains: searchQ } }];
   }
 
   if (Number.isFinite(minN) || Number.isFinite(maxN)) {
@@ -80,6 +85,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
             defaultCity={city ?? ""}
             defaultMin={Number.isFinite(minN) ? String(minN) : ""}
             defaultMax={Number.isFinite(maxN) ? String(maxN) : ""}
+            defaultSearch={searchQ ?? ""}
             category={categorySlug}
           />
           {listings.length === 0 ? (

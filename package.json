@@ -2,9 +2,15 @@
   "name": "anunturi-web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "concurrently -n next,socket -c blue,magenta \"next dev --webpack\" \"tsx src/socket-server.ts\"",
+    "dev:next": "next dev --webpack",
+    "socket": "tsx src/socket-server.ts",
     "build": "next build",
+    "build:render": "prisma db push && next build",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
@@ -15,12 +21,15 @@
     "@prisma/client": "^7.7.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.8.0",
+    "dotenv": "^17.4.2",
     "next": "16.2.3",
     "next-auth": "^5.0.0-beta.30",
     "next-intl": "^4.9.1",
     "prisma": "^7.7.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "zod": "^4.3.6"
   },
   "prisma": {
@@ -35,6 +44,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
+    "concurrently": "^9.2.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"

@@ -6,11 +6,29 @@
   },
   "Nav": {
     "home": "Home",
+    "categories": "Categories",
     "listings": "Listings",
     "publish": "Post ad",
+    "messages": "Messages",
     "admin": "Admin",
     "account": "Account",
-    "login": "Sign in"
+    "login": "Sign in",
+    "favorites": "Saved ads"
+  },
+  "Chat": {
+    "title": "Conversation",
+    "inboxTitle": "Messages",
+    "inboxSubtitle": "Your conversations with buyers and sellers.",
+    "inboxEmpty": "No messages yet. Contact a seller from a listing page.",
+    "contactSeller": "Contact seller",
+    "contactLogin": "Sign in to send messages",
+    "with": "With {name}",
+    "live": "Connected",
+    "connecting": "Connecting…",
+    "typing": "typing…",
+    "seen": "Seen",
+    "placeholder": "Write a message…",
+    "send": "Send"
   },
   "Home": {
     "title": "A local marketplace for classifieds and sales",
@@ -40,13 +58,25 @@
     "how3Body": "Listings follow community rules; abusive content can be removed (admin tools evolve over time).",
     "trustTitle": "Why use this platform",
     "trust1Title": "For buyers",
-    "trust1Body": "Clear filters, prices in local currency, and structured fields by category.",
+    "trust1Body": "Clear filters, prices in MDL or EUR (configurable), and structured fields by category.",
     "trust2Title": "For sellers",
     "trust2Body": "Guided posting, multiple images, and visibility in the feed — great for quick local sales.",
     "trust3Title": "Performance",
     "trust3Body": "Fast UI for desktop and mobile, with multi-language support.",
     "ctaTitle": "Ready to start?",
-    "ctaSubtitle": "Open the feed or post your first ad — it only takes a few minutes."
+    "ctaSubtitle": "Open the feed or post your first ad — it only takes a few minutes.",
+    "marketplace": {
+      "banner": "Welcome to VEX — local classifieds, quick and simple.",
+      "regionTag": "Moldova",
+      "activeListings": "{count} active listings",
+      "gridTitle": "Recent listings",
+      "viewAll": "All listings",
+      "categoriesTitle": "Categories",
+      "empty": "No listings yet. Be the first to post!",
+      "promo2Title": "Post for free",
+      "promo2Body": "Create an account and add your ad in minutes — with photos and clear details.",
+      "promo2Cta": "Post an ad"
+    }
   },
   "Footer": {
     "siteName": "VEX",
@@ -90,14 +120,24 @@
     "empty": "No listings match your filters.",
     "categories": "Categories",
     "allCategories": "All categories",
+    "browseAllCategories": "Browse full category tree",
+    "openCategoryMap": "Category map",
     "filters": {
       "title": "Filters",
+      "search": "Search listings",
       "city": "City",
       "min": "Min price (RON)",
       "max": "Max price (RON)",
+      "minWithCurrency": "Min price ({currency})",
+      "maxWithCurrency": "Max price ({currency})",
       "apply": "Apply",
       "reset": "Reset"
     }
+  },
+  "CategoriesPage": {
+    "searchPlaceholder": "Search listings by keywords…",
+    "search": "Search",
+    "sidebarTitle": "Categories"
   },
   "ListingDetail": {
     "specsTitle": "Specifications",
@@ -112,6 +152,10 @@
     "copyLink": "Copy link",
     "copied": "Copied!",
     "moderation": "Moderation",
+    "favoritesHint": "Save this ad to find it quickly later.",
+    "reportHint": "See something wrong? Tell us.",
+    "favoritesLogin": "You need an account to save ads. Sign in and come back to this page.",
+    "favoritesCtaLogin": "Sign in to save",
     "spec": {
       "brand": "Brand",
       "model": "Model",
@@ -128,7 +172,26 @@
       "storage_gb": "Storage (GB)",
       "ram_gb": "RAM (GB)",
       "experience_years": "Experience (years)",
-      "service_radius_km": "Service radius (km)"
+      "service_radius_km": "Service radius (km)",
+      "body_type": "Body type",
+      "drivetrain": "Drivetrain",
+      "engine_cc": "Engine displacement (cc)",
+      "power_hp": "Power (hp)",
+      "doors": "Doors",
+      "furnished": "Furnished",
+      "building_type": "Building type",
+      "land_area_sqm": "Land area (m²)",
+      "battery_health": "Battery health (%)",
+      "screen_inch": "Screen size (inch)",
+      "processor": "Processor",
+      "part_number": "Part / OEM code",
+      "compatibility": "Compatibility",
+      "employment_type": "Employment type",
+      "salary_from": "Salary from",
+      "salary_to": "Salary to",
+      "size_label": "Size",
+      "age_months": "Age (months)",
+      "vaccinated": "Vaccinated"
     }
   },
   "Auth": {
@@ -139,6 +202,11 @@
     "passwordMin": "Password (min. 8 characters)",
     "nameOptional": "Name (optional)",
     "login": "Sign in",
+    "loginEmail": "Sign in with email",
+    "continueGoogle": "Continue with Google",
+    "continueFacebook": "Continue with Facebook",
+    "oauthDivider": "or with email and password",
+    "oauthConfigureHint": "OAuth (Google / Facebook) appears here after you add credentials in .env — see .env.example.",
     "register": "Create account",
     "logout": "Sign out",
     "emailTaken": "This email is already registered.",
@@ -148,7 +216,8 @@
   "Account": {
     "title": "Account",
     "subtitle": "Sign in or create an account.",
-    "signedInAs": "Signed in as {email}."
+    "signedInAs": "Signed in as {email}.",
+    "linkFavorites": "Saved ads"
   },
   "Publish": {
     "title": "Post an ad",
@@ -156,8 +225,40 @@
     "noCategories": "No categories configured."
   },
   "Admin": {
+    "shellTitle": "Administration",
     "title": "Admin",
     "subtitle": "All listings (quick moderation).",
+    "navDashboard": "Overview",
+    "navListings": "Listings",
+    "navReports": "Reports",
+    "dashboardTitle": "Overview",
+    "dashboardSubtitle": "Key metrics and shortcuts.",
+    "statListings": "Published listings",
+    "statUsers": "Registered users",
+    "statPendingReports": "Pending reports",
+    "statResolvedReports": "Reviewed reports",
+    "openSection": "Open",
+    "listingsTitle": "All listings",
+    "listingsSubtitle": "Quick moderation — open an ad or remove it.",
+    "reportsTitle": "Reported listings",
+    "reportsSubtitle": "Review user reports and take action.",
+    "reportsEmpty": "No reports yet.",
+    "reportFrom": "Reporter",
+    "reportReason": "Reason",
+    "reportDetails": "Details",
+    "markReviewed": "Mark reviewed",
+    "dismiss": "Dismiss",
+    "deleteListing": "Delete listing",
+    "confirmDeleteListingFromReport": "Delete this listing from the site? This cannot be undone.",
+    "reportActionError": "Action failed. Try again.",
+    "status_PENDING": "Pending",
+    "status_REVIEWED": "Reviewed",
+    "status_DISMISSED": "Dismissed",
+    "reason_spam": "Spam / misleading",
+    "reason_fraud": "Fraud / scam",
+    "reason_inappropriate": "Inappropriate content",
+    "reason_duplicate": "Duplicate listing",
+    "reason_other": "Other",
     "empty": "No listings yet.",
     "delete": "Delete",
     "deleting": "Deleting…",
@@ -166,11 +267,49 @@
     "notFound": "Listing no longer exists.",
     "deleteError": "Could not delete."
   },
+  "Report": {
+    "cta": "Report this ad",
+    "reasonLabel": "Reason",
+    "detailsLabel": "Details (optional)",
+    "detailsPlaceholder": "Add context for moderators…",
+    "send": "Submit report",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "success": "Thanks — moderators will review it.",
+    "errorUnauthorized": "Sign in to report an ad.",
+    "errorOwn": "You cannot report your own ad.",
+    "errorDuplicate": "You already reported this ad.",
+    "errorGeneric": "Could not send the report.",
+    "reasonSpam": "Spam / misleading",
+    "reasonFraud": "Fraud / scam",
+    "reasonInappropriate": "Inappropriate content",
+    "reasonDuplicate": "Duplicate listing",
+    "reasonOther": "Other"
+  },
+  "Favorites": {
+    "title": "Saved ads",
+    "subtitle": "Listings you saved.",
+    "empty": "No saved ads yet. Open an ad and tap Save.",
+    "save": "Save",
+    "saved": "Saved",
+    "toggleError": "Could not update. If this persists, the database may need updating (run prisma db push on the server).",
+    "loginRequired": "Sign in to save ads."
+  },
   "ListingForm": {
     "category": "Category",
+    "formSectionCategory": "Category",
+    "formSectionListing": "Title and price",
+    "formSectionSpecs": "Category-specific details",
+    "formSectionMedia": "Photos",
+    "categorySelectedLabel": "Category",
+    "categoryBreadcrumbRoot": "All categories",
+    "categoryBack": "Back",
+    "categorySearchPlaceholder": "Filter by name…",
+    "categoryEmptyFilter": "No matches — try another word or go up a level.",
     "title": "Title",
     "description": "Description",
-    "price": "Price (RON)",
+    "price": "Price",
+    "priceWithCurrency": "Price ({currency})",
     "negotiable": "Negotiable",
     "city": "City",
     "district": "District (optional)",
@@ -209,6 +348,53 @@
       "manual": "Manual",
       "automatic": "Automatic"
     },
+    "body_type": {
+      "sedan": "Sedan",
+      "hatchback": "Hatchback",
+      "suv": "SUV",
+      "mpv": "MPV",
+      "coupe": "Coupe",
+      "convertible": "Convertible",
+      "wagon": "Wagon",
+      "pickup": "Pickup",
+      "van": "Van",
+      "other": "Other"
+    },
+    "drivetrain": {
+      "fwd": "FWD",
+      "rwd": "RWD",
+      "awd": "AWD",
+      "4wd": "4×4"
+    },
+    "doors": {
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5"
+    },
+    "furnished": {
+      "yes": "Furnished",
+      "no": "Unfurnished",
+      "partial": "Partially furnished"
+    },
+    "building_type": {
+      "block": "Apartment block",
+      "house": "House",
+      "new_build": "New build",
+      "other": "Other"
+    },
+    "employment_type": {
+      "full_time": "Full time",
+      "part_time": "Part time",
+      "contract": "Contract",
+      "remote": "Remote",
+      "internship": "Internship"
+    },
+    "vaccinated": {
+      "yes": "Yes",
+      "no": "No",
+      "unknown": "Unknown"
+    },
     "detail": {
       "fuel": { "label": "Fuel" },
       "transmission": { "label": "Transmission" },
@@ -216,7 +402,27 @@
       "storage_gb": { "label": "Storage (GB)" },
       "ram_gb": { "label": "RAM (GB)" },
       "experience_years": { "label": "Experience (years)" },
-      "service_radius_km": { "label": "Service radius (km)" }
+      "service_radius_km": { "label": "Service radius (km)" },
+      "color": { "label": "Color" },
+      "body_type": { "label": "Body type" },
+      "drivetrain": { "label": "Drivetrain" },
+      "engine_cc": { "label": "Engine displacement (cc)" },
+      "power_hp": { "label": "Power (hp)" },
+      "doors": { "label": "Doors" },
+      "furnished": { "label": "Furnished" },
+      "building_type": { "label": "Building type" },
+      "land_area_sqm": { "label": "Land area (m²)" },
+      "battery_health": { "label": "Battery health (%)" },
+      "screen_inch": { "label": "Screen size (inch)" },
+      "processor": { "label": "Processor" },
+      "part_number": { "label": "Part / OEM code" },
+      "compatibility": { "label": "Compatibility (model / years)" },
+      "employment_type": { "label": "Employment type" },
+      "salary_from": { "label": "Salary from (in displayed currency)" },
+      "salary_to": { "label": "Salary to" },
+      "size_label": { "label": "Size (e.g. M, 42)" },
+      "age_months": { "label": "Age (months)" },
+      "vaccinated": { "label": "Vaccinated" }
     },
     "validation": {
       "errCategory": "Pick a category.",

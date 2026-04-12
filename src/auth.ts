@@ -1,9 +1,17 @@
+import { randomBytes } from "node:crypto";
 import type { UserRole } from "@prisma/client";
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { compare } from "bcryptjs";
+import Facebook from "next-auth/providers/facebook";
+import Google from "next-auth/providers/google";
+import { compare, hash } from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+
+/** Unusable bcrypt hash for OAuth-only rows (email/password login will never match). */
+async function placeholderPasswordHash(): Promise<string> {
+  return hash(randomBytes(32).toString("hex"), 4);
+}
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
@@ -28,7 +36,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const user = await prisma.user.findUnique({
           where: { email: parsed.data.email },
         });
-        if (!user) {
+        if (!user?.passwordHash) {
           return null;
         }
         const ok = await compare(parsed.data.password, user.passwordHash);
@@ -43,12 +51,50 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       },
     }),
+    ...(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET
+      ? [
+          Google({
+            clientId: process.env.AUTH_GOOGLE_ID,
+            clientSecret: process.env.AUTH_GOOGLE_SECRET,
+          }),
+        ]
+      : []),
+    ...(process.env.AUTH_FACEBOOK_ID && process.env.AUTH_FACEBOOK_SECRET
+      ? [
+          Facebook({
+            clientId: process.env.AUTH_FACEBOOK_ID,
+            clientSecret: process.env.AUTH_FACEBOOK_SECRET,
+          }),
+        ]
+      : []),
   ],
   callbacks: {
-    jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        token.role = (user as { role: UserRole }).role;
+    async jwt({ token, user, account }) {
+      if (user && account) {
+        if (account.provider === "google" || account.provider === "facebook") {
+          const email = user.email;
+          if (!email) {
+            return token;
+          }
+          const dbUser = await prisma.user.upsert({
+            where: { email },
+            create: {
+              email,
+              name: user.name,
+              passwordHash: await placeholderPasswordHash(),
+            },
+            update: {
+              name: user.name ?? undefined,
+            },
+          });
+          token.id = dbUser.id;
+          token.role = dbUser.role;
+          return token;
+        }
+        if (account.provider === "credentials") {
+          token.id = user.id;
+          token.role = (user as { role: UserRole }).role;
+        }
       }
       return token;
     },

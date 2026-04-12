@@ -6,8 +6,16 @@ import { createListing, type CreateListingState } from "@/app/actions/listings";
 import {
   getDetailFieldsForSlug,
   getDetailFormName,
+  getListingFormFlags,
   type DetailField,
 } from "@/lib/listing-detail-config";
+import {
+  type CategoryTreeNode,
+  findAncestorStackForLeaf,
+  findLeafSlugById,
+  getPathLabelsForLeaf,
+} from "@/lib/category-tree";
+import { emojiForCategorySlug } from "@/lib/category-icons";
 import { LISTING_MAX_IMAGES, parseImageLines } from "@/lib/listing-form-schema";
 import {
   validateListingFormClient,
@@ -15,21 +23,165 @@ import {
   type ListingFormValidationMessages,
 } from "@/lib/listing-form-client-validation";
 
-export type CategoryOption = { id: string; slug: string; path: string };
-
 type Props = {
   locale: string;
-  categoryOptions: CategoryOption[];
+  categoryTree: CategoryTreeNode[];
 };
 
-function slugFlags(slug: string) {
-  const isVeh = slug === "auto" || slug === "moto";
-  const isRe = slug === "apartamente" || slug === "case";
-  const isBrandish = ["piese-auto", "telefoane", "laptop", "haine"].includes(slug);
-  return { isVeh, isRe, isBrandish };
+function priceCurrencyCode(): "EUR" | "MDL" {
+  return process.env.NEXT_PUBLIC_PRICE_CURRENCY?.trim().toUpperCase() === "EUR" ? "EUR" : "MDL";
 }
 
-export function ListingForm({ locale, categoryOptions }: Props) {
+type CategoryPickerProps = {
+  tree: CategoryTreeNode[];
+  value: string;
+  onChange: (categoryId: string) => void;
+  name?: string;
+  error?: string | null;
+};
+
+function ListingCategoryPicker({ tree, value, onChange, name = "categoryId", error }: CategoryPickerProps) {
+  const tCat = useTranslations("ListingForm");
+  const [stack, setStack] = useState<CategoryTreeNode[]>(() =>
+    value ? (findAncestorStackForLeaf(tree, value) ?? []) : [],
+  );
+  const [query, setQuery] = useState("");
+
+  const currentNodes = useMemo(() => {
+    if (stack.length === 0) {
+      return tree;
+    }
+    const last = stack[stack.length - 1];
+    return last.children ?? [];
+  }, [tree, stack]);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      return currentNodes;
+    }
+    return currentNodes.filter((n) => n.label.toLowerCase().includes(q));
+  }, [currentNodes, query]);
+
+  const selectedPath = value ? getPathLabelsForLeaf(tree, value) : "";
+
+  function onPickNode(n: CategoryTreeNode) {
+    if (n.children && n.children.length > 0) {
+      onChange("");
+      setStack((s) => [...s, n]);
+      setQuery("");
+      return;
+    }
+    onChange(n.id);
+    setStack(findAncestorStackForLeaf(tree, n.id) ?? []);
+  }
+
+  return (
+    <div className="space-y-3">
+      <input type="hidden" name={name} value={value} />
+
+      {selectedPath ? (
+        <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/80 px-3 py-2 text-sm dark:border-emerald-900/60 dark:bg-emerald-950/30">
+          <span className="font-medium text-emerald-900 dark:text-emerald-100">{tCat("categorySelectedLabel")}: </span>
+          <span className="text-emerald-800 dark:text-emerald-200">{selectedPath}</span>
+        </div>
+      ) : null}
+
+      <div className="flex flex-wrap items-center gap-1 text-sm text-zinc-600 dark:text-zinc-300">
+        <button
+          type="button"
+          className="rounded-md px-2 py-1 font-medium text-[#0b57d0] hover:bg-zinc-100 dark:text-blue-400 dark:hover:bg-zinc-800"
+          onClick={() => {
+            onChange("");
+            setStack([]);
+            setQuery("");
+          }}
+        >
+          {tCat("categoryBreadcrumbRoot")}
+        </button>
+        {stack.map((n, i) => (
+          <span key={n.id} className="inline-flex items-center gap-1">
+            <span className="text-zinc-400" aria-hidden>
+              ›
+            </span>
+            <button
+              type="button"
+              disabled={i === stack.length - 1}
+              className="rounded-md px-2 py-1 font-medium text-[#0b57d0] hover:bg-zinc-100 disabled:cursor-default disabled:text-zinc-700 disabled:hover:bg-transparent dark:text-blue-400 dark:disabled:text-zinc-300 dark:hover:bg-zinc-800 dark:disabled:hover:bg-transparent"
+              onClick={() => {
+                onChange("");
+                setStack(stack.slice(0, i + 1));
+                setQuery("");
+              }}
+            >
+              {n.label}
+            </button>
+          </span>
+        ))}
+        {stack.length > 0 ? (
+          <button
+            type="button"
+            className="ml-1 rounded-md border border-zinc-200 px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-800"
+            onClick={() => {
+              onChange("");
+              setStack((s) => s.slice(0, -1));
+              setQuery("");
+            }}
+          >
+            {tCat("categoryBack")}
+          </button>
+        ) : null}
+      </div>
+
+      <div className="relative">
+        <input
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={tCat("categorySearchPlaceholder")}
+          className="w-full rounded-lg border border-zinc-300 bg-white py-2 pl-3 pr-3 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          autoComplete="off"
+        />
+      </div>
+
+      {filtered.length === 0 ? (
+        <p className="text-sm text-zinc-500">{tCat("categoryEmptyFilter")}</p>
+      ) : (
+        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((n) => {
+            const isFolder = !!(n.children && n.children.length > 0);
+            const isLeafSelected = !isFolder && n.id === value;
+            const emoji = emojiForCategorySlug(n.slug);
+            return (
+              <li key={n.id}>
+                <button
+                  type="button"
+                  onClick={() => onPickNode(n)}
+                  className={`flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left text-sm transition ${
+                    isLeafSelected
+                      ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500/30 dark:border-emerald-700 dark:bg-emerald-950/40"
+                      : "border-zinc-200 bg-white hover:border-[#0b57d0]/40 hover:bg-sky-50/60 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-blue-500/40 dark:hover:bg-zinc-800/80"
+                  }`}
+                >
+                  <span className="text-xl leading-none" aria-hidden>
+                    {emoji}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="font-medium text-zinc-900 dark:text-zinc-50">{n.label}</span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+    </div>
+  );
+}
+
+export function ListingForm({ locale, categoryTree }: Props) {
   const t = useTranslations("ListingForm");
   const tVal = useTranslations("ListingForm.validation");
 
@@ -51,16 +203,17 @@ export function ListingForm({ locale, categoryOptions }: Props) {
     createListing,
     undefined as CreateListingState | undefined,
   );
-  const [categoryId, setCategoryId] = useState(categoryOptions[0]?.id ?? "");
+  const [categoryId, setCategoryId] = useState("");
   const [imagesRaw, setImagesRaw] = useState("");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [clientErrors, setClientErrors] = useState<Partial<Record<ListingFormFieldId, string>>>({});
 
-  const selectedSlug = useMemo(() => {
-    return categoryOptions.find((c) => c.id === categoryId)?.slug ?? "";
-  }, [categoryId, categoryOptions]);
+  const selectedSlug = useMemo(
+    () => findLeafSlugById(categoryTree, categoryId) ?? "",
+    [categoryId, categoryTree],
+  );
 
-  const { isVeh, isRe, isBrandish } = slugFlags(selectedSlug);
+  const { isVeh, isRe, isBrandish } = getListingFormFlags(selectedSlug);
   const detailFields = useMemo(() => getDetailFieldsForSlug(selectedSlug), [selectedSlug]);
 
   function detailLabel(field: DetailField): string {
@@ -73,6 +226,18 @@ export function ListingForm({ locale, categoryOptions }: Props) {
     }
     if (field.id === "transmission") {
       return t(`transmission.${value}` as never);
+    }
+    const groupKeys = [
+      "body_type",
+      "drivetrain",
+      "doors",
+      "furnished",
+      "building_type",
+      "employment_type",
+      "vaccinated",
+    ] as const;
+    if ((groupKeys as readonly string[]).includes(field.id)) {
+      return t(`${field.id}.${value}` as never);
     }
     return value;
   }
@@ -131,31 +296,26 @@ export function ListingForm({ locale, categoryOptions }: Props) {
   return (
     <form
       action={handleSubmit}
-      className="mx-auto max-w-2xl space-y-5 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+      className="mx-auto max-w-3xl space-y-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8"
     >
       <input type="hidden" name="locale" value={locale} />
 
-      <div id="field-categoryId">
-        <label className="block text-sm font-medium" htmlFor="categoryId">
-          {t("category")}
-        </label>
-        <select
-          id="categoryId"
-          name="categoryId"
-          required
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-        >
-          {categoryOptions.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.path}
-            </option>
-          ))}
-        </select>
-        {clientErrors.categoryId ? <p className="mt-1 text-sm text-red-600">{clientErrors.categoryId}</p> : null}
-      </div>
+      <section id="field-categoryId" className="space-y-3">
+        <div>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionCategory")}</h2>
+        </div>
+        <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 dark:border-zinc-700 dark:bg-zinc-950/40">
+          <ListingCategoryPicker
+            tree={categoryTree}
+            value={categoryId}
+            onChange={setCategoryId}
+            error={clientErrors.categoryId}
+          />
+        </div>
+      </section>
 
+      <section className="space-y-5 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionListing")}</h2>
       <div id="field-title">
         <label className="block text-sm font-medium" htmlFor="title">
           {t("title")}
@@ -186,7 +346,7 @@ export function ListingForm({ locale, categoryOptions }: Props) {
       <div className="grid gap-4 sm:grid-cols-2" id="field-price">
         <div>
           <label className="block text-sm font-medium" htmlFor="price">
-            {t("price")}
+            {t("priceWithCurrency", { currency: priceCurrencyCode() })}
           </label>
           <input
             id="price"
@@ -262,6 +422,13 @@ export function ListingForm({ locale, categoryOptions }: Props) {
         </select>
         {clientErrors.condition ? <p className="mt-1 text-sm text-red-600">{clientErrors.condition}</p> : null}
       </div>
+      </section>
+
+      {isVeh || isRe || (isBrandish && !isVeh) || detailFields.length > 0 ? (
+      <section className="space-y-5 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+        <div>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionSpecs")}</h2>
+        </div>
 
       {isVeh ? (
         <div className="grid gap-4 sm:grid-cols-2">
@@ -370,10 +537,11 @@ export function ListingForm({ locale, categoryOptions }: Props) {
         </div>
       ) : null}
 
+      <div className="grid gap-4 sm:grid-cols-2">
       {detailFields.map((field) => {
         const fname = getDetailFormName(field);
         return (
-          <div key={field.id}>
+          <div key={field.id} className="sm:col-span-1">
             <label className="block text-sm font-medium" htmlFor={fname}>
               {detailLabel(field)}
             </label>
@@ -413,7 +581,13 @@ export function ListingForm({ locale, categoryOptions }: Props) {
           </div>
         );
       })}
+      </div>
 
+      </section>
+      ) : null}
+
+      <section className="space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionMedia")}</h2>
       <div id="field-imagesRaw">
         <label className="block text-sm font-medium" htmlFor="imagesRaw">
           {t("images")}
@@ -446,6 +620,7 @@ export function ListingForm({ locale, categoryOptions }: Props) {
         {uploadError ? <p className="mt-1 text-sm text-red-600">{uploadError}</p> : null}
         {clientErrors.imagesRaw ? <p className="mt-1 text-sm text-red-600">{clientErrors.imagesRaw}</p> : null}
       </div>
+      </section>
 
       {serverMsg ? <p className="text-sm text-red-600">{serverMsg}</p> : null}
       {state?.ok === true ? <p className="text-sm text-emerald-700 dark:text-emerald-400">{t("success")}</p> : null}
