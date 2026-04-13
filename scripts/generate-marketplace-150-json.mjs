@@ -6,7 +6,6 @@
  * înlocuiește cu imagini locale (/public/seed) sau images.unsplash.com/photo-ID.
  */
 import fs from "node:fs";
-import { fileURLToPath } from "node:url";
 
 const outPath = new URL("../data/marketplace-150-realistic.json", import.meta.url);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const FALLBACK = "/marketplace-image-fallback.svg";
 
@@ -10,18 +10,23 @@ type Props = {
   className?: string;
 };
 
+type InnerProps = {
+  src: string;
+  alt: string;
+  className?: string;
+};
+
 /**
  * Imagine anunț: referrer redus (unele CDN-uri blochează altfel) + fallback local dacă URL-ul e mort.
+ * `key` pe copil resetează starea la schimbarea sursei (fără effect + setState).
  */
-export function ListingCoverImg({ src, alt, className }: Props) {
-  const initial = src?.trim() || FALLBACK;
-  const [url, setUrl] = useState(initial);
-
-  useEffect(() => {
-    setUrl(src?.trim() || FALLBACK);
-  }, [src]);
+function ListingCoverImgInner({ src, alt, className }: InnerProps) {
+  const [failed, setFailed] = useState(false);
+  const url = failed ? FALLBACK : src;
 
   return (
+    // URL-uri externe din anunțuri — next/image cere domenii cunoscute; păstrăm <img>.
+    // eslint-disable-next-line @next/next/no-img-element -- imagini dinamice, referrerPolicy no-referrer
     <img
       src={url}
       alt={alt}
@@ -30,8 +35,13 @@ export function ListingCoverImg({ src, alt, className }: Props) {
       loading="lazy"
       decoding="async"
       onError={() => {
-        if (url !== FALLBACK) setUrl(FALLBACK);
+        if (!failed) setFailed(true);
       }}
     />
   );
+}
+
+export function ListingCoverImg({ src, alt, className }: Props) {
+  const normalized = src?.trim() || FALLBACK;
+  return <ListingCoverImgInner key={normalized} src={normalized} alt={alt} className={className} />;
 }

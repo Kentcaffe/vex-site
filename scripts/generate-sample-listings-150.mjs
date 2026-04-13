@@ -26,7 +26,7 @@ const unsplashPairs = [
   ["https://images.unsplash.com/photo-1631889993959-41b4e9edf7c5?w=800&q=80", "https://images.unsplash.com/photo-1503602642458-232111445657?w=800&q=80"],
 ];
 
-function imagesFor(i, cat) {
+function imagesFor(i) {
   const pair = unsplashPairs[i % unsplashPairs.length];
   return [...pair];
 }
@@ -236,7 +236,7 @@ for (const cat of categories) {
       price,
       location: loc,
       category: cat,
-      images: imagesFor(idx, cat),
+      images: imagesFor(idx),
     });
     idx++;
   }

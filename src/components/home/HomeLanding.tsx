@@ -1,7 +1,8 @@
 import { auth } from "@/auth";
 import { getRootCategories } from "@/lib/category-queries";
+import { asListingSelect } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
-import { HomeMarketplace } from "@/components/home/HomeMarketplace";
+import { HomeMarketplace, type ListingCard } from "@/components/home/HomeMarketplace";
 
 type Props = {
   locale: string;
@@ -13,16 +14,17 @@ export async function HomeLanding({ locale }: Props) {
     prisma.listing.findMany({
       orderBy: { createdAt: "desc" },
       take: 15,
-      select: {
+      select: asListingSelect({
         id: true,
         title: true,
         price: true,
+        priceCurrency: true,
         city: true,
         district: true,
         images: true,
         mileageKm: true,
-      },
-    }),
+      }),
+    }) as unknown as Promise<ListingCard[]>,
     getRootCategories(),
   ]);
 

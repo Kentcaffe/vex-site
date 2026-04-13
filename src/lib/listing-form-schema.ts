@@ -5,10 +5,13 @@ export const LISTING_MAX_IMAGES = 8;
 
 export const conditionEnum = z.enum(["new", "used", "not_applicable"]);
 
+export const priceCurrencyEnum = z.enum(["MDL", "EUR"]);
+
 export const listingFormSchema = z.object({
   title: z.string().min(3).max(160),
   description: z.string().max(1_000_000),
   price: z.coerce.number().int().min(0).max(999_999_999),
+  priceCurrency: priceCurrencyEnum,
   negotiable: z.boolean().optional(),
   city: z.string().min(2).max(80),
   district: z.string().max(80).optional(),
@@ -117,6 +120,11 @@ export function rawFromFormData(formData: FormData): Record<string, unknown> {
     title: g("title") == null ? "" : String(g("title")),
     description: g("description") == null ? "" : String(g("description")),
     price: g("price"),
+    priceCurrency: (() => {
+      const v = g("priceCurrency");
+      const s = v == null ? "" : String(v).toUpperCase();
+      return s === "EUR" ? "EUR" : "MDL";
+    })(),
     negotiable: g("negotiable") === "on",
     city: g("city") == null ? "" : String(g("city")),
     district: optStr("district"),

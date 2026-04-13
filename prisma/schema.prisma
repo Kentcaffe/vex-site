@@ -70,6 +70,8 @@ model Listing {
   title       String
   description String
   price       Int
+  /** Moneda în care este exprimat prețul (afișare și filtre). */
+  priceCurrency String @default("MDL")
   negotiable  Boolean  @default(false)
   city        String
   district    String?

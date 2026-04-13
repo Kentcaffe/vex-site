@@ -7,6 +7,7 @@ import { emojiForRootSlug } from "@/lib/category-icons";
 import { formatPrice } from "@/lib/formatPrice";
 import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
+import type { PriceCurrencyCode } from "@/lib/currency";
 
 type LabelJson = { ro?: string; ru?: string; en?: string };
 
@@ -20,10 +21,11 @@ function labelFor(cat: CategoryRow, locale: string): string {
   }
 }
 
-type ListingCard = {
+export type ListingCard = {
   id: string;
   title: string;
   price: number;
+  priceCurrency: string;
   city: string;
   district: string | null;
   images: string | null;
@@ -170,7 +172,7 @@ export async function HomeMarketplace({ locale, listings, rootCategories, favori
                             </span>
                           </Link>
                           <span className="mt-2 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-50">
-                            {formatPrice(item.price, locale)}
+                            {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
                           </span>
                           <span className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{meta.join(" · ")}</span>
                         </div>

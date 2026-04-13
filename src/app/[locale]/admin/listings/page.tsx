@@ -3,6 +3,8 @@ import { DeleteListingButton } from "@/components/DeleteListingButton";
 import { Link } from "@/i18n/navigation";
 import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
+import type { PriceCurrencyCode } from "@/lib/currency";
+import type { ListingPayloadWithCategory } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 
 type Props = {
@@ -18,7 +20,7 @@ export default async function AdminListingsPage({ params }: Props) {
       orderBy: { createdAt: "desc" },
       take: 200,
       include: { category: true },
-    }),
+    }) as Promise<ListingPayloadWithCategory[]>,
     getAllCategories(),
   ]);
 
@@ -61,7 +63,7 @@ export default async function AdminListingsPage({ params }: Props) {
                       <span className="line-clamp-2">{path}</span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 tabular-nums text-zinc-800 dark:text-zinc-200">
-                      {formatPrice(item.price, locale)}
+                      {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <DeleteListingButton listingId={item.id} />

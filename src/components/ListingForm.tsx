@@ -28,10 +28,6 @@ type Props = {
   categoryTree: CategoryTreeNode[];
 };
 
-function priceCurrencyCode(): "EUR" | "MDL" {
-  return process.env.NEXT_PUBLIC_PRICE_CURRENCY?.trim().toUpperCase() === "EUR" ? "EUR" : "MDL";
-}
-
 type CategoryPickerProps = {
   tree: CategoryTreeNode[];
   value: string;
@@ -343,23 +339,39 @@ export function ListingForm({ locale, categoryTree }: Props) {
         {clientErrors.description ? <p className="mt-1 text-sm text-red-600">{clientErrors.description}</p> : null}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2" id="field-price">
-        <div>
-          <label className="block text-sm font-medium" htmlFor="price">
-            {t("priceWithCurrency", { currency: priceCurrencyCode() })}
-          </label>
-          <input
-            id="price"
-            name="price"
-            type="number"
-            inputMode="numeric"
-            min={0}
-            required
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-          />
-          {clientErrors.price ? <p className="mt-1 text-sm text-red-600">{clientErrors.price}</p> : null}
+      <div className="space-y-4" id="field-price">
+        <div className="grid gap-4 sm:grid-cols-2 sm:items-end">
+          <div>
+            <label className="block text-sm font-medium" htmlFor="price">
+              {t("priceAmount")}
+            </label>
+            <input
+              id="price"
+              name="price"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              required
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            />
+            {clientErrors.price ? <p className="mt-1 text-sm text-red-600">{clientErrors.price}</p> : null}
+          </div>
+          <div>
+            <label className="block text-sm font-medium" htmlFor="priceCurrency">
+              {t("priceCurrencyLabel")}
+            </label>
+            <select
+              id="priceCurrency"
+              name="priceCurrency"
+              defaultValue="MDL"
+              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            >
+              <option value="MDL">{t("priceCurrencyMdl")}</option>
+              <option value="EUR">{t("priceCurrencyEur")}</option>
+            </select>
+          </div>
         </div>
-        <div className="flex items-end pb-1">
+        <div>
           <label className="flex items-center gap-2 text-sm">
             <input name="negotiable" type="checkbox" className="rounded border-zinc-400" />
             {t("negotiable")}

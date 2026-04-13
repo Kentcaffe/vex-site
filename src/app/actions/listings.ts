@@ -13,6 +13,7 @@ import {
   parseListingImageUrlsStrict,
   rawFromFormData,
 } from "@/lib/listing-form-schema";
+import { asListingCreateInput } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 
 export type CreateListingState = { ok: true } | { ok: false; error: "unauthorized" | "validation" | "category" | "session" };
@@ -76,10 +77,11 @@ export async function createListing(
 
   try {
     await prisma.listing.create({
-      data: {
+      data: asListingCreateInput({
         title: parsed.data.title.trim(),
         description: parsed.data.description.trim(),
         price: parsed.data.price,
+        priceCurrency: parsed.data.priceCurrency,
         negotiable: parsed.data.negotiable ?? false,
         city: parsed.data.city.trim(),
         district: parsed.data.district?.trim() || null,
@@ -95,7 +97,7 @@ export async function createListing(
         images: JSON.stringify(urls),
         categoryId: parsed.data.categoryId,
         userId: session.user.id,
-      },
+      }),
     });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2003") {

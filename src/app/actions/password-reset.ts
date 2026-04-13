@@ -3,8 +3,13 @@
 import { createHash, randomBytes } from "node:crypto";
 import { hash } from "bcryptjs";
 import { z } from "zod";
-import { localizedHref } from "@/lib/paths";
-import { isMailConfigured, sendPasswordResetEmail } from "@/lib/mail";
+import {
+  buildPasswordResetEmailHtml,
+  getPasswordResetSubject,
+  isSmtpConfigured,
+  sendResetEmail,
+} from "@/lib/email";
+import { isMailConfigured, sendTransactionalEmail } from "@/lib/mail";
 import { passwordResetToken } from "@/lib/prisma-delegates";
 import { prisma } from "@/lib/prisma";
 
@@ -68,25 +73,16 @@ export async function requestPasswordReset(
     },
   });
 
-  const base = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
-  const path = localizedHref(locale, "/cont/reset-password");
-  const link = `${base}${path}?token=${encodeURIComponent(rawToken)}`;
+  let sent: { ok: boolean };
+  if (isSmtpConfigured()) {
+    const r = await sendResetEmail(user.email, rawToken, locale);
+    sent = { ok: r.ok };
+  } else {
+    const html = buildPasswordResetEmailHtml(rawToken, locale);
+    const subject = getPasswordResetSubject(locale);
+    sent = await sendTransactionalEmail(user.email, subject, html);
+  }
 
-  const subject =
-    locale === "en"
-      ? "Reset your password"
-      : locale === "ru"
-        ? "Сброс пароля"
-        : "Resetare parolă";
-
-  const html =
-    locale === "en"
-      ? `<p>Click the link to set a new password (valid 1 hour):</p><p><a href="${link}">${link}</a></p>`
-      : locale === "ru"
-        ? `<p>Откройте ссылку, чтобы задать новый пароль (действует 1 час):</p><p><a href="${link}">${link}</a></p>`
-        : `<p>Deschide linkul pentru o parolă nouă (valabil 1 oră):</p><p><a href="${link}">${link}</a></p>`;
-
-  const sent = await sendPasswordResetEmail(user.email, subject, html);
   if (!sent.ok) {
     await passwordResetToken.deleteMany({ where: { tokenHash } });
     return { ok: false, error: "sendFailed" };

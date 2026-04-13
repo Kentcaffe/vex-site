@@ -8,22 +8,21 @@ type Props = {
   defaultMin?: string;
   defaultMax?: string;
   defaultSearch?: string;
+  /** "" = toate monedele; MDL / EUR = filtrează anunțurile cu acea monedă (împreună cu min/max pe acel preț) */
+  defaultCurrency?: "" | "MDL" | "EUR";
   category?: string;
 };
-
-function filterCurrency(): "EUR" | "MDL" {
-  return process.env.NEXT_PUBLIC_PRICE_CURRENCY?.trim().toUpperCase() === "EUR" ? "EUR" : "MDL";
-}
 
 export function AnunturiFilters({
   defaultCity = "",
   defaultMin = "",
   defaultMax = "",
   defaultSearch = "",
+  defaultCurrency = "",
   category,
 }: Props) {
   const t = useTranslations("Listings.filters");
-  const cur = filterCurrency();
+  const cur = defaultCurrency === "EUR" || defaultCurrency === "MDL" ? defaultCurrency : null;
 
   return (
     <form
@@ -44,6 +43,21 @@ export function AnunturiFilters({
           className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-950"
         />
       </div>
+      <div className="mt-3">
+        <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-currency">
+          {t("currency")}
+        </label>
+        <select
+          id="flt-currency"
+          name="currency"
+          defaultValue={defaultCurrency || ""}
+          className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+        >
+          <option value="">{t("currencyAll")}</option>
+          <option value="MDL">{t("currencyMdl")}</option>
+          <option value="EUR">{t("currencyEur")}</option>
+        </select>
+      </div>
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         <div>
           <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-city">
@@ -58,7 +72,7 @@ export function AnunturiFilters({
         </div>
         <div>
           <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-min">
-            {t("minWithCurrency", { currency: cur })}
+            {cur ? t("minWithCurrency", { currency: cur }) : t("minPlain")}
           </label>
           <input
             id="flt-min"
@@ -72,7 +86,7 @@ export function AnunturiFilters({
         </div>
         <div>
           <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-max">
-            {t("maxWithCurrency", { currency: cur })}
+            {cur ? t("maxWithCurrency", { currency: cur }) : t("maxPlain")}
           </label>
           <input
             id="flt-max"

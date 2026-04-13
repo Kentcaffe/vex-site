@@ -14,6 +14,7 @@ import {
   userUpdatePasswordAndPreferences,
   userUpdatePreferences,
 } from "@/lib/prisma-account-settings";
+import { asListingSelect } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 import {
   mergePreferences,
@@ -201,7 +202,14 @@ export async function exportUserDataAction(): Promise<{ ok: true; json: string }
     where: { id: session.user.id },
     include: {
       listings: {
-        select: { id: true, title: true, createdAt: true, city: true, price: true },
+        select: asListingSelect({
+          id: true,
+          title: true,
+          createdAt: true,
+          city: true,
+          price: true,
+          priceCurrency: true,
+        }),
         take: 2000,
       },
       favorites: {

@@ -4,9 +4,11 @@ import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
+import type { PriceCurrencyCode } from "@/lib/currency";
 import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { localizedHref } from "@/lib/paths";
+import { asListingSelect, type FavoriteRowWithListing } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 
 type Props = {
@@ -29,18 +31,19 @@ export default async function FavoriteListPage({ params }: Props) {
       take: 100,
       include: {
         listing: {
-          select: {
+          select: asListingSelect({
             id: true,
             title: true,
             price: true,
+            priceCurrency: true,
             city: true,
             district: true,
             images: true,
             categoryId: true,
-          },
+          }),
         },
       },
-    }),
+    }) as unknown as Promise<FavoriteRowWithListing[]>,
     getAllCategories(),
   ]);
 
@@ -74,7 +77,9 @@ export default async function FavoriteListPage({ params }: Props) {
                   <div className="min-w-0 flex-1">
                     <h2 className="font-semibold text-zinc-900 dark:text-zinc-50">{item.title}</h2>
                     <p className="mt-1 text-xs text-zinc-500">{path}</p>
-                    <p className="mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-400">{formatPrice(item.price, locale)}</p>
+                    <p className="mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                      {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
+                    </p>
                     <p className="mt-1 text-sm text-zinc-500">
                       {item.city}
                       {item.district ? ` · ${item.district}` : ""}

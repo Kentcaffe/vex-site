@@ -6,13 +6,22 @@ import { CategorySidebar } from "@/components/CategorySidebar";
 import { getListingCategoryFilterIds } from "@/lib/category-filter";
 import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
+import type { PriceCurrencyCode } from "@/lib/currency";
 import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
+import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 
 type Props = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ category?: string; city?: string; min?: string; max?: string; search?: string }>;
+  searchParams: Promise<{
+    category?: string;
+    city?: string;
+    min?: string;
+    max?: string;
+    search?: string;
+    currency?: string;
+  }>;
 };
 
 export default async function AnunturiListPage({ params, searchParams }: Props) {
@@ -28,8 +37,13 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const maxRaw = sp.max?.trim();
   const minN = minRaw ? Number(minRaw) : NaN;
   const maxN = maxRaw ? Number(maxRaw) : NaN;
+  const currencyFilter = sp.currency?.trim().toUpperCase();
 
   const where: Prisma.ListingWhereInput = {};
+
+  if (currencyFilter === "MDL" || currencyFilter === "EUR") {
+    Object.assign(where, { priceCurrency: currencyFilter } as Prisma.ListingWhereInput);
+  }
 
   if (categorySlug) {
     const ids = await getListingCategoryFilterIds(categorySlug);
@@ -56,23 +70,25 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
     }
   }
 
-  const [listings, allCats] = await Promise.all([
+  const [listingsRaw, allCats] = await Promise.all([
     prisma.listing.findMany({
       where,
       orderBy: { createdAt: "desc" },
       take: 80,
-      select: {
+      select: asListingSelect({
         id: true,
         title: true,
         price: true,
+        priceCurrency: true,
         city: true,
         district: true,
         images: true,
         categoryId: true,
-      },
+      }),
     }),
     getAllCategories(),
   ]);
+  const listings = listingsRaw as unknown as ListingBrowseRow[];
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
@@ -87,6 +103,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
             defaultMin={Number.isFinite(minN) ? String(minN) : ""}
             defaultMax={Number.isFinite(maxN) ? String(maxN) : ""}
             defaultSearch={searchQ ?? ""}
+            defaultCurrency={currencyFilter === "MDL" || currencyFilter === "EUR" ? currencyFilter : ""}
             category={categorySlug}
           />
           {listings.length === 0 ? (
@@ -115,7 +132,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
                         <div className="flex flex-wrap items-start justify-between gap-2">
                           <h2 className="font-semibold text-zinc-900 dark:text-zinc-50">{item.title}</h2>
                           <span className="shrink-0 text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                            {formatPrice(item.price, locale)}
+                            {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
                           </span>
                         </div>
                         <p className="mt-1 text-xs text-zinc-500">{path}</p>

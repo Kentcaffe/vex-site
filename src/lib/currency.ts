@@ -1,6 +1,7 @@
-/** Monedă afișată: MDL (implicit) sau EUR — setează `NEXT_PUBLIC_PRICE_CURRENCY=EUR` în `.env`. */
+/** Monedă pentru prețuri la anunțuri. */
 export type PriceCurrencyCode = "MDL" | "EUR";
 
+/** Compatibilitate: moneda implicită site-wide din env (fără legătură cu anunțul). */
 export function getPriceCurrency(): PriceCurrencyCode {
   const v = process.env.NEXT_PUBLIC_PRICE_CURRENCY?.trim().toUpperCase();
   if (v === "EUR") {
@@ -17,8 +18,11 @@ function numberFormatLocale(uiLocale: string, currency: PriceCurrencyCode): stri
   return "ro-MD";
 }
 
-export function formatPrice(amount: number, locale: string): string {
-  const currency = getPriceCurrency();
+/**
+ * Formatează suma. Pentru anunțuri folosește `currency` din baza de date (`listing.priceCurrency`).
+ * Dacă lipsește al treilea argument, se folosește MDL (comportament vechi / liste fără monedă).
+ */
+export function formatPrice(amount: number, locale: string, currency: PriceCurrencyCode = "MDL"): string {
   return new Intl.NumberFormat(numberFormatLocale(locale, currency), {
     style: "currency",
     currency,

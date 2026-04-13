@@ -11,7 +11,9 @@ import { ListingSpecs } from "@/components/listing-detail/ListingSpecs";
 import { isStaff } from "@/lib/auth-roles";
 import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
+import type { PriceCurrencyCode } from "@/lib/currency";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
+import type { ListingPayloadWithCategory } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 import { Link } from "@/i18n/navigation";
 
@@ -40,7 +42,7 @@ export default async function ListingDetailPage({ params }: Props) {
     prisma.listing.findUnique({
       where: { id },
       include: { category: true },
-    }),
+    }) as Promise<ListingPayloadWithCategory | null>,
     getAllCategories(),
     auth(),
     getTranslations("ListingDetail"),
@@ -74,7 +76,9 @@ export default async function ListingDetailPage({ params }: Props) {
           <div>
             <p className="text-xs text-zinc-500">{path}</p>
             <h1 className="mt-2 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{listing.title}</h1>
-            <p className="mt-3 text-3xl font-bold text-emerald-600 dark:text-emerald-400">{formatPrice(listing.price, locale)}</p>
+            <p className="mt-3 text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+              {formatPrice(listing.price, locale, listing.priceCurrency as PriceCurrencyCode)}
+            </p>
             {listing.negotiable ? <p className="mt-1 text-sm text-zinc-500">{t("negotiable")}</p> : null}
           </div>
           <div>

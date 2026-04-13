@@ -1,12 +1,17 @@
-/** Returns true if transactional emails can be sent (configure on Render). */
-export function isMailConfigured(): boolean {
-  return Boolean(process.env.RESEND_API_KEY && process.env.EMAIL_FROM);
-}
+import { isSmtpConfigured } from "@/lib/email";
 
 type SendResult = { ok: true } | { ok: false; error: string };
 
+/** Poate trimite email tranzacțional: SMTP (Zoho) sau Resend. */
+export function isMailConfigured(): boolean {
+  const from = process.env.EMAIL_FROM;
+  if (!from) return false;
+  if (isSmtpConfigured()) return true;
+  return Boolean(process.env.RESEND_API_KEY);
+}
+
 /**
- * Sends email via Resend. Set RESEND_API_KEY + EMAIL_FROM in env.
+ * Trimite email prin API Resend. Necesită RESEND_API_KEY + EMAIL_FROM.
  */
 export async function sendTransactionalEmail(to: string, subject: string, html: string): Promise<SendResult> {
   const key = process.env.RESEND_API_KEY;
