@@ -53,12 +53,11 @@ export async function setReportStatus(
 
   await prisma.listingReport.update({
     where: { id: reportId },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- resolutionNote exists in schema; some IDE caches omit it from Prisma input types
     data: {
       status,
       resolutionNote: note,
       resolvedAt: status === "PENDING" ? null : new Date(),
-    } as any,
+    },
   });
 
   const shouldNotify =

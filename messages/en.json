@@ -120,7 +120,7 @@
     "linkListings": "All listings",
     "linkPublish": "Post an ad",
     "linkAccount": "Account",
-    "rights": "© {year} VEX. All rights reserved.",
+    "rights": "Â© {year} VEX. All rights reserved.",
     "disclaimer": "The platform displays ads; transactions happen between users. Always verify items or services before paying."
   },
   "Legal": {
@@ -194,7 +194,7 @@
       "year": "Year",
       "mileageKm": "Mileage",
       "rooms": "Rooms",
-      "areaSqm": "Area (m²)"
+      "areaSqm": "Area (mÂ²)"
     },
     "specExtra": {
       "fuel": "Fuel",
@@ -212,7 +212,7 @@
       "doors": "Doors",
       "furnished": "Furnished",
       "building_type": "Building type",
-      "land_area_sqm": "Land area (m²)",
+      "land_area_sqm": "Land area (mÂ²)",
       "battery_health": "Battery health (%)",
       "screen_inch": "Screen size (inch)",
       "processor": "Processor",
@@ -451,7 +451,7 @@
     "year": "Year",
     "mileage": "Mileage",
     "rooms": "Rooms",
-    "areaSqm": "Area (m²)",
+    "areaSqm": "Area (mÂ²)",
     "images": "Images",
     "imagesHint": "Minimum 1, maximum 8 URLs (one per line). You can upload files.",
     "upload": "Upload images",
@@ -492,7 +492,7 @@
       "fwd": "FWD",
       "rwd": "RWD",
       "awd": "AWD",
-      "4wd": "4×4"
+      "4wd": "4Ã—4"
     },
     "doors": {
       "2": "2",
@@ -524,33 +524,87 @@
       "unknown": "Unknown"
     },
     "detail": {
-      "fuel": { "label": "Fuel" },
-      "transmission": { "label": "Transmission" },
-      "floor": { "label": "Floor" },
-      "storage_gb": { "label": "Storage (GB)" },
-      "ram_gb": { "label": "RAM (GB)" },
-      "experience_years": { "label": "Experience (years)" },
-      "service_radius_km": { "label": "Service radius (km)" },
-      "color": { "label": "Color" },
-      "body_type": { "label": "Body type" },
-      "drivetrain": { "label": "Drivetrain" },
-      "engine_cc": { "label": "Engine displacement (cc)" },
-      "power_hp": { "label": "Power (hp)" },
-      "doors": { "label": "Doors" },
-      "furnished": { "label": "Furnished" },
-      "building_type": { "label": "Building type" },
-      "land_area_sqm": { "label": "Land area (m²)" },
-      "battery_health": { "label": "Battery health (%)" },
-      "screen_inch": { "label": "Screen size (inch)" },
-      "processor": { "label": "Processor" },
-      "part_number": { "label": "Part / OEM code" },
-      "compatibility": { "label": "Compatibility (model / years)" },
-      "employment_type": { "label": "Employment type" },
-      "salary_from": { "label": "Salary from (in displayed currency)" },
-      "salary_to": { "label": "Salary to" },
-      "size_label": { "label": "Size (e.g. M, 42)" },
-      "age_months": { "label": "Age (months)" },
-      "vaccinated": { "label": "Vaccinated" }
+      "fuel": {
+        "label": "Fuel"
+      },
+      "transmission": {
+        "label": "Transmission"
+      },
+      "floor": {
+        "label": "Floor"
+      },
+      "storage_gb": {
+        "label": "Storage (GB)"
+      },
+      "ram_gb": {
+        "label": "RAM (GB)"
+      },
+      "experience_years": {
+        "label": "Experience (years)"
+      },
+      "service_radius_km": {
+        "label": "Service radius (km)"
+      },
+      "color": {
+        "label": "Color"
+      },
+      "body_type": {
+        "label": "Body type"
+      },
+      "drivetrain": {
+        "label": "Drivetrain"
+      },
+      "engine_cc": {
+        "label": "Engine displacement (cc)"
+      },
+      "power_hp": {
+        "label": "Power (hp)"
+      },
+      "doors": {
+        "label": "Doors"
+      },
+      "furnished": {
+        "label": "Furnished"
+      },
+      "building_type": {
+        "label": "Building type"
+      },
+      "land_area_sqm": {
+        "label": "Land area (mÂ²)"
+      },
+      "battery_health": {
+        "label": "Battery health (%)"
+      },
+      "screen_inch": {
+        "label": "Screen size (inch)"
+      },
+      "processor": {
+        "label": "Processor"
+      },
+      "part_number": {
+        "label": "Part / OEM code"
+      },
+      "compatibility": {
+        "label": "Compatibility (model / years)"
+      },
+      "employment_type": {
+        "label": "Employment type"
+      },
+      "salary_from": {
+        "label": "Salary from (in displayed currency)"
+      },
+      "salary_to": {
+        "label": "Salary to"
+      },
+      "size_label": {
+        "label": "Size (e.g. M, 42)"
+      },
+      "age_months": {
+        "label": "Age (months)"
+      },
+      "vaccinated": {
+        "label": "Vaccinated"
+      }
     },
     "validation": {
       "errCategory": "Pick a category.",
@@ -564,4 +618,3 @@
     }
   }
 }
-

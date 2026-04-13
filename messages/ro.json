@@ -2,7 +2,7 @@
   "NotFound": {
     "title": "Pagina nu exist?",
     "body": "Resursa pe care o cau?i nu a fost g?sit?.",
-    "home": "Œnapoi acas?"
+    "home": "√énapoi acas?"
   },
   "Nav": {
     "home": "Acas?",
@@ -24,18 +24,18 @@
   "Chat": {
     "title": "Conversa?ie",
     "inboxTitle": "Mesaje",
-    "inboxSubtitle": "Conversa?iile tale cu cump?r?tori ?i v‚nz?tori.",
-    "inboxEmptyTitle": "Nicio conversa?ie Ónc?",
-    "inboxEmpty": "Deschide un anun? ?i apas? ?Contacteaz? v‚nz?torul? pentru a Óncepe.",
+    "inboxSubtitle": "Conversa?iile tale cu cump?r?tori ?i v√¢nz?tori.",
+    "inboxEmptyTitle": "Nicio conversa?ie √Ænc?",
+    "inboxEmpty": "Deschide un anun? ?i apas? ?Contacteaz? v√¢nz?torul? pentru a √Æncepe.",
     "noPreviewYet": "Niciun mesaj",
-    "contactSeller": "Contacteaz? v‚nz?torul",
+    "contactSeller": "Contacteaz? v√¢nz?torul",
     "contactLogin": "Autentific?-te pentru a scrie",
     "with": "Cu {name}",
-    "backToInbox": "Œnapoi la mesaje",
+    "backToInbox": "√énapoi la mesaje",
     "today": "Ast?zi",
     "yesterday": "Ieri",
     "youLabel": "Tu",
-    "emptyThread": "Scrie primul mesaj ? r?spunsurile apar aici Ón timp real.",
+    "emptyThread": "Scrie primul mesaj ? r?spunsurile apar aici √Æn timp real.",
     "charsLeft": "caractere r?mase",
     "live": "Conexiune activ?",
     "connecting": "Se conecteaz??",
@@ -43,21 +43,21 @@
     "seen": "V?zut",
     "placeholder": "Scrie un mesaj?",
     "send": "Trimite",
-    "inboxSearchPlaceholder": "Caut? Ón conversa?ii?",
+    "inboxSearchPlaceholder": "Caut? √Æn conversa?ii?",
     "inboxNoResults": "Nu am g?sit conversa?ii dup? acest text.",
     "unreadBadge": "{count} necitite"
   },
   "Home": {
-    "title": "Marketplace local pentru anun?uri ?i v‚nz?ri",
-    "subtitle": "Autoturisme, imobiliare, electronice ?i servicii ? totul Óntr-un singur loc. Public? gratuit sau g?se?te rapid ce cau?i.",
+    "title": "Marketplace local pentru anun?uri ?i v√¢nz?ri",
+    "subtitle": "Autoturisme, imobiliare, electronice ?i servicii ? totul √Æntr-un singur loc. Public? gratuit sau g?se?te rapid ce cau?i.",
     "browse": "Vezi anun?uri",
     "publish": "Public? anun?",
-    "badge": "Anun?uri & v‚nz?ri",
+    "badge": "Anun?uri & v√¢nz?ri",
     "stat1Label": "Catalog",
     "stat1Value": "Actualizat continuu",
     "stat2Label": "Acoperire",
     "stat2Value": "Local & regional",
-    "stat3Label": "Pentru v‚nz?tori",
+    "stat3Label": "Pentru v√¢nz?tori",
     "stat3Value": "Publicare gratuit?",
     "exploreTitle": "Exploreaz? categoriile",
     "exploreSubtitle": "Alege domeniul care te intereseaz? ? filtrele se aplic? automat pe list?.",
@@ -68,20 +68,20 @@
     "cat_servicii": "Servicii",
     "howTitle": "Cum func?ioneaz?",
     "how1Title": "Caut? sau public?",
-    "how1Body": "R?sfoie?te anun?urile dup? categorie ?i ora? sau creeaz? un cont ?i public? Ón c‚teva minute.",
+    "how1Body": "R?sfoie?te anun?urile dup? categorie ?i ora? sau creeaz? un cont ?i public? √Æn c√¢teva minute.",
     "how2Title": "Contact direct",
-    "how2Body": "Vorbe?ti cu v‚nz?torul sau cump?r?torul ? telefon sau detaliile din anun?, f?r? comisioane obligatorii platformei.",
+    "how2Body": "Vorbe?ti cu v√¢nz?torul sau cump?r?torul ? telefon sau detaliile din anun?, f?r? comisioane obligatorii platformei.",
     "how3Title": "Moderare ?i claritate",
-    "how3Body": "Anun?urile respect? regulile comunit??ii; po?i raporta con?inut abuziv (func?ie Ón evolu?ie Ón panoul admin).",
+    "how3Body": "Anun?urile respect? regulile comunit??ii; po?i raporta con?inut abuziv (func?ie √Æn evolu?ie √Æn panoul admin).",
     "trustTitle": "De ce merit? s? folose?ti platforma",
     "trust1Title": "Pentru cump?r?tori",
-    "trust1Body": "Filtrare clar?, pre?uri Ón MDL sau EUR (configurabil) ?i detalii structurate pe categorii.",
-    "trust2Title": "Pentru v‚nz?tori",
-    "trust2Body": "Publicare ghidat?, imagini multiple ?i vizibilitate Ón list? ? ideal pentru v‚nz?ri locale rapide.",
+    "trust1Body": "Filtrare clar?, pre?uri √Æn MDL sau EUR (configurabil) ?i detalii structurate pe categorii.",
+    "trust2Title": "Pentru v√¢nz?tori",
+    "trust2Body": "Publicare ghidat?, imagini multiple ?i vizibilitate √Æn list? ? ideal pentru v√¢nz?ri locale rapide.",
     "trust3Title": "Performan??",
     "trust3Body": "Interfa?? rapid?, optimizat? pentru desktop ?i mobil, cu suport pentru mai multe limbi.",
-    "ctaTitle": "Gata s? Óncepi?",
-    "ctaSubtitle": "Intr? Ón list? sau public? primul anun? ? dureaz? doar c‚teva minute.",
+    "ctaTitle": "Gata s? √Æncepi?",
+    "ctaSubtitle": "Intr? √Æn list? sau public? primul anun? ? dureaz? doar c√¢teva minute.",
     "marketplace": {
       "banner": "Bine ai venit pe VEX ? anun?uri locale, simple ?i rapide.",
       "regionTag": "Republica Moldova",
@@ -90,15 +90,15 @@
       "viewAll": "Toate anun?urile",
       "categoriesTitle": "Categorii populare",
       "categoriesHint": "Alege rapid domeniul ? vezi anun?urile filtrate.",
-      "empty": "Œnc? nu exist? anun?uri. Fii primul care public?!",
+      "empty": "√énc? nu exist? anun?uri. Fii primul care public?!",
       "sortLabel": "Sortare",
       "sortNewest": "Cele mai noi",
       "filterLink": "Filtre avansate",
       "promoTile1Title": "Caut? inteligent",
       "promoTile1Body": "Folose?te c?utarea ?i filtrele dup? ora? ?i pre?.",
       "promoTile1Link": "Deschide lista",
-      "promoTile2Title": "Mesaje Ón timp real",
-      "promoTile2Body": "Contacteaz? v‚nz?torul direct din anun?.",
+      "promoTile2Title": "Mesaje √Æn timp real",
+      "promoTile2Body": "Contacteaz? v√¢nz?torul direct din anun?.",
       "promoTile2Link": "Cum func?ioneaz?",
       "promoTile3Title": "Anun?uri gratuite",
       "promoTile3Body": "Public? cu poze ?i detalii structurate pe categorii.",
@@ -106,13 +106,13 @@
       "adPlaceholderTitle": "Spa?iu publicitar",
       "adPlaceholderBody": "Zon? rezervat? pentru parteneri.",
       "promo2Title": "Public? gratuit",
-      "promo2Body": "Creeaz? un cont ?i adaug? anun?ul Ón c‚teva minute ? cu fotografii ?i detalii clare.",
+      "promo2Body": "Creeaz? un cont ?i adaug? anun?ul √Æn c√¢teva minute ? cu fotografii ?i detalii clare.",
       "promo2Cta": "Public? un anun?"
     }
   },
   "Footer": {
     "siteName": "VEX",
-    "tagline": "Marketplace pentru anun?uri ?i v‚nz?ri locale. Conect?m cump?r?tori ?i v‚nz?tori f?r? pa?i inutili.",
+    "tagline": "Marketplace pentru anun?uri ?i v√¢nz?ri locale. Conect?m cump?r?tori ?i v√¢nz?tori f?r? pa?i inutili.",
     "explore": "Exploreaz?",
     "legal": "Legal",
     "terms": "Termeni ?i condi?ii",
@@ -120,31 +120,31 @@
     "linkListings": "Toate anun?urile",
     "linkPublish": "Public? anun?",
     "linkAccount": "Cont",
-    "rights": "© {year} VEX. Toate drepturile rezervate.",
-    "disclaimer": "Platforma faciliteaz? afi?area anun?urilor; tranzac?iile au loc Óntre utilizatori. Verific? mereu produsul sau serviciul Ónainte de plat?."
+    "rights": "¬© {year} VEX. Toate drepturile rezervate.",
+    "disclaimer": "Platforma faciliteaz? afi?area anun?urilor; tranzac?iile au loc √Æntre utilizatori. Verific? mereu produsul sau serviciul √Ænainte de plat?."
   },
   "Legal": {
     "terms": {
-      "back": "Œnapoi",
+      "back": "√énapoi",
       "title": "Termeni ?i condi?ii",
       "updated": "Ultima actualizare: aprilie 2026",
       "p1": "Prin accesarea ?i utilizarea acestui site accep?i ace?ti termeni. Dac? nu e?ti de acord, te rug?m s? nu folose?ti serviciul.",
-      "p2": "E?ti responsabil pentru con?inutul anun?urilor pe care le publici: veridicitatea informa?iilor, drepturile asupra imaginilor ?i respectarea legii. Ne rezerv?m dreptul de a ?terge sau modera anun?uri care Óncalc? regulile sau legea.",
-      "p3": "Site-ul este oferit ca intermediar tehnic Óntre utilizatori. Nu garant?m disponibilitatea continu? ?i nu suntem parte Ón tranzac?iile dintre utilizatori. Orice litigiu privind bunurile sau serviciile se solu?ioneaz? Óntre p?r?i.",
-      "p4": "Putem actualiza ace?ti termeni; versiunea publicat? pe site face drept referin??. Continuarea utiliz?rii dup? modific?ri Ónseamn? acceptarea noilor termeni.",
-      "p5": "Pentru utilizatorii din UE/SEE se aplic? prevederile relevante privind protec?ia consumatorilor ?i protec?ia datelor, Ón m?sura Ón care sunt aplicabile.",
-      "p6": "Pentru Óntreb?ri despre ace?ti termeni, folose?te datele de contact publicate de operatorul site-ului (actualizeaz?-le Ón produc?ie)."
+      "p2": "E?ti responsabil pentru con?inutul anun?urilor pe care le publici: veridicitatea informa?iilor, drepturile asupra imaginilor ?i respectarea legii. Ne rezerv?m dreptul de a ?terge sau modera anun?uri care √Æncalc? regulile sau legea.",
+      "p3": "Site-ul este oferit ca intermediar tehnic √Æntre utilizatori. Nu garant?m disponibilitatea continu? ?i nu suntem parte √Æn tranzac?iile dintre utilizatori. Orice litigiu privind bunurile sau serviciile se solu?ioneaz? √Æntre p?r?i.",
+      "p4": "Putem actualiza ace?ti termeni; versiunea publicat? pe site face drept referin??. Continuarea utiliz?rii dup? modific?ri √Ænseamn? acceptarea noilor termeni.",
+      "p5": "Pentru utilizatorii din UE/SEE se aplic? prevederile relevante privind protec?ia consumatorilor ?i protec?ia datelor, √Æn m?sura √Æn care sunt aplicabile.",
+      "p6": "Pentru √Æntreb?ri despre ace?ti termeni, folose?te datele de contact publicate de operatorul site-ului (actualizeaz?-le √Æn produc?ie)."
     },
     "privacy": {
-      "back": "Œnapoi",
+      "back": "√énapoi",
       "title": "Politica de confiden?ialitate",
       "updated": "Ultima actualizare: aprilie 2026",
       "p1": "Prelucr?m date cu caracter personal (ex.: adres? de email la crearea contului) pentru a furniza autentificare, publicare de anun?uri ?i administrare tehnic? a platformei.",
-      "p2": "Temeiul prelucr?rii poate fi executarea unui contract (cont), interesul legitim (securitate, prevenire abuz) sau consim??m‚ntul acolo unde este necesar.",
-      "p3": "P?str?m datele pe perioada necesar? Óndeplinirii scopurilor sau conform obliga?iilor legale. Po?i solicita acces, rectificare, ?tergere sau restric?ionare Ón limitele legii.",
-      "p4": "Putem folosi furnizori tehnici (g?zduire, email tranzac?ional) care prelucreaz? date Ón numele nostru, cu m?suri contractuale adecvate.",
+      "p2": "Temeiul prelucr?rii poate fi executarea unui contract (cont), interesul legitim (securitate, prevenire abuz) sau consim??m√¢ntul acolo unde este necesar.",
+      "p3": "P?str?m datele pe perioada necesar? √Ændeplinirii scopurilor sau conform obliga?iilor legale. Po?i solicita acces, rectificare, ?tergere sau restric?ionare √Æn limitele legii.",
+      "p4": "Putem folosi furnizori tehnici (g?zduire, email tranzac?ional) care prelucreaz? date √Æn numele nostru, cu m?suri contractuale adecvate.",
       "p5": "Cookie-uri: folosim cookie-uri esen?iale pentru sesiune ?i func?ionare. Dac? adaugi analit??? op?ional?, afi?eaz? un banner ?i documenteaz? alegerile utilizatorului.",
-      "p6": "Pentru exercitarea drepturilor GDPR sau Óntreb?ri despre date, contacteaz? operatorul site-ului la adresa publicat? (Ónlocuie?te cu email real Ón produc?ie)."
+      "p6": "Pentru exercitarea drepturilor GDPR sau √Æntreb?ri despre date, contacteaz? operatorul site-ului la adresa publicat? (√Ænlocuie?te cu email real √Æn produc?ie)."
     }
   },
   "Listings": {
@@ -156,7 +156,7 @@
     "openCategoryMap": "Hart? categorii",
     "filters": {
       "title": "Filtre",
-      "search": "Caut? Ón anun?uri",
+      "search": "Caut? √Æn anun?uri",
       "city": "Ora?",
       "min": "Pre? min (RON)",
       "max": "Pre? max (RON)",
@@ -167,7 +167,7 @@
     }
   },
   "CategoriesPage": {
-    "searchPlaceholder": "Caut? Ón anun?uri dup? cuvinte cheie?",
+    "searchPlaceholder": "Caut? √Æn anun?uri dup? cuvinte cheie?",
     "search": "Caut?",
     "sidebarTitle": "Categorii"
   },
@@ -184,17 +184,17 @@
     "copyLink": "Copiaz? link",
     "copied": "Copiat!",
     "moderation": "Moderare",
-    "favoritesHint": "Salveaz? anun?ul ca s? Ól g?se?ti rapid mai t‚rziu.",
+    "favoritesHint": "Salveaz? anun?ul ca s? √Æl g?se?ti rapid mai t√¢rziu.",
     "favoritesLogin": "Ai nevoie de cont pentru a salva anun?uri. Autentific?-te, apoi revino la aceast? pagin?.",
     "favoritesCtaLogin": "Autentific?-te ca s? salvezi",
-    "reportHint": "Ceva nu e Ón regul?? Semnaleaz? pentru moderare.",
+    "reportHint": "Ceva nu e √Æn regul?? Semnaleaz? pentru moderare.",
     "spec": {
       "brand": "Marc?",
       "model": "Model",
       "year": "An",
       "mileageKm": "Kilometraj",
       "rooms": "Camere",
-      "areaSqm": "Suprafa?? (m≤)"
+      "areaSqm": "Suprafa?? (m¬≤)"
     },
     "specExtra": {
       "fuel": "Combustibil",
@@ -207,12 +207,12 @@
       "service_radius_km": "Raz? servicii (km)",
       "body_type": "Caroserie",
       "drivetrain": "Trac?iune",
-      "engine_cc": "Cilindree (cm≥)",
+      "engine_cc": "Cilindree (cm¬≥)",
       "power_hp": "Putere (CP)",
       "doors": "U?i",
       "furnished": "Mobilat",
       "building_type": "Tip imobil",
-      "land_area_sqm": "Suprafa?? teren (m≤)",
+      "land_area_sqm": "Suprafa?? teren (m¬≤)",
       "battery_health": "S?n?tate baterie (%)",
       "screen_inch": "Diagonal? ecran (inch)",
       "processor": "Procesor",
@@ -220,31 +220,31 @@
       "compatibility": "Compatibilitate",
       "employment_type": "Tip angajare",
       "salary_from": "Salariu de la",
-      "salary_to": "Salariu p‚n? la",
+      "salary_to": "Salariu p√¢n? la",
       "size_label": "M?rime",
-      "age_months": "V‚rst? (luni)",
+      "age_months": "V√¢rst? (luni)",
       "vaccinated": "Vaccinat"
     }
   },
   "Auth": {
     "loginTitle": "Autentificare",
-    "registerTitle": "Œnregistrare",
+    "registerTitle": "√énregistrare",
     "email": "Email",
     "password": "Parol?",
     "passwordMin": "Parol? (min. 8 caractere)",
     "nameOptional": "Nume (op?ional)",
-    "login": "Intr? Ón cont",
+    "login": "Intr? √Æn cont",
     "loginEmail": "Intr? cu email ?i parol?",
     "continueGoogle": "Continu? cu Google",
     "continueFacebook": "Continu? cu Facebook",
     "oauthDivider": "sau cu email ?i parol?",
-    "oauthConfigureHint": "Google / Facebook apar aici dup? ce adaugi chei Ón .env ? vezi .env.example.",
+    "oauthConfigureHint": "Google / Facebook apar aici dup? ce adaugi chei √Æn .env ? vezi .env.example.",
     "register": "Creeaz? cont",
     "logout": "Ie?ire",
     "emailTaken": "Acest email este deja folosit.",
     "validationError": "Date invalide.",
     "registerSuccess": "Cont creat. Te po?i autentifica.",
-    "loginInvalid": "Email sau parol? incorect?. Verific? ?i Óncearc? din nou.",
+    "loginInvalid": "Email sau parol? incorect?. Verific? ?i √Æncearc? din nou.",
     "loginPending": "Se autentific??",
     "forgotPassword": "Ai uitat parola?",
     "forgotTitle": "Resetare parol?",
@@ -253,9 +253,9 @@
     "resetSending": "Se trimite?",
     "resetEmailSent": "Dac? exist? un cont cu acest email, ?i-am trimis instruc?iuni.",
     "resetMailNotConfigured": "Trimiterea emailurilor nu e configurat? pe server (RESEND + EMAIL_FROM).",
-    "resetSendFailed": "Nu s-a putut trimite emailul. Œncearc? mai t‚rziu.",
-    "resetOAuthHint": "Dac? te-ai Ónregistrat cu Google sau Facebook, folose?te acela?i buton ? nu exist? parol? separat?.",
-    "backToLogin": "Œnapoi la autentificare",
+    "resetSendFailed": "Nu s-a putut trimite emailul. √éncearc? mai t√¢rziu.",
+    "resetOAuthHint": "Dac? te-ai √Ænregistrat cu Google sau Facebook, folose?te acela?i buton ? nu exist? parol? separat?.",
+    "backToLogin": "√énapoi la autentificare",
     "resetTitle": "Parol? nou?",
     "resetSubtitle": "Alege o parol? nou? (minim 8 caractere).",
     "resetConfirmPassword": "Confirm? parola",
@@ -284,9 +284,9 @@
     "profileSave": "Salveaz? profilul",
     "profileSaving": "Se salveaz??",
     "profileSuccess": "Profilul a fost actualizat.",
-    "profileValidation": "Verific? datele introduse (ex: URL-ul pozei trebuie s? Ónceap? cu http/https).",
+    "profileValidation": "Verific? datele introduse (ex: URL-ul pozei trebuie s? √Ænceap? cu http/https).",
     "profileUnauthorized": "Trebuie s? fii autentificat.",
-    "profileUnknown": "Nu am putut salva profilul. Œncearc? din nou."
+    "profileUnknown": "Nu am putut salva profilul. √éncearc? din nou."
   },
   "Notifications": {
     "title": "Notific?ri",
@@ -294,7 +294,7 @@
     "empty": "Nu ai notific?ri.",
     "markRead": "Marcheaz? citit",
     "markAllRead": "Marcheaz? toate citite",
-    "backToAccount": "Œnapoi la cont"
+    "backToAccount": "√énapoi la cont"
   },
   "ReportOther": {
     "pageTitle": "Raporteaz? con?inut",
@@ -304,20 +304,20 @@
     "urlLabel": "Link (op?ional)",
     "submit": "Trimite reclama?ia",
     "sending": "Se trimite?",
-    "success": "Am Ónregistrat reclama?ia. Moderatorii o vor verifica.",
-    "errorValidation": "Verific? c‚mpurile (subiect minim 3 caractere, URL valid dac? Ól completezi).",
-    "backToAccount": "Œnapoi la cont"
+    "success": "Am √Ænregistrat reclama?ia. Moderatorii o vor verifica.",
+    "errorValidation": "Verific? c√¢mpurile (subiect minim 3 caractere, URL valid dac? √Æl completezi).",
+    "backToAccount": "√énapoi la cont"
   },
   "Publish": {
     "title": "Public? anun?",
-    "subtitle": "Completeaz? c‚mpurile de mai jos.",
+    "subtitle": "Completeaz? c√¢mpurile de mai jos.",
     "noCategories": "Nu exist? categorii configurate."
   },
   "Admin": {
     "shellTitle": "Administrare",
     "shellBrand": "Panou",
     "shellTagline": "Moderare & statistici",
-    "backToSite": "Œnapoi la site",
+    "backToSite": "√énapoi la site",
     "title": "Panou admin",
     "subtitle": "Lista anun?urilor (modificare rapid?).",
     "navDashboard": "Rezumat",
@@ -326,13 +326,13 @@
     "navComplaints": "Reclama?ii",
     "navUsers": "Utilizatori",
     "dashboardTitle": "Rezumat",
-    "dashboardSubtitle": "Vezi dintr-o privire ce necesit? aten?ie ?i intr? rapid Ón fiecare zon?.",
+    "dashboardSubtitle": "Vezi dintr-o privire ce necesit? aten?ie ?i intr? rapid √Æn fiecare zon?.",
     "dashboardAttention": "Necesit? aten?ie",
-    "dashboardAttentionDesc": "Ai {count} raport?ri Ón a?teptare. Revizuie?te coada Ónainte de a marca sau respinge.",
+    "dashboardAttentionDesc": "Ai {count} raport?ri √Æn a?teptare. Revizuie?te coada √Ænainte de a marca sau respinge.",
     "dashboardOpenQueue": "Deschide coada de raport?ri",
     "statListings": "Anun?uri publicate",
-    "statUsers": "Utilizatori Ónregistra?i",
-    "statPendingReports": "Raport?ri Ón a?teptare",
+    "statUsers": "Utilizatori √Ænregistra?i",
+    "statPendingReports": "Raport?ri √Æn a?teptare",
     "statResolvedReports": "Raport?ri revizuite",
     "statDismissedReports": "Raport?ri respinse",
     "openSection": "Deschide",
@@ -343,12 +343,12 @@
     "listingsColPrice": "Pre?",
     "listingsColActions": "Ac?iuni",
     "usersTitle": "Utilizatori",
-    "usersSubtitle": "Conturi Ónregistrate, roluri ?i num?r de anun?uri publicate.",
+    "usersSubtitle": "Conturi √Ænregistrate, roluri ?i num?r de anun?uri publicate.",
     "usersColEmail": "Email",
     "usersColName": "Nume",
     "usersColRole": "Rol",
     "usersColListings": "Anun?uri",
-    "usersColJoined": "Œnregistrat",
+    "usersColJoined": "√énregistrat",
     "usersEmpty": "Nu exist? utilizatori.",
     "role_USER": "Utilizator",
     "role_MODERATOR": "Moderator",
@@ -356,19 +356,19 @@
     "reportsTitle": "Raport?ri",
     "reportsSubtitle": "Filtreaz? dup? stare, cite?te motivul ?i ia m?suri pe anun?.",
     "filterAll": "Toate",
-    "filterPending": "Œn a?teptare",
+    "filterPending": "√én a?teptare",
     "filterReviewed": "Revizuite",
     "filterDismissed": "Respinse",
-    "reportsSummaryHint": "Raport?rile Ón a?teptare au prioritate; po?i ?terge anun?ul din orice stare.",
+    "reportsSummaryHint": "Raport?rile √Æn a?teptare au prioritate; po?i ?terge anun?ul din orice stare.",
     "complaintsTitle": "Reclama?ii",
     "complaintsSubtitle": "Toate raport?rile (anun?uri ?i alt con?inut), cu stare ?i mesaj op?ional pentru raportor dup? rezolvare.",
     "complaintFilterType": "Tip",
     "complaintTypeAll": "Toate",
     "complaintTypeListing": "Anun?",
     "complaintTypeOther": "Alt con?inut",
-    "complaintsHint": "La rezolvare, raportorul prime?te notificare Ón cont ?i email (dac? e configurat Resend).",
+    "complaintsHint": "La rezolvare, raportorul prime?te notificare √Æn cont ?i email (dac? e configurat Resend).",
     "resolutionNoteModerator": "Mesaj pentru raportor (op?ional)",
-    "resolutionNotePlaceholder": "Ex.: am eliminat anun?ul / nu s-a confirmat Ónc?lcarea?",
+    "resolutionNotePlaceholder": "Ex.: am eliminat anun?ul / nu s-a confirmat √Ænc?lcarea?",
     "resolutionNotePublic": "R?spuns moderare",
     "reportsEmpty": "Nu exist? raport?ri.",
     "reportFrom": "Raportat de",
@@ -378,11 +378,11 @@
     "dismiss": "Respinge",
     "deleteListing": "?terge anun?ul",
     "confirmDeleteListingFromReport": "?tergi acest anun? de pe site? Ac?iunea nu poate fi anulat?.",
-    "reportActionError": "Ac?iunea a e?uat. Œncearc? din nou.",
-    "status_PENDING": "Œn a?teptare",
+    "reportActionError": "Ac?iunea a e?uat. √éncearc? din nou.",
+    "status_PENDING": "√én a?teptare",
     "status_REVIEWED": "Revizuit",
     "status_DISMISSED": "Respins",
-    "reason_spam": "Spam / Ón?el?tor",
+    "reason_spam": "Spam / √Æn?el?tor",
     "reason_fraud": "Fraud? / escrocherie",
     "reason_inappropriate": "Con?inut nepotrivit",
     "reason_duplicate": "Anun? duplicat",
@@ -408,7 +408,7 @@
     "errorOwn": "Nu po?i raporta propriul anun?.",
     "errorDuplicate": "Ai raportat deja acest anun?.",
     "errorGeneric": "Nu s-a putut trimite raportul.",
-    "reasonSpam": "Spam / Ón?el?tor",
+    "reasonSpam": "Spam / √Æn?el?tor",
     "reasonFraud": "Fraud? / escrocherie",
     "reasonInappropriate": "Con?inut nepotrivit",
     "reasonDuplicate": "Anun? duplicat",
@@ -425,7 +425,7 @@
   },
   "ListingForm": {
     "category": "Categorie",
-    "formSectionCategory": "Unde se Óncadreaz? anun?ul",
+    "formSectionCategory": "Unde se √Æncadreaz? anun?ul",
     "formSectionListing": "Text ?i pre?",
     "formSectionSpecs": "Detalii specifice categoriei",
     "formSectionMedia": "Imagini",
@@ -433,7 +433,7 @@
     "categoryBreadcrumbRoot": "Toate categoriile",
     "categoryBack": "Nivel anterior",
     "categorySearchPlaceholder": "Filtreaz? dup? nume?",
-    "categoryEmptyFilter": "Nicio potrivire ? Óncearc? alt termen sau alt nivel.",
+    "categoryEmptyFilter": "Nicio potrivire ? √Æncearc? alt termen sau alt nivel.",
     "title": "Titlu",
     "description": "Descriere",
     "price": "Pre?",
@@ -451,17 +451,17 @@
     "year": "An fabrica?ie",
     "mileage": "Kilometraj",
     "rooms": "Camere",
-    "areaSqm": "Suprafa?? (m≤)",
+    "areaSqm": "Suprafa?? (m¬≤)",
     "images": "Imagini",
-    "imagesHint": "Minim 1, maxim 8 URL-uri (una pe linie). Po?i Ónc?rca fi?iere locale.",
-    "upload": "Œncarc? imagini",
+    "imagesHint": "Minim 1, maxim 8 URL-uri (una pe linie). Po?i √Ænc?rca fi?iere locale.",
+    "upload": "√éncarc? imagini",
     "imageCount": "{count} / {max} imagini",
     "uploadTooMany": "Prea multe imagini (max. 8).",
     "submit": "Public? anun?ul",
     "submitting": "Se public??",
     "success": "Anun? publicat cu succes.",
     "serverUnauthorized": "Trebuie s? fii autentificat.",
-    "serverValidation": "Verific? c‚mpurile ?i Óncearc? din nou.",
+    "serverValidation": "Verific? c√¢mpurile ?i √Æncearc? din nou.",
     "serverCategory": "Categorie invalid? (alege o subcategorie).",
     "serverSession": "Sesiune invalid?.",
     "detailOptional": "? op?ional ?",
@@ -492,7 +492,7 @@
       "fwd": "Fa??",
       "rwd": "Spate",
       "awd": "Integral? (AWD)",
-      "4wd": "4◊4"
+      "4wd": "4√ó4"
     },
     "doors": {
       "2": "2",
@@ -512,7 +512,7 @@
       "other": "Altul"
     },
     "employment_type": {
-      "full_time": "Norm? Óntreag?",
+      "full_time": "Norm? √Æntreag?",
       "part_time": "Cu jum?tate de norm?",
       "contract": "Contract",
       "remote": "Remote",
@@ -524,33 +524,87 @@
       "unknown": "Necunoscut"
     },
     "detail": {
-      "fuel": { "label": "Combustibil" },
-      "transmission": { "label": "Transmisie" },
-      "floor": { "label": "Etaj" },
-      "storage_gb": { "label": "Stocare (GB)" },
-      "ram_gb": { "label": "RAM (GB)" },
-      "experience_years": { "label": "Experien?? (ani)" },
-      "service_radius_km": { "label": "Raz? servicii (km)" },
-      "color": { "label": "Culoare" },
-      "body_type": { "label": "Caroserie" },
-      "drivetrain": { "label": "Trac?iune" },
-      "engine_cc": { "label": "Cilindree (cm≥)" },
-      "power_hp": { "label": "Putere (CP)" },
-      "doors": { "label": "U?i" },
-      "furnished": { "label": "Mobilat" },
-      "building_type": { "label": "Tip imobil" },
-      "land_area_sqm": { "label": "Suprafa?? teren (m≤)" },
-      "battery_health": { "label": "S?n?tate baterie (%)" },
-      "screen_inch": { "label": "Diagonal? ecran (inch)" },
-      "processor": { "label": "Procesor" },
-      "part_number": { "label": "Cod pies? / OEM" },
-      "compatibility": { "label": "Compatibilitate (model / ani)" },
-      "employment_type": { "label": "Tip angajare" },
-      "salary_from": { "label": "Salariu de la (Ón moneda afi?at?)" },
-      "salary_to": { "label": "Salariu p‚n? la" },
-      "size_label": { "label": "M?rime (ex. M, 42)" },
-      "age_months": { "label": "V‚rst? (luni)" },
-      "vaccinated": { "label": "Vaccinat" }
+      "fuel": {
+        "label": "Combustibil"
+      },
+      "transmission": {
+        "label": "Transmisie"
+      },
+      "floor": {
+        "label": "Etaj"
+      },
+      "storage_gb": {
+        "label": "Stocare (GB)"
+      },
+      "ram_gb": {
+        "label": "RAM (GB)"
+      },
+      "experience_years": {
+        "label": "Experien?? (ani)"
+      },
+      "service_radius_km": {
+        "label": "Raz? servicii (km)"
+      },
+      "color": {
+        "label": "Culoare"
+      },
+      "body_type": {
+        "label": "Caroserie"
+      },
+      "drivetrain": {
+        "label": "Trac?iune"
+      },
+      "engine_cc": {
+        "label": "Cilindree (cm¬≥)"
+      },
+      "power_hp": {
+        "label": "Putere (CP)"
+      },
+      "doors": {
+        "label": "U?i"
+      },
+      "furnished": {
+        "label": "Mobilat"
+      },
+      "building_type": {
+        "label": "Tip imobil"
+      },
+      "land_area_sqm": {
+        "label": "Suprafa?? teren (m¬≤)"
+      },
+      "battery_health": {
+        "label": "S?n?tate baterie (%)"
+      },
+      "screen_inch": {
+        "label": "Diagonal? ecran (inch)"
+      },
+      "processor": {
+        "label": "Procesor"
+      },
+      "part_number": {
+        "label": "Cod pies? / OEM"
+      },
+      "compatibility": {
+        "label": "Compatibilitate (model / ani)"
+      },
+      "employment_type": {
+        "label": "Tip angajare"
+      },
+      "salary_from": {
+        "label": "Salariu de la (√Æn moneda afi?at?)"
+      },
+      "salary_to": {
+        "label": "Salariu p√¢n? la"
+      },
+      "size_label": {
+        "label": "M?rime (ex. M, 42)"
+      },
+      "age_months": {
+        "label": "V√¢rst? (luni)"
+      },
+      "vaccinated": {
+        "label": "Vaccinat"
+      }
     },
     "validation": {
       "errCategory": "Alege o categorie.",
@@ -564,4 +618,3 @@
     }
   }
 }
-
