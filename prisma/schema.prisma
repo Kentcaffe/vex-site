@@ -37,6 +37,8 @@ model User {
   favorites     ListingFavorite[]
   passwordResetTokens PasswordResetToken[]
   notifications UserNotification[]
+  /** JSON: theme, notifications, privacy toggles, activity log snippets, etc. */
+  preferences   Json?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now()) @updatedAt
 }

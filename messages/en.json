@@ -620,5 +620,100 @@
       "errImages": "Invalid image URLs or wrong count (1?8).",
       "errImagesRequired": "Add at least one valid image URL per line."
     }
+  },
+  "AccountSettings": {
+    "title": "My account",
+    "subtitle": "Manage your profile, security, and preferences in one place.",
+    "nav": {
+      "profile": "Profile",
+      "security": "Security",
+      "notifications": "Notifications",
+      "preferences": "Preferences",
+      "activity": "Activity",
+      "privacy": "Privacy",
+      "account": "Account settings"
+    },
+    "profile": {
+      "heading": "Profile",
+      "lead": "Your public information and how others see you.",
+      "emailReadonly": "Email cannot be changed here.",
+      "avatarHint": "Paste an image URL (HTTPS). Upload to Imgur, Cloudinary, etc.",
+      "save": "Save changes",
+      "saving": "Saving..."
+    },
+    "security": {
+      "heading": "Security",
+      "lead": "Password and sign-in protection.",
+      "current": "Current password",
+      "new": "New password",
+      "change": "Update password",
+      "changing": "Updating...",
+      "oauthOnly": "You signed in with Google or Facebook. Set a password from the email login flow only after linking, or use provider sign-in.",
+      "twoFactor": "Two-factor authentication",
+      "twoFactorHint": "Extra verification when we add authenticator apps.",
+      "loginHistory": "Recent sign-in activity",
+      "loginHistoryHint": "Best-effort log from this app (not a full security audit).",
+      "mockIp": "Session",
+      "mockDevice": "This browser"
+    },
+    "notifications": {
+      "heading": "Notifications",
+      "lead": "Choose how we reach you.",
+      "email": "Email",
+      "push": "Push notifications",
+      "messages": "Messages & chat",
+      "save": "Save notification settings"
+    },
+    "preferences": {
+      "heading": "Preferences",
+      "lead": "Language, appearance, and display.",
+      "language": "Language",
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System",
+      "currency": "Currency",
+      "save": "Save preferences"
+    },
+    "activity": {
+      "heading": "Activity",
+      "lead": "Recent actions on your account.",
+      "empty": "No activity recorded yet.",
+      "memberSince": "Member since"
+    },
+    "privacy": {
+      "heading": "Privacy",
+      "lead": "Control visibility of your data.",
+      "who": "Who can see your profile",
+      "whoEveryone": "Everyone",
+      "whoRegistered": "Logged-in users only",
+      "whoMinimal": "Minimal (name only)",
+      "showEmail": "Show email on profile",
+      "showPhone": "Show phone on profile",
+      "save": "Save privacy settings"
+    },
+    "account": {
+      "heading": "Account",
+      "lead": "Export, sign out, or delete your account.",
+      "export": "Download my data (GDPR)",
+      "exporting": "Preparing...",
+      "logout": "Sign out",
+      "deleteTitle": "Delete account",
+      "deleteWarning": "This permanently removes your listings, messages, and favorites. This cannot be undone.",
+      "deletePlaceholder": "Type STERGE to confirm",
+      "deleteButton": "Delete my account forever",
+      "deleting": "Deleting..."
+    },
+    "toast": {
+      "saved": "Saved successfully.",
+      "error": "Something went wrong.",
+      "exported": "Download started.",
+      "passwordChanged": "Password updated.",
+      "wrongPassword": "Current password is incorrect.",
+      "deleted": "Account deleted."
+    },
+    "validation": {
+      "required": "This field is required."
+    }
   }
 }

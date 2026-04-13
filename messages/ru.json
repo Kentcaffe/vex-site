@@ -566,6 +566,101 @@
       "errImages": "Неверные URL или количество (1–8).",
       "errImagesRequired": "Добавьте хотя бы один корректный URL изображения."
     }
+  },
+  "AccountSettings": {
+    "title": "Мой аккаунт",
+    "subtitle": "Профиль, безопасность и настройки в одном месте.",
+    "nav": {
+      "profile": "Профиль",
+      "security": "Безопасность",
+      "notifications": "Уведомления",
+      "preferences": "Настройки",
+      "activity": "Активность",
+      "privacy": "Конфиденциальность",
+      "account": "Аккаунт"
+    },
+    "profile": {
+      "heading": "Профиль",
+      "lead": "Публичная информация и отображение для других.",
+      "emailReadonly": "Email здесь не меняется.",
+      "avatarHint": "Вставьте HTTPS-ссылку на изображение.",
+      "save": "Сохранить",
+      "saving": "Сохранение…"
+    },
+    "security": {
+      "heading": "Безопасность",
+      "lead": "Пароль и защита входа.",
+      "current": "Текущий пароль",
+      "new": "Новый пароль",
+      "change": "Обновить пароль",
+      "changing": "Обновление…",
+      "oauthOnly": "Вы вошли через Google или Facebook.",
+      "twoFactor": "Двухфакторная аутентификация",
+      "twoFactorHint": "Дополнительная проверка (скоро).",
+      "loginHistory": "Недавняя активность",
+      "loginHistoryHint": "Ориентировочный журнал из приложения.",
+      "mockIp": "Сессия",
+      "mockDevice": "Этот браузер"
+    },
+    "notifications": {
+      "heading": "Уведомления",
+      "lead": "Как с вами связаться.",
+      "email": "Email",
+      "push": "Push-уведомления",
+      "messages": "Сообщения и чат",
+      "save": "Сохранить"
+    },
+    "preferences": {
+      "heading": "Настройки",
+      "lead": "Язык, тема и отображение.",
+      "language": "Язык",
+      "theme": "Тема",
+      "themeLight": "Светлая",
+      "themeDark": "Тёмная",
+      "themeSystem": "Системная",
+      "currency": "Валюта",
+      "save": "Сохранить"
+    },
+    "activity": {
+      "heading": "Активность",
+      "lead": "Последние действия.",
+      "empty": "Пока нет записей.",
+      "memberSince": "С даты"
+    },
+    "privacy": {
+      "heading": "Конфиденциальность",
+      "lead": "Видимость данных.",
+      "who": "Кто видит профиль",
+      "whoEveryone": "Все",
+      "whoRegistered": "Только авторизованные",
+      "whoMinimal": "Минимум (только имя)",
+      "showEmail": "Показывать email",
+      "showPhone": "Показывать телефон",
+      "save": "Сохранить"
+    },
+    "account": {
+      "heading": "Аккаунт",
+      "lead": "Экспорт, выход или удаление.",
+      "export": "Скачать данные (GDPR)",
+      "exporting": "Подготовка…",
+      "logout": "Выйти",
+      "deleteTitle": "Удалить аккаунт",
+      "deleteWarning": "Безвозвратно удалит объявления, сообщения и избранное.",
+      "deletePlaceholder": "Введите STERGE для подтверждения",
+      "deleteButton": "Удалить навсегда",
+      "deleting": "Удаление…"
+    },
+    "toast": {
+      "saved": "Сохранено.",
+      "error": "Ошибка.",
+      "exported": "Загрузка началась.",
+      "passwordChanged": "Пароль обновлён.",
+      "wrongPassword": "Неверный текущий пароль.",
+      "deleted": "Аккаунт удалён."
+    },
+    "validation": {
+      "required": "Обязательное поле."
+    }
   }
 }
 
