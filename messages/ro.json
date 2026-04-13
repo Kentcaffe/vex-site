@@ -114,18 +114,76 @@
     }
   },
   "Footer": {
-    "siteName": "VEX",
-    "tagline": "Marketplace pentru anunțuri și vânzări locale. Conectăm cumpărători și vânzători fără pași inutili.",
-    "explore": "Explorează",
-    "legal": "Legal",
+    "colContact": "Contact",
+    "colHelp": "Ajutor",
+    "colSafety": "Siguranță",
+    "colLegal": "Legal",
+    "linkHowItWorks": "Cum funcționează",
+    "linkFaq": "Întrebări frecvente",
+    "linkAntiFraud": "Sfaturi anti-fraudă",
+    "linkReportListing": "Raportează anunț",
+    "linkCookiePolicy": "Politica cookie",
+    "linkCategories": "Categorii",
+    "quickNavAria": "Navigare rapidă",
     "terms": "Termeni și condiții",
     "privacy": "Confidențialitate",
     "linkListings": "Toate anunțurile",
     "linkPublish": "Publică anunț",
     "linkAccount": "Cont",
     "linkDataDeletion": "Ștergere date",
+    "madeInMoldova": "Creat în Moldova 🇲🇩",
     "rights": "© {year} VEX. Toate drepturile rezervate.",
-    "disclaimer": "Platforma facilitează afișarea anunțurilor; tranzacțiile au loc între utilizatori. Verifică mereu produsul sau serviciul înainte de plată."
+    "disclaimer": "VEX afișează anunțuri între utilizatori; nu este parte la tranzacții. Verifică produsul sau serviciul înainte de plată."
+  },
+  "InfoPages": {
+    "howItWorks": {
+      "metaTitle": "Cum funcționează",
+      "metaDescription": "Cum folosești VEX — marketplace pentru anunțuri locale în Moldova.",
+      "title": "Cum funcționează VEX",
+      "p1": "Creezi un cont sau te autentifici, alegi categoria potrivită și publici anunțul cu poze și detalii. Cumpărătorii te pot contacta prin mesaje pe platformă.",
+      "p2": "Nu percepem comision la publicare pentru anunțurile obișnuite; verifică mereu termenii actuali în pagina Termeni.",
+      "p3": "Pentru întrebări despre cont sau probleme tehnice: support@vex.md. Pentru colaborări: contact@vex.md."
+    },
+    "faq": {
+      "metaTitle": "Întrebări frecvente",
+      "metaDescription": "Răspunsuri la întrebări frecvente despre VEX.",
+      "title": "Întrebări frecvente",
+      "q1": "Cât costă să public un anunț?",
+      "a1": "În mod normal publicarea este gratuită pentru utilizatori; detalii și excepții sunt în Termeni.",
+      "q2": "Cum mă contactează cineva?",
+      "a2": "Prin sistemul de mesaje după ce ești autentificat, sau prin datele pe care le alegi să le afișezi în anunț (ex. telefon).",
+      "q3": "Cum șterg contul sau datele?",
+      "a3": "Din setările contului și conform paginii Ștergere date (GDPR). Pentru ajutor: support@vex.md."
+    },
+    "antiFraud": {
+      "metaTitle": "Sfaturi anti-fraudă",
+      "metaDescription": "Recomandări de siguranță la tranzacții pe VEX.",
+      "title": "Sfaturi anti-fraudă",
+      "intro": "Păstrează aceste reguli simple când tranzacționezi cu necunoscuți:",
+      "tip1": "Preferă întâlnirea la fața locului pentru produse și verifică-l înainte de plată.",
+      "tip2": "Evită plăți în avans către persoane pe care nu le-ai verificat.",
+      "tip3": "Nu trimite coduri SMS, parole sau date bancare prin chat.",
+      "tip4": "Bănuiești un anunț fals? Folosește „Raportează” pe pagina anunțului.",
+      "tip5": "Prețuri mult sub piață sau presiune pentru decizie rapidă = semnal de alarmă.",
+      "outro": "În caz de încercare de fraudă, păstrează capturi de ecran și contactează support@vex.md."
+    },
+    "cookies": {
+      "metaTitle": "Politica cookie",
+      "metaDescription": "Cum folosim cookie-uri și tehnologii similare pe VEX.",
+      "title": "Politica cookie",
+      "p1": "Site-ul poate folosi cookie-uri necesare pentru funcționare (sesiune, autentificare, securitate) și, unde este cazul, pentru preferințe sau analiză agregată.",
+      "p2": "Poți controla cookie-urile din setările browserului; limitarea cookie-urilor poate afecta unele funcții (ex. menținerea sesiunii).",
+      "p3": "Pentru date personale asociate contului, vezi Politica de confidențialitate și pagina Ștergere date.",
+      "p4": "Întrebări: contact@vex.md sau support@vex.md."
+    },
+    "reportAd": {
+      "metaTitle": "Raportează un anunț",
+      "metaDescription": "Cum raportezi un anunț suspect sau abuziv pe VEX.",
+      "title": "Raportează un anunț",
+      "p1": "Deschide pagina anunțului și apasă „Raportează”. Alege motivul și, dacă e cazul, detalii — echipa poate modera conținutul conform regulilor platformei.",
+      "p2": "Trebuie să fii autentificat pentru a trimite un raport de pe pagina anunțului.",
+      "browseLink": "Vezi anunțurile"
+    }
   },
   "Legal": {
     "document": {

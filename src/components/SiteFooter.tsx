@@ -1,63 +1,124 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
+const linkClass =
+  "inline-block text-sm text-zinc-600 transition-colors hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400";
+const mailClass =
+  "inline-block text-sm text-zinc-600 transition-colors hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400";
+const headingClass =
+  "text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500";
+
 export async function SiteFooter() {
   const t = await getTranslations("Footer");
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-3">
-          <div>
-            <p className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("siteName")}</p>
-            <p className="mt-2 max-w-xs text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("tagline")}</p>
+    <footer className="border-t border-zinc-200/90 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-14 lg:grid-cols-4 lg:gap-16">
+          {/* Contact */}
+          <div className="space-y-5">
+            <p className={headingClass}>{t("colContact")}</p>
+            <ul className="space-y-3">
+              <li>
+                <a href="mailto:support@vex.md" className={mailClass}>
+                  support@vex.md
+                </a>
+              </li>
+              <li>
+                <a href="mailto:contact@vex.md" className={mailClass}>
+                  contact@vex.md
+                </a>
+              </li>
+            </ul>
           </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{t("explore")}</p>
-            <ul className="mt-3 space-y-2 text-sm">
+
+          {/* Ajutor */}
+          <div className="space-y-5">
+            <p className={headingClass}>{t("colHelp")}</p>
+            <ul className="space-y-3">
               <li>
-                <Link href="/anunturi" className="text-zinc-700 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400">
-                  {t("linkListings")}
+                <Link href="/cum-functioneaza" className={linkClass}>
+                  {t("linkHowItWorks")}
                 </Link>
               </li>
               <li>
-                <Link href="/publica" className="text-zinc-700 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400">
-                  {t("linkPublish")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/cont" className="text-zinc-700 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400">
-                  {t("linkAccount")}
+                <Link href="/intrebari-frecvente" className={linkClass}>
+                  {t("linkFaq")}
                 </Link>
               </li>
             </ul>
           </div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{t("legal")}</p>
-            <ul className="mt-3 space-y-2 text-sm">
+
+          {/* Siguranță */}
+          <div className="space-y-5">
+            <p className={headingClass}>{t("colSafety")}</p>
+            <ul className="space-y-3">
               <li>
-                <Link href="/termeni" className="text-zinc-700 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400">
+                <Link href="/sfaturi-anti-frauda" className={linkClass}>
+                  {t("linkAntiFraud")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/raporteaza-anunt" className={linkClass}>
+                  {t("linkReportListing")}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div className="space-y-5">
+            <p className={headingClass}>{t("colLegal")}</p>
+            <ul className="space-y-3">
+              <li>
+                <Link href="/termeni" className={linkClass}>
                   {t("terms")}
                 </Link>
               </li>
               <li>
-                <Link href="/confidentialitate" className="text-zinc-700 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400">
+                <Link href="/confidentialitate" className={linkClass}>
                   {t("privacy")}
                 </Link>
               </li>
               <li>
-                <Link href="/stergere-date" className="text-zinc-700 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400">
+                <Link href="/stergere-date" className={linkClass}>
                   {t("linkDataDeletion")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/politica-cookie" className={linkClass}>
+                  {t("linkCookiePolicy")}
                 </Link>
               </li>
             </ul>
           </div>
         </div>
-        <div className="mt-10 flex flex-col gap-2 border-t border-zinc-200 pt-8 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-500">
-          <p>{t("rights", { year })}</p>
-          <p className="text-zinc-400 dark:text-zinc-600">{t("disclaimer")}</p>
+
+        {/* Nav rapid minimalist */}
+        <nav
+          className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-zinc-200/80 pt-12 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-500"
+          aria-label={t("quickNavAria")}
+        >
+          <Link href="/anunturi" className={`${linkClass} text-xs`}>
+            {t("linkListings")}
+          </Link>
+          <Link href="/publica" className={`${linkClass} text-xs`}>
+            {t("linkPublish")}
+          </Link>
+          <Link href="/categorii" className={`${linkClass} text-xs`}>
+            {t("linkCategories")}
+          </Link>
+          <Link href="/cont" className={`${linkClass} text-xs`}>
+            {t("linkAccount")}
+          </Link>
+        </nav>
+
+        <div className="mt-12 flex flex-col gap-6 border-t border-zinc-200/80 pt-10 sm:flex-row sm:items-center sm:justify-between dark:border-zinc-800">
+          <p className="text-xs text-zinc-500 dark:text-zinc-500">{t("rights", { year })}</p>
+          <p className="text-sm font-medium tracking-wide text-zinc-700 dark:text-zinc-300">{t("madeInMoldova")}</p>
         </div>
+        <p className="mt-6 max-w-2xl text-xs leading-relaxed text-zinc-500 dark:text-zinc-600">{t("disclaimer")}</p>
       </div>
     </footer>
   );
