@@ -122,6 +122,8 @@ model OtherContentReport {
   id             String       @id @default(cuid())
   reporterId     String
   reporter       User         @relation("OtherReportAuthor", fields: [reporterId], references: [id], onDelete: Cascade)
+  /** "listing" = problemă legată de un anunț (URL anunț); "site" = problemă tehnică / pagină. */
+  kind           String       @default("site")
   subject        String
   contextUrl     String?
   reason         String

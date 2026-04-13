@@ -24,6 +24,7 @@ type ListingReportRow = {
 type OtherContentReportRow = {
   id: string;
   reporterId: string;
+  kind: string;
   subject: string;
   contextUrl: string | null;
   reason: string;
@@ -240,6 +241,7 @@ export default async function AdminReclamatiiPage({ params, searchParams }: Prop
                   locale={locale}
                   report={{
                     id: r.id,
+                    kind: r.kind,
                     status: r.status,
                     reason: r.reason,
                     details: r.details,

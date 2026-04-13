@@ -8,6 +8,7 @@ import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
 import { otherContentReport } from "@/lib/prisma-delegates";
 import { REPORT_REASONS, type ReportReasonId } from "@/lib/report-reasons";
+import { REPORT_KIND, isValidReasonForKind, type ReportCenterKind } from "@/lib/other-report-center";
 import { routing } from "@/i18n/routing";
 
 const ALLOWED = new Set(REPORT_REASONS.map((r) => r.id));
@@ -17,8 +18,8 @@ export type SubmitReportResult =
   | { ok: false; error: "unauthorized" | "not_found" | "own_listing" | "already_reported" | "bad_reason" };
 
 export type SubmitOtherReportResult =
-  | { ok: true }
-  | { ok: false; error: "unauthorized" | "bad_reason" };
+  | { ok: true; kind: ReportCenterKind }
+  | { ok: false; error: "unauthorized" | "bad_reason" | "bad_kind" };
 
 export async function submitListingReport(
   listingId: string,
@@ -99,6 +100,12 @@ export async function submitOtherContentReport(
     return { ok: false, error: "unauthorized" };
   }
 
+  const kindRaw = String(formData.get("reportKind") ?? "").trim();
+  if (kindRaw !== REPORT_KIND.listing && kindRaw !== REPORT_KIND.site) {
+    return { ok: false, error: "bad_kind" };
+  }
+  const kind = kindRaw as ReportCenterKind;
+
   const subject = String(formData.get("subject") ?? "").trim();
   const reason = String(formData.get("reason") ?? "");
   const detailsRaw = String(formData.get("details") ?? "").trim();
@@ -115,7 +122,7 @@ export async function submitOtherContentReport(
     return { ok: false, error: "bad_reason" };
   }
 
-  if (!ALLOWED.has(reason as ReportReasonId)) {
+  if (!isValidReasonForKind(kind, reason)) {
     return { ok: false, error: "bad_reason" };
   }
 
@@ -129,9 +136,14 @@ export async function submitOtherContentReport(
     }
   }
 
+  if (kind === REPORT_KIND.listing && !contextUrl) {
+    return { ok: false, error: "bad_reason" };
+  }
+
   await otherContentReport.create({
     data: {
       reporterId: reporter.id,
+      kind,
       subject: parsed.data.subject,
       contextUrl,
       reason,
@@ -143,5 +155,5 @@ export async function submitOtherContentReport(
     revalidatePath(localizedHref(locale, "/admin/reclamatii"));
   }
 
-  return { ok: true };
+  return { ok: true, kind };
 }

@@ -6,22 +6,26 @@ import { useState, useTransition } from "react";
 import { setOtherReportStatus } from "@/app/actions/admin-other-reports";
 import { useRouter } from "@/i18n/navigation";
 
-function reasonLabel(t: (key: string) => string, code: string): string {
-  const map: Record<string, string> = {
+function reasonLabel(tAdmin: (key: string) => string, tOther: (key: string) => string, code: string): string {
+  const legacy: Record<string, string> = {
     spam: "reason_spam",
     fraud: "reason_fraud",
     inappropriate: "reason_inappropriate",
     duplicate: "reason_duplicate",
     other: "reason_other",
   };
-  const k = map[code];
-  return k ? t(k) : code;
+  const legacyKey = legacy[code];
+  if (legacyKey) {
+    return tAdmin(legacyKey);
+  }
+  return (tOther as (key: string) => string)(`reasons.${code}`);
 }
 
 type RowProps = {
   locale: string;
   report: {
     id: string;
+    kind: string;
     status: ReportStatus;
     reason: string;
     details: string | null;
@@ -35,6 +39,7 @@ type RowProps = {
 
 export function OtherReportRow({ report: initial, locale }: RowProps) {
   const t = useTranslations("Admin");
+  const tOther = useTranslations("ReportOther");
   const router = useRouter();
   const [err, setErr] = useState<string | null>(null);
   const [note, setNote] = useState("");
@@ -52,12 +57,19 @@ export function OtherReportRow({ report: initial, locale }: RowProps) {
     });
   }
 
+  const kindLabel =
+    initial.kind === "listing"
+      ? t("otherKindListing")
+      : initial.kind === "site"
+        ? t("otherKindSite")
+        : t("complaintTypeOther");
+
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0 flex-1 space-y-1">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-violet-900 dark:bg-violet-950/60 dark:text-violet-200">
-            {t("complaintTypeOther")}
+            {kindLabel}
           </span>
           <span
             className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${
@@ -80,7 +92,7 @@ export function OtherReportRow({ report: initial, locale }: RowProps) {
         </div>
         <p className="font-medium text-zinc-900 dark:text-zinc-50">{initial.subject}</p>
         {initial.contextUrl ? (
-          <p className="text-sm break-all text-emerald-700 dark:text-emerald-400">
+          <p className="break-all text-sm text-emerald-700 dark:text-emerald-400">
             <a href={initial.contextUrl} target="_blank" rel="noopener noreferrer" className="hover:underline">
               {initial.contextUrl}
             </a>
@@ -91,7 +103,7 @@ export function OtherReportRow({ report: initial, locale }: RowProps) {
         </p>
         <p className="text-sm">
           <span className="font-medium text-zinc-700 dark:text-zinc-300">{t("reportReason")}:</span>{" "}
-          {reasonLabel(t, initial.reason)}
+          {reasonLabel(t, tOther, initial.reason)}
         </p>
         {initial.details ? (
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
