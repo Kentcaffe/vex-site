@@ -5,15 +5,13 @@ import { isStaff } from "@/lib/auth-roles";
 import { getActiveListingCount } from "@/lib/listing-stats";
 import { localizedHref } from "@/lib/paths";
 import { userNotification } from "@/lib/prisma-delegates";
+import { UserRound } from "lucide-react";
 import { ChatInboxLink } from "@/components/chat/ChatInboxLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
-import { HeaderOAuthButtons } from "@/components/HeaderOAuthButtons";
-import { getOAuthAvailability } from "@/lib/oauth-env";
 
 export async function SiteHeader() {
   const session = await auth();
-  const oauth = getOAuthAvailability();
   const locale = await getLocale();
   const [t, tm, tf, listingCount, unreadNotifications] = await Promise.all([
     getTranslations("Nav"),
@@ -122,7 +120,13 @@ export async function SiteHeader() {
                 <SignOutButton />
               </>
             ) : (
-              <HeaderOAuthButtons oauth={oauth} />
+              <Link
+                href="/cont"
+                className="inline-flex h-11 items-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-800 shadow-sm transition hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
+              >
+                <UserRound className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+                {t("account")}
+              </Link>
             )}
           </div>
         </div>

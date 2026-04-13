@@ -16,12 +16,23 @@ export async function logout(formData: FormData) {
   redirect(localizedHref(locale, "/"));
 }
 
-export type RegisterState = { ok: true } | { ok: false; error: "validation" | "emailTaken" };
+export type RegisterState =
+  | { ok: true }
+  | { ok: false; error: "validation" | "emailTaken" | "phoneInvalid" };
+
+function phoneDigitsOnly(raw: unknown): string {
+  return String(raw ?? "").replace(/\D/g, "");
+}
 
 export async function registerUser(
   _prev: RegisterState | undefined,
   formData: FormData,
 ): Promise<RegisterState> {
+  const phone = phoneDigitsOnly(formData.get("phone"));
+  if (phone.length < 8) {
+    return { ok: false, error: "phoneInvalid" };
+  }
+
   const parsed = z
     .object({
       email: z.string().email(),
@@ -51,6 +62,7 @@ export async function registerUser(
       email,
       passwordHash: await hash(parsed.data.password, 12),
       name: parsed.data.name?.trim() || null,
+      phone,
     },
   });
 

@@ -48,10 +48,12 @@ export default async function ContPage({ params }: Props) {
   const oauth = getOAuthAvailability();
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-      <p className="mt-2 text-zinc-600 dark:text-zinc-400">{t("subtitle")}</p>
-      <div className="mt-8">
+    <div className="flex min-h-[calc(100vh-12rem)] flex-col items-center px-4 py-10 sm:px-6">
+      <div className="w-full max-w-4xl">
+        <header className="mb-8 text-center">
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">{t("title")}</h1>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 sm:text-base">{t("subtitle")}</p>
+        </header>
         <AuthForms oauth={oauth} />
       </div>
     </div>
