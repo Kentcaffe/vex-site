@@ -2,26 +2,27 @@
  * Seed marketplace VEX (Moldova) — 150 anunțuri + utilizatori realiști.
  * Rulare: node seed.js
  *
- * Cerințe: npx prisma db push
+ * Cerințe: schema aplicată pe Postgres (npm run db:migrate sau db:push)
  * Categorii: rulează mai întâi  npx tsx prisma/seed.ts  (sau build care creează copacul de categorii).
  * Dacă Prisma e indisponibilă, scrie ads.json în rădăcina proiectului.
  */
 
+require("dotenv/config");
 const fs = require("fs");
 const path = require("path");
 
 let PrismaClient;
-let PrismaBetterSqlite3;
 try {
   PrismaClient = require("@prisma/client").PrismaClient;
-  PrismaBetterSqlite3 = require("@prisma/adapter-better-sqlite3").PrismaBetterSqlite3;
+  require("@prisma/adapter-pg");
+  require("pg");
 } catch {
   PrismaClient = null;
 }
 
 const { hashSync } = require("bcryptjs");
 
-const DB_URL = process.env.DATABASE_URL || "file:./dev.db";
+const DB_URL = process.env.DATABASE_URL;
 const ADS_JSON = path.join(__dirname, "ads.json");
 
 const LOCATIONS = ["Chișinău", "Bălți", "Cahul", "Comrat", "Orhei", "Ungheni"];
@@ -263,15 +264,20 @@ function buildListingDrafts() {
 }
 
 async function runPrisma() {
-  const adapter = new PrismaBetterSqlite3({ url: DB_URL });
-  const prisma = new PrismaClient({ adapter });
+  if (!DB_URL) {
+    throw new Error("DATABASE_URL lipsește. Setează connection string-ul PostgreSQL în .env.");
+  }
+  const { Pool } = require("pg");
+  const { PrismaPg } = require("@prisma/adapter-pg");
+  const pool = new Pool({ connectionString: DB_URL });
+  const prisma = new PrismaClient({ adapter: new PrismaPg(pool) });
 
+  try {
   const slugList = [...new Set(Object.values(SLUG_BY_GROUP).flat())];
   const categories = await prisma.category.findMany({ where: { slug: { in: slugList } } });
   const slugToId = Object.fromEntries(categories.map((c) => [c.slug, c.id]));
   const missing = slugList.filter((s) => !slugToId[s]);
   if (missing.length) {
-    await prisma.$disconnect();
     throw new Error(
       `Lipsesc categorii în DB: ${missing.join(", ")}. Rulează: npx tsx prisma/seed.ts`,
     );
@@ -344,8 +350,11 @@ async function runPrisma() {
   });
 
   const total = await prisma.listing.count();
-  await prisma.$disconnect();
   return { ok: true, users: seedUsers.length, listings: drafts.length, totalListings: total };
+  } finally {
+    await prisma.$disconnect().catch(() => {});
+    await pool.end().catch(() => {});
+  }
 }
 
 function runJsonExportOnly() {

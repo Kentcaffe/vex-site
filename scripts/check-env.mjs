@@ -59,7 +59,13 @@ if (!ok("NEXT_PUBLIC_APP_URL")) {
 }
 
 if (!ok("DATABASE_URL")) {
-  issues.push("DATABASE_URL: recomandat file:./dev.db pentru local.");
+  issues.push(
+    "DATABASE_URL: obligatoriu — connection string PostgreSQL (ex. din Supabase → Project Settings → Database → URI).",
+  );
+} else if (!/^postgres(ql)?:\/\//i.test(env.DATABASE_URL)) {
+  issues.push(
+    "DATABASE_URL: trebuie să înceapă cu postgresql:// sau postgres:// (baza e migrată de la SQLite la PostgreSQL).",
+  );
 }
 
 if (issues.length) {

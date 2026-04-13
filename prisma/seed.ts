@@ -1,11 +1,7 @@
+import "dotenv/config";
 import { hash } from "bcryptjs";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { prisma } from "../src/lib/prisma";
 import { CATEGORY_ROOTS, type CatDef } from "./category-tree/index.js";
-import { PrismaClient } from "../node_modules/.prisma/client/index.js";
-
-const dbUrl = process.env.DATABASE_URL ?? "file:./dev.db";
-const adapter = new PrismaBetterSqlite3({ url: dbUrl });
-const prisma = new PrismaClient({ adapter });
 
 function L(ro: string, ru: string, en: string) {
   return JSON.stringify({ ro, ru, en });
