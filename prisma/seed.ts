@@ -32,13 +32,18 @@ async function seedTree(defs: CatDef[], parentId: string | null) {
 async function main() {
   await prisma.listing.deleteMany();
   await prisma.category.deleteMany();
-  await prisma.user.deleteMany();
-
-  await prisma.user.create({
-    data: {
+  /** Nu ștergem toți utilizatorii — conturile înregistrate prin site trebuie să rămână permanente.
+   *  Asigurăm doar utilizatorul demo (upsert). */
+  await prisma.user.upsert({
+    where: { email: "demo@vex.site" },
+    create: {
       email: "demo@vex.site",
       name: "Demo",
       passwordHash: await hash("demo12345", 12),
+      role: "ADMIN",
+    },
+    update: {
+      name: "Demo",
       role: "ADMIN",
     },
   });
@@ -62,7 +67,7 @@ async function main() {
         mileageKm: 95000,
         categoryId: leafAuto.id,
         userId: demo.id,
-        images: JSON.stringify(["https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=800&q=80"]),
+        images: JSON.stringify(["/seed/cover-0.jpg"]),
       },
     });
   }

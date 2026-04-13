@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 
 type Props = {
   images: string[];
@@ -23,22 +24,20 @@ export function ListingGallery({ images, title }: Props) {
   return (
     <div className="space-y-3">
       <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={main} alt={title} className="aspect-[4/3] w-full object-cover" />
+        <ListingCoverImg src={main} alt={title} className="aspect-[4/3] w-full object-cover" />
       </div>
       {safe.length > 1 ? (
         <div className="flex flex-wrap gap-2">
           {safe.map((src, i) => (
             <button
-              key={src}
+              key={`${i}-${src}`}
               type="button"
               onClick={() => setIdx(i)}
               className={`h-16 w-20 overflow-hidden rounded-lg border-2 ${
                 i === idx ? "border-emerald-600" : "border-transparent opacity-80 hover:opacity-100"
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={src} alt="" className="h-full w-full object-cover" />
+              <ListingCoverImg src={src} alt="" className="h-full w-full object-cover" />
             </button>
           ))}
         </div>

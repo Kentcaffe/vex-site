@@ -5,6 +5,7 @@ import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import type { CategoryRow } from "@/lib/category-queries";
 import { emojiForRootSlug } from "@/lib/category-icons";
 import { formatPrice } from "@/lib/formatPrice";
+import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 
 type LabelJson = { ro?: string; ru?: string; en?: string };
@@ -145,10 +146,11 @@ export async function HomeMarketplace({ locale, listings, rootCategories, favori
                         <div className="relative aspect-[4/3] bg-zinc-100 dark:bg-zinc-800">
                           <Link href={`/anunturi/${item.id}`} className="absolute inset-0 z-0 block" aria-label={item.title}>
                             {cover ? (
-                              <>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={cover} alt="" className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]" />
-                              </>
+                              <ListingCoverImg
+                                src={cover}
+                                alt=""
+                                className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
+                              />
                             ) : (
                               <div className="flex h-full items-center justify-center text-sm text-zinc-400">—</div>
                             )}

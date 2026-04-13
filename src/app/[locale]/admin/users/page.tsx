@@ -5,6 +5,9 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
+/** Lista trebuie să reflecte mereu DB-ul (fără cache la build). */
+export const dynamic = "force-dynamic";
+
 export default async function AdminUsersPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);

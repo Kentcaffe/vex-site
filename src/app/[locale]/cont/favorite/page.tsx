@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
+import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
@@ -63,8 +64,7 @@ export default async function FavoriteListPage({ params }: Props) {
                 >
                   {cover ? (
                     <div className="h-20 w-24 shrink-0 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={cover} alt="" className="h-full w-full object-cover" />
+                      <ListingCoverImg src={cover} alt="" className="h-full w-full object-cover" />
                     </div>
                   ) : (
                     <div className="flex h-20 w-24 shrink-0 items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-zinc-50 text-xs text-zinc-400 dark:border-zinc-600 dark:bg-zinc-800">

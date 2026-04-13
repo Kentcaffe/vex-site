@@ -1,0 +1,2702 @@
+[
+  {
+    "title": "iPhone 13 128gb",
+    "description": "Baterie zice 98% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Chișinău, nu trimit.\nNu schimb.",
+    "price": 29700,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=0"
+    ],
+    "createdAt": "2026-04-08T05:33:10.363Z",
+    "views": 376,
+    "user": {
+      "name": "Ion Popescu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Samsung A54 5G",
+    "description": "Baterie zice 85% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nVad doar Bălți, nu trimit.\nNu schimb.",
+    "price": 12750,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=10",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=11"
+    ],
+    "createdAt": "2026-04-08T23:41:10.019Z",
+    "views": 126,
+    "user": {
+      "name": "Maria Rusu",
+      "verified": true
+    }
+  },
+  {
+    "title": "iPhone 11 64GB",
+    "description": "Baterie zice 88% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Cahul, nu trimit.\nNu schimb.",
+    "price": 16700,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=20",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=21",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=22"
+    ],
+    "createdAt": "2026-04-08T04:41:40.973Z",
+    "views": 152,
+    "user": {
+      "name": "Andrei Cojocaru",
+      "verified": true
+    }
+  },
+  {
+    "title": "Redmi Note 12 128",
+    "description": "Baterie zice 94% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Comrat, nu trimit.\nNu schimb.",
+    "price": 24450,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=30"
+    ],
+    "createdAt": "2026-04-13T02:05:30.919Z",
+    "views": 278,
+    "user": {
+      "name": "Elena Melnic",
+      "verified": false
+    }
+  },
+  {
+    "title": "Pixel 7a",
+    "description": "Baterie zice 95% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Orhei, nu trimit.\nNu schimb.\nZgarietura mica pe rama — in poza se vede.",
+    "price": 25100,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=40",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=41"
+    ],
+    "createdAt": "2026-04-09T16:28:23.354Z",
+    "views": 204,
+    "user": {
+      "name": "Vasile Stratan",
+      "verified": false
+    }
+  },
+  {
+    "title": "Galaxy S21 FE",
+    "description": "Baterie zice 87% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nVad doar Ungheni, nu trimit.\nPret negociabil serios.",
+    "price": 14950,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=50",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=51",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=52"
+    ],
+    "createdAt": "2026-04-07T04:34:05.268Z",
+    "views": 493,
+    "user": {
+      "name": "Ana Donțu",
+      "verified": false
+    }
+  },
+  {
+    "title": "iPhone SE 2020",
+    "description": "Baterie zice 84% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nURGENT plec saptamina asta din tara.\nNu schimb.",
+    "price": 11250,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=60"
+    ],
+    "createdAt": "2026-04-11T20:00:18.207Z",
+    "views": 335,
+    "user": {
+      "name": "Cristian Burlacu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Motorola g84 — negociabil",
+    "description": "Baterie zice 98% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Bălți, nu trimit.\nNu schimb.",
+    "price": 29400,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=70",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=71"
+    ],
+    "createdAt": "2026-04-12T09:43:46.393Z",
+    "views": 115,
+    "user": {
+      "name": "Doina Cebotari",
+      "verified": true
+    }
+  },
+  {
+    "title": "[URGENT] OnePlus Nord 3",
+    "description": "Baterie zice 76% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nVad doar Cahul, nu trimit.\nPret negociabil serios.",
+    "price": 1300,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=80",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=81",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=82"
+    ],
+    "createdAt": "2026-04-08T17:54:03.388Z",
+    "views": 336,
+    "user": {
+      "name": "Sergiu Gutu",
+      "verified": true
+    }
+  },
+  {
+    "title": "iPhone 12 mini 64",
+    "description": "Baterie zice 94% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nURGENT plec saptamina asta din tara.\nNu schimb.",
+    "price": 24750,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=90"
+    ],
+    "createdAt": "2026-04-13T06:11:55.606Z",
+    "views": 155,
+    "user": {
+      "name": "Ludmila Railean",
+      "verified": true
+    }
+  },
+  {
+    "title": "Samsung A34",
+    "description": "Baterie zice 88% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Orhei, nu trimit.\nNu schimb.\nZgarietura mica pe rama — in poza se vede.",
+    "price": 16800,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=100",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=101"
+    ],
+    "createdAt": "2026-04-11T07:26:46.992Z",
+    "views": 470,
+    "user": {
+      "name": "Nicolae Moraru",
+      "verified": false
+    }
+  },
+  {
+    "title": "Xiaomi 13T",
+    "description": "Baterie zice 78% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nVad doar Ungheni, nu trimit.\nPret negociabil serios.",
+    "price": 4650,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=110",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=111",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=112"
+    ],
+    "createdAt": "2026-04-10T03:45:14.345Z",
+    "views": 10,
+    "user": {
+      "name": "Victoria Plămădeală",
+      "verified": false
+    }
+  },
+  {
+    "title": "iPhone 14 Pro 256",
+    "description": "Baterie zice 84% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nURGENT plec saptamina asta din tara.\nPret negociabil serios.",
+    "price": 11600,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=120"
+    ],
+    "createdAt": "2026-04-07T04:27:46.366Z",
+    "views": 173,
+    "user": {
+      "name": "Petru Turcan",
+      "verified": false
+    }
+  },
+  {
+    "title": "Realme 11 — negociabil",
+    "description": "Baterie zice 87% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nURGENT plec saptamina asta din tara.\nNu schimb.",
+    "price": 15550,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=130",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=131"
+    ],
+    "createdAt": "2026-04-12T09:50:57.308Z",
+    "views": 143,
+    "user": {
+      "name": "Gabriela Hanganu",
+      "verified": true
+    }
+  },
+  {
+    "title": "[URGENT] Galaxy Flip 4",
+    "description": "Baterie zice 77% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nVad doar Cahul, nu trimit.\nPret negociabil serios.",
+    "price": 2400,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=140",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=141",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=142"
+    ],
+    "createdAt": "2026-04-13T04:11:21.623Z",
+    "views": 451,
+    "user": {
+      "name": "Maxim Ursu",
+      "verified": true
+    }
+  },
+  {
+    "title": "iPhone XR 64",
+    "description": "Baterie zice 79% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nURGENT plec saptamina asta din tara.\nNu schimb.",
+    "price": 4900,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=150"
+    ],
+    "createdAt": "2026-04-10T10:04:13.588Z",
+    "views": 457,
+    "user": {
+      "name": "Stela Ciobanu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Poco F5",
+    "description": "Baterie zice 97% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Orhei, nu trimit.\nNu schimb.",
+    "price": 28650,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=160",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=161"
+    ],
+    "createdAt": "2026-04-11T05:22:40.723Z",
+    "views": 162,
+    "user": {
+      "name": "Dumitru Negru",
+      "verified": false
+    }
+  },
+  {
+    "title": "Samsung S23",
+    "description": "Baterie zice 78% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nVad doar Ungheni, nu trimit.\nNu schimb.",
+    "price": 4550,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=170",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=171",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=172"
+    ],
+    "createdAt": "2026-04-12T08:28:26.273Z",
+    "views": 49,
+    "user": {
+      "name": "Rodica Ștefănescu",
+      "verified": false
+    }
+  },
+  {
+    "title": "iPhone 15 128",
+    "description": "Baterie zice 91% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Chișinău, nu trimit.\nNu schimb.",
+    "price": 20050,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=180"
+    ],
+    "createdAt": "2026-04-09T21:05:08.155Z",
+    "views": 409,
+    "user": {
+      "name": "Igor Caraș",
+      "verified": true
+    }
+  },
+  {
+    "title": "Huawei nova vechi",
+    "description": "Baterie zice 91% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Bălți, nu trimit.\nNu schimb.",
+    "price": 20000,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=190",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=191"
+    ],
+    "createdAt": "2026-04-10T07:09:47.693Z",
+    "views": 445,
+    "user": {
+      "name": "Alina Bivol",
+      "verified": true
+    }
+  },
+  {
+    "title": "Nokia clasic cu taste",
+    "description": "Baterie zice 89% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Cahul, nu trimit.\nNu schimb.",
+    "price": 17500,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=200",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=201",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=202"
+    ],
+    "createdAt": "2026-04-09T10:50:16.074Z",
+    "views": 314,
+    "user": {
+      "name": "Oleg Rotari",
+      "verified": false
+    }
+  },
+  {
+    "title": "Google Pixel 6",
+    "description": "Baterie zice 83% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nVad doar Comrat, nu trimit.\nPret negociabil serios.",
+    "price": 10850,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=210"
+    ],
+    "createdAt": "2026-04-09T00:19:07.839Z",
+    "views": 374,
+    "user": {
+      "name": "Natalia Lungu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Samsung A52",
+    "description": "Baterie zice 97% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Orhei, nu trimit.\nNu schimb.",
+    "price": 27650,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=220",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=221"
+    ],
+    "createdAt": "2026-04-13T14:22:31.492Z",
+    "views": 418,
+    "user": {
+      "name": "Roman Ceban",
+      "verified": false
+    }
+  },
+  {
+    "title": "iPhone 8 64",
+    "description": "Baterie zice 91% health, tine o zi uzual.\nFara cutie, incarcator compatibil dau.\nVad doar Ungheni, nu trimit.\nNu schimb.",
+    "price": 20650,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=230",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=231",
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=232"
+    ],
+    "createdAt": "2026-04-10T20:56:09.888Z",
+    "views": 411,
+    "user": {
+      "name": "Corina Manole",
+      "verified": true
+    }
+  },
+  {
+    "title": "Nothing Phone 1",
+    "description": "Baterie zice 80% health, tine o zi uzual.\nCutie + cablu, husa inclusa.\nVad doar Chișinău, nu trimit.\nNu schimb.",
+    "price": 7200,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Telefoane",
+    "images": [
+      "https://source.unsplash.com/600x400/?smartphone,iphone&sig=240"
+    ],
+    "createdAt": "2026-04-07T15:46:31.882Z",
+    "views": 53,
+    "user": {
+      "name": "Veaceslav Grosu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Audi A6 2011 — 277k km",
+    "description": "Motor diesel, rulaj 277.124 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 45700,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=250",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=251"
+    ],
+    "createdAt": "2026-04-10T07:28:36.311Z",
+    "views": 147,
+    "user": {
+      "name": "Ion Popescu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Mercedes ML 2010 — 262k km",
+    "description": "Motor benzină, rulaj 262.071 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nPret negociabil la fata locului.",
+    "price": 84100,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=260",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=261",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=262"
+    ],
+    "createdAt": "2026-04-10T07:22:40.799Z",
+    "views": 440,
+    "user": {
+      "name": "Maria Rusu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Volkswagen Golf 2015 — 229k km",
+    "description": "Motor benzină, rulaj 229.111 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 105300,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=270"
+    ],
+    "createdAt": "2026-04-10T09:07:19.745Z",
+    "views": 9,
+    "user": {
+      "name": "Andrei Cojocaru",
+      "verified": false
+    }
+  },
+  {
+    "title": "BMW 320d 2011 — 122k km",
+    "description": "Motor benzină, rulaj 122.181 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 412500,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=280",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=281"
+    ],
+    "createdAt": "2026-04-08T09:25:02.628Z",
+    "views": 472,
+    "user": {
+      "name": "Elena Melnic",
+      "verified": true
+    }
+  },
+  {
+    "title": "Audi Q5 2016 — 160k km",
+    "description": "Motor diesel, rulaj 160.098 km.\nActe in regula, ITP valabil.\nInterior uzat pe scaun sofer, normal pt vechime.\nVand serios, nu pierd timpul.",
+    "price": 97700,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=290",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=291",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=292"
+    ],
+    "createdAt": "2026-04-10T21:39:04.127Z",
+    "views": 63,
+    "user": {
+      "name": "Vasile Stratan",
+      "verified": false
+    }
+  },
+  {
+    "title": "Mercedes C220 2018 — 163k km",
+    "description": "Motor diesel, rulaj 163.289 km.\nActe in regula, ITP valabil.\nInterior uzat pe scaun sofer, normal pt vechime.\nVand serios, nu pierd timpul.",
+    "price": 88400,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=300"
+    ],
+    "createdAt": "2026-04-10T12:48:48.259Z",
+    "views": 252,
+    "user": {
+      "name": "Ana Donțu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Volkswagen Passat 2011 — 206k km",
+    "description": "Motor benzină, rulaj 206.429 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 52800,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=310",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=311"
+    ],
+    "createdAt": "2026-04-07T02:17:09.089Z",
+    "views": 452,
+    "user": {
+      "name": "Cristian Burlacu",
+      "verified": true
+    }
+  },
+  {
+    "title": "BMW 320d 2007 — 240k km",
+    "description": "Motor diesel, rulaj 239.876 km.\nActe in regula, ITP valabil.\nInterior uzat pe scaun sofer, normal pt vechime.\nPret negociabil la fata locului.",
+    "price": 97200,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=320",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=321",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=322"
+    ],
+    "createdAt": "2026-04-12T06:31:09.154Z",
+    "views": 337,
+    "user": {
+      "name": "Doina Cebotari",
+      "verified": false
+    }
+  },
+  {
+    "title": "Audi A4 2000 — 113k km",
+    "description": "Motor diesel, rulaj 112.581 km.\nActe in regula, ITP valabil.\nInterior uzat pe scaun sofer, normal pt vechime.\nVand serios, nu pierd timpul.",
+    "price": 73900,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=330"
+    ],
+    "createdAt": "2026-04-11T18:00:45.306Z",
+    "views": 46,
+    "user": {
+      "name": "Sergiu Gutu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Mercedes E200 2014 — 187k km",
+    "description": "Motor benzină, rulaj 186.837 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 70400,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=340",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=341"
+    ],
+    "createdAt": "2026-04-08T04:35:56.296Z",
+    "views": 313,
+    "user": {
+      "name": "Ludmila Railean",
+      "verified": true
+    }
+  },
+  {
+    "title": "Volkswagen Tiguan 2011 — 252k km",
+    "description": "Motor diesel, rulaj 251.789 km.\nActe in regula, ITP valabil.\nInterior uzat pe scaun sofer, normal pt vechime.\nVand serios, nu pierd timpul.",
+    "price": 70900,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=350",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=351",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=352"
+    ],
+    "createdAt": "2026-04-11T17:23:21.297Z",
+    "views": 319,
+    "user": {
+      "name": "Nicolae Moraru",
+      "verified": true
+    }
+  },
+  {
+    "title": "BMW 320d 2015 — 125k km",
+    "description": "Motor diesel, rulaj 125.246 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 57300,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=360"
+    ],
+    "createdAt": "2026-04-09T02:07:42.817Z",
+    "views": 87,
+    "user": {
+      "name": "Victoria Plămădeală",
+      "verified": true
+    }
+  },
+  {
+    "title": "Audi A6 2012 — 220k km",
+    "description": "Motor benzină, rulaj 220.087 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nPret negociabil la fata locului.",
+    "price": 35800,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=370",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=371"
+    ],
+    "createdAt": "2026-04-12T14:47:32.211Z",
+    "views": 88,
+    "user": {
+      "name": "Petru Turcan",
+      "verified": false
+    }
+  },
+  {
+    "title": "Mercedes ML 2023 — 149k km",
+    "description": "Motor diesel, rulaj 148.875 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nPret negociabil la fata locului.",
+    "price": 31700,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=380",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=381",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=382"
+    ],
+    "createdAt": "2026-04-11T06:35:38.637Z",
+    "views": 431,
+    "user": {
+      "name": "Gabriela Hanganu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Volkswagen Golf 2017 — 144k km negociabil",
+    "description": "Motor benzină, rulaj 144.443 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nPret negociabil la fata locului.",
+    "price": 45000,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=390"
+    ],
+    "createdAt": "2026-04-07T03:19:02.795Z",
+    "views": 394,
+    "user": {
+      "name": "Maxim Ursu",
+      "verified": true
+    }
+  },
+  {
+    "title": "[URGENT] BMW 320d 2018 — 259k km negociabil",
+    "description": "Motor benzină, rulaj 259.498 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nPret negociabil la fata locului.",
+    "price": 529000,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=400",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=401"
+    ],
+    "createdAt": "2026-04-12T17:51:17.462Z",
+    "views": 91,
+    "user": {
+      "name": "Stela Ciobanu",
+      "verified": true
+    }
+  },
+  {
+    "title": "[URGENT] Audi Q5 2020 — 113k km",
+    "description": "Motor benzină, rulaj 112.991 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 764000,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=410",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=411",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=412"
+    ],
+    "createdAt": "2026-04-08T21:34:59.740Z",
+    "views": 340,
+    "user": {
+      "name": "Dumitru Negru",
+      "verified": true
+    }
+  },
+  {
+    "title": "Mercedes C220 2021 — 134k km",
+    "description": "Motor benzină, rulaj 133.648 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 355500,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=420"
+    ],
+    "createdAt": "2026-04-10T20:47:55.336Z",
+    "views": 455,
+    "user": {
+      "name": "Rodica Ștefănescu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Volkswagen Passat 2021 — 185k km",
+    "description": "Motor diesel, rulaj 185.490 km.\nActe in regula, ITP valabil.\nInterior uzat pe scaun sofer, normal pt vechime.\nVand serios, nu pierd timpul.",
+    "price": 64300,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=430",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=431"
+    ],
+    "createdAt": "2026-04-08T08:13:55.807Z",
+    "views": 362,
+    "user": {
+      "name": "Igor Caraș",
+      "verified": true
+    }
+  },
+  {
+    "title": "BMW 320d 2002 — 152k km",
+    "description": "Motor diesel, rulaj 151.649 km.\nActe in regula, ITP valabil.\nInterior uzat pe scaun sofer, normal pt vechime.\nVand serios, nu pierd timpul.",
+    "price": 83300,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=440",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=441",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=442"
+    ],
+    "createdAt": "2026-04-12T18:48:14.835Z",
+    "views": 151,
+    "user": {
+      "name": "Alina Bivol",
+      "verified": true
+    }
+  },
+  {
+    "title": "Audi A4 2021 — 197k km",
+    "description": "Motor benzină, rulaj 197.225 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 73900,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=450"
+    ],
+    "createdAt": "2026-04-07T03:52:07.280Z",
+    "views": 262,
+    "user": {
+      "name": "Oleg Rotari",
+      "verified": true
+    }
+  },
+  {
+    "title": "Mercedes E200 2010 — 215k km",
+    "description": "Motor benzină, rulaj 215.347 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 74800,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=460",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=461"
+    ],
+    "createdAt": "2026-04-09T00:53:29.042Z",
+    "views": 453,
+    "user": {
+      "name": "Natalia Lungu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Volkswagen Tiguan 2000 — 141k km",
+    "description": "Motor diesel, rulaj 140.544 km.\nActe in regula, ITP valabil.\nInterior uzat pe scaun sofer, normal pt vechime.\nVand serios, nu pierd timpul.",
+    "price": 98500,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=470",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=471",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=472"
+    ],
+    "createdAt": "2026-04-06T22:20:47.014Z",
+    "views": 26,
+    "user": {
+      "name": "Roman Ceban",
+      "verified": true
+    }
+  },
+  {
+    "title": "BMW 320d 2019 — 292k km",
+    "description": "Motor diesel, rulaj 292.338 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 114400,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=480"
+    ],
+    "createdAt": "2026-04-12T13:47:33.188Z",
+    "views": 364,
+    "user": {
+      "name": "Corina Manole",
+      "verified": false
+    }
+  },
+  {
+    "title": "Audi A6 2022 — 124k km",
+    "description": "Motor diesel, rulaj 124.332 km.\nActe in regula, ITP valabil.\nCuloare gri, zgarieturi parcare.\nVand serios, nu pierd timpul.",
+    "price": 40200,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Mașini",
+    "images": [
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=490",
+      "https://source.unsplash.com/600x400/?car,bmw,audi,mercedes&sig=491"
+    ],
+    "createdAt": "2026-04-06T23:35:24.588Z",
+    "views": 296,
+    "user": {
+      "name": "Veaceslav Grosu",
+      "verified": false
+    }
+  },
+  {
+    "title": "ThinkPad T14 i5 16gb",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nNegociabil daca iei azi.",
+    "price": 48700,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=500",
+      "https://source.unsplash.com/600x400/?laptop&sig=501",
+      "https://source.unsplash.com/600x400/?laptop&sig=502"
+    ],
+    "createdAt": "2026-04-13T05:39:57.287Z",
+    "views": 145,
+    "user": {
+      "name": "Ion Popescu",
+      "verified": true
+    }
+  },
+  {
+    "title": "MacBook Air M1 256gb",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nURGENT vind ca am luat altul.\nPret fix aproape.",
+    "price": 59550,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=510"
+    ],
+    "createdAt": "2026-04-07T06:08:31.811Z",
+    "views": 401,
+    "user": {
+      "name": "Maria Rusu",
+      "verified": false
+    }
+  },
+  {
+    "title": "HP Pavilion Ryzen 7",
+    "description": "Folosit acasa, nu mining.\nBaterie ok inca.\nPot arata in centru.\nPret fix aproape.",
+    "price": 8950,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=520",
+      "https://source.unsplash.com/600x400/?laptop&sig=521"
+    ],
+    "createdAt": "2026-04-12T04:46:27.981Z",
+    "views": 87,
+    "user": {
+      "name": "Andrei Cojocaru",
+      "verified": true
+    }
+  },
+  {
+    "title": "Dell Latitude i7",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 45100,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=530",
+      "https://source.unsplash.com/600x400/?laptop&sig=531",
+      "https://source.unsplash.com/600x400/?laptop&sig=532"
+    ],
+    "createdAt": "2026-04-10T08:54:59.542Z",
+    "views": 244,
+    "user": {
+      "name": "Elena Melnic",
+      "verified": false
+    }
+  },
+  {
+    "title": "ASUS Vivobook 15 inch",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 33050,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=540"
+    ],
+    "createdAt": "2026-04-07T21:03:05.845Z",
+    "views": 460,
+    "user": {
+      "name": "Vasile Stratan",
+      "verified": true
+    }
+  },
+  {
+    "title": "Lenovo Legion GTX",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 47550,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=550",
+      "https://source.unsplash.com/600x400/?laptop&sig=551"
+    ],
+    "createdAt": "2026-04-08T20:19:26.798Z",
+    "views": 287,
+    "user": {
+      "name": "Ana Donțu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Surface Laptop 13",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 53150,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=560",
+      "https://source.unsplash.com/600x400/?laptop&sig=561",
+      "https://source.unsplash.com/600x400/?laptop&sig=562"
+    ],
+    "createdAt": "2026-04-09T04:57:18.832Z",
+    "views": 497,
+    "user": {
+      "name": "Cristian Burlacu",
+      "verified": false
+    }
+  },
+  {
+    "title": "MacBook Pro 14 M1 pro",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 51350,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=570"
+    ],
+    "createdAt": "2026-04-12T20:37:36.914Z",
+    "views": 214,
+    "user": {
+      "name": "Doina Cebotari",
+      "verified": false
+    }
+  },
+  {
+    "title": "Acer Aspire office",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nNegociabil daca iei azi.",
+    "price": 48600,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=580",
+      "https://source.unsplash.com/600x400/?laptop&sig=581"
+    ],
+    "createdAt": "2026-04-07T01:48:09.643Z",
+    "views": 114,
+    "user": {
+      "name": "Sergiu Gutu",
+      "verified": true
+    }
+  },
+  {
+    "title": "MSI thin gaming usor",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nURGENT vind ca am luat altul.\nPret fix aproape.",
+    "price": 54000,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=590",
+      "https://source.unsplash.com/600x400/?laptop&sig=591",
+      "https://source.unsplash.com/600x400/?laptop&sig=592"
+    ],
+    "createdAt": "2026-04-10T03:25:05.189Z",
+    "views": 7,
+    "user": {
+      "name": "Ludmila Railean",
+      "verified": true
+    }
+  },
+  {
+    "title": "ThinkPad X1 carbon — urgent",
+    "description": "Folosit acasa, nu mining.\nBaterie ok inca.\nPot arata in centru.\nPret fix aproape.",
+    "price": 2300,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=600"
+    ],
+    "createdAt": "2026-04-07T18:36:21.509Z",
+    "views": 394,
+    "user": {
+      "name": "Nicolae Moraru",
+      "verified": true
+    }
+  },
+  {
+    "title": "HP EliteBook 14",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nNegociabil daca iei azi.",
+    "price": 53400,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=610",
+      "https://source.unsplash.com/600x400/?laptop&sig=611"
+    ],
+    "createdAt": "2026-04-13T06:07:52.765Z",
+    "views": 70,
+    "user": {
+      "name": "Victoria Plămădeală",
+      "verified": false
+    }
+  },
+  {
+    "title": "Dell XPS 13 fhd",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nURGENT vind ca am luat altul.\nNegociabil daca iei azi.",
+    "price": 43950,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=620",
+      "https://source.unsplash.com/600x400/?laptop&sig=621",
+      "https://source.unsplash.com/600x400/?laptop&sig=622"
+    ],
+    "createdAt": "2026-04-08T05:38:55.923Z",
+    "views": 391,
+    "user": {
+      "name": "Petru Turcan",
+      "verified": true
+    }
+  },
+  {
+    "title": "MacBook 2019 intel",
+    "description": "Folosit acasa, nu mining.\nBaterie ok inca.\nURGENT vind ca am luat altul.\nPret fix aproape.",
+    "price": 9150,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=630"
+    ],
+    "createdAt": "2026-04-13T06:21:53.488Z",
+    "views": 194,
+    "user": {
+      "name": "Gabriela Hanganu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Lenovo IdeaPad i3",
+    "description": "Folosit acasa, nu mining.\nBaterie ok inca.\nPot arata in centru.\nPret fix aproape.",
+    "price": 13600,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=640",
+      "https://source.unsplash.com/600x400/?laptop&sig=641"
+    ],
+    "createdAt": "2026-04-09T10:04:18.682Z",
+    "views": 40,
+    "user": {
+      "name": "Maxim Ursu",
+      "verified": false
+    }
+  },
+  {
+    "title": "ASUS Zenbook oled",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 54400,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=650",
+      "https://source.unsplash.com/600x400/?laptop&sig=651",
+      "https://source.unsplash.com/600x400/?laptop&sig=652"
+    ],
+    "createdAt": "2026-04-13T14:28:40.766Z",
+    "views": 390,
+    "user": {
+      "name": "Stela Ciobanu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Framework modular",
+    "description": "Folosit acasa, nu mining.\nBaterie ok inca.\nPot arata in centru.\nPret fix aproape.",
+    "price": 19700,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=660"
+    ],
+    "createdAt": "2026-04-10T05:32:56.582Z",
+    "views": 79,
+    "user": {
+      "name": "Dumitru Negru",
+      "verified": true
+    }
+  },
+  {
+    "title": "Samsung Galaxy Book",
+    "description": "Folosit acasa, nu mining.\nBaterie ok inca.\nPot arata in centru.\nNegociabil daca iei azi.",
+    "price": 27800,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=670",
+      "https://source.unsplash.com/600x400/?laptop&sig=671"
+    ],
+    "createdAt": "2026-04-11T14:23:44.862Z",
+    "views": 123,
+    "user": {
+      "name": "Rodica Ștefănescu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Toshiba second ieftin",
+    "description": "Folosit acasa, nu mining.\nBaterie ok inca.\nURGENT vind ca am luat altul.\nPret fix aproape.",
+    "price": 18700,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=680",
+      "https://source.unsplash.com/600x400/?laptop&sig=681",
+      "https://source.unsplash.com/600x400/?laptop&sig=682"
+    ],
+    "createdAt": "2026-04-13T14:02:39.124Z",
+    "views": 396,
+    "user": {
+      "name": "Igor Caraș",
+      "verified": true
+    }
+  },
+  {
+    "title": "Sony Vaio vechi piese — urgent",
+    "description": "Folosit acasa, nu mining.\nBaterie ok inca.\nPot arata in centru.\nPret fix aproape.",
+    "price": 3350,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=690"
+    ],
+    "createdAt": "2026-04-13T06:29:42.562Z",
+    "views": 208,
+    "user": {
+      "name": "Alina Bivol",
+      "verified": true
+    }
+  },
+  {
+    "title": "Mac mini M2 desktop",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 44750,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=700",
+      "https://source.unsplash.com/600x400/?laptop&sig=701"
+    ],
+    "createdAt": "2026-04-13T14:39:26.168Z",
+    "views": 342,
+    "user": {
+      "name": "Oleg Rotari",
+      "verified": true
+    }
+  },
+  {
+    "title": "PC all-in-one Lenovo",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 49850,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=710",
+      "https://source.unsplash.com/600x400/?laptop&sig=711",
+      "https://source.unsplash.com/600x400/?laptop&sig=712"
+    ],
+    "createdAt": "2026-04-09T03:05:22.428Z",
+    "views": 139,
+    "user": {
+      "name": "Natalia Lungu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Laptop copii Chromebook",
+    "description": "Folosit acasa, nu mining.\nBaterie ok inca.\nPot arata in centru.\nPret fix aproape.",
+    "price": 20350,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=720"
+    ],
+    "createdAt": "2026-04-11T15:03:39.160Z",
+    "views": 464,
+    "user": {
+      "name": "Roman Ceban",
+      "verified": true
+    }
+  },
+  {
+    "title": "Gaming Acer Nitro",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 56000,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=730",
+      "https://source.unsplash.com/600x400/?laptop&sig=731"
+    ],
+    "createdAt": "2026-04-09T22:48:53.674Z",
+    "views": 478,
+    "user": {
+      "name": "Corina Manole",
+      "verified": true
+    }
+  },
+  {
+    "title": "Workstation Dell Precision",
+    "description": "Folosit acasa, nu mining.\nBateria 2-3 ore real, trebuie schimb daca vrei mult.\nPot arata in centru.\nPret fix aproape.",
+    "price": 51100,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Laptopuri",
+    "images": [
+      "https://source.unsplash.com/600x400/?laptop&sig=740",
+      "https://source.unsplash.com/600x400/?laptop&sig=741",
+      "https://source.unsplash.com/600x400/?laptop&sig=742"
+    ],
+    "createdAt": "2026-04-10T03:08:00.915Z",
+    "views": 116,
+    "user": {
+      "name": "Veaceslav Grosu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Geaca Nike — M",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 4440,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=750"
+    ],
+    "createdAt": "2026-04-10T10:01:42.627Z",
+    "views": 299,
+    "user": {
+      "name": "Ion Popescu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Blugi Levi's — 32",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nNegociabil.",
+    "price": 3600,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=760",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=761"
+    ],
+    "createdAt": "2026-04-07T04:31:37.900Z",
+    "views": 347,
+    "user": {
+      "name": "Maria Rusu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Rochie Zara — 38",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nNegociabil.",
+    "price": 840,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=770",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=771",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=772"
+    ],
+    "createdAt": "2026-04-10T12:51:23.916Z",
+    "views": 187,
+    "user": {
+      "name": "Andrei Cojocaru",
+      "verified": true
+    }
+  },
+  {
+    "title": "Adidasi Adidas — 42",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 750,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=780"
+    ],
+    "createdAt": "2026-04-07T00:58:20.269Z",
+    "views": 355,
+    "user": {
+      "name": "Elena Melnic",
+      "verified": true
+    }
+  },
+  {
+    "title": "Palton Reserved — L",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 4070,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=790",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=791"
+    ],
+    "createdAt": "2026-04-10T20:37:48.191Z",
+    "views": 250,
+    "user": {
+      "name": "Vasile Stratan",
+      "verified": false
+    }
+  },
+  {
+    "title": "Compleu office — 48",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 2780,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=800",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=801",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=802"
+    ],
+    "createdAt": "2026-04-10T12:33:15.970Z",
+    "views": 115,
+    "user": {
+      "name": "Ana Donțu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Geanta piele — maro",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 2640,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=810"
+    ],
+    "createdAt": "2026-04-09T12:05:49.954Z",
+    "views": 312,
+    "user": {
+      "name": "Cristian Burlacu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Hanorac Puma — L",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 3550,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=820",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=821"
+    ],
+    "createdAt": "2026-04-13T14:10:34.294Z",
+    "views": 291,
+    "user": {
+      "name": "Doina Cebotari",
+      "verified": false
+    }
+  },
+  {
+    "title": "Fusta H&M — M",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nNegociabil.",
+    "price": 3260,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=830",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=831",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=832"
+    ],
+    "createdAt": "2026-04-11T03:06:59.972Z",
+    "views": 154,
+    "user": {
+      "name": "Sergiu Gutu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Cizme iarna — 39",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 1170,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=840"
+    ],
+    "createdAt": "2026-04-07T10:41:14.052Z",
+    "views": 242,
+    "user": {
+      "name": "Ludmila Railean",
+      "verified": false
+    }
+  },
+  {
+    "title": "Tricouri pachet 3 — L",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 2170,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=850",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=851"
+    ],
+    "createdAt": "2026-04-10T13:39:12.788Z",
+    "views": 291,
+    "user": {
+      "name": "Nicolae Moraru",
+      "verified": false
+    }
+  },
+  {
+    "title": "Costum gri — 50",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nNegociabil.",
+    "price": 4030,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=860",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=861",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=862"
+    ],
+    "createdAt": "2026-04-11T00:58:13.038Z",
+    "views": 31,
+    "user": {
+      "name": "Victoria Plămădeală",
+      "verified": true
+    }
+  },
+  {
+    "title": "Geaca ski Decathlon — M",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nNegociabil.",
+    "price": 640,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=870"
+    ],
+    "createdAt": "2026-04-10T17:31:38.600Z",
+    "views": 133,
+    "user": {
+      "name": "Petru Turcan",
+      "verified": false
+    }
+  },
+  {
+    "title": "[URGENT] Pantaloni elegant — 46",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 380,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=880",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=881"
+    ],
+    "createdAt": "2026-04-09T18:13:21.621Z",
+    "views": 192,
+    "user": {
+      "name": "Gabriela Hanganu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Rochie mireasa simpla — 40",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 2470,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=890",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=891",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=892"
+    ],
+    "createdAt": "2026-04-13T11:22:25.353Z",
+    "views": 497,
+    "user": {
+      "name": "Maxim Ursu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Umbrela mare — —",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 3990,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=900"
+    ],
+    "createdAt": "2026-04-09T14:53:17.571Z",
+    "views": 153,
+    "user": {
+      "name": "Stela Ciobanu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Esarfa mătase — —",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 1570,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=910",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=911"
+    ],
+    "createdAt": "2026-04-08T18:01:45.074Z",
+    "views": 71,
+    "user": {
+      "name": "Dumitru Negru",
+      "verified": false
+    }
+  },
+  {
+    "title": "Cămașă albă — 41",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nNegociabil.",
+    "price": 4800,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=920",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=921",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=922"
+    ],
+    "createdAt": "2026-04-10T13:37:36.733Z",
+    "views": 103,
+    "user": {
+      "name": "Rodica Ștefănescu",
+      "verified": false
+    }
+  },
+  {
+    "title": "[URGENT] Pulover wool — M",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 590,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=930"
+    ],
+    "createdAt": "2026-04-10T12:14:27.735Z",
+    "views": 390,
+    "user": {
+      "name": "Igor Caraș",
+      "verified": false
+    }
+  },
+  {
+    "title": "Ghete piele — 43",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 2310,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=940",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=941"
+    ],
+    "createdAt": "2026-04-07T05:48:23.617Z",
+    "views": 384,
+    "user": {
+      "name": "Alina Bivol",
+      "verified": false
+    }
+  },
+  {
+    "title": "Sapca Snapback — —",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 1650,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=950",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=951",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=952"
+    ],
+    "createdAt": "2026-04-12T10:33:17.518Z",
+    "views": 48,
+    "user": {
+      "name": "Oleg Rotari",
+      "verified": false
+    }
+  },
+  {
+    "title": "Trening copii — 128",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nNegociabil.",
+    "price": 2630,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=960"
+    ],
+    "createdAt": "2026-04-07T15:25:52.993Z",
+    "views": 243,
+    "user": {
+      "name": "Natalia Lungu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Rucsac laptop — —",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nNegociabil.",
+    "price": 1290,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=970",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=971"
+    ],
+    "createdAt": "2026-04-12T11:18:40.150Z",
+    "views": 386,
+    "user": {
+      "name": "Roman Ceban",
+      "verified": false
+    }
+  },
+  {
+    "title": "[URGENT] Mănuși piele — M",
+    "description": "Cu mic defect la fermoar — pret mai mic.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 330,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=980",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=981",
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=982"
+    ],
+    "createdAt": "2026-04-12T12:46:44.471Z",
+    "views": 394,
+    "user": {
+      "name": "Corina Manole",
+      "verified": false
+    }
+  },
+  {
+    "title": "Curea barbati — 105cm",
+    "description": "Purta putin, spalat corect.\nNu schimb, doar vanzare.\nVad in rascani weekend.",
+    "price": 2710,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Haine",
+    "images": [
+      "https://source.unsplash.com/600x400/?fashion,clothes&sig=990"
+    ],
+    "createdAt": "2026-04-08T22:19:57.306Z",
+    "views": 398,
+    "user": {
+      "name": "Veaceslav Grosu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Frigider Indesit",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 35150,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1000",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1001"
+    ],
+    "createdAt": "2026-04-08T13:04:10.701Z",
+    "views": 20,
+    "user": {
+      "name": "Ion Popescu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Masina spalat Bosch",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 15350,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1010",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1011",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1012"
+    ],
+    "createdAt": "2026-04-12T01:42:41.072Z",
+    "views": 314,
+    "user": {
+      "name": "Maria Rusu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Cuptor electric Gorenje",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 9100,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1020"
+    ],
+    "createdAt": "2026-04-11T17:00:15.272Z",
+    "views": 447,
+    "user": {
+      "name": "Andrei Cojocaru",
+      "verified": true
+    }
+  },
+  {
+    "title": "Aspirator Dyson vechi",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 28450,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1030",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1031"
+    ],
+    "createdAt": "2026-04-09T22:12:01.566Z",
+    "views": 149,
+    "user": {
+      "name": "Elena Melnic",
+      "verified": false
+    }
+  },
+  {
+    "title": "Espressor DeLonghi",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 25450,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1040",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1041",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1042"
+    ],
+    "createdAt": "2026-04-10T23:20:52.463Z",
+    "views": 35,
+    "user": {
+      "name": "Vasile Stratan",
+      "verified": true
+    }
+  },
+  {
+    "title": "Robot bucatarie Philips",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 33500,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1050"
+    ],
+    "createdAt": "2026-04-06T21:22:30.974Z",
+    "views": 447,
+    "user": {
+      "name": "Ana Donțu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Microunde Samsung",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 14150,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1060",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1061"
+    ],
+    "createdAt": "2026-04-09T02:45:18.341Z",
+    "views": 282,
+    "user": {
+      "name": "Cristian Burlacu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Plita vitroceramica — negociabil",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nURGENT eliberez apartament.",
+    "price": 3900,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1070",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1071",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1072"
+    ],
+    "createdAt": "2026-04-12T05:31:55.396Z",
+    "views": 288,
+    "user": {
+      "name": "Doina Cebotari",
+      "verified": false
+    }
+  },
+  {
+    "title": "Hota incorporabila",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 7650,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1080"
+    ],
+    "createdAt": "2026-04-09T02:34:37.017Z",
+    "views": 418,
+    "user": {
+      "name": "Sergiu Gutu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Uscator rufe Beko",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 17150,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1090",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1091"
+    ],
+    "createdAt": "2026-04-11T15:50:32.780Z",
+    "views": 362,
+    "user": {
+      "name": "Ludmila Railean",
+      "verified": false
+    }
+  },
+  {
+    "title": "Congelator lada",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 37450,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1100",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1101",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1102"
+    ],
+    "createdAt": "2026-04-07T05:14:43.377Z",
+    "views": 124,
+    "user": {
+      "name": "Nicolae Moraru",
+      "verified": false
+    }
+  },
+  {
+    "title": "Aer conditionat split",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 18200,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1110"
+    ],
+    "createdAt": "2026-04-13T16:57:28.532Z",
+    "views": 356,
+    "user": {
+      "name": "Victoria Plămădeală",
+      "verified": true
+    }
+  },
+  {
+    "title": "Fier calcat cu abur",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 36200,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1120",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1121"
+    ],
+    "createdAt": "2026-04-11T09:46:46.429Z",
+    "views": 301,
+    "user": {
+      "name": "Petru Turcan",
+      "verified": true
+    }
+  },
+  {
+    "title": "Fierbator sticla",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 23200,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1130",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1131",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1132"
+    ],
+    "createdAt": "2026-04-11T19:58:01.413Z",
+    "views": 316,
+    "user": {
+      "name": "Gabriela Hanganu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Toster 4 felii — negociabil",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nURGENT eliberez apartament.",
+    "price": 5600,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1140"
+    ],
+    "createdAt": "2026-04-07T11:45:32.451Z",
+    "views": 454,
+    "user": {
+      "name": "Maxim Ursu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Multicooker Redmond",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 30700,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1150",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1151"
+    ],
+    "createdAt": "2026-04-07T09:40:48.036Z",
+    "views": 28,
+    "user": {
+      "name": "Stela Ciobanu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Purificator aer Xiaomi",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 19600,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1160",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1161",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1162"
+    ],
+    "createdAt": "2026-04-11T13:20:10.620Z",
+    "views": 83,
+    "user": {
+      "name": "Dumitru Negru",
+      "verified": false
+    }
+  },
+  {
+    "title": "Aspirator vertical Rowenta",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 24550,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1170"
+    ],
+    "createdAt": "2026-04-13T03:45:59.334Z",
+    "views": 472,
+    "user": {
+      "name": "Rodica Ștefănescu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Masina vase incorporabila",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 35650,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1180",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1181"
+    ],
+    "createdAt": "2026-04-08T01:48:24.754Z",
+    "views": 10,
+    "user": {
+      "name": "Igor Caraș",
+      "verified": true
+    }
+  },
+  {
+    "title": "Boiler 80L",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nURGENT eliberez apartament.",
+    "price": 6350,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1190",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1191",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1192"
+    ],
+    "createdAt": "2026-04-07T13:39:44.715Z",
+    "views": 291,
+    "user": {
+      "name": "Alina Bivol",
+      "verified": true
+    }
+  },
+  {
+    "title": "Radiator ulei 11 elem",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 39350,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1200"
+    ],
+    "createdAt": "2026-04-09T10:05:48.603Z",
+    "views": 398,
+    "user": {
+      "name": "Oleg Rotari",
+      "verified": true
+    }
+  },
+  {
+    "title": "Ventilator turn",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 16250,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1210",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1211"
+    ],
+    "createdAt": "2026-04-08T13:41:51.007Z",
+    "views": 46,
+    "user": {
+      "name": "Natalia Lungu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Statie calcat vertical — negociabil",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nURGENT eliberez apartament.",
+    "price": 5250,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1220",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1221",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1222"
+    ],
+    "createdAt": "2026-04-07T22:37:30.489Z",
+    "views": 186,
+    "user": {
+      "name": "Roman Ceban",
+      "verified": false
+    }
+  },
+  {
+    "title": "Deshidrator alimente",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 24600,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1230"
+    ],
+    "createdAt": "2026-04-08T01:08:23.843Z",
+    "views": 255,
+    "user": {
+      "name": "Corina Manole",
+      "verified": false
+    }
+  },
+  {
+    "title": "Plita camping gaz",
+    "description": "Extras la renovare / upgrade.\nMerge, testat inainte de ridicare.\nTransport nu asigur.",
+    "price": 20650,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Electrocasnice",
+    "images": [
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1240",
+      "https://source.unsplash.com/600x400/?washing-machine,fridge&sig=1241"
+    ],
+    "createdAt": "2026-04-13T02:16:25.143Z",
+    "views": 61,
+    "user": {
+      "name": "Veaceslav Grosu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Canapea colț — gri",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nDoar ridicare personala.",
+    "price": 17950,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1250",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1251",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1252"
+    ],
+    "createdAt": "2026-04-11T18:25:58.132Z",
+    "views": 406,
+    "user": {
+      "name": "Ion Popescu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Pat 160 — cu somiera",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nPret negociabil la tot setul.",
+    "price": 18100,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1260"
+    ],
+    "createdAt": "2026-04-07T15:22:13.719Z",
+    "views": 91,
+    "user": {
+      "name": "Maria Rusu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Dulap 3 usi — alb",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nDoar ridicare personala.",
+    "price": 7700,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1270",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1271"
+    ],
+    "createdAt": "2026-04-13T17:25:36.868Z",
+    "views": 87,
+    "user": {
+      "name": "Andrei Cojocaru",
+      "verified": true
+    }
+  },
+  {
+    "title": "Masa extensibila — bucatarie",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nDoar ridicare personala.",
+    "price": 17200,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1280",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1281",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1282"
+    ],
+    "createdAt": "2026-04-07T04:26:06.888Z",
+    "views": 246,
+    "user": {
+      "name": "Elena Melnic",
+      "verified": true
+    }
+  },
+  {
+    "title": "Set scaune — 6 buc",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nDoar ridicare personala.",
+    "price": 26250,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1290"
+    ],
+    "createdAt": "2026-04-12T22:56:19.006Z",
+    "views": 190,
+    "user": {
+      "name": "Vasile Stratan",
+      "verified": false
+    }
+  },
+  {
+    "title": "Biblioteca — modulara",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nPret negociabil la tot setul.",
+    "price": 12950,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1300",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1301"
+    ],
+    "createdAt": "2026-04-10T07:08:19.430Z",
+    "views": 102,
+    "user": {
+      "name": "Ana Donțu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Comoda TV — wenge",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nDoar ridicare personala.",
+    "price": 7050,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1310",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1311",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1312"
+    ],
+    "createdAt": "2026-04-07T11:13:51.328Z",
+    "views": 464,
+    "user": {
+      "name": "Cristian Burlacu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Birou — 120cm",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nDoar ridicare personala.",
+    "price": 29700,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1320"
+    ],
+    "createdAt": "2026-04-09T02:16:51.697Z",
+    "views": 491,
+    "user": {
+      "name": "Doina Cebotari",
+      "verified": false
+    }
+  },
+  {
+    "title": "Etajera perete — 5 rafturi",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nDoar ridicare personala.",
+    "price": 28650,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1330",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1331"
+    ],
+    "createdAt": "2026-04-13T04:45:11.816Z",
+    "views": 80,
+    "user": {
+      "name": "Sergiu Gutu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Fotoliu — piele eco",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nDoar ridicare personala.",
+    "price": 19200,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1340",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1341",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1342"
+    ],
+    "createdAt": "2026-04-09T10:17:10.903Z",
+    "views": 146,
+    "user": {
+      "name": "Ludmila Railean",
+      "verified": true
+    }
+  },
+  {
+    "title": "Masa cafea — sticla",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nDoar ridicare personala.",
+    "price": 24050,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1350"
+    ],
+    "createdAt": "2026-04-09T08:27:19.923Z",
+    "views": 134,
+    "user": {
+      "name": "Nicolae Moraru",
+      "verified": false
+    }
+  },
+  {
+    "title": "Dulap copii — multicolor",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nPret negociabil la tot setul.",
+    "price": 19150,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1360",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1361"
+    ],
+    "createdAt": "2026-04-12T14:53:03.420Z",
+    "views": 163,
+    "user": {
+      "name": "Victoria Plămădeală",
+      "verified": true
+    }
+  },
+  {
+    "title": "[URGENT] Paravan — textil",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nDoar ridicare personala.",
+    "price": 2150,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1370",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1371",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1372"
+    ],
+    "createdAt": "2026-04-12T14:30:26.033Z",
+    "views": 318,
+    "user": {
+      "name": "Petru Turcan",
+      "verified": false
+    }
+  },
+  {
+    "title": "Pat supraetajat — copii",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nPret negociabil la tot setul.",
+    "price": 27700,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1380"
+    ],
+    "createdAt": "2026-04-07T18:24:48.840Z",
+    "views": 299,
+    "user": {
+      "name": "Gabriela Hanganu",
+      "verified": false
+    }
+  },
+  {
+    "title": "[URGENT] Masa birou — reglabila",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nPret negociabil la tot setul.",
+    "price": 2400,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1390",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1391"
+    ],
+    "createdAt": "2026-04-08T06:58:34.966Z",
+    "views": 288,
+    "user": {
+      "name": "Maxim Ursu",
+      "verified": true
+    }
+  },
+  {
+    "title": "[URGENT] Scaun ergonomic — second",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nPret negociabil la tot setul.",
+    "price": 2650,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1400",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1401",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1402"
+    ],
+    "createdAt": "2026-04-12T13:33:44.904Z",
+    "views": 137,
+    "user": {
+      "name": "Stela Ciobanu",
+      "verified": false
+    }
+  },
+  {
+    "title": "[URGENT] Bufet — vintage",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nDoar ridicare personala.",
+    "price": 1300,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1410"
+    ],
+    "createdAt": "2026-04-09T01:18:40.147Z",
+    "views": 20,
+    "user": {
+      "name": "Dumitru Negru",
+      "verified": true
+    }
+  },
+  {
+    "title": "Raft pantofi — metal",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nPret negociabil la tot setul.",
+    "price": 21550,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1420",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1421"
+    ],
+    "createdAt": "2026-04-07T10:14:11.309Z",
+    "views": 54,
+    "user": {
+      "name": "Rodica Ștefănescu",
+      "verified": false
+    }
+  },
+  {
+    "title": "Canapea 2 loc — piele",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nPret negociabil la tot setul.",
+    "price": 5450,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1430",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1431",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1432"
+    ],
+    "createdAt": "2026-04-08T17:42:08.684Z",
+    "views": 253,
+    "user": {
+      "name": "Igor Caraș",
+      "verified": true
+    }
+  },
+  {
+    "title": "[URGENT] Masa picnic — pliabila",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nPret negociabil la tot setul.",
+    "price": 600,
+    "currency": "MDL",
+    "location": "Chișinău",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1440"
+    ],
+    "createdAt": "2026-04-11T17:21:56.358Z",
+    "views": 141,
+    "user": {
+      "name": "Alina Bivol",
+      "verified": false
+    }
+  },
+  {
+    "title": "Saltea — 180x200",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nPret negociabil la tot setul.",
+    "price": 6750,
+    "currency": "MDL",
+    "location": "Bălți",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1450",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1451"
+    ],
+    "createdAt": "2026-04-10T03:39:44.054Z",
+    "views": 63,
+    "user": {
+      "name": "Oleg Rotari",
+      "verified": true
+    }
+  },
+  {
+    "title": "Noptiera — pereche",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nDoar ridicare personala.",
+    "price": 5800,
+    "currency": "MDL",
+    "location": "Cahul",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1460",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1461",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1462"
+    ],
+    "createdAt": "2026-04-07T10:59:45.021Z",
+    "views": 367,
+    "user": {
+      "name": "Natalia Lungu",
+      "verified": true
+    }
+  },
+  {
+    "title": "Taburet — rotund",
+    "description": "Stare uzuala, vezi pozele.\nZgarieturi fine pe blat.\nDoar ridicare personala.",
+    "price": 13100,
+    "currency": "MDL",
+    "location": "Comrat",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1470"
+    ],
+    "createdAt": "2026-04-13T11:26:34.764Z",
+    "views": 302,
+    "user": {
+      "name": "Roman Ceban",
+      "verified": true
+    }
+  },
+  {
+    "title": "Polita — colt",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nDoar ridicare personala.",
+    "price": 27300,
+    "currency": "MDL",
+    "location": "Orhei",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1480",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1481"
+    ],
+    "createdAt": "2026-04-08T17:03:45.672Z",
+    "views": 245,
+    "user": {
+      "name": "Corina Manole",
+      "verified": false
+    }
+  },
+  {
+    "title": "Sifonier — oglinda",
+    "description": "Stare uzuala, vezi pozele.\nDemontare partiala, am suruburi.\nPret negociabil la tot setul.",
+    "price": 18300,
+    "currency": "MDL",
+    "location": "Ungheni",
+    "category": "Mobilă",
+    "images": [
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1490",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1491",
+      "https://source.unsplash.com/600x400/?sofa,furniture&sig=1492"
+    ],
+    "createdAt": "2026-04-09T16:16:27.265Z",
+    "views": 267,
+    "user": {
+      "name": "Veaceslav Grosu",
+      "verified": true
+    }
+  }
+]

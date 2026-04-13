@@ -71,21 +71,24 @@ function memberSinceDate(year) {
   return new Date(year, m, d);
 }
 
-/** Imagini — format cerut (source.unsplash.com); pot redirecționa, dar respect brief-ul */
-function imagesForGroup(group, i) {
-  const q = {
-    Telefoane: "iphone",
-    Mașini: ["bmw", "audi", "car", "mercedes", "volkswagen"][i % 5],
-    Electronice: "laptop",
-    Haine: "clothing",
-    Electrocasnice: "appliance",
-    Mobilă: "furniture",
-  }[group];
-  const tag = q;
+/**
+ * Imagini locale din /public/seed — același domeniu cu site-ul, fără CDN blocat de rețea / extensii.
+ * (Generare: vezi comentariu README sau rulează scriptul din repo care descarcă JPEG-uri în public/seed.)
+ */
+const LOCAL_COVERS = [
+  "/seed/cover-0.jpg",
+  "/seed/cover-1.jpg",
+  "/seed/cover-2.jpg",
+  "/seed/cover-3.jpg",
+  "/seed/cover-4.jpg",
+  "/seed/cover-5.jpg",
+];
+
+function imagesForGroup(_group, i) {
   const n = 1 + (i % 3);
   const urls = [];
   for (let k = 0; k < n; k++) {
-    urls.push(`https://source.unsplash.com/featured/?${encodeURIComponent(tag)}&sig=${i * 10 + k}`);
+    urls.push(LOCAL_COVERS[(i * 3 + k) % LOCAL_COVERS.length]);
   }
   return urls;
 }

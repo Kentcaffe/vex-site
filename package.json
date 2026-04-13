@@ -17,7 +17,8 @@
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "db:seed": "npx tsx prisma/seed.ts",
-    "seed:marketplace": "node seed.js"
+    "seed:marketplace": "node seed.js",
+    "listings:clear": "node scripts/clear-all-listings.js"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.7.0",
