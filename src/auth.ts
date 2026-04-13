@@ -8,6 +8,11 @@ import { compare, hash } from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 
+/** Auth.js reads AUTH_URL; many projects still set NEXTAUTH_URL — mirror it for OAuth callbacks. */
+if (typeof process !== "undefined" && process.env.NEXTAUTH_URL && !process.env.AUTH_URL) {
+  process.env.AUTH_URL = process.env.NEXTAUTH_URL;
+}
+
 /** Unusable bcrypt hash for OAuth-only rows (email/password login will never match). */
 async function placeholderPasswordHash(): Promise<string> {
   return hash(randomBytes(32).toString("hex"), 4);
@@ -15,7 +20,7 @@ async function placeholderPasswordHash(): Promise<string> {
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
   /** Do not log noisy "failed login" as server errors (UI shows a friendly message instead). */
   logger: {
     error(error) {

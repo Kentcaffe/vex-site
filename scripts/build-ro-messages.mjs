@@ -29,6 +29,9 @@ const ro = {
     searchPlaceholder: "Ce cauți astăzi? Ex.: apartament, iPhone, VW?",
     searchSubmit: "Caută",
     addListingShort: "Adaugă anunț",
+    oauthGoogle: "Login cu Google",
+    oauthFacebook: "Login cu Facebook",
+    loginWithEmail: "Cu email",
   },
   Chat: {
     title: "Conversație",

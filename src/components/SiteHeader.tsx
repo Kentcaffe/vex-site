@@ -8,9 +8,14 @@ import { userNotification } from "@/lib/prisma-delegates";
 import { ChatInboxLink } from "@/components/chat/ChatInboxLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
+import { HeaderOAuthButtons } from "@/components/HeaderOAuthButtons";
 
 export async function SiteHeader() {
   const session = await auth();
+  const oauth = {
+    google: Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET),
+    facebook: Boolean(process.env.AUTH_FACEBOOK_ID && process.env.AUTH_FACEBOOK_SECRET),
+  };
   const locale = await getLocale();
   const [t, tm, tf, listingCount, unreadNotifications] = await Promise.all([
     getTranslations("Nav"),
@@ -84,12 +89,32 @@ export async function SiteHeader() {
             <LanguageSwitcher />
             {session?.user ? (
               <>
-                <span
-                  className="hidden max-w-[100px] truncate text-[11px] text-zinc-500 xl:inline"
-                  title={session.user.email ?? ""}
-                >
-                  {session.user.email}
-                </span>
+                <div className="hidden min-w-0 max-w-[200px] flex-col items-end text-right leading-tight sm:flex">
+                  {session.user.name?.trim() ? (
+                    <>
+                      <span className="truncate text-xs font-semibold text-zinc-900 dark:text-zinc-50">
+                        {session.user.name.trim()}
+                      </span>
+                      {session.user.email ? (
+                        <span
+                          className="truncate text-[11px] text-zinc-500 dark:text-zinc-400"
+                          title={session.user.email}
+                        >
+                          {session.user.email}
+                        </span>
+                      ) : null}
+                    </>
+                  ) : session.user.email ? (
+                    <span
+                      className="truncate text-xs font-semibold text-zinc-900 dark:text-zinc-50"
+                      title={session.user.email}
+                    >
+                      {session.user.email}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-zinc-500">—</span>
+                  )}
+                </div>
                 <Link
                   href="/cont"
                   className="inline-flex h-9 items-center rounded-lg border border-zinc-300 px-2.5 text-xs font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
@@ -99,12 +124,7 @@ export async function SiteHeader() {
                 <SignOutButton />
               </>
             ) : (
-              <Link
-                href="/cont"
-                className="inline-flex h-9 items-center rounded-lg border border-zinc-400 bg-white px-3 text-xs font-semibold text-zinc-900 hover:bg-zinc-50 dark:border-zinc-500 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800"
-              >
-                {t("login")}
-              </Link>
+              <HeaderOAuthButtons oauth={oauth} />
             )}
           </div>
         </div>

@@ -24,7 +24,8 @@ export function AuthForms({ oauth }: Props) {
   const [loginError, setLoginError] = useState<string | null>(null);
   const [loginPending, setLoginPending] = useState(false);
 
-  const callbackUrl = locale === routing.defaultLocale ? "/anunturi" : `/${locale}/anunturi`;
+  /** Homepage after sign-in (all methods). */
+  const callbackUrl = locale === routing.defaultLocale ? "/" : `/${locale}`;
 
   async function onLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

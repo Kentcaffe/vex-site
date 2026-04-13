@@ -19,7 +19,10 @@
     "allCategories": "Все категории",
     "searchPlaceholder": "Что ищете? Например: квартира, iPhone, VW…",
     "searchSubmit": "Найти",
-    "addListingShort": "Добавить объявление"
+    "addListingShort": "Добавить объявление",
+    "oauthGoogle": "Войти через Google",
+    "oauthFacebook": "Войти через Facebook",
+    "loginWithEmail": "По email"
   },
   "Chat": {
     "title": "Переписка",
