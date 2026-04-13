@@ -231,8 +231,7 @@ export const ARTICLES_EN: Record<string, InfoArticle> = {
       {
         heading: "Publishing and fees",
         paragraphs: [
-          "Check the site for free options or paid promotion (highlighting, bumps). Policies may change—read pricing or service FAQs before paying.",
-          "Promotion does not guarantee a sale; description quality and fair pricing still matter most.",
+          "Standard listings are free: VEX does not charge listing fees and does not sell ad space or paid visibility to third parties. There are no commercial “boost” packages—what matters is an honest description, clear photos, and a fair price.",
         ],
       },
       {

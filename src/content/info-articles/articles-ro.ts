@@ -230,8 +230,7 @@ export const ARTICLES_RO: Record<string, InfoArticle> = {
       {
         heading: "Publicare și costuri",
         paragraphs: [
-          "Verifică pe site dacă există opțiuni gratuite sau servicii plătite de promovare (evidențiere, republicare). Politicile pot fi actualizate; citește întotdeauna pagina de tarife sau întrebările despre servicii înainte de a achita.",
-          "Promovarea nu garantează vânzarea; descrierea corectă și prețul pieței rămân factorii principali.",
+          "Publicarea anunțurilor standard este gratuită: VEX nu percepe taxe pentru listări și nu oferă spații publicitare sau promovări plătite către terți. Nu există „pachete” comerciale pentru vizibilitate — contează descrierea sinceră, fotografiile clare și un preț potrivit pieței.",
         ],
       },
       {

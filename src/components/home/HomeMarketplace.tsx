@@ -193,13 +193,6 @@ export async function HomeMarketplace({ locale, listings, rootCategories, favori
                 {t("promo2Cta")}
               </Link>
             </div>
-            <div className="rounded-2xl border border-dashed border-zinc-300 bg-zinc-100/80 p-6 text-center dark:border-zinc-700 dark:bg-zinc-900/50">
-              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{t("adPlaceholderTitle")}</p>
-              <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-500">{t("adPlaceholderBody")}</p>
-              <div className="mx-auto mt-4 flex h-28 max-w-[200px] items-center justify-center rounded-xl bg-zinc-200/80 text-[10px] text-zinc-400 dark:bg-zinc-800 dark:text-zinc-600">
-                300×250
-              </div>
-            </div>
           </aside>
         </div>
       </div>
