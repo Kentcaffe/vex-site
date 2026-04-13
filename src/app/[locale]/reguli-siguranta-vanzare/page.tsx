@@ -4,7 +4,7 @@ import {
   type InfoArticleRouteProps,
 } from "@/lib/info-article-page";
 
-const route = createInfoArticlePage("intrebari-frecvente");
+const route = createInfoArticlePage("reguli-siguranta-vanzare");
 
 export async function generateMetadata(props: InfoArticleRouteProps): Promise<Metadata> {
   return route.generateMetadata(props);

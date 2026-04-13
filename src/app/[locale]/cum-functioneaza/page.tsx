@@ -1,25 +1,13 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-import { SimpleInfoPage } from "@/components/info/SimpleInfoPage";
+import {
+  createInfoArticlePage,
+  type InfoArticleRouteProps,
+} from "@/lib/info-article-page";
 
-type Props = { params: Promise<{ locale: string }> };
+const route = createInfoArticlePage("cum-functioneaza");
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "InfoPages.howItWorks" });
-  return { title: `${t("metaTitle")} | VEX`, description: t("metaDescription") };
+export async function generateMetadata(props: InfoArticleRouteProps): Promise<Metadata> {
+  return route.generateMetadata(props);
 }
 
-export default async function CumFunctioneazaPage({ params }: Props) {
-  const { locale } = await params;
-  setRequestLocale(locale);
-  const t = await getTranslations("InfoPages.howItWorks");
-
-  return (
-    <SimpleInfoPage title={t("title")}>
-      <p>{t("p1")}</p>
-      <p>{t("p2")}</p>
-      <p>{t("p3")}</p>
-    </SimpleInfoPage>
-  );
-}
+export default route.Page;

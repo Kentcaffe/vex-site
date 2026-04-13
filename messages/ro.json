@@ -114,14 +114,27 @@
     }
   },
   "Footer": {
+    "siteName": "VEX",
+    "tagline": "Marketplace pentru anunțuri locale în Moldova — conectăm cumpărători și vânzători rapid și sigur.",
     "colContact": "Contact",
+    "colContactIntro": "Scrie-ne pentru suport tehnic, cont sau întrebări despre platformă.",
+    "emailSupportHint": "Suport & probleme tehnice",
+    "emailContactHint": "Colaborări și informații generale",
     "colHelp": "Ajutor",
+    "colHelpIntro": "Resurse ca să publici, să cauți anunțuri și să îți gestionezi contul fără bătăi de cap.",
     "colSafety": "Siguranță",
+    "colSafetyIntro": "Reguli, protecție la plată și raportare — comunitatea merge mai bine când fiecare e atent.",
     "colLegal": "Legal",
-    "linkHowItWorks": "Cum funcționează",
+    "linkHowItWorks": "Cum funcționează platforma",
     "linkFaq": "Întrebări frecvente",
+    "linkPostingGuide": "Cum publici un anunț",
+    "linkContactSeller": "Cum contactezi un vânzător",
+    "linkManageAccount": "Cum îți gestionezi contul",
     "linkAntiFraud": "Sfaturi anti-fraudă",
-    "linkReportListing": "Raportează anunț",
+    "linkRecognizeScam": "Cum recunoști un scam",
+    "linkSafetyBuy": "Reguli de siguranță la cumpărare",
+    "linkSafetySell": "Reguli de siguranță la vânzare",
+    "linkReportListing": "Raportează un anunț suspect",
     "linkCookiePolicy": "Politica cookie",
     "linkCategories": "Categorii",
     "quickNavAria": "Navigare rapidă",
@@ -134,6 +147,15 @@
     "madeInMoldova": "Creat în Moldova 🇲🇩",
     "rights": "© {year} VEX. Toate drepturile rezervate.",
     "disclaimer": "VEX afișează anunțuri între utilizatori; nu este parte la tranzacții. Verifică produsul sau serviciul înainte de plată."
+  },
+  "InfoArticle": {
+    "breadcrumbHome": "Acasă",
+    "breadcrumbHelp": "Ajutor",
+    "breadcrumbSafety": "Siguranță",
+    "hubHelpTitle": "Ajutor",
+    "hubHelpIntro": "Ghiduri despre cum folosești platforma, publici anunțuri, iei legătura cu vânzătorii și îți administrezi contul.",
+    "hubSafetyTitle": "Siguranță",
+    "hubSafetyIntro": "Reguli practice anti-fraudă, recunoașterea escrocheriilor și raportarea anunțurilor suspecte."
   },
   "InfoPages": {
     "howItWorks": {

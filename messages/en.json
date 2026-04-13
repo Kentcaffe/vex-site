@@ -114,14 +114,27 @@
     }
   },
   "Footer": {
+    "siteName": "VEX",
+    "tagline": "Local classifieds marketplace in Moldova — connecting buyers and sellers quickly and safely.",
     "colContact": "Contact",
+    "colContactIntro": "Reach us for account help, technical issues, or general questions.",
+    "emailSupportHint": "Support & technical issues",
+    "emailContactHint": "Partnerships & general inquiries",
     "colHelp": "Help",
+    "colHelpIntro": "Guides to post ads, browse listings, and manage your account.",
     "colSafety": "Safety",
+    "colSafetyIntro": "Rules, safer payments, and reporting — a better community for everyone.",
     "colLegal": "Legal",
-    "linkHowItWorks": "How it works",
+    "linkHowItWorks": "How the platform works",
     "linkFaq": "FAQ",
+    "linkPostingGuide": "How to post an ad",
+    "linkContactSeller": "How to contact a seller",
+    "linkManageAccount": "How to manage your account",
     "linkAntiFraud": "Anti-fraud tips",
-    "linkReportListing": "Report a listing",
+    "linkRecognizeScam": "How to spot a scam",
+    "linkSafetyBuy": "Safety rules for buyers",
+    "linkSafetySell": "Safety rules for sellers",
+    "linkReportListing": "Report a suspicious listing",
     "linkCookiePolicy": "Cookie policy",
     "linkCategories": "Categories",
     "quickNavAria": "Quick navigation",
@@ -134,6 +147,15 @@
     "madeInMoldova": "Made in Moldova \ud83c\uddf2\ud83c\udde9",
     "rights": "\u00a9 {year} VEX. All rights reserved.",
     "disclaimer": "VEX lists ads between users and is not a party to your deals. Verify the item or service before paying."
+  },
+  "InfoArticle": {
+    "breadcrumbHome": "Home",
+    "breadcrumbHelp": "Help",
+    "breadcrumbSafety": "Safety",
+    "hubHelpTitle": "Help",
+    "hubHelpIntro": "Guides on using the platform, posting ads, contacting sellers, and managing your account.",
+    "hubSafetyTitle": "Safety",
+    "hubSafetyIntro": "Practical anti-fraud rules, spotting scams, and reporting suspicious listings."
   },
   "InfoPages": {
     "howItWorks": {
