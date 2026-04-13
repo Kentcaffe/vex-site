@@ -62,6 +62,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name ?? undefined,
+          image: user.avatarUrl ?? undefined,
           role: user.role,
         };
       },
@@ -96,19 +97,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             create: {
               email,
               name: user.name,
+              avatarUrl: user.image ?? null,
               passwordHash: await placeholderPasswordHash(),
             },
             update: {
               name: user.name ?? undefined,
+              avatarUrl: user.image ?? undefined,
             },
           });
           token.id = dbUser.id;
           token.role = dbUser.role;
+          token.picture = dbUser.avatarUrl ?? user.image ?? null;
           return token;
         }
         if (account.provider === "credentials") {
           token.id = user.id;
           token.role = (user as { role: UserRole }).role;
+          token.picture = user.image ?? null;
         }
       }
       return token;
@@ -120,6 +125,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const id = typeof token.id === "string" && token.id.length > 0 ? token.id : "";
         session.user.id = id;
         session.user.role = (token.role as UserRole) ?? "USER";
+        session.user.image = typeof token.picture === "string" ? token.picture : null;
       }
       return session;
     },

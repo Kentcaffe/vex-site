@@ -25,11 +25,12 @@ export default async function ChatInboxPage({ params }: Props) {
           id: true,
           title: true,
           userId: true,
-          user: { select: { name: true, email: true } },
+          user: { select: { name: true, email: true, avatarUrl: true } },
         },
       },
-      buyer: { select: { id: true, name: true, email: true } },
+      buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
       messages: { orderBy: { createdAt: "desc" }, take: 1 },
+      readStates: { where: { userId }, select: { lastReadAt: true } },
     },
     orderBy: { updatedAt: "desc" },
     take: 50,
@@ -39,14 +40,20 @@ export default async function ChatInboxPage({ params }: Props) {
     const seller = r.listing.user;
     const isBuyer = r.buyerId === userId;
     const otherName = isBuyer ? seller.name ?? seller.email ?? "" : r.buyer.name ?? r.buyer.email ?? "";
+    const otherAvatar = isBuyer ? seller.avatarUrl ?? null : r.buyer.avatarUrl ?? null;
     const last = r.messages[0];
+    const lastReadAt = r.readStates[0]?.lastReadAt;
+    const unread =
+      Boolean(last?.senderId && last.senderId !== userId) &&
+      Boolean(!lastReadAt || last.createdAt.getTime() > lastReadAt.getTime());
     return {
       roomId: r.id,
       listingTitle: r.listing.title,
       otherUserName: otherName,
+      otherUserAvatarUrl: otherAvatar,
       lastMessageBody: last?.body ?? null,
       lastMessageAt: last?.createdAt.toISOString() ?? null,
-      lastSenderId: last?.senderId ?? null,
+      unread,
     };
   });
 
@@ -57,7 +64,7 @@ export default async function ChatInboxPage({ params }: Props) {
         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("inboxTitle")}</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("inboxSubtitle")}</p>
       </div>
-      <ChatInboxList items={items} currentUserId={userId} />
+      <ChatInboxList items={items} />
     </div>
   );
 }

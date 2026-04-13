@@ -15,6 +15,7 @@
     "start:render": "prisma db push && next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
+    "prisma:generate": "prisma generate",
     "db:seed": "npx tsx prisma/seed.ts"
   },
   "dependencies": {

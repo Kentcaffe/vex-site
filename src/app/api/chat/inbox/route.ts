@@ -17,11 +17,12 @@ export async function GET() {
           id: true,
           title: true,
           userId: true,
-          user: { select: { name: true, email: true } },
+          user: { select: { name: true, email: true, avatarUrl: true } },
         },
       },
-      buyer: { select: { id: true, name: true, email: true } },
+      buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
       messages: { orderBy: { createdAt: "desc" }, take: 1 },
+      readStates: { where: { userId }, select: { lastReadAt: true } },
     },
     orderBy: { updatedAt: "desc" },
     take: 50,
@@ -33,15 +34,21 @@ export async function GET() {
     const otherName = isBuyer
       ? seller.name ?? seller.email ?? "Seller"
       : r.buyer.name ?? r.buyer.email ?? "Buyer";
+    const otherAvatar = isBuyer ? seller.avatarUrl ?? null : r.buyer.avatarUrl ?? null;
     const last = r.messages[0];
+    const lastReadAt = r.readStates[0]?.lastReadAt;
+    const unread =
+      Boolean(last?.senderId && last.senderId !== userId) &&
+      Boolean(!lastReadAt || last.createdAt.getTime() > lastReadAt.getTime());
     return {
       roomId: r.id,
       listingId: r.listingId,
       listingTitle: r.listing.title,
       otherUserName: otherName,
+      otherUserAvatarUrl: otherAvatar,
       lastMessageBody: last?.body ?? null,
       lastMessageAt: last?.createdAt.toISOString() ?? null,
-      lastSenderId: last?.senderId ?? null,
+      unread,
     };
   });
 

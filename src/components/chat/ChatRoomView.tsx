@@ -9,10 +9,12 @@ import { chatAvatarHue, chatInitials, sameCalendarDay } from "@/lib/chat-ui";
 export type ChatBootstrap = {
   roomId: string;
   listing: { id: string; title: string };
-  seller: { id: string; name: string };
-  buyer?: { id: string; name: string };
+  seller: { id: string; name: string; avatarUrl: string | null };
+  buyer?: { id: string; name: string; avatarUrl: string | null };
   meIsBuyer: boolean;
   otherUserName: string;
+  otherUserAvatarUrl: string | null;
+  myAvatarUrl: string | null;
   messages: { id: string; senderId: string; body: string; createdAt: string }[];
   otherLastReadAt: string | null;
   myLastReadAt: string | null;
@@ -165,14 +167,21 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
-        <div
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-inner"
-          style={{
-            background: `linear-gradient(145deg, hsl(${otherHue}, 55%, 48%), hsl(${otherHue}, 60%, 38%))`,
-          }}
-        >
-          {chatInitials(bootstrap.otherUserName)}
-        </div>
+        {bootstrap.otherUserAvatarUrl ? (
+          <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-zinc-200 shadow-sm dark:border-zinc-700">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={bootstrap.otherUserAvatarUrl} alt={bootstrap.otherUserName} className="h-full w-full object-cover" />
+          </div>
+        ) : (
+          <div
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-inner"
+            style={{
+              background: `linear-gradient(145deg, hsl(${otherHue}, 55%, 48%), hsl(${otherHue}, 60%, 38%))`,
+            }}
+          >
+            {chatInitials(bootstrap.otherUserName)}
+          </div>
+        )}
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-semibold leading-tight text-zinc-900 dark:text-zinc-50">
             {bootstrap.otherUserName}
@@ -228,19 +237,31 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
                     </li>
                   ) : null}
                   <li className={`flex gap-2 ${mine ? "flex-row-reverse" : "flex-row"}`}>
-                    <div
-                      className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white opacity-95 ${
-                        mine ? "shadow-sm" : ""
-                      }`}
-                      style={{
-                        background: mine
-                          ? `linear-gradient(145deg, hsl(${myHue}, 50%, 46%), hsl(${myHue}, 55%, 38%))`
-                          : `linear-gradient(145deg, hsl(${otherHue}, 55%, 48%), hsl(${otherHue}, 60%, 38%))`,
-                      }}
-                      aria-hidden
-                    >
-                      {mine ? chatInitials(t("youLabel")) : chatInitials(bootstrap.otherUserName)}
-                    </div>
+                    {mine && bootstrap.myAvatarUrl ? (
+                      <div className="mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-full border border-zinc-200 dark:border-zinc-700" aria-hidden>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={bootstrap.myAvatarUrl} alt="" className="h-full w-full object-cover" />
+                      </div>
+                    ) : !mine && bootstrap.otherUserAvatarUrl ? (
+                      <div className="mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-full border border-zinc-200 dark:border-zinc-700" aria-hidden>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={bootstrap.otherUserAvatarUrl} alt="" className="h-full w-full object-cover" />
+                      </div>
+                    ) : (
+                      <div
+                        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white opacity-95 ${
+                          mine ? "shadow-sm" : ""
+                        }`}
+                        style={{
+                          background: mine
+                            ? `linear-gradient(145deg, hsl(${myHue}, 50%, 46%), hsl(${myHue}, 55%, 38%))`
+                            : `linear-gradient(145deg, hsl(${otherHue}, 55%, 48%), hsl(${otherHue}, 60%, 38%))`,
+                        }}
+                        aria-hidden
+                      >
+                        {mine ? chatInitials(t("youLabel")) : chatInitials(bootstrap.otherUserName)}
+                      </div>
+                    )}
                     <div className={`max-w-[min(85%,420px)] ${mine ? "items-end" : "items-start"} flex flex-col`}>
                       <div
                         className={`rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug shadow-sm ${

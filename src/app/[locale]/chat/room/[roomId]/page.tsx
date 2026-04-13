@@ -18,7 +18,7 @@ export default async function ChatRoomPage({ params }: Props) {
   }
   const userId = session.user.id;
 
-  const me = await prisma.user.findUnique({ where: { id: userId } });
+  const me = await prisma.user.findUnique({ where: { id: userId }, select: { avatarUrl: true } });
   if (!me) {
     redirect(localizedHref(locale, "/cont"));
   }
@@ -34,10 +34,10 @@ export default async function ChatRoomPage({ params }: Props) {
           id: true,
           title: true,
           userId: true,
-          user: { select: { id: true, name: true, email: true } },
+          user: { select: { id: true, name: true, email: true, avatarUrl: true } },
         },
       },
-      buyer: { select: { id: true, name: true, email: true } },
+      buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
       messages: { orderBy: { createdAt: "asc" }, take: 200 },
       readStates: true,
     },
@@ -56,10 +56,16 @@ export default async function ChatRoomPage({ params }: Props) {
   const bootstrap: ChatBootstrap = {
     roomId: room.id,
     listing: { id: room.listing.id, title: room.listing.title },
-    seller: { id: seller.id, name: seller.name ?? seller.email ?? "" },
-    buyer: { id: room.buyer.id, name: room.buyer.name ?? room.buyer.email ?? "" },
+    seller: { id: seller.id, name: seller.name ?? seller.email ?? "", avatarUrl: seller.avatarUrl ?? null },
+    buyer: {
+      id: room.buyer.id,
+      name: room.buyer.name ?? room.buyer.email ?? "",
+      avatarUrl: room.buyer.avatarUrl ?? null,
+    },
     meIsBuyer: isBuyer,
     otherUserName: otherName,
+    otherUserAvatarUrl: isBuyer ? seller.avatarUrl ?? null : room.buyer.avatarUrl ?? null,
+    myAvatarUrl: me.avatarUrl ?? null,
     messages: room.messages.map((m: { id: string; senderId: string; body: string; createdAt: Date }) => ({
       id: m.id,
       senderId: m.senderId,

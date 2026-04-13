@@ -42,7 +42,10 @@
     "typing": "печатает…",
     "seen": "Прочитано",
     "placeholder": "Введите сообщение…",
-    "send": "Отправить"
+    "send": "Отправить",
+    "inboxSearchPlaceholder": "Поиск по диалогам…",
+    "inboxNoResults": "По вашему запросу диалоги не найдены.",
+    "unreadBadge": "{count} непрочитанных"
   },
   "Home": {
     "title": "Локальная площадка объявлений и продаж",
@@ -269,7 +272,21 @@
     "signedInAs": "Вы вошли как {email}.",
     "linkFavorites": "Избранные объявления",
     "linkNotifications": "Уведомления",
-    "linkReportContent": "Пожаловаться на контент"
+    "linkReportContent": "Пожаловаться на контент",
+    "accountActions": "Быстрые действия",
+    "profileTitle": "Публичный профиль",
+    "profileSubtitle": "Заполните основные данные и фото профиля.",
+    "profileName": "Отображаемое имя",
+    "profilePhone": "Телефон",
+    "profileCity": "Город",
+    "profileAvatarUrl": "Ссылка на фото профиля",
+    "profileBio": "Кратко о себе",
+    "profileSave": "Сохранить профиль",
+    "profileSaving": "Сохранение…",
+    "profileSuccess": "Профиль обновлен.",
+    "profileValidation": "Проверьте введённые данные (например, ссылка на фото должна начинаться с http/https).",
+    "profileUnauthorized": "Нужно войти в аккаунт.",
+    "profileUnknown": "Не удалось сохранить профиль. Попробуйте снова."
   },
   "Notifications": {
     "title": "Уведомления",
@@ -547,3 +564,4 @@
     }
   }
 }
+
