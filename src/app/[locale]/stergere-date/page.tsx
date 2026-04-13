@@ -1,28 +1,28 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LegalDocumentShell } from "@/components/legal/LegalDocumentShell";
-import { TermeniContentRo } from "@/components/legal/content/TermeniContentRo";
+import { StergereDateContentRo } from "@/components/legal/content/StergereDateContentRo";
 
 type Props = { params: Promise<{ locale: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Legal.termeni" });
+  const t = await getTranslations({ locale, namespace: "Legal.stergere" });
   const title = `${t("pageTitle")} | VEX`;
   return {
     title,
-    description: "Termeni și condiții pentru platforma VEX (vex.md) — marketplace și anunțuri.",
+    description: "Ștergerea datelor personale pe VEX (vex.md) — cereri GDPR, termene, contact support@vex.md.",
     openGraph: { title, type: "article" },
   };
 }
 
-export default async function TermeniPage({ params }: Props) {
+export default async function StergereDatePage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("Legal.termeni");
+  const t = await getTranslations("Legal.stergere");
 
   return (
-    <LegalDocumentShell slug="termeni">
+    <LegalDocumentShell slug="stergere-date">
       <header className="border-b border-zinc-100 pb-8 dark:border-zinc-800">
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("pageTitle")}</h1>
         <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{t("pageUpdated")}</p>
@@ -33,7 +33,7 @@ export default async function TermeniPage({ params }: Props) {
         ) : null}
       </header>
       <div className="mt-10 space-y-10">
-        <TermeniContentRo />
+        <StergereDateContentRo />
       </div>
     </LegalDocumentShell>
   );

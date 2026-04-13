@@ -128,6 +128,33 @@
     "disclaimer": "The platform displays ads; transactions happen between users. Always verify items or services before paying."
   },
   "Legal": {
+    "document": {
+      "backHome": "Back to home",
+      "navAria": "Legal pages",
+      "navTerms": "Terms",
+      "navPrivacy": "Privacy",
+      "navDeletion": "Data deletion",
+      "ackPrefix": "I have read and agree to the",
+      "ackTerms": "Terms of Service",
+      "ackMiddle": "and",
+      "ackPrivacy": "Privacy Policy",
+      "ackSuffix": "."
+    },
+    "termeni": {
+      "pageTitle": "Terms and Conditions",
+      "pageUpdated": "Last updated: April 13, 2026",
+      "languageNote": "The complete legal text below is provided in Romanian (official version for VEX / vex.md)."
+    },
+    "confidentialitate": {
+      "pageTitle": "Privacy Policy",
+      "pageUpdated": "Last updated: April 13, 2026",
+      "languageNote": "The complete legal text below is provided in Romanian (official version for VEX / vex.md)."
+    },
+    "stergere": {
+      "pageTitle": "Data deletion (GDPR)",
+      "pageUpdated": "Last updated: April 13, 2026",
+      "languageNote": "The complete legal text below is provided in Romanian (official version for VEX / vex.md)."
+    },
     "terms": {
       "back": "Back",
       "title": "Terms of service",

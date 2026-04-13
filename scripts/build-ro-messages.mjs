@@ -143,6 +143,33 @@ const ro = {
       "Platforma facilitează afișarea anunțurilor; tranzacțiile au loc între utilizatori. Verifică mereu produsul sau serviciul înainte de plată.",
   },
   Legal: {
+    document: {
+      backHome: "Înapoi acasă",
+      navAria: "Pagini legale",
+      navTerms: "Termeni",
+      navPrivacy: "Confidențialitate",
+      navDeletion: "Ștergere date",
+      ackPrefix: "Sunt de acord cu",
+      ackTerms: "Termenii și Condițiile",
+      ackMiddle: "și cu",
+      ackPrivacy: "Politica de confidențialitate",
+      ackSuffix: ".",
+    },
+    termeni: {
+      pageTitle: "Termeni și condiții",
+      pageUpdated: "Ultima actualizare: 13 aprilie 2026",
+      languageNote: "",
+    },
+    confidentialitate: {
+      pageTitle: "Politica de confidențialitate",
+      pageUpdated: "Ultima actualizare: 13 aprilie 2026",
+      languageNote: "",
+    },
+    stergere: {
+      pageTitle: "Ștergerea datelor (GDPR)",
+      pageUpdated: "Ultima actualizare: 13 aprilie 2026",
+      languageNote: "",
+    },
     terms: {
       back: "Înapoi",
       title: "Termeni și condiții",
