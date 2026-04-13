@@ -46,6 +46,11 @@ export async function SiteFooter() {
                   {t("privacy")}
                 </Link>
               </li>
+              <li>
+                <Link href="/data-deletion" className="text-zinc-700 hover:text-emerald-600 dark:text-zinc-300 dark:hover:text-emerald-400">
+                  {t("linkDataDeletion")}
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

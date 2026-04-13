@@ -120,6 +120,7 @@
     "linkListings": "All listings",
     "linkPublish": "Post an ad",
     "linkAccount": "Account",
+    "linkDataDeletion": "Data deletion",
     "rights": "© {year} VEX. All rights reserved.",
     "disclaimer": "The platform displays ads; transactions happen between users. Always verify items or services before paying."
   },
@@ -194,7 +195,7 @@
       "year": "Year",
       "mileageKm": "Mileage",
       "rooms": "Rooms",
-      "areaSqm": "Area (m²)"
+      "areaSqm": "Area (m)"
     },
     "specExtra": {
       "fuel": "Fuel",
@@ -212,7 +213,7 @@
       "doors": "Doors",
       "furnished": "Furnished",
       "building_type": "Building type",
-      "land_area_sqm": "Land area (m²)",
+      "land_area_sqm": "Land area (m)",
       "battery_health": "Battery health (%)",
       "screen_inch": "Screen size (inch)",
       "processor": "Processor",
@@ -451,7 +452,7 @@
     "year": "Year",
     "mileage": "Mileage",
     "rooms": "Rooms",
-    "areaSqm": "Area (m²)",
+    "areaSqm": "Area (m)",
     "images": "Images",
     "imagesHint": "Minimum 1, maximum 8 URLs (one per line). You can upload files.",
     "upload": "Upload images",
@@ -492,7 +493,7 @@
       "fwd": "FWD",
       "rwd": "RWD",
       "awd": "AWD",
-      "4wd": "4×4"
+      "4wd": "44"
     },
     "doors": {
       "2": "2",
@@ -570,7 +571,7 @@
         "label": "Building type"
       },
       "land_area_sqm": {
-        "label": "Land area (m²)"
+        "label": "Land area (m)"
       },
       "battery_health": {
         "label": "Battery health (%)"

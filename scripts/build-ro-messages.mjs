@@ -134,6 +134,7 @@ const ro = {
     linkListings: "Toate anunțurile",
     linkPublish: "Publică anunț",
     linkAccount: "Cont",
+    linkDataDeletion: "Ștergere date",
     rights: "© {year} VEX. Toate drepturile rezervate.",
     disclaimer:
       "Platforma facilitează afișarea anunțurilor; tranzacțiile au loc între utilizatori. Verifică mereu produsul sau serviciul înainte de plată.",
