@@ -69,6 +69,7 @@ async function main() {
 
   const count = await prisma.category.count();
   console.log(`Seed OK: ${count} categorii + utilizator demo@vex.site / demo12345 + anunț exemplu.`);
+  console.log(`Pentru 150 anunțuri demo (marketplace MD): npm run seed:marketplace`);
 }
 
 main()

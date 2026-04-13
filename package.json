@@ -16,7 +16,8 @@
     "lint": "eslint",
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
-    "db:seed": "npx tsx prisma/seed.ts"
+    "db:seed": "npx tsx prisma/seed.ts",
+    "seed:marketplace": "node seed.js"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.7.0",
