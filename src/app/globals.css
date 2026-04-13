@@ -3,4 +3,9 @@
 body {
   font-feature-settings: "kern" 1, "liga" 1;
   text-rendering: optimizeLegibility;
+  background-color: #f2f3f5;
+}
+
+.dark body {
+  background-color: rgb(9 9 11);
 }
