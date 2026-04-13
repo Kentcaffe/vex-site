@@ -1,4 +1,4 @@
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { AccountSettingsView } from "@/components/account-settings/AccountSettingsView";
@@ -16,7 +16,6 @@ export default async function ContPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const session = await auth();
-  const t = await getTranslations("Account");
 
   if (session?.user) {
     const me = (await prisma.user.findUnique({
@@ -48,14 +47,8 @@ export default async function ContPage({ params }: Props) {
   const oauth = getOAuthAvailability();
 
   return (
-    <div className="flex min-h-[calc(100vh-12rem)] flex-col items-center px-4 py-10 sm:px-6">
-      <div className="w-full max-w-4xl">
-        <header className="mb-8 text-center">
-          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">{t("title")}</h1>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 sm:text-base">{t("subtitle")}</p>
-        </header>
-        <AuthForms oauth={oauth} />
-      </div>
+    <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center bg-[#f9fafb] px-4 py-12 dark:bg-zinc-950 sm:px-6">
+      <AuthForms oauth={oauth} />
     </div>
   );
 }

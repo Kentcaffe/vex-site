@@ -40,26 +40,42 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     Credentials({
       id: "credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        identifier: { label: "Email or phone", type: "text" },
         password: { label: "Password", type: "password" },
       },
       authorize: async (credentials) => {
         const parsed = z
           .object({
-            email: z.string().email(),
+            identifier: z.string().min(1),
             password: z.string().min(1),
           })
           .safeParse(credentials);
         if (!parsed.success) {
           return null;
         }
-        const user = await prisma.user.findUnique({
-          where: { email: parsed.data.email.trim().toLowerCase() },
-        });
+        const raw = parsed.data.identifier.trim();
+        const password = parsed.data.password;
+
+        let user =
+          raw.includes("@")
+            ? await prisma.user.findUnique({
+                where: { email: raw.toLowerCase() },
+              })
+            : null;
+
+        if (!user) {
+          const digits = raw.replace(/\D/g, "");
+          if (digits.length >= 8) {
+            user = await prisma.user.findFirst({
+              where: { phone: digits },
+            });
+          }
+        }
+
         if (!user?.passwordHash) {
           return null;
         }
-        const ok = await compare(parsed.data.password, user.passwordHash);
+        const ok = await compare(password, user.passwordHash);
         if (!ok) {
           return null;
         }

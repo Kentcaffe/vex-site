@@ -6,6 +6,7 @@ import { z } from "zod";
 import { signOut } from "@/auth";
 import { routing } from "@/i18n/routing";
 import { localizedHref } from "@/lib/paths";
+import { passwordMeetsAllRules } from "@/lib/auth-password-rules";
 import { prisma } from "@/lib/prisma";
 
 /** Folosește server action în loc de `signOut` din `next-auth/react` (evită erori CSRF / JSON pe producție). */
@@ -18,7 +19,10 @@ export async function logout(formData: FormData) {
 
 export type RegisterState =
   | { ok: true }
-  | { ok: false; error: "validation" | "emailTaken" | "phoneInvalid" };
+  | {
+      ok: false;
+      error: "validation" | "emailTaken" | "phoneInvalid" | "passwordWeak" | "termsRequired";
+    };
 
 function phoneDigitsOnly(raw: unknown): string {
   return String(raw ?? "").replace(/\D/g, "");
@@ -28,6 +32,10 @@ export async function registerUser(
   _prev: RegisterState | undefined,
   formData: FormData,
 ): Promise<RegisterState> {
+  if (formData.get("acceptTerms") !== "on") {
+    return { ok: false, error: "termsRequired" };
+  }
+
   const phone = phoneDigitsOnly(formData.get("phone"));
   if (phone.length < 8) {
     return { ok: false, error: "phoneInvalid" };
@@ -47,6 +55,10 @@ export async function registerUser(
 
   if (!parsed.success) {
     return { ok: false, error: "validation" };
+  }
+
+  if (!passwordMeetsAllRules(parsed.data.password)) {
+    return { ok: false, error: "passwordWeak" };
   }
 
   const email = parsed.data.email.trim().toLowerCase();
