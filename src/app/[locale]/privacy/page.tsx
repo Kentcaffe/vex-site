@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PrivacyPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("Legal.terms");
+  const t = await getTranslations("Legal.privacy");
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
@@ -35,8 +35,9 @@ export default async function PrivacyPage({ params }: Props) {
         ← {t("back")}
       </Link>
       <h1 className="mt-6 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Privacy Policy</h1>
-      <p className="mt-2 text-sm text-zinc-500">vex.md</p>
+      <p className="mt-2 text-sm text-zinc-500">{t("updated")}</p>
       <div className="mt-8 space-y-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+        <p className="font-semibold text-zinc-800 dark:text-zinc-200">Privacy Policy</p>
         <p>
           This website (vex.md) collects basic user data such as name, email address, and profile information when users
           log in using Google or Facebook.
