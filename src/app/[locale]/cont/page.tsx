@@ -6,6 +6,7 @@ import { SignOutButton } from "@/components/SignOutButton";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { chatInitials } from "@/lib/chat-ui";
+import { getOAuthAvailability } from "@/lib/oauth-env";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -104,10 +105,7 @@ export default async function ContPage({ params }: Props) {
     );
   }
 
-  const oauth = {
-    google: Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET),
-    facebook: Boolean(process.env.AUTH_FACEBOOK_ID && process.env.AUTH_FACEBOOK_SECRET),
-  };
+  const oauth = getOAuthAvailability();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">

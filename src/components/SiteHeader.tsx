@@ -9,13 +9,11 @@ import { ChatInboxLink } from "@/components/chat/ChatInboxLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
 import { HeaderOAuthButtons } from "@/components/HeaderOAuthButtons";
+import { getOAuthAvailability } from "@/lib/oauth-env";
 
 export async function SiteHeader() {
   const session = await auth();
-  const oauth = {
-    google: Boolean(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET),
-    facebook: Boolean(process.env.AUTH_FACEBOOK_ID && process.env.AUTH_FACEBOOK_SECRET),
-  };
+  const oauth = getOAuthAvailability();
   const locale = await getLocale();
   const [t, tm, tf, listingCount, unreadNotifications] = await Promise.all([
     getTranslations("Nav"),
