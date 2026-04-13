@@ -8,10 +8,10 @@ function getTransport(): nodemailer.Transporter | null {
   if (transporter === null) return null;
   if (transporter) return transporter;
 
-  const host = process.env.SMTP_HOST;
+  const host = process.env.SMTP_HOST?.trim();
   const port = Number(process.env.SMTP_PORT ?? 465);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const user = process.env.SMTP_USER?.trim();
+  const pass = (process.env.SMTP_PASS ?? "").trim();
 
   if (!host || !user || !pass) {
     transporter = null;
@@ -23,13 +23,25 @@ function getTransport(): nodemailer.Transporter | null {
   const secure =
     explicit === "true" ? true : explicit === "false" ? false : port === 465;
 
+  // Zoho: uneori AUTH PLAIN dă 535; LOGIN e mai compatibil. Forțează cu SMTP_AUTH_METHOD=PLAIN dacă e nevoie.
+  const authMethod =
+    process.env.SMTP_AUTH_METHOD === "PLAIN" ? "PLAIN" : ("LOGIN" as const);
+
+  const smtpDebug = process.env.SMTP_DEBUG === "1" || process.env.SMTP_DEBUG === "true";
+
   transporter = nodemailer.createTransport({
     host,
     port,
     secure,
     auth: { user, pass },
+    authMethod,
     ...(!secure ? { requireTLS: true as const } : {}),
-    tls: { minVersion: "TLSv1.2" as const },
+    tls: {
+      minVersion: "TLSv1.2" as const,
+      servername: host,
+    },
+    logger: smtpDebug,
+    debug: smtpDebug,
   });
   return transporter;
 }

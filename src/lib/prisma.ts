@@ -6,9 +6,18 @@ import { PrismaClient } from "@prisma/client";
 /** Asigură că folderul părinte al fișierului SQLite există (evită „directory does not exist”). */
 function ensureSqliteParentDirExists(fileUrl: string): void {
   if (!fileUrl.startsWith("file:")) return;
-  let rest = fileUrl.slice("file:".length).replace(/^\/+/, "");
-  if (rest.startsWith("./")) rest = rest.slice(2);
-  const absolute = path.isAbsolute(rest) ? rest : path.join(process.cwd(), rest);
+  const rest = fileUrl.slice("file:".length);
+  let absolute: string;
+  if (rest.startsWith("/")) {
+    // Unix: file:/var/data/vex.db (Render Persistent Disk)
+    absolute = rest;
+  } else if (/^[A-Za-z]:[\\/]/.test(rest)) {
+    // Windows absolut: file:C:/data/db.sqlite
+    absolute = rest;
+  } else {
+    const rel = rest.replace(/^\.\//, "");
+    absolute = path.join(process.cwd(), rel);
+  }
   const dir = path.dirname(absolute);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
