@@ -18,11 +18,18 @@ function getTransport(): nodemailer.Transporter | null {
     return null;
   }
 
+  // Zoho: 465 = SSL (secure: true); 587 = STARTTLS (secure: false). Setează SMTP_SECURE=true|false dacă e nevoie.
+  const explicit = process.env.SMTP_SECURE;
+  const secure =
+    explicit === "true" ? true : explicit === "false" ? false : port === 465;
+
   transporter = nodemailer.createTransport({
     host,
     port,
-    secure: true,
+    secure,
     auth: { user, pass },
+    ...(!secure ? { requireTLS: true as const } : {}),
+    tls: { minVersion: "TLSv1.2" as const },
   });
   return transporter;
 }
@@ -198,7 +205,8 @@ export async function sendResetEmail(
     });
     return { ok: true };
   } catch (err) {
-    console.error("[email] SMTP send failed:", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[email] SMTP send failed:", msg, err);
     return { ok: false, error: "send_failed" };
   }
 }
@@ -225,7 +233,8 @@ export async function sendHtmlViaSmtp(
     });
     return { ok: true };
   } catch (err) {
-    console.error("[email] SMTP send failed:", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error("[email] SMTP send failed:", msg, err);
     return { ok: false, error: "send_failed" };
   }
 }

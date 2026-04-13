@@ -56,6 +56,13 @@ export async function requestPasswordReset(
   const genericOk: RequestResetState = { ok: true };
 
   if (!user?.passwordHash) {
+    // Cont doar OAuth / fără parolă locală — nu există ce să resetăm; același răspuns ca la email inexistent (anti-enumerare).
+    if (process.env.NODE_ENV === "development") {
+      console.warn(
+        "[password-reset] Cont fără parolă locală (ex. doar Google/Facebook) — email de resetare nu se trimite:",
+        email.trim().toLowerCase(),
+      );
+    }
     return genericOk;
   }
 

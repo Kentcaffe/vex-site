@@ -19,7 +19,8 @@
     "db:seed": "npx tsx prisma/seed.ts",
     "seed:marketplace": "node seed.js",
     "listings:clear": "node scripts/clear-all-listings.js",
-    "env:check": "node scripts/check-env.mjs"
+    "env:check": "node scripts/check-env.mjs",
+    "test:smtp": "node scripts/test-smtp.mjs"
   },
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.7.0",
