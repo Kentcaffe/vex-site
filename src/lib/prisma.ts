@@ -1,9 +1,24 @@
+import fs from "node:fs";
+import path from "node:path";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaClient } from "@prisma/client";
+
+/** Asigură că folderul părinte al fișierului SQLite există (evită „directory does not exist”). */
+function ensureSqliteParentDirExists(fileUrl: string): void {
+  if (!fileUrl.startsWith("file:")) return;
+  let rest = fileUrl.slice("file:".length).replace(/^\/+/, "");
+  if (rest.startsWith("./")) rest = rest.slice(2);
+  const absolute = path.isAbsolute(rest) ? rest : path.join(process.cwd(), rest);
+  const dir = path.dirname(absolute);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+}
 
 /** Tip explicit — evită pierderea inferenței pentru `include`/`select` când clientul e creat cu adapter. */
 function createPrismaClient(): PrismaClient {
   const url = process.env.DATABASE_URL ?? "file:./dev.db";
+  ensureSqliteParentDirExists(url);
   const adapter = new PrismaBetterSqlite3({ url });
   return new PrismaClient({ adapter });
 }
