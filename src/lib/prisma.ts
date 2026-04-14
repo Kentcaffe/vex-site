@@ -13,11 +13,20 @@ function createPrismaClient(): PrismaClient {
       "DATABASE_URL lipsește. Setează connection string-ul PostgreSQL (ex. din Supabase: Project Settings → Database).",
     );
   }
+  const dbUrl = process.env.DATABASE_URL;
+  const sslRequested =
+    process.env.DB_SSL === "true" || /sslmode=require/i.test(dbUrl);
+  const rejectUnauthorized =
+    process.env.DB_SSL_REJECT_UNAUTHORIZED === "true";
+
   const pool =
     globalForPrisma.pgPool ??
     new Pool({
-      connectionString: process.env.DATABASE_URL,
+      connectionString: dbUrl,
       max: Number(process.env.DATABASE_POOL_MAX ?? 10),
+      ...(sslRequested
+        ? { ssl: { rejectUnauthorized } }
+        : {}),
     });
   if (process.env.NODE_ENV !== "production") {
     globalForPrisma.pgPool = pool;
