@@ -7,6 +7,47 @@ const globalForPrisma = globalThis as unknown as {
   pgPool: Pool | undefined;
 };
 
+/** pg nu citește mereu sslmode din URL la fel ca libpq; pentru host remote trebuie ssl explicit. */
+function poolSslForUrl(dbUrl: string):
+  | undefined
+  | false
+  | { rejectUnauthorized: boolean } {
+  const rejectUnauthorized =
+    process.env.DB_SSL_REJECT_UNAUTHORIZED === "true";
+
+  if (process.env.DB_SSL === "false") {
+    return undefined;
+  }
+
+  let host = "";
+  try {
+    const normalized = dbUrl.replace(/^postgres(ql)?:\/\//i, "http://");
+    host = new URL(normalized).hostname;
+  } catch {
+    host = "";
+  }
+
+  const isLocal =
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "::1" ||
+    host.endsWith(".local");
+
+  const urlImpliesTls =
+    /sslmode=(require|verify-full|verify-ca)/i.test(dbUrl) ||
+    /[?&]ssl=true/i.test(dbUrl);
+
+  if (isLocal && !urlImpliesTls && process.env.DB_SSL !== "true") {
+    return undefined;
+  }
+
+  if (!isLocal || process.env.DB_SSL === "true" || urlImpliesTls) {
+    return { rejectUnauthorized };
+  }
+
+  return undefined;
+}
+
 function createPrismaClient(): PrismaClient {
   if (!process.env.DATABASE_URL) {
     throw new Error(
@@ -14,29 +55,20 @@ function createPrismaClient(): PrismaClient {
     );
   }
   const dbUrl = process.env.DATABASE_URL;
-  const sslRequested =
-    process.env.DB_SSL === "true" || /sslmode=require/i.test(dbUrl);
-  const rejectUnauthorized =
-    process.env.DB_SSL_REJECT_UNAUTHORIZED === "true";
+  const ssl = poolSslForUrl(dbUrl);
 
   const pool =
     globalForPrisma.pgPool ??
     new Pool({
       connectionString: dbUrl,
       max: Number(process.env.DATABASE_POOL_MAX ?? 10),
-      ...(sslRequested
-        ? { ssl: { rejectUnauthorized } }
-        : {}),
+      ...(ssl !== undefined ? { ssl } : {}),
     });
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.pgPool = pool;
-  }
+  globalForPrisma.pgPool = pool;
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 }
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+globalForPrisma.prisma = prisma;
