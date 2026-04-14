@@ -7,17 +7,7 @@ const { initDb } = require("./init-db");
 const { requireAuth } = require("./auth-middleware");
 
 const app = express();
-const rawPort = process.env.PORT ?? process.env.API_PORT;
-const PORT = rawPort
-  ? Number(rawPort)
-  : process.env.NODE_ENV === "production"
-    ? NaN
-    : 4000;
-if (!Number.isFinite(PORT) || PORT < 1) {
-  throw new Error(
-    "Setează PORT sau API_PORT pentru backend (obligatoriu când NODE_ENV=production).",
-  );
-}
+const port = Number(process.env.PORT || process.env.API_PORT || 3000);
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
 if (!process.env.JWT_SECRET) {
@@ -170,8 +160,8 @@ app.get("/api/ads", async (_req, res) => {
 
 async function start() {
   await initDb();
-  app.listen(PORT, () => {
-    console.log(`Backend API running at http://localhost:${PORT}`);
+  app.listen(port, () => {
+    console.log(`Backend API running at http://localhost:${port}`);
   });
 }
 
