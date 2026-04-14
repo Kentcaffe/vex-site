@@ -7,6 +7,12 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 dotenv.config({ path: path.join(root, ".env") });
 dotenv.config({ path: path.join(root, ".env.local"), override: true });
 
+/** Urgență: site live fără migrate la start (ai rulat deja `prisma migrate deploy` în altă parte). */
+if (process.env.SKIP_PRISMA_MIGRATE === "true") {
+  console.log("[migrate] SKIP_PRISMA_MIGRATE=true — sar migrarea.");
+  process.exit(0);
+}
+
 function maskConnectionHint(url) {
   try {
     const u = new URL(url);
@@ -160,7 +166,7 @@ if (lastStatus !== 0) {
     "[migrate] (2) rulează migrarea din Render → Shell: npm run db:migrate:render;",
   );
   console.error(
-    "[migrate] (3) Dacă s-a blocat mult la pooler (6543): `migrate deploy` + PgBouncer Transaction poate agăța; pe Render ordinea e direct primul (vezi log «Ordine»).",
+    "[migrate] (3) Pooler Transaction (6543) poate eșua sau agăța la migrate; încearcă în Supabase «Session mode» pentru pooler sau aplică SQL-ul din `prisma/migrations` manual.",
   );
   if (onlyDirect) {
     console.error(
