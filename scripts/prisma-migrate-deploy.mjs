@@ -173,6 +173,17 @@ if (lastStatus !== 0) {
       "[migrate] Acum ai un singur URL (probabil doar direct). Adaugă DATABASE_URL cu pooler.",
     );
   }
+
+  if (process.env.PRISMA_MIGRATE_CONTINUE_ON_ERROR === "true") {
+    console.error("");
+    console.error(
+      "[migrate] PRISMA_MIGRATE_CONTINUE_ON_ERROR=true — migrarea a eșuat, dar continuăm pornirea serverului (debug / urgență).",
+    );
+    console.error(
+      "[migrate] Repară DB-ul sau rulează manual: npm run db:migrate:render",
+    );
+    process.exit(0);
+  }
 }
 
 process.exit(lastStatus);

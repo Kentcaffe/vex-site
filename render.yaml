@@ -4,8 +4,8 @@ services:
   - type: web
     name: anunturi-web
     runtime: node
-    # Build fără DB; la start rulează migrarea apoi `next start` (vezi `start:render` în package.json).
-    buildCommand: npm ci && npm run build:render
+    # `npm ci` rulează postinstall (prisma generate), apoi `next build` (vezi scriptul `build`).
+    buildCommand: npm ci && npm run build
     startCommand: npm run start:render
     envVars:
       - key: NODE_VERSION
