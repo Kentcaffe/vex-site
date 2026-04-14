@@ -48,6 +48,25 @@ function poolSslForUrl(dbUrl: string):
   return undefined;
 }
 
+/**
+ * pg v8+ tratează sslmode=require din URL ca verify-full (vezi warning în logs).
+ * Dacă setăm `ssl: { rejectUnauthorized }` pe Pool, trebuie scoși parametrii SSL din URL,
+ * altfel TLS rămâne strict și pică cu "self-signed certificate in certificate chain".
+ */
+function connectionStringWithoutSslQuery(dbUrl: string): string {
+  try {
+    const u = new URL(dbUrl);
+    u.searchParams.delete("sslmode");
+    u.searchParams.delete("ssl");
+    u.searchParams.delete("sslrootcert");
+    u.searchParams.delete("sslcert");
+    u.searchParams.delete("sslkey");
+    return u.toString();
+  } catch {
+    return dbUrl;
+  }
+}
+
 function createPrismaClient(): PrismaClient {
   if (!process.env.DATABASE_URL) {
     throw new Error(
@@ -56,11 +75,15 @@ function createPrismaClient(): PrismaClient {
   }
   const dbUrl = process.env.DATABASE_URL;
   const ssl = poolSslForUrl(dbUrl);
+  const connectionString =
+    ssl !== undefined
+      ? connectionStringWithoutSslQuery(dbUrl)
+      : dbUrl;
 
   const pool =
     globalForPrisma.pgPool ??
     new Pool({
-      connectionString: dbUrl,
+      connectionString,
       max: Number(process.env.DATABASE_POOL_MAX ?? 10),
       ...(ssl !== undefined ? { ssl } : {}),
     });
