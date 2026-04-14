@@ -7,7 +7,7 @@ const { initDb } = require("./init-db");
 const { requireAuth } = require("./auth-middleware");
 
 const app = express();
-const PORT = Number(process.env.API_PORT || 4000);
+const PORT = Number(process.env.PORT || process.env.API_PORT || 4000);
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "7d";
 
 if (!process.env.JWT_SECRET) {

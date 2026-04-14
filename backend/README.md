@@ -6,6 +6,7 @@
    - `DATABASE_URL`
    - `JWT_SECRET`
    - optional: `API_PORT`, `JWT_EXPIRES_IN`, `DB_SSL`
+   - in Render se foloseste automat `PORT` (setat de platforma)
 2. Ruleaza serverul:
    - `npm run dev:api`
 
