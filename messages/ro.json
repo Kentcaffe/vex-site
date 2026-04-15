@@ -22,7 +22,9 @@
     "addListingShort": "Adaugă anunț",
     "oauthGoogle": "Login cu Google",
     "oauthFacebook": "Login cu Facebook",
-    "loginWithEmail": "Cu email"
+    "loginWithEmail": "Cu email",
+    "bottomNavAria": "Navigare principală",
+    "bottomNavPublish": "Adaugă"
   },
   "Chat": {
     "title": "Conversație",
@@ -793,6 +795,7 @@
     },
     "validation": {
       "errCategory": "Alege o categorie.",
+      "errCategoryLeaf": "Alege o subcategorie finală (ex. Autoturisme), nu doar categoria părinte.",
       "errTitle": "Titlul trebuie să aibă 5–160 caractere.",
       "errDescription": "Descrierea trebuie să aibă 20–1.000.000 caractere.",
       "errPrice": "Introdu un preț întreg mai mare ca 0.",

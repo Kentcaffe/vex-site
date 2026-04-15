@@ -13,7 +13,12 @@ import {
   getListingFormFlags,
   type DetailField,
 } from "@/lib/listing-detail-config";
-import { type CategoryTreeNode, findLeafSlugById, isLeafCategoryNode } from "@/lib/category-tree";
+import {
+  type CategoryTreeNode,
+  findLeafSlugById,
+  isLeafCategoryNode,
+  normalizeLeafCategoryId,
+} from "@/lib/category-tree";
 import { LISTING_MAX_IMAGES, parseImageLines } from "@/lib/listing-form-schema";
 import {
   validateListingFormClient,
@@ -49,7 +54,7 @@ type Props = {
 };
 
 const baseInputClass =
-  "mt-1 w-full rounded-lg border px-3 py-2 text-sm dark:bg-zinc-950";
+  "mt-1 min-h-[48px] w-full rounded-xl border px-3 py-2.5 text-base leading-normal dark:bg-zinc-950 md:min-h-0 md:rounded-lg md:py-2 md:text-sm";
 const okBorder = "border-zinc-300 dark:border-zinc-600";
 const errBorder = "border-red-500 ring-2 ring-red-500/30 dark:border-red-500";
 
@@ -82,6 +87,8 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   const [publishValues, setPublishValues] = useState<PublishFormValues>(emptyPublishFormValues);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [clientErrors, setClientErrors] = useState<Partial<Record<ListingFormFieldId, string>>>({});
+  /** După eroare server „category”, ascundem mesajul dacă user a schimbat categoria. */
+  const [dismissServerCategoryError, setDismissServerCategoryError] = useState(false);
 
   const listingDetailsRef = useRef<HTMLDivElement | null>(null);
   const prevCategoryIdRef = useRef<string>("");
@@ -111,7 +118,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     });
     if (loaded) {
       skipDraftSaveRef.current = true;
-      setCategoryId(loaded.categoryId);
+      setCategoryId(normalizeLeafCategoryId(categoryTree, loaded.categoryId));
       setImagesRaw(loaded.imagesRaw);
       setPublishValues(publishValuesFromDraftValues(loaded.values));
       queueMicrotask(() => {
@@ -140,7 +147,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
         return;
       }
       skipDraftSaveRef.current = true;
-      setCategoryId(alt.categoryId);
+      setCategoryId(normalizeLeafCategoryId(categoryTree, alt.categoryId));
       setImagesRaw(alt.imagesRaw);
       setPublishValues(publishValuesFromDraftValues(alt.values));
       saveListingDraftToStorage(storageKey, alt);
@@ -151,6 +158,8 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       /* ignore */
     }
     setDraftHydrated(true);
+    // categoryTree vine din server o dată; nu reîncărca ciorna la fiecare rerandare.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- doar la mount / chei storage
   }, [storageKey, legacyDraftSessionKey, draftAdKey]);
 
   const scheduleDraftPersist = useCallback(() => {
@@ -207,6 +216,12 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }, [state, toast, t]);
 
   useEffect(() => {
+    if (state?.ok === false && state.error === "category") {
+      setDismissServerCategoryError(false);
+    }
+  }, [state]);
+
+  useEffect(() => {
     if (
       categoryId &&
       categoryId !== prevCategoryIdRef.current &&
@@ -251,13 +266,27 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fd = buildFormDataFromPublishValues(
-      locale,
-      categoryId,
-      imagesRaw,
-      publishValues,
-      detailFields,
-    );
+    const cid = categoryId.trim();
+    console.log("[publish] categoryId", cid, {
+      isLeaf: cid ? isLeafCategoryNode(categoryTree, cid) : false,
+    });
+
+    if (!cid) {
+      setClientErrors({ categoryId: msg.errCategory });
+      queueMicrotask(() => {
+        document.getElementById("field-categoryId")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      return;
+    }
+    if (!isLeafCategoryNode(categoryTree, cid)) {
+      setClientErrors({ categoryId: tVal("errCategoryLeaf") });
+      queueMicrotask(() => {
+        document.getElementById("field-categoryId")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      return;
+    }
+
+    const fd = buildFormDataFromPublishValues(locale, cid, imagesRaw, publishValues, detailFields);
     const v = validateListingFormClient(fd, msg);
     if (!v.ok) {
       setClientErrors(v.errors);
@@ -301,34 +330,50 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }
 
   const serverMsg =
-    state?.ok === false && state.error !== "server"
+    state?.ok === false && state.error !== "server" && state.error !== "category"
       ? state.error === "unauthorized"
         ? t("serverUnauthorized")
-        : state.error === "category"
-          ? t("serverCategory")
-          : state.error === "session"
-            ? t("serverSession")
-            : t("serverValidation")
+        : state.error === "session"
+          ? t("serverSession")
+          : t("serverValidation")
       : null;
+
+  const categoryFieldError =
+    clientErrors.categoryId ??
+    (!dismissServerCategoryError && state?.ok === false && state.error === "category"
+      ? t("serverCategory")
+      : null);
 
   return (
     <form
       noValidate
       onSubmit={handleSubmit}
-      className="mx-auto max-w-3xl space-y-8 rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8"
+      className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200/90 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:space-y-8 sm:p-8"
     >
       <section id="field-categoryId" className="space-y-3">
         <div>
           <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionCategory")}</h2>
         </div>
-        <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 dark:border-zinc-700 dark:bg-zinc-950/40">
+        <div
+          className={`rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 dark:border-zinc-700 dark:bg-zinc-950/40 ${
+            categoryFieldError ? "ring-2 ring-red-500/35 dark:ring-red-500/40" : ""
+          }`}
+        >
           <CategorySelector
             tree={categoryTree}
             value={categoryId}
-            onChange={(id) => {
-              setCategoryId(id);
+            onCategoryIdAction={(id) => {
+              setCategoryId(id.trim());
+              setDismissServerCategoryError(true);
+              setClientErrors((prev) => {
+                if (!prev.categoryId) {
+                  return prev;
+                }
+                const { categoryId: _c, ...rest } = prev;
+                return rest;
+              });
             }}
-            error={clientErrors.categoryId}
+            error={categoryFieldError}
           />
         </div>
       </section>
@@ -720,7 +765,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       <button
         type="submit"
         disabled={isPending}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:pointer-events-none disabled:opacity-60"
+        className="inline-flex min-h-[52px] w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-emerald-700 disabled:pointer-events-none disabled:opacity-60 lg:hover:bg-emerald-700"
       >
         {isPending ? (
           <>

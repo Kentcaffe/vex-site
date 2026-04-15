@@ -88,6 +88,18 @@ export function isLeafCategoryNode(nodes: CategoryTreeNode[], categoryId: string
   return n !== null && n.children === null;
 }
 
+/**
+ * Păstrează doar ID-uri de frunză care există în copacul curent (din DB).
+ * Ciorne vechi puteau salva ID-uri sintetice `root:slug:...` din fallback — invalide pentru Prisma.
+ */
+export function normalizeLeafCategoryId(nodes: CategoryTreeNode[], categoryId: string): string {
+  const id = categoryId.trim();
+  if (!id) {
+    return "";
+  }
+  return isLeafCategoryNode(nodes, id) ? id : "";
+}
+
 /** Slug for a leaf node by id (publish form → listing profile). */
 export function findLeafSlugById(nodes: CategoryTreeNode[], id: string): string | null {
   for (const n of nodes) {

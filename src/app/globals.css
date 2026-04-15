@@ -1,9 +1,17 @@
 @import "tailwindcss";
 
-body {
-  font-feature-settings: "kern" 1, "liga" 1;
-  text-rendering: optimizeLegibility;
-  background-color: #f2f3f5;
+html {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  body {
+    font-feature-settings: "kern" 1, "liga" 1;
+    text-rendering: optimizeLegibility;
+    background-color: #f2f3f5;
+    overflow-x: clip;
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 .dark body {

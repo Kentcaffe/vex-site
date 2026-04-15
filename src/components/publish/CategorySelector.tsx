@@ -13,12 +13,13 @@ import {
 type Props = {
   tree: CategoryTreeNode[];
   value: string;
-  onChange: (categoryId: string) => void;
+  /** Callback client (nume cu sufix Action = convenție Next.js ts(71007) pentru props serializabile). */
+  onCategoryIdAction: (categoryId: string) => void;
   name?: string;
   error?: string | null;
 };
 
-export function CategorySelector({ tree, value, onChange, name = "categoryId", error }: Props) {
+export function CategorySelector({ tree, value, onCategoryIdAction, name = "categoryId", error }: Props) {
   const tCat = useTranslations("ListingForm");
   const [stack, setStack] = useState<CategoryTreeNode[]>(() =>
     value ? (findAncestorStackForLeaf(tree, value) ?? []) : [],
@@ -55,17 +56,17 @@ export function CategorySelector({ tree, value, onChange, name = "categoryId", e
 
   function onPickNode(n: CategoryTreeNode) {
     if (n.children && n.children.length > 0) {
-      onChange("");
+      onCategoryIdAction("");
       setStack((s) => [...s, n]);
       setQuery("");
       return;
     }
-    onChange(n.id);
+    onCategoryIdAction(n.id);
     setStack(findAncestorStackForLeaf(tree, n.id) ?? []);
   }
 
   function clearCategory() {
-    onChange("");
+    onCategoryIdAction("");
     setStack([]);
     setQuery("");
   }
@@ -125,7 +126,7 @@ export function CategorySelector({ tree, value, onChange, name = "categoryId", e
                   disabled={i === stack.length - 1}
                   className="rounded-md px-2 py-1 font-medium text-[#0b57d0] hover:bg-zinc-100 disabled:cursor-default disabled:text-zinc-700 disabled:hover:bg-transparent dark:text-blue-400 dark:disabled:text-zinc-300 dark:hover:bg-zinc-800 dark:disabled:hover:bg-transparent"
                   onClick={() => {
-                    onChange("");
+                    onCategoryIdAction("");
                     setStack(stack.slice(0, i + 1));
                     setQuery("");
                   }}
@@ -139,7 +140,7 @@ export function CategorySelector({ tree, value, onChange, name = "categoryId", e
                 type="button"
                 className="ml-1 rounded-md border border-zinc-200 px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-800"
                 onClick={() => {
-                  onChange("");
+                  onCategoryIdAction("");
                   setStack((s) => s.slice(0, -1));
                   setQuery("");
                 }}

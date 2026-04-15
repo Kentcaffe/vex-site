@@ -13,7 +13,7 @@ export function LanguageSwitcher() {
   return (
     <select
       aria-label="Language"
-      className="rounded border border-zinc-300 bg-white px-2 py-1 text-xs dark:border-zinc-600 dark:bg-zinc-900"
+      className="min-h-[44px] min-w-[44px] rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-900 md:min-h-0 md:min-w-0 md:rounded md:px-2 md:py-1 md:text-xs"
       value={locale}
       onChange={(e) => {
         router.replace(pathname, { locale: e.target.value });

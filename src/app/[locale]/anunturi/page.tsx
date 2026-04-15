@@ -110,7 +110,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
             <p className="mt-4 text-zinc-600 dark:text-zinc-400">{t("empty")}</p>
           ) : (
             <ul className="space-y-4">
-              {listings.map((item) => {
+              {listings.map((item, index) => {
                 const path = categoryPathLabels(allCats, item.categoryId, locale);
                 const cover = parseStoredListingImages(item.images)[0];
                 return (
@@ -121,7 +121,12 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
                     >
                       {cover ? (
                         <div className="h-24 w-28 shrink-0 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
-                          <ListingCoverImg src={cover} alt="" className="h-full w-full object-cover" />
+                          <ListingCoverImg
+                            src={cover}
+                            alt=""
+                            priority={index < 2}
+                            className="h-full w-full object-cover"
+                          />
                         </div>
                       ) : (
                         <div className="flex h-24 w-28 shrink-0 items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-zinc-50 text-xs text-zinc-400 dark:border-zinc-600 dark:bg-zinc-800">

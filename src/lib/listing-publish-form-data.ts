@@ -100,6 +100,7 @@ export function listingDraftFromPublishValues(
   imagesRaw: string,
   values: PublishFormValues,
 ): ListingFormDraftV1 {
+  const cat = categoryId.trim();
   const flat: Record<string, string | boolean> = {
     title: values.title,
     description: values.description,
@@ -120,7 +121,7 @@ export function listingDraftFromPublishValues(
   };
   return {
     v: LISTING_DRAFT_STORAGE_VERSION,
-    categoryId,
+    categoryId: cat,
     imagesRaw,
     values: flat,
   };
@@ -135,7 +136,7 @@ export function buildFormDataFromPublishValues(
 ): FormData {
   const fd = new FormData();
   fd.set("locale", locale);
-  fd.set("categoryId", categoryId);
+  fd.set("categoryId", categoryId.trim());
   fd.set("imagesRaw", imagesRaw);
   fd.set("title", values.title);
   fd.set("description", values.description);

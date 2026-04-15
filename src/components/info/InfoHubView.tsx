@@ -17,7 +17,7 @@ export async function InfoHubView({ locale, variant, links }: Props) {
   const intro = variant === "ajutor" ? t("hubHelpIntro") : t("hubSafetyIntro");
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:py-20">
+    <div className="mx-auto w-full max-w-3xl overflow-x-clip px-4 py-10 sm:px-6 sm:py-12 lg:py-20">
       <nav className="mb-10 text-sm text-zinc-500 dark:text-zinc-400" aria-label="Breadcrumb">
         <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <li>
@@ -42,7 +42,7 @@ export async function InfoHubView({ locale, variant, links }: Props) {
           <li key={item.href}>
             <Link
               href={item.href}
-              className="group flex items-start justify-between gap-4 rounded-xl border border-zinc-200/90 bg-white px-5 py-4 text-base font-medium text-zinc-800 shadow-sm transition hover:border-emerald-300/80 hover:bg-emerald-50/50 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/30"
+              className="group flex min-h-[56px] items-start justify-between gap-4 rounded-xl border border-zinc-200/90 bg-white px-5 py-4 text-base font-medium leading-snug text-zinc-800 shadow-sm transition active:scale-[0.99] dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-100 lg:hover:border-emerald-300/80 lg:hover:bg-emerald-50/50 lg:dark:hover:border-emerald-700 lg:dark:hover:bg-emerald-950/30"
             >
               <span>{tFooter(item.labelKey)}</span>
               <span className="text-emerald-600 transition group-hover:translate-x-0.5 dark:text-emerald-400" aria-hidden>

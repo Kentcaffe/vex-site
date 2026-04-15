@@ -8,19 +8,22 @@ type Props = {
   src: string | null | undefined;
   alt: string;
   className?: string;
+  /** Prima imagine vizibilă (ex. grid acasă) — îmbunătățește LCP. */
+  priority?: boolean;
 };
 
 type InnerProps = {
   src: string;
   alt: string;
   className?: string;
+  priority?: boolean;
 };
 
 /**
  * Imagine anunț: referrer redus (unele CDN-uri blochează altfel) + fallback local dacă URL-ul e mort.
  * `key` pe copil resetează starea la schimbarea sursei (fără effect + setState).
  */
-function ListingCoverImgInner({ src, alt, className }: InnerProps) {
+function ListingCoverImgInner({ src, alt, className, priority }: InnerProps) {
   const [failed, setFailed] = useState(false);
   const url = failed ? FALLBACK : src;
 
@@ -32,7 +35,8 @@ function ListingCoverImgInner({ src, alt, className }: InnerProps) {
       alt={alt}
       className={className}
       referrerPolicy="no-referrer"
-      loading="lazy"
+      loading={priority ? "eager" : "lazy"}
+      fetchPriority={priority ? "high" : undefined}
       decoding="async"
       onError={() => {
         if (!failed) setFailed(true);
@@ -41,7 +45,9 @@ function ListingCoverImgInner({ src, alt, className }: InnerProps) {
   );
 }
 
-export function ListingCoverImg({ src, alt, className }: Props) {
+export function ListingCoverImg({ src, alt, className, priority }: Props) {
   const normalized = src?.trim() || FALLBACK;
-  return <ListingCoverImgInner key={normalized} src={normalized} alt={alt} className={className} />;
+  return (
+    <ListingCoverImgInner key={normalized} src={normalized} alt={alt} className={className} priority={priority} />
+  );
 }

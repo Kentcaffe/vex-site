@@ -2,9 +2,9 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
 const linkClass =
-  "inline-block text-sm text-zinc-600 transition-colors hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400";
+  "inline-block min-h-[44px] py-1 text-base leading-snug text-zinc-600 sm:min-h-0 sm:text-sm lg:hover:text-emerald-600 dark:text-zinc-400 lg:dark:hover:text-emerald-400";
 const mailClass =
-  "inline-block text-sm text-zinc-600 transition-colors hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400";
+  "inline-block min-h-[44px] py-1 text-base text-zinc-600 sm:min-h-0 sm:text-sm lg:hover:text-emerald-600 dark:text-zinc-400 lg:dark:hover:text-emerald-400";
 const headingClass =
   "text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500";
 
@@ -13,8 +13,8 @@ export async function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-zinc-200/90 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+    <footer className="w-full max-w-full overflow-x-clip border-t border-zinc-200/90 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
         {/* Brand — același namespace Footer ca în header (siteName, tagline) */}
         <div className="border-b border-zinc-200/80 pb-12 dark:border-zinc-800">
           <Link

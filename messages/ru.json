@@ -22,7 +22,9 @@
     "addListingShort": "Добавить объявление",
     "oauthGoogle": "Войти через Google",
     "oauthFacebook": "Войти через Facebook",
-    "loginWithEmail": "По email"
+    "loginWithEmail": "По email",
+    "bottomNavAria": "Основная навигация",
+    "bottomNavPublish": "Добавить"
   },
   "Chat": {
     "title": "Переписка",
@@ -739,6 +741,7 @@
     },
     "validation": {
       "errCategory": "Выберите категорию.",
+      "errCategoryLeaf": "Выберите конечную подкатегорию (например, «Легковые»), а не только родительскую.",
       "errTitle": "Заголовок: 5–160 символов.",
       "errDescription": "Описание: 20–1 000 000 символов.",
       "errPrice": "Укажите целую цену больше 0.",

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { io, type Socket } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 
 type ChatSocketContextValue = {
@@ -46,6 +46,14 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  /** Badge mesaje fără să aștepte socket.io (mai puțin JS pe main thread la încărcare). */
+  useEffect(() => {
+    if (!session?.user?.id) {
+      return;
+    }
+    void refreshUnread();
+  }, [session?.user?.id, refreshUnread]);
+
   useEffect(() => {
     const userId = session?.user?.id;
     if (!userId) {
@@ -53,7 +61,14 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
     }
 
     let cancelled = false;
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
     const run = async () => {
+      const { io } = await import("socket.io-client");
+      if (cancelled) {
+        return;
+      }
       const tokRes = await fetch("/api/chat/token", { credentials: "include" });
       if (!tokRes.ok || cancelled) {
         return;
@@ -68,6 +83,11 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
         reconnectionAttempts: 10,
         reconnectionDelay: 2000,
       });
+      if (cancelled) {
+        s.removeAllListeners();
+        s.disconnect();
+        return;
+      }
       socketRef.current = s;
       setSocket(s);
 
@@ -98,10 +118,24 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
       void refreshUnread();
     };
 
-    void run();
+    const start = () => {
+      void run();
+    };
+
+    if (typeof window !== "undefined" && typeof window.requestIdleCallback === "function") {
+      idleId = window.requestIdleCallback(start, { timeout: 4500 });
+    } else {
+      timeoutId = setTimeout(start, 1);
+    }
 
     return () => {
       cancelled = true;
+      if (idleId !== undefined && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
       socketRef.current?.removeAllListeners();
       socketRef.current?.disconnect();
       socketRef.current = null;

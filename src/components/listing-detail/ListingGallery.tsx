@@ -24,7 +24,12 @@ export function ListingGallery({ images, title }: Props) {
   return (
     <div className="space-y-3">
       <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800">
-        <ListingCoverImg src={main} alt={title} className="aspect-[4/3] w-full object-cover" />
+        <ListingCoverImg
+          src={main}
+          alt={title}
+          priority
+          className="aspect-[4/3] w-full object-cover"
+        />
       </div>
       {safe.length > 1 ? (
         <div className="flex flex-wrap gap-2">

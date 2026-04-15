@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -9,16 +9,51 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+    { color: "#fafafa" },
+  ],
+};
+
 const sans = Inter({
   subsets: ["latin", "latin-ext"],
   display: "swap",
+  adjustFontFallback: true,
   variable: "--font-sans",
+  preload: true,
 });
 
+function supabaseOrigin(): string | null {
+  const raw = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  if (!raw) {
+    return null;
+  }
+  try {
+    return new URL(raw).origin;
+  } catch {
+    return null;
+  }
+}
+
 export default function RootLayout({ children }: { children: ReactNode }) {
+  const preconnect = supabaseOrigin();
+
   return (
     <html lang="ro" suppressHydrationWarning className={sans.variable}>
-      <body className={`${sans.className} min-h-screen bg-zinc-50 text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-50`}>
+      <head>
+        {preconnect ? (
+          <>
+            <link rel="preconnect" href={preconnect} crossOrigin="anonymous" />
+            <link rel="dns-prefetch" href={preconnect} />
+          </>
+        ) : null}
+      </head>
+      <body
+        className={`${sans.className} min-h-screen bg-zinc-50 text-base text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-50`}
+      >
         {children}
       </body>
     </html>

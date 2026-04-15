@@ -43,33 +43,33 @@ export async function HomeMarketplace({ locale, listings, rootCategories, favori
   const t = await getTranslations("Home.marketplace");
 
   return (
-    <div className="bg-[#f2f3f5] pb-12 pt-6 dark:bg-zinc-950">
-      <div className="mx-auto max-w-[1200px] px-3 sm:px-4">
-        {/* Category strip — 999-style horizontal cards */}
+    <div className="bg-[#f2f3f5] pb-12 pt-4 dark:bg-zinc-950 sm:pt-6">
+      <div className="mx-auto w-full max-w-[1200px] px-4 sm:px-4">
+        {/* Categorii — grid 2 col (mobile-first), card mare, touch-friendly */}
         <section className="mb-6">
-          <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
             <div>
               <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("categoriesTitle")}</h2>
               <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">{t("categoriesHint")}</p>
             </div>
             <Link
               href="/categorii"
-              className="text-sm font-semibold text-[#0b57d0] hover:underline dark:text-blue-400"
+              className="text-sm font-semibold text-[#0b57d0] active:opacity-80 lg:hover:underline dark:text-blue-400"
             >
               {t("viewAll")}
             </Link>
           </div>
-          <div className="flex gap-3 overflow-x-auto pb-1 pt-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-visible">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
             {rootCategories.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/categorii?c=${encodeURIComponent(cat.slug)}`}
-                className="flex min-w-[104px] max-w-[120px] shrink-0 flex-col items-center rounded-2xl border border-zinc-200/90 bg-white p-3 text-center shadow-sm transition hover:border-[#0b57d0]/40 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-500/50"
+                className="flex min-h-[72px] flex-col items-center justify-center gap-1 rounded-2xl border border-zinc-200/90 bg-white p-3 text-center shadow-sm transition active:scale-[0.98] sm:min-h-[76px] lg:min-h-[80px] lg:hover:border-[#0b57d0]/40 lg:hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 lg:dark:hover:border-blue-500/50"
               >
-                <span className="text-3xl leading-none" aria-hidden>
+                <span className="text-2xl leading-none sm:text-3xl" aria-hidden>
                   {emojiForRootSlug(cat.slug)}
                 </span>
-                <span className="mt-2 line-clamp-2 text-center text-xs font-semibold leading-tight text-zinc-800 dark:text-zinc-100">
+                <span className="line-clamp-2 text-center text-xs font-semibold leading-snug text-zinc-800 dark:text-zinc-100">
                   {labelFor(cat, locale)}
                 </span>
               </Link>
@@ -78,10 +78,10 @@ export async function HomeMarketplace({ locale, listings, rootCategories, favori
         </section>
 
         {/* Promo tiles */}
-        <section className="mb-8 grid gap-3 sm:grid-cols-3">
+        <section className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Link
             href="/anunturi"
-            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-900"
+            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition active:scale-[0.99] lg:hover:border-blue-200 lg:hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 lg:dark:hover:border-blue-900"
           >
             <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{t("promoTile1Title")}</p>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{t("promoTile1Body")}</p>
@@ -89,7 +89,7 @@ export async function HomeMarketplace({ locale, listings, rootCategories, favori
           </Link>
           <Link
             href="/chat"
-            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-blue-200 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-900"
+            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition active:scale-[0.99] lg:hover:border-blue-200 lg:hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 lg:dark:hover:border-blue-900"
           >
             <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{t("promoTile2Title")}</p>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{t("promoTile2Body")}</p>
@@ -97,7 +97,7 @@ export async function HomeMarketplace({ locale, listings, rootCategories, favori
           </Link>
           <Link
             href="/publica"
-            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition hover:border-amber-200 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-amber-900/50"
+            className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm transition active:scale-[0.99] lg:hover:border-amber-200 lg:hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 lg:dark:hover:border-amber-900/50"
           >
             <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{t("promoTile3Title")}</p>
             <p className="mt-1 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">{t("promoTile3Body")}</p>
@@ -136,7 +136,7 @@ export async function HomeMarketplace({ locale, listings, rootCategories, favori
               </p>
             ) : (
               <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {listings.map((item) => {
+                {listings.map((item, index) => {
                   const cover = parseStoredListingImages(item.images)[0];
                   const meta = [item.city + (item.district ? ` · ${item.district}` : "")];
                   if (item.mileageKm != null) {
@@ -151,6 +151,7 @@ export async function HomeMarketplace({ locale, listings, rootCategories, favori
                               <ListingCoverImg
                                 src={cover}
                                 alt=""
+                                priority={index < 2}
                                 className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
                               />
                             ) : (
