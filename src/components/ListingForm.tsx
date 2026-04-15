@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  useActionState,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useActionState, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createListing, type CreateListingState } from "@/app/actions/listings";
@@ -29,16 +21,25 @@ import {
   type ListingFormValidationMessages,
 } from "@/lib/listing-form-client-validation";
 import {
-  applyListingDraftPartial,
   clearListingDraftStorage,
-  collectListingFormDraft,
   isListingDraftEffectivelyEmpty,
   legacyListingDraftSessionKey,
+  LISTING_DRAFT_STORAGE_VERSION,
   loadListingDraftFromStorage,
   listingDraftStorageKey,
   saveListingDraftToStorage,
   type ListingFormDraftV1,
 } from "@/lib/listing-form-draft-storage";
+import {
+  buildFormDataFromPublishValues,
+  clearDraftAdMirror,
+  draftAdStorageKey,
+  emptyPublishFormValues,
+  listingDraftFromPublishValues,
+  publishValuesFromDraftValues,
+  saveDraftAdMirror,
+  type PublishFormValues,
+} from "@/lib/listing-publish-form-data";
 
 type Props = {
   locale: string;
@@ -46,6 +47,11 @@ type Props = {
   userId: string;
   categoryTree: CategoryTreeNode[];
 };
+
+const baseInputClass =
+  "mt-1 w-full rounded-lg border px-3 py-2 text-sm dark:bg-zinc-950";
+const okBorder = "border-zinc-300 dark:border-zinc-600";
+const errBorder = "border-red-500 ring-2 ring-red-500/30 dark:border-red-500";
 
 export function ListingForm({ locale, userId, categoryTree }: Props) {
   const router = useRouter();
@@ -73,18 +79,19 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   );
   const [categoryId, setCategoryId] = useState("");
   const [imagesRaw, setImagesRaw] = useState("");
+  const [publishValues, setPublishValues] = useState<PublishFormValues>(emptyPublishFormValues);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [clientErrors, setClientErrors] = useState<Partial<Record<ListingFormFieldId, string>>>({});
 
-  const formRef = useRef<HTMLFormElement>(null);
   const listingDetailsRef = useRef<HTMLDivElement | null>(null);
   const prevCategoryIdRef = useRef<string>("");
   const publishRedirectDoneRef = useRef(false);
-  const draftRemainderRef = useRef<ListingFormDraftV1 | null>(null);
   const skipDraftSaveRef = useRef(false);
+  const [draftHydrated, setDraftHydrated] = useState(false);
   const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const storageKey = useMemo(() => listingDraftStorageKey(locale, userId), [locale, userId]);
   const legacyDraftSessionKey = useMemo(() => legacyListingDraftSessionKey(locale), [locale]);
+  const draftAdKey = useMemo(() => draftAdStorageKey(userId, locale), [userId, locale]);
 
   const selectedSlug = useMemo(
     () => findLeafSlugById(categoryTree, categoryId) ?? "",
@@ -94,30 +101,57 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   const { isVeh, isRe, isBrandish } = getListingFormFlags(selectedSlug);
   const detailFields = useMemo(() => getDetailFieldsForSlug(selectedSlug), [selectedSlug]);
 
+  function ring(field: ListingFormFieldId): string {
+    return clientErrors[field] ? errBorder : okBorder;
+  }
+
   useEffect(() => {
     const loaded = loadListingDraftFromStorage(storageKey, {
       migrateLegacySessionKey: legacyDraftSessionKey,
     });
-    if (!loaded) {
+    if (loaded) {
+      skipDraftSaveRef.current = true;
+      setCategoryId(loaded.categoryId);
+      setImagesRaw(loaded.imagesRaw);
+      setPublishValues(publishValuesFromDraftValues(loaded.values));
+      queueMicrotask(() => {
+        skipDraftSaveRef.current = false;
+      });
+      setDraftHydrated(true);
       return;
     }
-    draftRemainderRef.current = loaded;
-    skipDraftSaveRef.current = true;
-    setCategoryId(loaded.categoryId);
-    setImagesRaw(loaded.imagesRaw);
-  }, [storageKey, legacyDraftSessionKey]);
-
-  useLayoutEffect(() => {
-    const form = formRef.current;
-    const remainder = draftRemainderRef.current;
-    if (!form || !remainder) {
-      skipDraftSaveRef.current = false;
-      return;
+    try {
+      const raw = localStorage.getItem(draftAdKey);
+      if (!raw) {
+        setDraftHydrated(true);
+        return;
+      }
+      const alt = JSON.parse(raw) as ListingFormDraftV1;
+      if (
+        alt?.v !== LISTING_DRAFT_STORAGE_VERSION ||
+        typeof alt.categoryId !== "string" ||
+        typeof alt.imagesRaw !== "string"
+      ) {
+        setDraftHydrated(true);
+        return;
+      }
+      if (!alt.values || typeof alt.values !== "object") {
+        setDraftHydrated(true);
+        return;
+      }
+      skipDraftSaveRef.current = true;
+      setCategoryId(alt.categoryId);
+      setImagesRaw(alt.imagesRaw);
+      setPublishValues(publishValuesFromDraftValues(alt.values));
+      saveListingDraftToStorage(storageKey, alt);
+      queueMicrotask(() => {
+        skipDraftSaveRef.current = false;
+      });
+    } catch {
+      /* ignore */
     }
-    const { next } = applyListingDraftPartial(form, remainder);
-    draftRemainderRef.current = next;
-    skipDraftSaveRef.current = false;
-  }, [selectedSlug, categoryId]);
+    setDraftHydrated(true);
+  }, [storageKey, legacyDraftSessionKey, draftAdKey]);
 
   const scheduleDraftPersist = useCallback(() => {
     if (saveDraftTimerRef.current) {
@@ -128,18 +162,23 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       if (skipDraftSaveRef.current) {
         return;
       }
-      const form = formRef.current;
-      if (!form) {
-        return;
-      }
-      const draft = collectListingFormDraft(form);
+      const draft = listingDraftFromPublishValues(categoryId, imagesRaw, publishValues);
       if (isListingDraftEffectivelyEmpty(draft)) {
         clearListingDraftStorage(storageKey, legacyDraftSessionKey);
+        clearDraftAdMirror(draftAdKey);
         return;
       }
       saveListingDraftToStorage(storageKey, draft);
+      saveDraftAdMirror(draftAdKey, draft);
     }, 450);
-  }, [storageKey, legacyDraftSessionKey]);
+  }, [categoryId, imagesRaw, publishValues, storageKey, legacyDraftSessionKey, draftAdKey]);
+
+  useEffect(() => {
+    if (!draftHydrated) {
+      return;
+    }
+    scheduleDraftPersist();
+  }, [draftHydrated, scheduleDraftPersist]);
 
   useEffect(() => {
     return () => {
@@ -155,11 +194,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     }
     publishRedirectDoneRef.current = true;
     clearListingDraftStorage(storageKey, legacyDraftSessionKey);
+    clearDraftAdMirror(draftAdKey);
     skipDraftSaveRef.current = true;
-    draftRemainderRef.current = null;
     toast("success", t("success"));
     router.push(localizedHref(locale, `/anunturi/${state.listingId}`));
-  }, [state, storageKey, legacyDraftSessionKey, router, toast, t, locale]);
+  }, [state, storageKey, legacyDraftSessionKey, draftAdKey, router, toast, t, locale]);
 
   useEffect(() => {
     if (state?.ok === false && state.error === "server") {
@@ -206,10 +245,20 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     return value;
   }
 
-  function handleSubmit(formData: FormData) {
-    formData.set("imagesRaw", imagesRaw);
-    formData.set("locale", locale);
-    const v = validateListingFormClient(formData, msg);
+  function setExtra(name: string, value: string) {
+    setPublishValues((p) => ({ ...p, extra: { ...p.extra, [name]: value } }));
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = buildFormDataFromPublishValues(
+      locale,
+      categoryId,
+      imagesRaw,
+      publishValues,
+      detailFields,
+    );
+    const v = validateListingFormClient(fd, msg);
     if (!v.ok) {
       setClientErrors(v.errors);
       const fieldId =
@@ -220,7 +269,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       return;
     }
     setClientErrors({});
-    formAction(formData);
+    formAction(fd);
   }
 
   async function onPickImages(files: FileList | null) {
@@ -249,9 +298,6 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     const urls = data.urls ?? [];
     const next = [...lines, ...urls].join("\n");
     setImagesRaw(next);
-    queueMicrotask(() => {
-      scheduleDraftPersist();
-    });
   }
 
   const serverMsg =
@@ -267,15 +313,10 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   return (
     <form
-      ref={formRef}
-      action={handleSubmit}
-      onInput={() => {
-        scheduleDraftPersist();
-      }}
+      noValidate
+      onSubmit={handleSubmit}
       className="mx-auto max-w-3xl space-y-8 rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8"
     >
-      <input type="hidden" name="locale" value={locale} />
-
       <section id="field-categoryId" className="space-y-3">
         <div>
           <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionCategory")}</h2>
@@ -286,7 +327,6 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             value={categoryId}
             onChange={(id) => {
               setCategoryId(id);
-              scheduleDraftPersist();
             }}
             error={clientErrors.categoryId}
           />
@@ -299,326 +339,380 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
         className="scroll-mt-6 space-y-5 border-t border-zinc-200 pt-8 dark:border-zinc-800"
       >
         <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionListing")}</h2>
-      <div id="field-title">
-        <label className="block text-sm font-medium" htmlFor="title">
-          {t("title")}
-        </label>
-        <input
-          id="title"
-          name="title"
-          required
-          maxLength={160}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-        />
-        {clientErrors.title ? <p className="mt-1 text-sm text-red-600">{clientErrors.title}</p> : null}
-      </div>
+        <div id="field-title">
+          <label className="block text-sm font-medium" htmlFor="title">
+            {t("title")}
+          </label>
+          <input
+            id="title"
+            name="title"
+            maxLength={160}
+            value={publishValues.title}
+            onChange={(e) => setPublishValues((p) => ({ ...p, title: e.target.value }))}
+            aria-invalid={Boolean(clientErrors.title)}
+            className={`${baseInputClass} ${ring("title")}`}
+          />
+          {clientErrors.title ? <p className="mt-1 text-sm text-red-600">{clientErrors.title}</p> : null}
+        </div>
 
-      <div id="field-description">
-        <label className="block text-sm font-medium" htmlFor="description">
-          {t("description")}
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          rows={6}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-        />
-        {clientErrors.description ? <p className="mt-1 text-sm text-red-600">{clientErrors.description}</p> : null}
-      </div>
+        <div id="field-description">
+          <label className="block text-sm font-medium" htmlFor="description">
+            {t("description")}
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows={6}
+            value={publishValues.description}
+            onChange={(e) => setPublishValues((p) => ({ ...p, description: e.target.value }))}
+            aria-invalid={Boolean(clientErrors.description)}
+            className={`${baseInputClass} ${ring("description")}`}
+          />
+          {clientErrors.description ? (
+            <p className="mt-1 text-sm text-red-600">{clientErrors.description}</p>
+          ) : null}
+        </div>
 
-      <div className="space-y-4" id="field-price">
-        <div className="grid gap-4 sm:grid-cols-2 sm:items-end">
+        <div className="space-y-4" id="field-price">
+          <div className="grid gap-4 sm:grid-cols-2 sm:items-end">
+            <div>
+              <label className="block text-sm font-medium" htmlFor="price">
+                {t("priceAmount")}
+              </label>
+              <input
+                id="price"
+                name="price"
+                type="number"
+                inputMode="numeric"
+                min={1}
+                value={publishValues.price}
+                onChange={(e) => setPublishValues((p) => ({ ...p, price: e.target.value }))}
+                aria-invalid={Boolean(clientErrors.price)}
+                className={`${baseInputClass} ${ring("price")}`}
+              />
+              {clientErrors.price ? <p className="mt-1 text-sm text-red-600">{clientErrors.price}</p> : null}
+            </div>
+            <div>
+              <label className="block text-sm font-medium" htmlFor="priceCurrency">
+                {t("priceCurrencyLabel")}
+              </label>
+              <select
+                id="priceCurrency"
+                name="priceCurrency"
+                value={publishValues.priceCurrency}
+                onChange={(e) =>
+                  setPublishValues((p) => ({
+                    ...p,
+                    priceCurrency: e.target.value === "EUR" ? "EUR" : "MDL",
+                  }))
+                }
+                className={`${baseInputClass} ${okBorder}`}
+              >
+                <option value="MDL">{t("priceCurrencyMdl")}</option>
+                <option value="EUR">{t("priceCurrencyEur")}</option>
+              </select>
+            </div>
+          </div>
           <div>
-            <label className="block text-sm font-medium" htmlFor="price">
-              {t("priceAmount")}
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                name="negotiable"
+                type="checkbox"
+                checked={publishValues.negotiable}
+                onChange={(e) => setPublishValues((p) => ({ ...p, negotiable: e.target.checked }))}
+                className="rounded border-zinc-400"
+              />
+              {t("negotiable")}
+            </label>
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div id="field-city">
+            <label className="block text-sm font-medium" htmlFor="city">
+              {t("city")}
             </label>
             <input
-              id="price"
-              name="price"
-              type="number"
-              inputMode="numeric"
-              min={1}
-              required
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+              id="city"
+              name="city"
+              maxLength={80}
+              value={publishValues.city}
+              onChange={(e) => setPublishValues((p) => ({ ...p, city: e.target.value }))}
+              aria-invalid={Boolean(clientErrors.city)}
+              className={`${baseInputClass} ${ring("city")}`}
             />
-            {clientErrors.price ? <p className="mt-1 text-sm text-red-600">{clientErrors.price}</p> : null}
+            {clientErrors.city ? <p className="mt-1 text-sm text-red-600">{clientErrors.city}</p> : null}
           </div>
           <div>
-            <label className="block text-sm font-medium" htmlFor="priceCurrency">
-              {t("priceCurrencyLabel")}
+            <label className="block text-sm font-medium" htmlFor="district">
+              {t("district")}
             </label>
-            <select
-              id="priceCurrency"
-              name="priceCurrency"
-              defaultValue="MDL"
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-            >
-              <option value="MDL">{t("priceCurrencyMdl")}</option>
-              <option value="EUR">{t("priceCurrencyEur")}</option>
-            </select>
+            <input
+              id="district"
+              name="district"
+              maxLength={80}
+              value={publishValues.district}
+              onChange={(e) => setPublishValues((p) => ({ ...p, district: e.target.value }))}
+              className={`${baseInputClass} ${okBorder}`}
+            />
           </div>
         </div>
-        <div>
-          <label className="flex items-center gap-2 text-sm">
-            <input name="negotiable" type="checkbox" className="rounded border-zinc-400" />
-            {t("negotiable")}
-          </label>
-        </div>
-      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div id="field-city">
-          <label className="block text-sm font-medium" htmlFor="city">
-            {t("city")}
+        <div>
+          <label className="block text-sm font-medium" htmlFor="phone">
+            {t("phone")}
           </label>
           <input
-            id="city"
-            name="city"
-            required
-            maxLength={80}
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            id="phone"
+            name="phone"
+            maxLength={30}
+            value={publishValues.phone}
+            onChange={(e) => setPublishValues((p) => ({ ...p, phone: e.target.value }))}
+            className={`${baseInputClass} ${okBorder}`}
           />
-          {clientErrors.city ? <p className="mt-1 text-sm text-red-600">{clientErrors.city}</p> : null}
         </div>
-        <div>
-          <label className="block text-sm font-medium" htmlFor="district">
-            {t("district")}
+
+        <div id="field-condition">
+          <label className="block text-sm font-medium" htmlFor="condition">
+            {t("condition")}
           </label>
-          <input
-            id="district"
-            name="district"
-            maxLength={80}
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-          />
+          <select
+            id="condition"
+            name="condition"
+            value={publishValues.condition}
+            onChange={(e) => setPublishValues((p) => ({ ...p, condition: e.target.value }))}
+            aria-invalid={Boolean(clientErrors.condition)}
+            className={`${baseInputClass} ${ring("condition")}`}
+          >
+            <option value="new">{t("conditionNew")}</option>
+            <option value="used">{t("conditionUsed")}</option>
+            <option value="not_applicable">{t("conditionNA")}</option>
+          </select>
+          {clientErrors.condition ? (
+            <p className="mt-1 text-sm text-red-600">{clientErrors.condition}</p>
+          ) : null}
         </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium" htmlFor="phone">
-          {t("phone")}
-        </label>
-        <input
-          id="phone"
-          name="phone"
-          maxLength={30}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-        />
-      </div>
-
-      <div id="field-condition">
-        <label className="block text-sm font-medium" htmlFor="condition">
-          {t("condition")}
-        </label>
-        <select
-          id="condition"
-          name="condition"
-          required
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-        >
-          <option value="new">{t("conditionNew")}</option>
-          <option value="used">{t("conditionUsed")}</option>
-          <option value="not_applicable">{t("conditionNA")}</option>
-        </select>
-        {clientErrors.condition ? <p className="mt-1 text-sm text-red-600">{clientErrors.condition}</p> : null}
-      </div>
       </section>
 
       {isVeh || isRe || (isBrandish && !isVeh) || detailFields.length > 0 ? (
-      <section className="space-y-5 border-t border-zinc-200 pt-8 dark:border-zinc-800">
-        <div>
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionSpecs")}</h2>
-        </div>
+        <section className="space-y-5 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+          <div>
+            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionSpecs")}</h2>
+          </div>
 
-      {isVeh ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium" htmlFor="brand">
-              {t("brand")}
-            </label>
-            <input
-              id="brand"
-              name="brand"
-              maxLength={80}
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium" htmlFor="modelName">
-              {t("model")}
-            </label>
-            <input
-              id="modelName"
-              name="modelName"
-              maxLength={80}
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium" htmlFor="year">
-              {t("year")}
-            </label>
-            <input
-              id="year"
-              name="year"
-              type="number"
-              inputMode="numeric"
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium" htmlFor="mileageKm">
-              {t("mileage")}
-            </label>
-            <input
-              id="mileageKm"
-              name="mileageKm"
-              type="number"
-              inputMode="numeric"
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-            />
-          </div>
-        </div>
-      ) : null}
+          {isVeh ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium" htmlFor="brand">
+                  {t("brand")}
+                </label>
+                <input
+                  id="brand"
+                  name="brand"
+                  maxLength={80}
+                  value={publishValues.brand}
+                  onChange={(e) => setPublishValues((p) => ({ ...p, brand: e.target.value }))}
+                  className={`${baseInputClass} ${okBorder}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium" htmlFor="modelName">
+                  {t("model")}
+                </label>
+                <input
+                  id="modelName"
+                  name="modelName"
+                  maxLength={80}
+                  value={publishValues.modelName}
+                  onChange={(e) => setPublishValues((p) => ({ ...p, modelName: e.target.value }))}
+                  className={`${baseInputClass} ${okBorder}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium" htmlFor="year">
+                  {t("year")}
+                </label>
+                <input
+                  id="year"
+                  name="year"
+                  type="number"
+                  inputMode="numeric"
+                  value={publishValues.year}
+                  onChange={(e) => setPublishValues((p) => ({ ...p, year: e.target.value }))}
+                  className={`${baseInputClass} ${okBorder}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium" htmlFor="mileageKm">
+                  {t("mileage")}
+                </label>
+                <input
+                  id="mileageKm"
+                  name="mileageKm"
+                  type="number"
+                  inputMode="numeric"
+                  value={publishValues.mileageKm}
+                  onChange={(e) => setPublishValues((p) => ({ ...p, mileageKm: e.target.value }))}
+                  className={`${baseInputClass} ${okBorder}`}
+                />
+              </div>
+            </div>
+          ) : null}
 
-      {isRe ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium" htmlFor="rooms">
-              {t("rooms")}
-            </label>
-            <input
-              id="rooms"
-              name="rooms"
-              maxLength={40}
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium" htmlFor="areaSqm">
-              {t("areaSqm")}
-            </label>
-            <input
-              id="areaSqm"
-              name="areaSqm"
-              type="number"
-              inputMode="numeric"
-              min={1}
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-            />
-          </div>
-        </div>
-      ) : null}
+          {isRe ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium" htmlFor="rooms">
+                  {t("rooms")}
+                </label>
+                <input
+                  id="rooms"
+                  name="rooms"
+                  maxLength={40}
+                  value={publishValues.rooms}
+                  onChange={(e) => setPublishValues((p) => ({ ...p, rooms: e.target.value }))}
+                  className={`${baseInputClass} ${okBorder}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium" htmlFor="areaSqm">
+                  {t("areaSqm")}
+                </label>
+                <input
+                  id="areaSqm"
+                  name="areaSqm"
+                  type="number"
+                  inputMode="numeric"
+                  min={1}
+                  value={publishValues.areaSqm}
+                  onChange={(e) => setPublishValues((p) => ({ ...p, areaSqm: e.target.value }))}
+                  className={`${baseInputClass} ${okBorder}`}
+                />
+              </div>
+            </div>
+          ) : null}
 
-      {isBrandish && !isVeh ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium" htmlFor="brand2">
-              {t("brand")}
-            </label>
-            <input
-              id="brand2"
-              name="brand"
-              maxLength={80}
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium" htmlFor="modelName2">
-              {t("model")}
-            </label>
-            <input
-              id="modelName2"
-              name="modelName"
-              maxLength={80}
-              className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-            />
-          </div>
-        </div>
-      ) : null}
+          {isBrandish && !isVeh ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-sm font-medium" htmlFor="brand2">
+                  {t("brand")}
+                </label>
+                <input
+                  id="brand2"
+                  name="brand"
+                  maxLength={80}
+                  value={publishValues.brand}
+                  onChange={(e) => setPublishValues((p) => ({ ...p, brand: e.target.value }))}
+                  className={`${baseInputClass} ${okBorder}`}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium" htmlFor="modelName2">
+                  {t("model")}
+                </label>
+                <input
+                  id="modelName2"
+                  name="modelName"
+                  maxLength={80}
+                  value={publishValues.modelName}
+                  onChange={(e) => setPublishValues((p) => ({ ...p, modelName: e.target.value }))}
+                  className={`${baseInputClass} ${okBorder}`}
+                />
+              </div>
+            </div>
+          ) : null}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-      {detailFields.map((field) => {
-        const fname = getDetailFormName(field);
-        return (
-          <div key={field.id} className="sm:col-span-1">
-            <label className="block text-sm font-medium" htmlFor={fname}>
-              {detailLabel(field)}
-            </label>
-            {field.input === "select" && field.selectValues ? (
-              <select
-                id={fname}
-                name={fname}
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-              >
-                <option value="">{t("detailOptional")}</option>
-                {field.selectValues.map((v) => (
-                  <option key={v} value={v}>
-                    {selectOptionLabel(field, v)}
-                  </option>
-                ))}
-              </select>
-            ) : null}
-            {field.input === "text" ? (
-              <input
-                id={fname}
-                name={fname}
-                maxLength={field.maxLength ?? 80}
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-              />
-            ) : null}
-            {field.input === "number" ? (
-              <input
-                id={fname}
-                name={fname}
-                type="number"
-                inputMode="numeric"
-                min={field.min}
-                max={field.max}
-                className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-              />
-            ) : null}
+          <div className="grid gap-4 sm:grid-cols-2">
+            {detailFields.map((field) => {
+              const fname = getDetailFormName(field);
+              const val = publishValues.extra[fname] ?? "";
+              return (
+                <div key={field.id} className="sm:col-span-1">
+                  <label className="block text-sm font-medium" htmlFor={fname}>
+                    {detailLabel(field)}
+                  </label>
+                  {field.input === "select" && field.selectValues ? (
+                    <select
+                      id={fname}
+                      name={fname}
+                      value={val}
+                      onChange={(e) => setExtra(fname, e.target.value)}
+                      className={`${baseInputClass} ${okBorder}`}
+                    >
+                      <option value="">{t("detailOptional")}</option>
+                      {field.selectValues.map((v) => (
+                        <option key={v} value={v}>
+                          {selectOptionLabel(field, v)}
+                        </option>
+                      ))}
+                    </select>
+                  ) : null}
+                  {field.input === "text" ? (
+                    <input
+                      id={fname}
+                      name={fname}
+                      maxLength={field.maxLength ?? 80}
+                      value={val}
+                      onChange={(e) => setExtra(fname, e.target.value)}
+                      className={`${baseInputClass} ${okBorder}`}
+                    />
+                  ) : null}
+                  {field.input === "number" ? (
+                    <input
+                      id={fname}
+                      name={fname}
+                      type="number"
+                      inputMode="numeric"
+                      min={field.min}
+                      max={field.max}
+                      value={val}
+                      onChange={(e) => setExtra(fname, e.target.value)}
+                      className={`${baseInputClass} ${okBorder}`}
+                    />
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
-      </div>
-
-      </section>
+        </section>
       ) : null}
 
       <section className="space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
         <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionMedia")}</h2>
-      <div id="field-imagesRaw">
-        <label className="block text-sm font-medium" htmlFor="imagesRaw">
-          {t("images")}
-        </label>
-        <p className="mt-1 text-xs text-zinc-500">{t("imagesHint")}</p>
-        <textarea
-          id="imagesRaw"
-          name="imagesRaw"
-          value={imagesRaw}
-          onChange={(e) => setImagesRaw(e.target.value)}
-          rows={4}
-          className="mt-2 w-full rounded-lg border border-zinc-300 px-3 py-2 font-mono text-xs dark:border-zinc-600 dark:bg-zinc-950"
-          placeholder="https://..."
-        />
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <label className="cursor-pointer rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium hover:bg-zinc-50 dark:border-zinc-600 dark:hover:bg-zinc-800">
-            {t("upload")}
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              multiple
-              className="hidden"
-              onChange={(e) => void onPickImages(e.target.files)}
-            />
+        <div id="field-imagesRaw">
+          <label className="block text-sm font-medium" htmlFor="imagesRaw">
+            {t("images")}
           </label>
-          <span className="text-xs text-zinc-500">
-            {t("imageCount", { count: parseImageLines(imagesRaw).length, max: LISTING_MAX_IMAGES })}
-          </span>
+          <p className="mt-1 text-xs text-zinc-500">{t("imagesHint")}</p>
+          <textarea
+            id="imagesRaw"
+            name="imagesRaw"
+            value={imagesRaw}
+            onChange={(e) => setImagesRaw(e.target.value)}
+            rows={4}
+            aria-invalid={Boolean(clientErrors.imagesRaw)}
+            className={`mt-2 w-full rounded-lg border px-3 py-2 font-mono text-xs dark:bg-zinc-950 ${ring("imagesRaw")}`}
+            placeholder="https://..."
+          />
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <label className="cursor-pointer rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium hover:bg-zinc-50 dark:border-zinc-600 dark:hover:bg-zinc-800">
+              {t("upload")}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                multiple
+                className="hidden"
+                onChange={(e) => void onPickImages(e.target.files)}
+              />
+            </label>
+            <span className="text-xs text-zinc-500">
+              {t("imageCount", { count: parseImageLines(imagesRaw).length, max: LISTING_MAX_IMAGES })}
+            </span>
+          </div>
+          {uploadError ? <p className="mt-1 text-sm text-red-600">{uploadError}</p> : null}
+          {clientErrors.imagesRaw ? <p className="mt-1 text-sm text-red-600">{clientErrors.imagesRaw}</p> : null}
         </div>
-        {uploadError ? <p className="mt-1 text-sm text-red-600">{uploadError}</p> : null}
-        {clientErrors.imagesRaw ? <p className="mt-1 text-sm text-red-600">{clientErrors.imagesRaw}</p> : null}
-      </div>
       </section>
 
       {serverMsg ? <p className="text-sm font-medium text-red-600 dark:text-red-400">{serverMsg}</p> : null}
