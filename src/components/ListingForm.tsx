@@ -35,6 +35,7 @@ import {
   clearListingDraftStorage,
   collectListingFormDraft,
   isListingDraftEffectivelyEmpty,
+  legacyListingDraftSessionKey,
   loadListingDraftFromStorage,
   listingDraftStorageKey,
   saveListingDraftToStorage,
@@ -43,6 +44,8 @@ import {
 
 type Props = {
   locale: string;
+  /** Ciorna e salvată per cont (localStorage). */
+  userId: string;
   categoryTree: CategoryTreeNode[];
 };
 
@@ -202,7 +205,7 @@ function ListingCategoryPicker({ tree, value, onChange, name = "categoryId", err
   );
 }
 
-export function ListingForm({ locale, categoryTree }: Props) {
+export function ListingForm({ locale, userId, categoryTree }: Props) {
   const t = useTranslations("ListingForm");
   const tVal = useTranslations("ListingForm.validation");
 
@@ -233,7 +236,8 @@ export function ListingForm({ locale, categoryTree }: Props) {
   const draftRemainderRef = useRef<ListingFormDraftV1 | null>(null);
   const skipDraftSaveRef = useRef(false);
   const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const storageKey = useMemo(() => listingDraftStorageKey(locale), [locale]);
+  const storageKey = useMemo(() => listingDraftStorageKey(locale, userId), [locale, userId]);
+  const legacyDraftSessionKey = useMemo(() => legacyListingDraftSessionKey(locale), [locale]);
 
   const selectedSlug = useMemo(
     () => findLeafSlugById(categoryTree, categoryId) ?? "",
@@ -244,7 +248,9 @@ export function ListingForm({ locale, categoryTree }: Props) {
   const detailFields = useMemo(() => getDetailFieldsForSlug(selectedSlug), [selectedSlug]);
 
   useEffect(() => {
-    const loaded = loadListingDraftFromStorage(storageKey);
+    const loaded = loadListingDraftFromStorage(storageKey, {
+      migrateLegacySessionKey: legacyDraftSessionKey,
+    });
     if (!loaded) {
       return;
     }
@@ -252,7 +258,7 @@ export function ListingForm({ locale, categoryTree }: Props) {
     skipDraftSaveRef.current = true;
     setCategoryId(loaded.categoryId);
     setImagesRaw(loaded.imagesRaw);
-  }, [storageKey]);
+  }, [storageKey, legacyDraftSessionKey]);
 
   useLayoutEffect(() => {
     const form = formRef.current;
@@ -281,12 +287,12 @@ export function ListingForm({ locale, categoryTree }: Props) {
       }
       const draft = collectListingFormDraft(form);
       if (isListingDraftEffectivelyEmpty(draft)) {
-        clearListingDraftStorage(storageKey);
+        clearListingDraftStorage(storageKey, legacyDraftSessionKey);
         return;
       }
       saveListingDraftToStorage(storageKey, draft);
     }, 450);
-  }, [storageKey]);
+  }, [storageKey, legacyDraftSessionKey]);
 
   useEffect(() => {
     return () => {
@@ -298,9 +304,9 @@ export function ListingForm({ locale, categoryTree }: Props) {
 
   useEffect(() => {
     if (state?.ok === true) {
-      clearListingDraftStorage(storageKey);
+      clearListingDraftStorage(storageKey, legacyDraftSessionKey);
     }
-  }, [state?.ok, storageKey]);
+  }, [state?.ok, storageKey, legacyDraftSessionKey]);
 
   function detailLabel(field: DetailField): string {
     return t(`detail.${field.id}.label`);
@@ -401,7 +407,7 @@ export function ListingForm({ locale, categoryTree }: Props) {
           <ListingCategoryPicker
             tree={categoryTree}
             value={categoryId}
-            onChange={(id) => {
+                        onChange={(id) => {
               setCategoryId(id);
               scheduleDraftPersist();
             }}

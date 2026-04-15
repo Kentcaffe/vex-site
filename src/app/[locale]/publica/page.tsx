@@ -33,7 +33,7 @@ export default async function PublicaPage({ params }: Props) {
       <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">{t("subtitle")}</p>
       <div className="mt-8">
-        <ListingForm locale={locale} categoryTree={categoryTree} />
+        <ListingForm locale={locale} userId={session.user.id} categoryTree={categoryTree} />
       </div>
     </div>
   );

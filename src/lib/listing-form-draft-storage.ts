@@ -1,4 +1,7 @@
-/** Ciornă formular „publică anunț” — supraviețuiește navigării între pagini (sessionStorage). */
+/**
+ * Ciornă formular „publică anunț” — localStorage până la publicare reușită (închis tab, restart browser).
+ * Cheie per utilizator + locale ca să nu se amestece conturile pe același dispozitiv.
+ */
 
 export const LISTING_DRAFT_STORAGE_VERSION = 1 as const;
 
@@ -9,8 +12,32 @@ export type ListingFormDraftV1 = {
   values: Record<string, string | boolean>;
 };
 
-export function listingDraftStorageKey(locale: string): string {
+export function listingDraftStorageKey(locale: string, userId: string): string {
+  return `vex:listing-draft:v${LISTING_DRAFT_STORAGE_VERSION}:${userId}:${locale}`;
+}
+
+/** Format vechi (fără userId) — doar pentru migrare din sessionStorage. */
+export function legacyListingDraftSessionKey(locale: string): string {
   return `vex:listing-draft:v${LISTING_DRAFT_STORAGE_VERSION}:${locale}`;
+}
+
+function parseDraftJson(raw: string): ListingFormDraftV1 | null {
+  try {
+    const data = JSON.parse(raw) as unknown;
+    if (!data || typeof data !== "object") return null;
+    const d = data as Partial<ListingFormDraftV1>;
+    if (d.v !== LISTING_DRAFT_STORAGE_VERSION) return null;
+    if (typeof d.categoryId !== "string" || typeof d.imagesRaw !== "string") return null;
+    if (!d.values || typeof d.values !== "object") return null;
+    return {
+      v: LISTING_DRAFT_STORAGE_VERSION,
+      categoryId: d.categoryId,
+      imagesRaw: d.imagesRaw,
+      values: d.values as Record<string, string | boolean>,
+    };
+  } catch {
+    return null;
+  }
 }
 
 /** Citește tot din DOM ca să nu folosim valori învechite din closure la debounce. */
@@ -94,25 +121,38 @@ export function applyListingDraftPartial(
 
 export function loadListingDraftFromStorage(
   key: string,
+  options?: { migrateLegacySessionKey?: string },
 ): ListingFormDraftV1 | null {
-  if (typeof sessionStorage === "undefined") {
+  if (typeof localStorage === "undefined") {
     return null;
   }
   try {
-    const raw = sessionStorage.getItem(key);
-    if (!raw) return null;
-    const data = JSON.parse(raw) as unknown;
-    if (!data || typeof data !== "object") return null;
-    const d = data as Partial<ListingFormDraftV1>;
-    if (d.v !== LISTING_DRAFT_STORAGE_VERSION) return null;
-    if (typeof d.categoryId !== "string" || typeof d.imagesRaw !== "string") return null;
-    if (!d.values || typeof d.values !== "object") return null;
-    return {
-      v: LISTING_DRAFT_STORAGE_VERSION,
-      categoryId: d.categoryId,
-      imagesRaw: d.imagesRaw,
-      values: d.values as Record<string, string | boolean>,
-    };
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      return parseDraftJson(raw);
+    }
+    const legacy = options?.migrateLegacySessionKey;
+    if (legacy && typeof sessionStorage !== "undefined") {
+      const oldRaw = sessionStorage.getItem(legacy);
+      if (!oldRaw) {
+        return null;
+      }
+      const draft = parseDraftJson(oldRaw);
+      if (draft) {
+        try {
+          localStorage.setItem(key, JSON.stringify(draft));
+        } catch {
+          /* quota */
+        }
+        try {
+          sessionStorage.removeItem(legacy);
+        } catch {
+          /* ignore */
+        }
+        return draft;
+      }
+    }
+    return null;
   } catch {
     return null;
   }
@@ -120,17 +160,24 @@ export function loadListingDraftFromStorage(
 
 export function saveListingDraftToStorage(key: string, draft: ListingFormDraftV1): void {
   try {
-    sessionStorage.setItem(key, JSON.stringify(draft));
+    localStorage.setItem(key, JSON.stringify(draft));
   } catch {
     /* quota / private mode */
   }
 }
 
-export function clearListingDraftStorage(key: string): void {
+export function clearListingDraftStorage(key: string, legacySessionKey?: string): void {
   try {
-    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
   } catch {
     /* ignore */
+  }
+  if (legacySessionKey && typeof sessionStorage !== "undefined") {
+    try {
+      sessionStorage.removeItem(legacySessionKey);
+    } catch {
+      /* ignore */
+    }
   }
 }
 
