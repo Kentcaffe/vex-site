@@ -39,6 +39,7 @@ function ok(name) {
 }
 
 const issues = [];
+const warnings = [];
 
 if (!ok("AUTH_SECRET") || env.AUTH_SECRET.includes("generate-with-openssl")) {
   issues.push("AUTH_SECRET: setează un secret real (openssl rand -base64 32), nu placeholder-ul din exemplu.");
@@ -55,7 +56,7 @@ if (!smtpReady && !resendReady) {
 }
 
 if (!ok("NEXT_PUBLIC_APP_URL")) {
-  issues.push("NEXT_PUBLIC_APP_URL: recomandat (ex. http://localhost:3000 sau https://vex.md).");
+  issues.push("NEXT_PUBLIC_APP_URL: recomandat (ex. https://vex.md).");
 }
 
 if (!ok("DATABASE_URL")) {
@@ -68,7 +69,10 @@ if (!ok("DATABASE_URL")) {
   );
 }
 
-const warnings = [];
+if (!ok("AUTH_URL")) {
+  warnings.push("AUTH_URL lipsește. În producție setează AUTH_URL=https://vex.md pentru callback-uri corecte.");
+}
+
 if (ok("DATABASE_URL")) {
   try {
     const u = new URL(env.DATABASE_URL);

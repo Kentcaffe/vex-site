@@ -6,7 +6,7 @@ import { prisma } from "./lib/prisma";
 import { verifySocketToken } from "./lib/socket-auth";
 
 const PORT = Number(process.env.SOCKET_PORT ?? 3001);
-const corsOrigin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const corsOrigin = process.env.NEXT_PUBLIC_APP_URL ?? "https://vex.md";
 
 const httpServer = createServer();
 const io = new Server(httpServer, {

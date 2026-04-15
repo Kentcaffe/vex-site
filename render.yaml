@@ -1,5 +1,5 @@
 # Render Blueprint — setează Build Command dacă nu folosești YAML din dashboard.
-# În Environment: DATABASE_URL, DIRECT_URL, AUTH_SECRET, NEXT_PUBLIC_APP_URL.
+# În Environment: DATABASE_URL, DIRECT_URL, AUTH_SECRET, NEXT_PUBLIC_APP_URL, AUTH_URL.
 services:
   - type: web
     name: anunturi-web
@@ -17,6 +17,8 @@ services:
       - key: AUTH_SECRET
         sync: false
       - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: AUTH_URL
         sync: false
       - key: NEXT_PUBLIC_PRICE_CURRENCY
         value: MDL

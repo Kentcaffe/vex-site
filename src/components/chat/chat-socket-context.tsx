@@ -23,7 +23,7 @@ const disconnectedValue: ChatSocketContextValue = {
 };
 
 function socketUrl(): string {
-  return process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:3001";
+  return process.env.NEXT_PUBLIC_SOCKET_URL ?? "https://vex.md";
 }
 
 function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
