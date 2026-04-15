@@ -7,7 +7,7 @@ const eslintConfig = defineConfig([
   ...nextTs,
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
   {
-    files: ["seed.js", "scripts/**/*.js"],
+    files: ["seed.js", "scripts/**/*.js", "backend/**/*.js"],
     rules: {
       // Scripturi rulate cu `node` — CommonJS + require sunt intenționate.
       "@typescript-eslint/no-require-imports": "off",
