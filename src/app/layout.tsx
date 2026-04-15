@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
+
+export const metadata: Metadata = {
+  verification: {
+    google: "c8RdLZCq_i84jUUQXIatmo8Uoc37kRmu2_fv_t-IQS8",
+  },
+};
 
 const sans = Inter({
   subsets: ["latin", "latin-ext"],
