@@ -613,6 +613,7 @@
     "categoryBack": "Назад",
     "categorySearchPlaceholder": "Фильтр по названию…",
     "categoryEmptyFilter": "Ничего не найдено — смените запрос или уровень.",
+    "categoryChangeCategory": "Сменить категорию",
     "title": "Заголовок",
     "description": "Описание",
     "price": "Цена",
@@ -647,6 +648,7 @@
     "serverValidation": "Проверьте поля и попробуйте снова.",
     "serverCategory": "Неверная категория (выберите подкатегорию).",
     "serverSession": "Сессия недействительна.",
+    "serverPublishError": "Не удалось опубликовать. Попробуйте снова.",
     "detailOptional": "— необязательно —",
     "fuel": {
       "petrol": "Бензин",
@@ -737,9 +739,9 @@
     },
     "validation": {
       "errCategory": "Выберите категорию.",
-      "errTitle": "Заголовок: 3–160 символов.",
-      "errDescription": "Описание слишком длинное.",
-      "errPrice": "Неверная цена.",
+      "errTitle": "Заголовок: 5–160 символов.",
+      "errDescription": "Описание: 20–1 000 000 символов.",
+      "errPrice": "Укажите целую цену больше 0.",
       "errCity": "Неверный город.",
       "errCondition": "Неверное состояние.",
       "errImages": "Неверные URL или количество (1–8).",

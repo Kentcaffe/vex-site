@@ -66,6 +66,28 @@ export function getPathLabelsForLeaf(nodes: CategoryTreeNode[], leafId: string):
   return parts.join(" › ");
 }
 
+/** Găsește un nod după id (DFS). */
+export function findCategoryNodeById(nodes: CategoryTreeNode[], id: string): CategoryTreeNode | null {
+  for (const n of nodes) {
+    if (n.id === id) {
+      return n;
+    }
+    if (n.children?.length) {
+      const x = findCategoryNodeById(n.children, id);
+      if (x) {
+        return x;
+      }
+    }
+  }
+  return null;
+}
+
+/** Frunză = categorie finală (fără subcategorii). */
+export function isLeafCategoryNode(nodes: CategoryTreeNode[], categoryId: string): boolean {
+  const n = findCategoryNodeById(nodes, categoryId);
+  return n !== null && n.children === null;
+}
+
 /** Slug for a leaf node by id (publish form → listing profile). */
 export function findLeafSlugById(nodes: CategoryTreeNode[], id: string): string | null {
   for (const n of nodes) {

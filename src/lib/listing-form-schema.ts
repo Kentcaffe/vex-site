@@ -8,9 +8,9 @@ export const conditionEnum = z.enum(["new", "used", "not_applicable"]);
 export const priceCurrencyEnum = z.enum(["MDL", "EUR"]);
 
 export const listingFormSchema = z.object({
-  title: z.string().min(3).max(160),
-  description: z.string().max(1_000_000),
-  price: z.coerce.number().int().min(0).max(999_999_999),
+  title: z.string().min(5).max(160),
+  description: z.string().min(20).max(1_000_000),
+  price: z.coerce.number().int().min(1).max(999_999_999),
   priceCurrency: priceCurrencyEnum,
   negotiable: z.boolean().optional(),
   city: z.string().min(2).max(80),

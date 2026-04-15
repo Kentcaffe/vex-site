@@ -16,7 +16,9 @@ import {
 import { asListingCreateInput } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 
-export type CreateListingState = { ok: true } | { ok: false; error: "unauthorized" | "validation" | "category" | "session" };
+export type CreateListingState =
+  | { ok: true; listingId: string }
+  | { ok: false; error: "unauthorized" | "validation" | "category" | "session" | "server" };
 
 export async function createListing(
   _prev: CreateListingState | undefined,
@@ -75,8 +77,9 @@ export async function createListing(
   const detailsObj = parseDetailsJsonFromForm(slug, (name) => formData.get(name));
   const detailsJson = detailsObj;
 
+  let listingId: string;
   try {
-    await prisma.listing.create({
+    const created = await prisma.listing.create({
       data: asListingCreateInput({
         title: parsed.data.title.trim(),
         description: parsed.data.description.trim(),
@@ -98,16 +101,20 @@ export async function createListing(
         categoryId: parsed.data.categoryId,
         userId: session.user.id,
       }),
+      select: { id: true },
     });
+    listingId = created.id;
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2003") {
       return { ok: false, error: "validation" };
     }
-    throw e;
+    console.error("[createListing]", e);
+    return { ok: false, error: "server" };
   }
 
   revalidatePath(localizedHref(parsed.data.locale, "/anunturi"));
   revalidatePath(localizedHref(parsed.data.locale, "/"));
+  revalidatePath(localizedHref(parsed.data.locale, `/anunturi/${listingId}`));
 
-  return { ok: true };
+  return { ok: true, listingId };
 }

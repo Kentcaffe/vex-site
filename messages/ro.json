@@ -613,6 +613,7 @@
     "categoryBack": "Nivel anterior",
     "categorySearchPlaceholder": "Filtrează după nume…",
     "categoryEmptyFilter": "Nicio potrivire — încearcă alt termen sau alt nivel.",
+    "categoryChangeCategory": "Schimbă categoria",
     "title": "Titlu",
     "description": "Descriere",
     "price": "Preț",
@@ -647,6 +648,7 @@
     "serverValidation": "Verifică câmpurile și încearcă din nou.",
     "serverCategory": "Categorie invalidă (alege o subcategorie).",
     "serverSession": "Sesiune invalidă.",
+    "serverPublishError": "Eroare la publicare. Încearcă din nou.",
     "detailOptional": "— opțional —",
     "fuel": {
       "petrol": "Benzină",
@@ -791,9 +793,9 @@
     },
     "validation": {
       "errCategory": "Alege o categorie.",
-      "errTitle": "Titlul trebuie să aibă 3–160 caractere.",
-      "errDescription": "Descrierea este prea lungă.",
-      "errPrice": "Preț invalid.",
+      "errTitle": "Titlul trebuie să aibă 5–160 caractere.",
+      "errDescription": "Descrierea trebuie să aibă 20–1.000.000 caractere.",
+      "errPrice": "Introdu un preț întreg mai mare ca 0.",
       "errCity": "Oraș invalid.",
       "errCondition": "Stare invalidă.",
       "errImages": "URL-uri de imagini invalide sau număr incorect (1–8).",

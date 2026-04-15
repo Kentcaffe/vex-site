@@ -145,7 +145,7 @@ export function liveValidateField(
     }
     case "title": {
       const t = values.title.trim();
-      if (t.length > 0 && t.length < 3) {
+      if (t.length > 0 && t.length < 5) {
         return msg.errTitle;
       }
       if (t.length > 160) {
@@ -154,6 +154,10 @@ export function liveValidateField(
       return undefined;
     }
     case "description": {
+      const d = values.description.trim();
+      if (d.length > 0 && d.length < 20) {
+        return msg.errDescription;
+      }
       if (values.description.length > 1_000_000) {
         return msg.errDescription;
       }
@@ -165,7 +169,7 @@ export function liveValidateField(
         return undefined;
       }
       const n = Number(p);
-      if (!Number.isFinite(n) || !Number.isInteger(n) || n < 0 || n > 999_999_999) {
+      if (!Number.isFinite(n) || !Number.isInteger(n) || n < 1 || n > 999_999_999) {
         return msg.errPrice;
       }
       return undefined;

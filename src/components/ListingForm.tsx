@@ -9,21 +9,19 @@ import {
   useRef,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createListing, type CreateListingState } from "@/app/actions/listings";
+import { CategorySelector } from "@/components/publish/CategorySelector";
+import { useToast } from "@/components/ui/SimpleToast";
+import { localizedHref } from "@/lib/paths";
 import {
   getDetailFieldsForSlug,
   getDetailFormName,
   getListingFormFlags,
   type DetailField,
 } from "@/lib/listing-detail-config";
-import {
-  type CategoryTreeNode,
-  findAncestorStackForLeaf,
-  findLeafSlugById,
-  getPathLabelsForLeaf,
-} from "@/lib/category-tree";
-import { emojiForCategorySlug } from "@/lib/category-icons";
+import { type CategoryTreeNode, findLeafSlugById, isLeafCategoryNode } from "@/lib/category-tree";
 import { LISTING_MAX_IMAGES, parseImageLines } from "@/lib/listing-form-schema";
 import {
   validateListingFormClient,
@@ -49,163 +47,9 @@ type Props = {
   categoryTree: CategoryTreeNode[];
 };
 
-type CategoryPickerProps = {
-  tree: CategoryTreeNode[];
-  value: string;
-  onChange: (categoryId: string) => void;
-  name?: string;
-  error?: string | null;
-};
-
-function ListingCategoryPicker({ tree, value, onChange, name = "categoryId", error }: CategoryPickerProps) {
-  const tCat = useTranslations("ListingForm");
-  const [stack, setStack] = useState<CategoryTreeNode[]>(() =>
-    value ? (findAncestorStackForLeaf(tree, value) ?? []) : [],
-  );
-  const [query, setQuery] = useState("");
-
-  useEffect(() => {
-    if (!value) {
-      return;
-    }
-    setStack(findAncestorStackForLeaf(tree, value) ?? []);
-  }, [value, tree]);
-
-  const currentNodes = useMemo(() => {
-    if (stack.length === 0) {
-      return tree;
-    }
-    const last = stack[stack.length - 1];
-    return last.children ?? [];
-  }, [tree, stack]);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) {
-      return currentNodes;
-    }
-    return currentNodes.filter((n) => n.label.toLowerCase().includes(q));
-  }, [currentNodes, query]);
-
-  const selectedPath = value ? getPathLabelsForLeaf(tree, value) : "";
-
-  function onPickNode(n: CategoryTreeNode) {
-    if (n.children && n.children.length > 0) {
-      onChange("");
-      setStack((s) => [...s, n]);
-      setQuery("");
-      return;
-    }
-    onChange(n.id);
-    setStack(findAncestorStackForLeaf(tree, n.id) ?? []);
-  }
-
-  return (
-    <div className="space-y-3">
-      <input type="hidden" name={name} value={value} />
-
-      {selectedPath ? (
-        <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/80 px-3 py-2 text-sm dark:border-emerald-900/60 dark:bg-emerald-950/30">
-          <span className="font-medium text-emerald-900 dark:text-emerald-100">{tCat("categorySelectedLabel")}: </span>
-          <span className="text-emerald-800 dark:text-emerald-200">{selectedPath}</span>
-        </div>
-      ) : null}
-
-      <div className="flex flex-wrap items-center gap-1 text-sm text-zinc-600 dark:text-zinc-300">
-        <button
-          type="button"
-          className="rounded-md px-2 py-1 font-medium text-[#0b57d0] hover:bg-zinc-100 dark:text-blue-400 dark:hover:bg-zinc-800"
-          onClick={() => {
-            onChange("");
-            setStack([]);
-            setQuery("");
-          }}
-        >
-          {tCat("categoryBreadcrumbRoot")}
-        </button>
-        {stack.map((n, i) => (
-          <span key={n.id} className="inline-flex items-center gap-1">
-            <span className="text-zinc-400" aria-hidden>
-              ›
-            </span>
-            <button
-              type="button"
-              disabled={i === stack.length - 1}
-              className="rounded-md px-2 py-1 font-medium text-[#0b57d0] hover:bg-zinc-100 disabled:cursor-default disabled:text-zinc-700 disabled:hover:bg-transparent dark:text-blue-400 dark:disabled:text-zinc-300 dark:hover:bg-zinc-800 dark:disabled:hover:bg-transparent"
-              onClick={() => {
-                onChange("");
-                setStack(stack.slice(0, i + 1));
-                setQuery("");
-              }}
-            >
-              {n.label}
-            </button>
-          </span>
-        ))}
-        {stack.length > 0 ? (
-          <button
-            type="button"
-            className="ml-1 rounded-md border border-zinc-200 px-2 py-1 text-xs text-zinc-600 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-800"
-            onClick={() => {
-              onChange("");
-              setStack((s) => s.slice(0, -1));
-              setQuery("");
-            }}
-          >
-            {tCat("categoryBack")}
-          </button>
-        ) : null}
-      </div>
-
-      <div className="relative">
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={tCat("categorySearchPlaceholder")}
-          className="w-full rounded-lg border border-zinc-300 bg-white py-2 pl-3 pr-3 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-          autoComplete="off"
-        />
-      </div>
-
-      {filtered.length === 0 ? (
-        <p className="text-sm text-zinc-500">{tCat("categoryEmptyFilter")}</p>
-      ) : (
-        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((n) => {
-            const isFolder = !!(n.children && n.children.length > 0);
-            const isLeafSelected = !isFolder && n.id === value;
-            const emoji = emojiForCategorySlug(n.slug);
-            return (
-              <li key={n.id}>
-                <button
-                  type="button"
-                  onClick={() => onPickNode(n)}
-                  className={`flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left text-sm transition ${
-                    isLeafSelected
-                      ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500/30 dark:border-emerald-700 dark:bg-emerald-950/40"
-                      : "border-zinc-200 bg-white hover:border-[#0b57d0]/40 hover:bg-sky-50/60 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-blue-500/40 dark:hover:bg-zinc-800/80"
-                  }`}
-                >
-                  <span className="text-xl leading-none" aria-hidden>
-                    {emoji}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="font-medium text-zinc-900 dark:text-zinc-50">{n.label}</span>
-                  </span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-    </div>
-  );
-}
-
 export function ListingForm({ locale, userId, categoryTree }: Props) {
+  const router = useRouter();
+  const { toast } = useToast();
   const t = useTranslations("ListingForm");
   const tVal = useTranslations("ListingForm.validation");
 
@@ -231,10 +75,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   const [imagesRaw, setImagesRaw] = useState("");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [clientErrors, setClientErrors] = useState<Partial<Record<ListingFormFieldId, string>>>({});
-  /** După publicare reușită, remontăm formularul ca toate câmpurile să fie goale pentru următorul anunț. */
-  const [formInstanceKey, setFormInstanceKey] = useState(0);
 
   const formRef = useRef<HTMLFormElement>(null);
+  const listingDetailsRef = useRef<HTMLDivElement | null>(null);
+  const prevCategoryIdRef = useRef<string>("");
+  const publishRedirectDoneRef = useRef(false);
   const draftRemainderRef = useRef<ListingFormDraftV1 | null>(null);
   const skipDraftSaveRef = useRef(false);
   const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -305,21 +150,35 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }, []);
 
   useEffect(() => {
-    if (state?.ok !== true) {
+    if (!state || state.ok !== true || !state.listingId || publishRedirectDoneRef.current) {
       return;
     }
+    publishRedirectDoneRef.current = true;
     clearListingDraftStorage(storageKey, legacyDraftSessionKey);
     skipDraftSaveRef.current = true;
     draftRemainderRef.current = null;
-    setCategoryId("");
-    setImagesRaw("");
-    setClientErrors({});
-    setUploadError(null);
-    setFormInstanceKey((k) => k + 1);
-    queueMicrotask(() => {
-      skipDraftSaveRef.current = false;
-    });
-  }, [state, storageKey, legacyDraftSessionKey]);
+    toast("success", t("success"));
+    router.push(localizedHref(locale, `/anunturi/${state.listingId}`));
+  }, [state, storageKey, legacyDraftSessionKey, router, toast, t, locale]);
+
+  useEffect(() => {
+    if (state?.ok === false && state.error === "server") {
+      toast("error", t("serverPublishError"));
+    }
+  }, [state, toast, t]);
+
+  useEffect(() => {
+    if (
+      categoryId &&
+      categoryId !== prevCategoryIdRef.current &&
+      isLeafCategoryNode(categoryTree, categoryId)
+    ) {
+      queueMicrotask(() => {
+        listingDetailsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+    prevCategoryIdRef.current = categoryId;
+  }, [categoryId, categoryTree]);
 
   function detailLabel(field: DetailField): string {
     return t(`detail.${field.id}.label`);
@@ -353,6 +212,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     const v = validateListingFormClient(formData, msg);
     if (!v.ok) {
       setClientErrors(v.errors);
+      const fieldId =
+        v.firstField === "categoryId" ? "field-categoryId" : `field-${v.firstField}`;
+      queueMicrotask(() => {
+        document.getElementById(fieldId)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
       return;
     }
     setClientErrors({});
@@ -391,7 +255,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }
 
   const serverMsg =
-    state?.ok === false
+    state?.ok === false && state.error !== "server"
       ? state.error === "unauthorized"
         ? t("serverUnauthorized")
         : state.error === "category"
@@ -403,13 +267,12 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   return (
     <form
-      key={formInstanceKey}
       ref={formRef}
       action={handleSubmit}
       onInput={() => {
         scheduleDraftPersist();
       }}
-      className="mx-auto max-w-3xl space-y-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8"
+      className="mx-auto max-w-3xl space-y-8 rounded-2xl border border-zinc-200/90 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8"
     >
       <input type="hidden" name="locale" value={locale} />
 
@@ -418,7 +281,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionCategory")}</h2>
         </div>
         <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 dark:border-zinc-700 dark:bg-zinc-950/40">
-          <ListingCategoryPicker
+          <CategorySelector
             tree={categoryTree}
             value={categoryId}
             onChange={(id) => {
@@ -430,7 +293,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
         </div>
       </section>
 
-      <section className="space-y-5 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+      <section
+        ref={listingDetailsRef}
+        id="publish-listing-details"
+        className="scroll-mt-6 space-y-5 border-t border-zinc-200 pt-8 dark:border-zinc-800"
+      >
         <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionListing")}</h2>
       <div id="field-title">
         <label className="block text-sm font-medium" htmlFor="title">
@@ -470,7 +337,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
               name="price"
               type="number"
               inputMode="numeric"
-              min={0}
+              min={1}
               required
               className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
             />
@@ -754,15 +621,34 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       </div>
       </section>
 
-      {serverMsg ? <p className="text-sm text-red-600">{serverMsg}</p> : null}
-      {state?.ok === true ? <p className="text-sm text-emerald-700 dark:text-emerald-400">{t("success")}</p> : null}
+      {serverMsg ? <p className="text-sm font-medium text-red-600 dark:text-red-400">{serverMsg}</p> : null}
 
       <button
         type="submit"
         disabled={isPending}
-        className="w-full rounded-lg bg-emerald-600 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:pointer-events-none disabled:opacity-60"
       >
-        {isPending ? t("submitting") : t("submit")}
+        {isPending ? (
+          <>
+            <svg
+              className="h-5 w-5 shrink-0 animate-spin text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              aria-hidden
+            >
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
+            </svg>
+            {t("submitting")}
+          </>
+        ) : (
+          t("submit")
+        )}
       </button>
     </form>
   );

@@ -613,6 +613,7 @@
     "categoryBack": "Back",
     "categorySearchPlaceholder": "Filter by name?",
     "categoryEmptyFilter": "No matches ? try another word or go up a level.",
+    "categoryChangeCategory": "Change category",
     "title": "Title",
     "description": "Description",
     "price": "Price",
@@ -647,6 +648,7 @@
     "serverValidation": "Please check the fields and try again.",
     "serverCategory": "Invalid category (pick a leaf subcategory).",
     "serverSession": "Invalid session.",
+    "serverPublishError": "Could not publish. Please try again.",
     "detailOptional": "? optional ?",
     "fuel": {
       "petrol": "Petrol",
@@ -791,9 +793,9 @@
     },
     "validation": {
       "errCategory": "Pick a category.",
-      "errTitle": "Title must be 3?160 characters.",
-      "errDescription": "Description is too long.",
-      "errPrice": "Invalid price.",
+      "errTitle": "Title must be 5–160 characters.",
+      "errDescription": "Description must be 20–1,000,000 characters.",
+      "errPrice": "Enter a whole number price greater than 0.",
       "errCity": "Invalid city.",
       "errCondition": "Invalid condition.",
       "errImages": "Invalid image URLs or wrong count (1?8).",
