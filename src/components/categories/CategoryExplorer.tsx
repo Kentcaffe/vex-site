@@ -1,9 +1,8 @@
 import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
 import { CATEGORY_ROOT_EMOJI } from "@/lib/category-icons";
-import { prisma } from "@/lib/prisma";
+import { getAllCategories } from "@/lib/category-queries";
 
 type Cat = {
   id: string;
@@ -29,31 +28,26 @@ type Props = {
 export async function CategoryExplorer({ locale, rootSlug }: Props) {
   const t = await getTranslations("CategoriesPage");
 
-  const roots = await prisma.category.findMany({
-    where: { parentId: null },
-    orderBy: [{ sortOrder: "asc" }, { slug: "asc" }],
-  });
+  const all = await getAllCategories();
+  const roots = all.filter((c) => c.parentId === null);
 
-  const root = roots.find((r) => r.slug === rootSlug);
+  const root = roots.find((r) => r.slug === rootSlug) ?? roots[0];
   if (!root) {
-    notFound();
+    return null;
   }
 
-  const rawSections = await prisma.category.findMany({
-    where: { parentId: root.id },
-    orderBy: [{ sortOrder: "asc" }, { slug: "asc" }],
-    include: {
-      children: {
-        orderBy: [{ sortOrder: "asc" }, { slug: "asc" }],
-      },
-    },
-  });
+  const rawSections = all
+    .filter((c) => c.parentId === root.id)
+    .sort((a, b) => a.sortOrder - b.sortOrder || a.slug.localeCompare(b.slug));
 
   const sections: Cat[] = rawSections.map((s) => ({
     id: s.id,
     slug: s.slug,
     labels: s.labels,
-    children: s.children.map((ch) => ({ id: ch.id, slug: ch.slug, labels: ch.labels, children: [] })),
+    children: all
+      .filter((c) => c.parentId === s.id)
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.slug.localeCompare(b.slug))
+      .map((ch) => ({ id: ch.id, slug: ch.slug, labels: ch.labels, children: [] })),
   }));
 
   const rootTitle = labelFromJson(root.labels, locale);
