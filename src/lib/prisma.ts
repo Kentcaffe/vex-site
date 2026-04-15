@@ -5,6 +5,7 @@ import { Pool } from "pg";
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
   pgPool: Pool | undefined;
+  prismaInitError: string | undefined;
 };
 
 /** pg nu citește mereu sslmode din URL la fel ca libpq; pentru host remote trebuie ssl explicit. */
@@ -68,12 +69,13 @@ function connectionStringWithoutSslQuery(dbUrl: string): string {
 }
 
 function createPrismaClient(): PrismaClient {
-  if (!process.env.DATABASE_URL) {
-    throw new Error(
-      "DATABASE_URL lipsește. Setează connection string-ul PostgreSQL (ex. din Supabase: Project Settings → Database).",
-    );
-  }
   const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) {
+    throw new Error("DATABASE_URL is missing. Database features are unavailable.");
+  }
+  if (!/^postgres(ql)?:\/\//i.test(dbUrl)) {
+    throw new Error("DATABASE_URL must start with postgresql:// or postgres://");
+  }
   const ssl = poolSslForUrl(dbUrl);
   const connectionString =
     ssl !== undefined
@@ -92,6 +94,42 @@ function createPrismaClient(): PrismaClient {
   return new PrismaClient({ adapter });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
+function createUnavailablePrismaClient(message: string): PrismaClient {
+  const error = new Error(
+    `[prisma] Database client unavailable: ${message}. App boot continues, but DB-backed features will fail until DATABASE_URL/migrations are fixed.`,
+  );
+  const delegateTarget = () => undefined;
+  const delegateProxy = new Proxy(delegateTarget, {
+    get() {
+      return delegateProxy;
+    },
+    apply() {
+      throw error;
+    },
+  });
+  return new Proxy(delegateProxy as unknown as PrismaClient, {
+    get() {
+      return delegateProxy;
+    },
+  });
+}
 
-globalForPrisma.prisma = prisma;
+function getPrismaClient(): PrismaClient {
+  if (globalForPrisma.prisma) {
+    return globalForPrisma.prisma;
+  }
+  try {
+    const client = createPrismaClient();
+    globalForPrisma.prisma = client;
+    return client;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    globalForPrisma.prismaInitError = message;
+    console.error(`[prisma] Startup fallback enabled: ${message}`);
+    const unavailable = createUnavailablePrismaClient(message);
+    globalForPrisma.prisma = unavailable;
+    return unavailable;
+  }
+}
+
+export const prisma = getPrismaClient();

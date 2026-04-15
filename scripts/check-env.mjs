@@ -68,6 +68,35 @@ if (!ok("DATABASE_URL")) {
   );
 }
 
+const warnings = [];
+if (ok("DATABASE_URL")) {
+  try {
+    const u = new URL(env.DATABASE_URL);
+    const host = u.hostname;
+    const isPooler =
+      host.includes("pooler.supabase.com") || u.port === "6543";
+    const isDirectSupabase =
+      host.startsWith("db.") && host.endsWith(".supabase.co");
+
+    if (isDirectSupabase && !isPooler) {
+      warnings.push(
+        "DATABASE_URL pare direct (db.*.supabase.co:5432). Pentru runtime pe Render e recomandat pooler-ul Supabase (de obicei :6543).",
+      );
+    }
+    if (!ok("DIRECT_URL")) {
+      warnings.push(
+        "DIRECT_URL lipsește (opțional, dar recomandat pentru migrate fallback când pooler-ul nu permite migrate).",
+      );
+    } else if (env.DIRECT_URL === env.DATABASE_URL) {
+      warnings.push(
+        "DIRECT_URL este identic cu DATABASE_URL. În Supabase folosește URL-uri diferite: pooler pentru DATABASE_URL, direct pentru DIRECT_URL.",
+      );
+    }
+  } catch {
+    warnings.push("DATABASE_URL nu poate fi parse-at ca URL valid.");
+  }
+}
+
 if (issues.length) {
   console.error("--- Verificare .env: de rezolvat ---\n");
   for (const m of issues) console.error("• " + m);
@@ -76,5 +105,9 @@ if (issues.length) {
 }
 
 console.log("OK: variabile critice par setate (fără a afișa valori).");
+if (warnings.length) {
+  console.warn("\n--- Verificare .env: recomandări ---\n");
+  for (const m of warnings) console.warn("• " + m);
+}
 console.log("Fișier:", envPath);
 process.exit(0);
