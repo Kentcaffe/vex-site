@@ -20,8 +20,13 @@ export async function createSupabaseServerClient() {
           return cookieStore.getAll();
         },
         setAll(items) {
-          for (const item of items) {
-            cookieStore.set(item.name, item.value, item.options);
+          try {
+            for (const item of items) {
+              cookieStore.set(item.name, item.value, item.options);
+            }
+          } catch {
+            // În Server Components, Next.js nu permite scrierea cookie-urilor; reîmprospătarea
+            // sesiei se face în `src/middleware.ts`. Vezi Supabase SSR + Next.js App Router.
           }
         },
       },
