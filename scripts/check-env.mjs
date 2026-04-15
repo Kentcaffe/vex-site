@@ -41,8 +41,16 @@ function ok(name) {
 const issues = [];
 const warnings = [];
 
-if (!ok("AUTH_SECRET") || env.AUTH_SECRET.includes("generate-with-openssl")) {
-  issues.push("AUTH_SECRET: setează un secret real (openssl rand -base64 32), nu placeholder-ul din exemplu.");
+if (!ok("NEXT_PUBLIC_SUPABASE_URL")) {
+  issues.push("NEXT_PUBLIC_SUPABASE_URL: obligatoriu pentru Supabase Auth.");
+}
+if (!ok("NEXT_PUBLIC_SUPABASE_ANON_KEY")) {
+  issues.push("NEXT_PUBLIC_SUPABASE_ANON_KEY: obligatoriu pentru Supabase Auth.");
+}
+if (!ok("SUPABASE_SERVICE_ROLE_KEY")) {
+  warnings.push(
+    "SUPABASE_SERVICE_ROLE_KEY lipsește. Nu este necesar pentru login basic client, dar e recomandat pentru operații server-side administrative.",
+  );
 }
 
 const smtpReady =

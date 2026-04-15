@@ -1,10 +1,9 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Lock, Mail, Phone, User } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { registerUser, type RegisterState } from "@/app/actions/auth";
 import { AuthDivider } from "@/components/auth/AuthDivider";
 import { authInputClass, IconField } from "@/components/auth/IconField";
 import { PasswordRulesList } from "@/components/auth/PasswordRulesList";
@@ -12,6 +11,7 @@ import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import type { OauthAvailability } from "@/components/auth/types";
 import { routing } from "@/i18n/routing";
 import { evaluatePasswordRules, passwordMeetsAllRules } from "@/lib/auth-password-rules";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 type Props = {
   oauth?: OauthAvailability;
@@ -22,8 +22,11 @@ const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function RegisterTab({ oauth }: Props) {
   const t = useTranslations("Auth");
   const locale = useLocale();
+  const supabase = createSupabaseBrowserClient();
   const callbackUrl = locale === routing.defaultLocale ? "/" : `/${locale}`;
-  const [regState, regAction, regPending] = useActionState(registerUser, undefined as RegisterState | undefined);
+  const [regPending, setRegPending] = useState(false);
+  const [registerError, setRegisterError] = useState<string | null>(null);
+  const [registerOk, setRegisterOk] = useState(false);
   const [password, setPassword] = useState("");
   const [pwdTouched, setPwdTouched] = useState(false);
   const [email, setEmail] = useState("");
@@ -36,6 +39,8 @@ export function RegisterTab({ oauth }: Props) {
   const rules = useMemo(() => evaluatePasswordRules(password), [password]);
 
   function validateClient(fd: FormData): boolean {
+    setRegisterError(null);
+    setRegisterOk(false);
     setClientBlock(null);
     setEmailErr(null);
     setPhoneErr(null);
@@ -68,14 +73,45 @@ export function RegisterTab({ oauth }: Props) {
     const fd = new FormData(e.currentTarget);
     if (!validateClient(fd)) {
       e.preventDefault();
+      return;
     }
+    e.preventDefault();
+    const email = String(fd.get("email") ?? "").trim().toLowerCase();
+    const password = String(fd.get("password") ?? "");
+    const phone = String(fd.get("phone") ?? "").replace(/\D/g, "");
+    const name = String(fd.get("name") ?? "").trim();
+
+    setRegPending(true);
+    void supabase.auth
+      .signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
+          data: {
+            full_name: name || null,
+            phone: phone || null,
+          },
+        },
+      })
+      .then(async ({ error }) => {
+        if (error) {
+          setRegisterError(t("validationError"));
+          return;
+        }
+        await fetch("/api/auth/sync-user", { method: "POST", credentials: "include" });
+        setRegisterOk(true);
+      })
+      .finally(() => {
+        setRegPending(false);
+      });
   }
 
   const showOAuth = oauth?.google || oauth?.facebook;
 
   return (
     <div className="space-y-6">
-      <form className="space-y-5" action={regAction} onSubmit={onSubmit}>
+      <form className="space-y-5" onSubmit={onSubmit}>
         <IconField id="reg-name" label={t("nameOptional")} icon={User}>
           <input id="reg-name" name="name" type="text" maxLength={80} autoComplete="name" className={authInputClass} />
         </IconField>
@@ -179,20 +215,12 @@ export function RegisterTab({ oauth }: Props) {
             {clientBlock}
           </p>
         ) : null}
-        {regState?.ok === false ? (
+        {registerError ? (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-[13px] font-medium text-red-700 dark:bg-red-950/40 dark:text-red-300" role="alert">
-            {regState.error === "emailTaken"
-              ? t("emailTaken")
-              : regState.error === "phoneInvalid"
-                ? t("phoneInvalid")
-                : regState.error === "passwordWeak"
-                  ? t("passwordWeak")
-                  : regState.error === "termsRequired"
-                    ? t("termsRequired")
-                    : t("validationError")}
+            {registerError}
           </p>
         ) : null}
-        {regState?.ok === true ? (
+        {registerOk ? (
           <p className="rounded-lg bg-emerald-50 px-3 py-2 text-[13px] font-medium text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200" role="status">
             {t("registerSuccess")}
           </p>

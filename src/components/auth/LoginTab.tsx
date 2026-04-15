@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { AtSign, Lock } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
@@ -9,6 +8,7 @@ import { AuthDivider } from "@/components/auth/AuthDivider";
 import { authInputClass, IconField } from "@/components/auth/IconField";
 import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import type { OauthAvailability } from "@/components/auth/types";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 type Props = {
   callbackUrl: string;
@@ -18,6 +18,7 @@ type Props = {
 export function LoginTab({ callbackUrl, oauth }: Props) {
   const t = useTranslations("Auth");
   const router = useRouter();
+  const supabase = createSupabaseBrowserClient();
   const [pending, setPending] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [identifierErr, setIdentifierErr] = useState<string | null>(null);
@@ -29,7 +30,7 @@ export function LoginTab({ callbackUrl, oauth }: Props) {
     setIdentifierErr(null);
     setPasswordErr(null);
     const fd = new FormData(e.currentTarget);
-    const identifier = String(fd.get("identifier") ?? "").trim();
+    const identifier = String(fd.get("identifier") ?? "").trim().toLowerCase();
     const password = String(fd.get("password") ?? "");
     if (!identifier) {
       setIdentifierErr(t("fieldRequired"));
@@ -39,22 +40,23 @@ export function LoginTab({ callbackUrl, oauth }: Props) {
       setPasswordErr(t("fieldRequired"));
       return;
     }
+    if (!identifier.includes("@")) {
+      setFormError(t("invalidEmail"));
+      return;
+    }
     setPending(true);
-    const res = await signIn("credentials", {
-      identifier,
+    const { error } = await supabase.auth.signInWithPassword({
+      email: identifier,
       password,
-      redirect: false,
-      callbackUrl,
     });
+    await fetch("/api/auth/sync-user", { method: "POST", credentials: "include" });
     setPending(false);
-    if (res?.error) {
+    if (error) {
       setFormError(t("loginInvalid"));
       return;
     }
-    if (res?.ok) {
-      router.push(callbackUrl);
-      router.refresh();
-    }
+    router.push(callbackUrl);
+    router.refresh();
   }
 
   const showOAuth = oauth?.google || oauth?.facebook;

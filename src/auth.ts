@@ -1,154 +1,113 @@
-import { randomBytes } from "node:crypto";
 import type { UserRole } from "@prisma/client";
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
-import Facebook from "next-auth/providers/facebook";
-import Google from "next-auth/providers/google";
-import { compare, hash } from "bcryptjs";
-import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 
-/** Auth.js reads AUTH_URL; many projects still set NEXTAUTH_URL — mirror it for OAuth callbacks. */
-if (typeof process !== "undefined" && process.env.NEXTAUTH_URL && !process.env.AUTH_URL) {
-  process.env.AUTH_URL = process.env.NEXTAUTH_URL;
+export type AppSession = {
+  user: {
+    id: string;
+    email: string;
+    name?: string | null;
+    image?: string | null;
+    role: UserRole;
+    supabaseUserId: string;
+  };
+};
+
+type SyncInput = {
+  supabaseUserId: string;
+  email: string;
+  name?: string | null;
+  avatarUrl?: string | null;
+};
+
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
 }
 
-/** Unusable bcrypt hash for OAuth-only rows (email/password login will never match). */
-async function placeholderPasswordHash(): Promise<string> {
-  return hash(randomBytes(32).toString("hex"), 4);
+function hasSupabaseEnv(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim(),
+  );
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  trustHost: true,
-  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
-  /** Do not log noisy "failed login" as server errors (UI shows a friendly message instead). */
-  logger: {
-    error(error) {
-      const text =
-        typeof error === "string"
-          ? error
-          : error instanceof Error
-            ? `${error.name} ${error.message}`
-            : String(error);
-      if (/CredentialsSignin/i.test(text)) {
-        return;
-      }
-      console.error(error);
+async function upsertPrismaUserFromSupabase(input: SyncInput) {
+  const email = normalizeEmail(input.email);
+  return prisma.user.upsert({
+    where: { email },
+    create: {
+      email,
+      name: input.name ?? null,
+      avatarUrl: input.avatarUrl ?? null,
+      supabaseAuthId: input.supabaseUserId,
     },
-  },
-  providers: [
-    Credentials({
-      id: "credentials",
-      credentials: {
-        identifier: { label: "Email or phone", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
-      authorize: async (credentials) => {
-        const parsed = z
-          .object({
-            identifier: z.string().min(1),
-            password: z.string().min(1),
-          })
-          .safeParse(credentials);
-        if (!parsed.success) {
-          return null;
-        }
-        const raw = parsed.data.identifier.trim();
-        const password = parsed.data.password;
-
-        let user =
-          raw.includes("@")
-            ? await prisma.user.findUnique({
-                where: { email: raw.toLowerCase() },
-              })
-            : null;
-
-        if (!user) {
-          const digits = raw.replace(/\D/g, "");
-          if (digits.length >= 8) {
-            user = await prisma.user.findFirst({
-              where: { phone: digits },
-            });
-          }
-        }
-
-        if (!user?.passwordHash) {
-          return null;
-        }
-        const ok = await compare(password, user.passwordHash);
-        if (!ok) {
-          return null;
-        }
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name ?? undefined,
-          image: user.avatarUrl ?? undefined,
-          role: user.role,
-        };
-      },
-    }),
-    ...(process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET
-      ? [
-          Google({
-            clientId: process.env.AUTH_GOOGLE_ID,
-            clientSecret: process.env.AUTH_GOOGLE_SECRET,
-          }),
-        ]
-      : []),
-    ...(process.env.AUTH_FACEBOOK_ID && process.env.AUTH_FACEBOOK_SECRET
-      ? [
-          Facebook({
-            clientId: process.env.AUTH_FACEBOOK_ID,
-            clientSecret: process.env.AUTH_FACEBOOK_SECRET,
-          }),
-        ]
-      : []),
-  ],
-  callbacks: {
-    async jwt({ token, user, account }) {
-      if (user && account) {
-        if (account.provider === "google" || account.provider === "facebook") {
-          const email = user.email?.trim().toLowerCase();
-          if (!email) {
-            return token;
-          }
-          const dbUser = await prisma.user.upsert({
-            where: { email },
-            create: {
-              email,
-              name: user.name,
-              avatarUrl: user.image ?? null,
-              passwordHash: await placeholderPasswordHash(),
-            },
-            update: {
-              name: user.name ?? undefined,
-              avatarUrl: user.image ?? undefined,
-            },
-          });
-          token.id = dbUser.id;
-          token.role = dbUser.role;
-          token.picture = dbUser.avatarUrl ?? user.image ?? null;
-          return token;
-        }
-        if (account.provider === "credentials") {
-          token.id = user.id;
-          token.role = (user as { role: UserRole }).role;
-          token.picture = user.image ?? null;
-        }
-      }
-      return token;
+    update: {
+      name: input.name ?? undefined,
+      avatarUrl: input.avatarUrl ?? undefined,
+      supabaseAuthId: input.supabaseUserId,
     },
-    session({ session, token }) {
-      if (session.user) {
-        // Never use `token.sub` as DB user id — it's the OAuth provider subject, not our User.id.
-        // Using it caused FK violations (P2003) on reports/notifications keyed by User.id.
-        const id = typeof token.id === "string" && token.id.length > 0 ? token.id : "";
-        session.user.id = id;
-        session.user.role = (token.role as UserRole) ?? "USER";
-        session.user.image = typeof token.picture === "string" ? token.picture : null;
-      }
-      return session;
+  });
+}
+
+function metadataName(metadata: Record<string, unknown> | undefined): string | null {
+  if (!metadata) return null;
+  const preferred = metadata.full_name ?? metadata.name;
+  return typeof preferred === "string" && preferred.trim().length > 0 ? preferred.trim() : null;
+}
+
+function metadataAvatar(metadata: Record<string, unknown> | undefined): string | null {
+  if (!metadata) return null;
+  const preferred = metadata.avatar_url;
+  return typeof preferred === "string" && preferred.trim().length > 0 ? preferred.trim() : null;
+}
+
+export async function syncAuthenticatedUserToPrisma(): Promise<AppSession | null> {
+  if (!hasSupabaseEnv()) {
+    return null;
+  }
+  const supabase = await createSupabaseServerClient();
+  const [{ data: userData, error: userError }] = await Promise.all([supabase.auth.getUser()]);
+
+  if (userError || !userData.user?.id || !userData.user.email) {
+    return null;
+  }
+
+  const authUser = userData.user;
+  const authEmail = authUser.email;
+  if (!authEmail) {
+    return null;
+  }
+  const dbUser = await upsertPrismaUserFromSupabase({
+    supabaseUserId: authUser.id,
+    email: authEmail,
+    name: metadataName(authUser.user_metadata as Record<string, unknown> | undefined),
+    avatarUrl: metadataAvatar(authUser.user_metadata as Record<string, unknown> | undefined),
+  });
+
+  return {
+    user: {
+      id: dbUser.id,
+      email: dbUser.email,
+      name: dbUser.name,
+      image: dbUser.avatarUrl,
+      role: dbUser.role,
+      supabaseUserId: authUser.id,
     },
-  },
-});
+  };
+}
+
+export async function auth(): Promise<AppSession | null> {
+  return syncAuthenticatedUserToPrisma();
+}
+
+export async function signOut(_opts?: { redirect?: boolean }): Promise<void> {
+  void _opts;
+  if (!hasSupabaseEnv()) {
+    return;
+  }
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error("[auth] Supabase signOut failed:", error.message);
+  }
+}

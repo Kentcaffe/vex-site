@@ -1,12 +1,12 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useOptionalChatSocket } from "@/components/chat/chat-socket-context";
+import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 
 export function ChatInboxLink() {
-  const { status } = useSession();
+  const { status } = useAuthSession();
   const t = useTranslations("Nav");
   const chat = useOptionalChatSocket();
 

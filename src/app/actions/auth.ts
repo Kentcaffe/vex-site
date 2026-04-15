@@ -1,82 +1,14 @@
 "use server";
 
-import { hash } from "bcryptjs";
 import { redirect } from "next/navigation";
-import { z } from "zod";
 import { signOut } from "@/auth";
 import { routing } from "@/i18n/routing";
 import { localizedHref } from "@/lib/paths";
-import { passwordMeetsAllRules } from "@/lib/auth-password-rules";
-import { prisma } from "@/lib/prisma";
 
-/** Folosește server action în loc de `signOut` din `next-auth/react` (evită erori CSRF / JSON pe producție). */
+/** Logout via server action to keep auth cookies consistent in production. */
 export async function logout(formData: FormData) {
   const raw = String(formData.get("locale") ?? routing.defaultLocale);
   const locale = (routing.locales as readonly string[]).includes(raw) ? raw : routing.defaultLocale;
   await signOut({ redirect: false });
   redirect(localizedHref(locale, "/"));
-}
-
-export type RegisterState =
-  | { ok: true }
-  | {
-      ok: false;
-      error: "validation" | "emailTaken" | "phoneInvalid" | "passwordWeak" | "termsRequired";
-    };
-
-function phoneDigitsOnly(raw: unknown): string {
-  return String(raw ?? "").replace(/\D/g, "");
-}
-
-export async function registerUser(
-  _prev: RegisterState | undefined,
-  formData: FormData,
-): Promise<RegisterState> {
-  if (formData.get("acceptTerms") !== "on") {
-    return { ok: false, error: "termsRequired" };
-  }
-
-  const phone = phoneDigitsOnly(formData.get("phone"));
-  if (phone.length < 8) {
-    return { ok: false, error: "phoneInvalid" };
-  }
-
-  const parsed = z
-    .object({
-      email: z.string().email(),
-      password: z.string().min(8),
-      name: z.string().max(80).optional(),
-    })
-    .safeParse({
-      email: formData.get("email"),
-      password: formData.get("password"),
-      name: formData.get("name") || undefined,
-    });
-
-  if (!parsed.success) {
-    return { ok: false, error: "validation" };
-  }
-
-  if (!passwordMeetsAllRules(parsed.data.password)) {
-    return { ok: false, error: "passwordWeak" };
-  }
-
-  const email = parsed.data.email.trim().toLowerCase();
-  const existing = await prisma.user.findUnique({
-    where: { email },
-  });
-  if (existing) {
-    return { ok: false, error: "emailTaken" };
-  }
-
-  await prisma.user.create({
-    data: {
-      email,
-      passwordHash: await hash(parsed.data.password, 12),
-      name: parsed.data.name?.trim() || null,
-      phone,
-    },
-  });
-
-  return { ok: true };
 }

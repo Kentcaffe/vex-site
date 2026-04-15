@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
 import { useTranslations } from "next-intl";
 import type { OauthAvailability } from "@/components/auth/types";
 
@@ -36,31 +36,48 @@ type Props = {
 
 export function SocialAuthButtons({ oauth, callbackUrl, variant }: Props) {
   const t = useTranslations("Auth");
+  const supabase = createSupabaseBrowserClient();
   const google = oauth?.google;
   const facebook = oauth?.facebook;
   if (!google && !facebook) return null;
 
+  async function signInOAuth(provider: "google" | "facebook") {
+    const origin = window.location.origin;
+    const redirectTo = `${origin}/api/auth/callback?next=${encodeURIComponent(callbackUrl)}`;
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo },
+    });
+    if (error) {
+      console.error(`[auth] ${provider} sign-in failed:`, error.message);
+    }
+  }
+
   if (variant === "compact") {
     return (
-      <div className="flex items-center justify-center gap-3">
+      <div className="flex flex-col gap-3">
         {google ? (
           <button
             type="button"
             title={t("continueGoogle")}
-            onClick={() => void signIn("google", { callbackUrl })}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-800 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 hover:shadow active:scale-[0.98] dark:border-zinc-600 dark:bg-zinc-950 dark:hover:bg-zinc-800"
+            onClick={() => void signInOAuth("google")}
+            className="flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white py-3 text-sm font-semibold text-zinc-800 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-800"
           >
             <GoogleGlyph className="h-5 w-5" />
+            Login cu Google
           </button>
         ) : null}
         {facebook ? (
           <button
             type="button"
             title={t("continueFacebook")}
-            onClick={() => void signIn("facebook", { callbackUrl })}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1877F2] text-lg font-bold text-white shadow-sm transition hover:bg-[#166fe5] active:scale-[0.98]"
+            onClick={() => void signInOAuth("facebook")}
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#1877F2] py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#166fe5]"
           >
-            f
+            <span className="text-lg font-bold" aria-hidden>
+              f
+            </span>
+            Login cu Facebook
           </button>
         ) : null}
       </div>
@@ -72,7 +89,7 @@ export function SocialAuthButtons({ oauth, callbackUrl, variant }: Props) {
       {google ? (
         <button
           type="button"
-          onClick={() => void signIn("google", { callbackUrl })}
+          onClick={() => void signInOAuth("google")}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white py-3 text-sm font-semibold text-zinc-800 shadow-sm transition hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:bg-zinc-800"
         >
           <GoogleGlyph className="h-5 w-5" />
@@ -82,7 +99,7 @@ export function SocialAuthButtons({ oauth, callbackUrl, variant }: Props) {
       {facebook ? (
         <button
           type="button"
-          onClick={() => void signIn("facebook", { callbackUrl })}
+          onClick={() => void signInOAuth("facebook")}
           className="flex w-full items-center justify-center gap-3 rounded-xl bg-[#1877F2] py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#166fe5]"
         >
           <span className="text-lg font-bold" aria-hidden>

@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { useSession } from "next-auth/react";
 import { io, type Socket } from "socket.io-client";
+import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 
 type ChatSocketContextValue = {
   socket: Socket | null;
@@ -27,7 +27,7 @@ function socketUrl(): string {
 }
 
 function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
-  const { data: session } = useSession();
+  const { data: session } = useAuthSession();
   const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -124,7 +124,7 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
 }
 
 export function ChatSocketProvider({ children }: { children: ReactNode }) {
-  const { status } = useSession();
+  const { status } = useAuthSession();
 
   if (status === "loading" || status === "unauthenticated") {
     return <ChatSocketContext.Provider value={disconnectedValue}>{children}</ChatSocketContext.Provider>;

@@ -1,8 +1,8 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 
 type Props = {
   listingId: string;
@@ -10,7 +10,7 @@ type Props = {
 };
 
 export function ContactSellerButton({ listingId, sellerUserId }: Props) {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useAuthSession();
   const t = useTranslations("Chat");
 
   if (status === "loading") {

@@ -3,15 +3,21 @@
  * Use these helpers in Server Components instead of inlining process.env in static pages.
  */
 export function isGoogleOAuthConfigured(): boolean {
-  const id = process.env.AUTH_GOOGLE_ID?.trim();
-  const secret = process.env.AUTH_GOOGLE_SECRET?.trim();
-  return Boolean(id && secret);
+  const hasSupabase = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim(),
+  );
+  const enabled = process.env.NEXT_PUBLIC_AUTH_GOOGLE_ENABLED !== "false";
+  return hasSupabase && enabled;
 }
 
 export function isFacebookOAuthConfigured(): boolean {
-  const id = process.env.AUTH_FACEBOOK_ID?.trim();
-  const secret = process.env.AUTH_FACEBOOK_SECRET?.trim();
-  return Boolean(id && secret);
+  const hasSupabase = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim(),
+  );
+  const enabled = process.env.NEXT_PUBLIC_AUTH_FACEBOOK_ENABLED !== "false";
+  return hasSupabase && enabled;
 }
 
 export function getOAuthAvailability(): { google: boolean; facebook: boolean } {
