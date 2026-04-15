@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import { cache } from "react";
 import type { CategoryTreeNode } from "@/lib/category-tree";
 import { prisma } from "@/lib/prisma";
+import { CATEGORY_ROOTS, type CatDef } from "../../prisma/category-tree";
 
 export type CategoryRow = {
   id: string;
@@ -15,11 +16,46 @@ type LabelJson = { ro?: string; ru?: string; en?: string };
 
 const CATEGORY_CACHE_SECONDS = 300;
 
+function flattenCategoryDefs(defs: CatDef[], parentId: string | null): CategoryRow[] {
+  const out: CategoryRow[] = [];
+  for (let i = 0; i < defs.length; i += 1) {
+    const def = defs[i];
+    const id = `${parentId ?? "root"}:${def.slug}`;
+    out.push({
+      id,
+      parentId,
+      slug: def.slug,
+      labels: JSON.stringify({
+        ro: def.ro,
+        ru: def.ru ?? def.ro,
+        en: def.en ?? def.ro,
+      }),
+      sortOrder: i + 1,
+    });
+    if (def.children?.length) {
+      out.push(...flattenCategoryDefs(def.children, id));
+    }
+  }
+  return out;
+}
+
+const fallbackCategories: CategoryRow[] = flattenCategoryDefs(CATEGORY_ROOTS, null);
+
 const loadAllCategoriesFromDb = unstable_cache(
   async (): Promise<CategoryRow[]> => {
-    return prisma.category.findMany({
-      orderBy: [{ sortOrder: "asc" }, { slug: "asc" }],
-    });
+    try {
+      const rows = await prisma.category.findMany({
+        orderBy: [{ sortOrder: "asc" }, { slug: "asc" }],
+      });
+      if (rows.length > 0) {
+        return rows;
+      }
+      console.warn("[categories] Database returned 0 rows, using static fallback tree.");
+      return fallbackCategories;
+    } catch (error) {
+      console.error("[categories] Failed to read categories from database, using static fallback tree.", error);
+      return fallbackCategories;
+    }
   },
   ["categories", "all"],
   { revalidate: CATEGORY_CACHE_SECONDS, tags: ["categories"] },
