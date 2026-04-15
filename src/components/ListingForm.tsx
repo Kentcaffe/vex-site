@@ -1,6 +1,14 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import {
+  useActionState,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslations } from "next-intl";
 import { createListing, type CreateListingState } from "@/app/actions/listings";
 import {
@@ -22,6 +30,16 @@ import {
   type ListingFormFieldId,
   type ListingFormValidationMessages,
 } from "@/lib/listing-form-client-validation";
+import {
+  applyListingDraftPartial,
+  clearListingDraftStorage,
+  collectListingFormDraft,
+  isListingDraftEffectivelyEmpty,
+  loadListingDraftFromStorage,
+  listingDraftStorageKey,
+  saveListingDraftToStorage,
+  type ListingFormDraftV1,
+} from "@/lib/listing-form-draft-storage";
 
 type Props = {
   locale: string;
@@ -42,6 +60,13 @@ function ListingCategoryPicker({ tree, value, onChange, name = "categoryId", err
     value ? (findAncestorStackForLeaf(tree, value) ?? []) : [],
   );
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (!value) {
+      return;
+    }
+    setStack(findAncestorStackForLeaf(tree, value) ?? []);
+  }, [value, tree]);
 
   const currentNodes = useMemo(() => {
     if (stack.length === 0) {
@@ -204,6 +229,12 @@ export function ListingForm({ locale, categoryTree }: Props) {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [clientErrors, setClientErrors] = useState<Partial<Record<ListingFormFieldId, string>>>({});
 
+  const formRef = useRef<HTMLFormElement>(null);
+  const draftRemainderRef = useRef<ListingFormDraftV1 | null>(null);
+  const skipDraftSaveRef = useRef(false);
+  const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const storageKey = useMemo(() => listingDraftStorageKey(locale), [locale]);
+
   const selectedSlug = useMemo(
     () => findLeafSlugById(categoryTree, categoryId) ?? "",
     [categoryId, categoryTree],
@@ -211,6 +242,65 @@ export function ListingForm({ locale, categoryTree }: Props) {
 
   const { isVeh, isRe, isBrandish } = getListingFormFlags(selectedSlug);
   const detailFields = useMemo(() => getDetailFieldsForSlug(selectedSlug), [selectedSlug]);
+
+  useEffect(() => {
+    const loaded = loadListingDraftFromStorage(storageKey);
+    if (!loaded) {
+      return;
+    }
+    draftRemainderRef.current = loaded;
+    skipDraftSaveRef.current = true;
+    setCategoryId(loaded.categoryId);
+    setImagesRaw(loaded.imagesRaw);
+  }, [storageKey]);
+
+  useLayoutEffect(() => {
+    const form = formRef.current;
+    const remainder = draftRemainderRef.current;
+    if (!form || !remainder) {
+      skipDraftSaveRef.current = false;
+      return;
+    }
+    const { next } = applyListingDraftPartial(form, remainder);
+    draftRemainderRef.current = next;
+    skipDraftSaveRef.current = false;
+  }, [selectedSlug, categoryId]);
+
+  const scheduleDraftPersist = useCallback(() => {
+    if (saveDraftTimerRef.current) {
+      clearTimeout(saveDraftTimerRef.current);
+    }
+    saveDraftTimerRef.current = setTimeout(() => {
+      saveDraftTimerRef.current = null;
+      if (skipDraftSaveRef.current) {
+        return;
+      }
+      const form = formRef.current;
+      if (!form) {
+        return;
+      }
+      const draft = collectListingFormDraft(form);
+      if (isListingDraftEffectivelyEmpty(draft)) {
+        clearListingDraftStorage(storageKey);
+        return;
+      }
+      saveListingDraftToStorage(storageKey, draft);
+    }, 450);
+  }, [storageKey]);
+
+  useEffect(() => {
+    return () => {
+      if (saveDraftTimerRef.current) {
+        clearTimeout(saveDraftTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (state?.ok === true) {
+      clearListingDraftStorage(storageKey);
+    }
+  }, [state?.ok, storageKey]);
 
   function detailLabel(field: DetailField): string {
     return t(`detail.${field.id}.label`);
@@ -276,6 +366,9 @@ export function ListingForm({ locale, categoryTree }: Props) {
     const urls = data.urls ?? [];
     const next = [...lines, ...urls].join("\n");
     setImagesRaw(next);
+    queueMicrotask(() => {
+      scheduleDraftPersist();
+    });
   }
 
   const serverMsg =
@@ -291,7 +384,11 @@ export function ListingForm({ locale, categoryTree }: Props) {
 
   return (
     <form
+      ref={formRef}
       action={handleSubmit}
+      onInput={() => {
+        scheduleDraftPersist();
+      }}
       className="mx-auto max-w-3xl space-y-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:p-8"
     >
       <input type="hidden" name="locale" value={locale} />
@@ -304,7 +401,10 @@ export function ListingForm({ locale, categoryTree }: Props) {
           <ListingCategoryPicker
             tree={categoryTree}
             value={categoryId}
-            onChange={setCategoryId}
+            onChange={(id) => {
+              setCategoryId(id);
+              scheduleDraftPersist();
+            }}
             error={clientErrors.categoryId}
           />
         </div>
