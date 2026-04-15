@@ -231,6 +231,8 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   const [imagesRaw, setImagesRaw] = useState("");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [clientErrors, setClientErrors] = useState<Partial<Record<ListingFormFieldId, string>>>({});
+  /** După publicare reușită, remontăm formularul ca toate câmpurile să fie goale pentru următorul anunț. */
+  const [formInstanceKey, setFormInstanceKey] = useState(0);
 
   const formRef = useRef<HTMLFormElement>(null);
   const draftRemainderRef = useRef<ListingFormDraftV1 | null>(null);
@@ -303,10 +305,21 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }, []);
 
   useEffect(() => {
-    if (state?.ok === true) {
-      clearListingDraftStorage(storageKey, legacyDraftSessionKey);
+    if (state?.ok !== true) {
+      return;
     }
-  }, [state?.ok, storageKey, legacyDraftSessionKey]);
+    clearListingDraftStorage(storageKey, legacyDraftSessionKey);
+    skipDraftSaveRef.current = true;
+    draftRemainderRef.current = null;
+    setCategoryId("");
+    setImagesRaw("");
+    setClientErrors({});
+    setUploadError(null);
+    setFormInstanceKey((k) => k + 1);
+    queueMicrotask(() => {
+      skipDraftSaveRef.current = false;
+    });
+  }, [state, storageKey, legacyDraftSessionKey]);
 
   function detailLabel(field: DetailField): string {
     return t(`detail.${field.id}.label`);
@@ -390,6 +403,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   return (
     <form
+      key={formInstanceKey}
       ref={formRef}
       action={handleSubmit}
       onInput={() => {
@@ -407,7 +421,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           <ListingCategoryPicker
             tree={categoryTree}
             value={categoryId}
-                        onChange={(id) => {
+            onChange={(id) => {
               setCategoryId(id);
               scheduleDraftPersist();
             }}

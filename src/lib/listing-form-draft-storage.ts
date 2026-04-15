@@ -1,5 +1,6 @@
 /**
- * Ciornă formular „publică anunț” — localStorage până la publicare reușită (închis tab, restart browser).
+ * Ciornă formular „publică anunț” — `localStorage` până la apăsarea „Publică” cu succes.
+ * Supraviețuiește navigări, refresh, închidere tab; se șterge la publicare reușită (și UI se resetează în `ListingForm`).
  * Cheie per utilizator + locale ca să nu se amestece conturile pe același dispozitiv.
  */
 
