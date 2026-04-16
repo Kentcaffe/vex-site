@@ -37,190 +37,175 @@ type Props = {
   listings: ListingCard[];
   rootCategories: CategoryRow[];
   favoritedIds: ReadonlySet<string>;
+  loadError?: boolean;
 };
 
-export async function HomeMarketplace({ locale, listings, rootCategories, favoritedIds }: Props) {
+export async function HomeMarketplace({
+  locale,
+  listings,
+  rootCategories,
+  favoritedIds,
+  loadError = false,
+}: Props) {
   const t = await getTranslations("Home.marketplace");
 
   return (
     <div className="app-shell app-section">
-      <div className="space-y-6">
-        <section className="surface-card overflow-hidden p-4 sm:p-6">
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] lg:items-start">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600 dark:text-emerald-400">
-                Marketplace VEX
-              </p>
-              <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-4xl">
-                {t("gridTitle")}
-              </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-base">
-                {t("categoriesHint")}
-              </p>
-              <div className="mt-5 flex flex-wrap gap-3">
-                <Link href="/anunturi" className="btn-primary">
-                  {t("viewAll")}
-                </Link>
-                <Link href="/publica" className="btn-secondary">
-                  {t("promo2Cta")}
-                </Link>
-              </div>
-            </div>
-            <div className="surface-muted p-4">
-              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{t("promo2Title")}</p>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("promo2Body")}</p>
-              <Link href="/publica" className="btn-primary mt-4 w-full">
-                {t("promo2Cta")}
-              </Link>
-            </div>
+      <div className="space-y-6 pb-24">
+        <section className="surface-card p-4">
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-xl font-bold tracking-tight text-zinc-900">{t("gridTitle")}</h1>
+            <Link href="/cont" className="rounded-full border border-zinc-200 p-2.5 text-zinc-700">
+              <span aria-hidden>👤</span>
+              <span className="sr-only">Cont</span>
+            </Link>
           </div>
+
+          <form action="/anunturi" method="get" className="sticky top-0 z-20 mt-4 bg-[#f8fafc] py-1">
+            <div className="relative">
+              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" aria-hidden>
+                ⌕
+              </span>
+              <input
+                type="search"
+                name="search"
+                placeholder="Caută anunțuri..."
+                className="field-input h-[52px] rounded-[20px] border-zinc-200 bg-zinc-100 pl-11 pr-4 text-base"
+                autoComplete="off"
+              />
+            </div>
+          </form>
         </section>
 
-        <section className="surface-card p-4 sm:p-5">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h2 className="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("categoriesTitle")}</h2>
-              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">{t("categoriesHint")}</p>
-            </div>
-            <Link
-              href="/categorii"
-              className="text-sm font-semibold text-[#0b57d0] active:opacity-80 lg:hover:underline dark:text-blue-400"
-            >
+        <section className="surface-card p-4">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <h2 className="text-base font-semibold text-zinc-900">{t("categoriesTitle")}</h2>
+            <Link href="/categorii" className="text-sm font-semibold text-[#0b57d0]">
               {t("viewAll")}
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
+          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
             {rootCategories.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/categorii?c=${encodeURIComponent(cat.slug)}`}
-                className="surface-muted flex min-h-[84px] flex-col items-center justify-center gap-2 p-3 text-center transition active:scale-[0.98] lg:hover:border-emerald-300 lg:hover:bg-emerald-50/70 lg:hover:shadow-md dark:lg:hover:border-emerald-700 dark:lg:hover:bg-emerald-950/20"
+                className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm"
               >
-                <span className="text-3xl leading-none" aria-hidden>
+                <span className="mr-1.5" aria-hidden>
                   {emojiForRootSlug(cat.slug)}
                 </span>
-                <span className="line-clamp-2 text-center text-sm font-semibold leading-snug text-zinc-800 dark:text-zinc-100">
-                  {labelFor(cat, locale)}
-                </span>
+                {labelFor(cat, locale)}
               </Link>
             ))}
           </div>
         </section>
 
-        {/* Promo tiles */}
-        <section className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-          <Link
-            href="/anunturi"
-            className="surface-card p-5 transition active:scale-[0.99] lg:hover:border-emerald-200 lg:hover:shadow-md dark:lg:hover:border-emerald-900"
-          >
-            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{t("promoTile1Title")}</p>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("promoTile1Body")}</p>
-            <span className="mt-4 inline-block text-sm font-semibold text-emerald-700 dark:text-emerald-400">{t("promoTile1Link")} →</span>
-          </Link>
-          <Link
-            href="/chat"
-            className="surface-card p-5 transition active:scale-[0.99] lg:hover:border-emerald-200 lg:hover:shadow-md dark:lg:hover:border-emerald-900"
-          >
-            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{t("promoTile2Title")}</p>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("promoTile2Body")}</p>
-            <span className="mt-4 inline-block text-sm font-semibold text-emerald-700 dark:text-emerald-400">{t("promoTile2Link")} →</span>
-          </Link>
-          <Link
-            href="/publica"
-            className="surface-card p-5 transition active:scale-[0.99] lg:hover:border-emerald-200 lg:hover:shadow-md dark:lg:hover:border-emerald-900"
-          >
-            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{t("promoTile3Title")}</p>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("promoTile3Body")}</p>
-            <span className="mt-4 inline-block text-sm font-semibold text-emerald-700 dark:text-emerald-400">{t("promoTile3Link")} →</span>
-          </Link>
-        </section>
+        <section className="surface-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-sm text-zinc-500">{listings.length} rezultate</p>
+            <Link href="/anunturi" className="text-sm font-semibold text-emerald-700">
+              {t("viewAll")}
+            </Link>
+          </div>
 
-        <section className="surface-card p-4 sm:p-5">
-          <div className="flex flex-col gap-6 xl:flex-row xl:items-start xl:gap-6">
-            <div className="min-w-0 flex-1">
-              <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("gridTitle")}</h1>
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                  <span className="font-medium text-zinc-700 dark:text-zinc-300">{t("sortLabel")}:</span> {t("sortNewest")}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-3">
-                <Link href="/anunturi" className="text-sm font-semibold text-emerald-700 hover:underline dark:text-emerald-400">
-                  {t("filterLink")}
-                </Link>
-                <Link href="/anunturi" className="btn-secondary min-h-[42px] px-4 py-2">
-                  {t("viewAll")}
-                </Link>
-              </div>
+          {loadError ? (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
+              <p className="text-sm font-medium text-red-700">Eroare la încărcarea anunțurilor.</p>
+              <p className="mt-1 text-sm text-red-600">Încearcă refresh sau revino în câteva momente.</p>
             </div>
-
-            {listings.length === 0 ? (
-              <p className="surface-muted p-10 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                {t("empty")}
-              </p>
-            ) : (
-              <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {listings.map((item, index) => {
-                  const cover = parseStoredListingImages(item.images)[0];
-                  const meta = [item.city + (item.district ? ` · ${item.district}` : "")];
-                  if (item.mileageKm != null) {
-                    meta.push(`${item.mileageKm.toLocaleString(locale)} km`);
-                  }
-                  return (
-                    <li key={item.id} className="group relative">
-                      <div className="flex h-full flex-col overflow-hidden rounded-[16px] border border-zinc-200/90 bg-white shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)] transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-[0_22px_50px_-30px_rgba(5,150,105,0.35)] dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-700">
-                        <div className="relative aspect-[4/3] bg-zinc-100 dark:bg-zinc-800">
-                          <Link href={`/anunturi/${item.id}`} className="absolute inset-0 z-0 block" aria-label={item.title}>
-                            {cover ? (
-                              <ListingCoverImg
-                                src={cover}
-                                alt=""
-                                priority={index < 2}
-                                className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]"
-                              />
-                            ) : (
-                              <div className="flex h-full items-center justify-center text-sm text-zinc-400">—</div>
-                            )}
-                          </Link>
-                          <div className="absolute right-2 top-2 z-10">
-                            <FavoriteButton
-                              listingId={item.id}
-                              initialFavorited={favoritedIds.has(item.id)}
-                              variant="icon"
+          ) : listings.length === 0 ? (
+            <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
+              <p className="text-sm text-zinc-600">{t("empty")}</p>
+              <Link href="/publica" className="btn-primary mt-4 w-full sm:w-auto">
+                Adaugă primul anunț
+              </Link>
+            </div>
+          ) : (
+            <ul className="grid grid-cols-2 gap-3">
+              {listings.map((item, index) => {
+                const cover = parseStoredListingImages(item.images)[0];
+                const place = item.city + (item.district ? ` · ${item.district}` : "");
+                return (
+                  <li key={item.id} className="group">
+                    <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
+                      <div className="relative aspect-square bg-zinc-100">
+                        <Link href={`/anunturi/${item.id}`} className="absolute inset-0 z-0 block" aria-label={item.title}>
+                          {cover ? (
+                            <ListingCoverImg
+                              src={cover}
+                              alt=""
+                              priority={index < 2}
+                              className="h-full w-full object-cover"
                             />
-                          </div>
-                        </div>
-                        <div className="flex flex-1 flex-col p-4">
-                          <Link href={`/anunturi/${item.id}`} className="block">
-                            <span className="line-clamp-2 text-base font-bold leading-snug text-zinc-900 group-hover:text-emerald-700 dark:text-zinc-50 dark:group-hover:text-emerald-400">
-                              {item.title}
-                            </span>
-                          </Link>
-                          <span className="mt-3 text-xl font-bold tabular-nums text-emerald-700 dark:text-emerald-400">
-                            {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
-                          </span>
-                          <span className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">{meta.join(" · ")}</span>
+                          ) : (
+                            <div className="flex h-full items-center justify-center text-sm text-zinc-400">Fără imagine</div>
+                          )}
+                        </Link>
+                        <div className="absolute right-2 top-2 z-10">
+                          <FavoriteButton
+                            listingId={item.id}
+                            initialFavorited={favoritedIds.has(item.id)}
+                            variant="icon"
+                          />
                         </div>
                       </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-            </div>
-
-            <aside className="w-full shrink-0 space-y-4 xl:w-72">
-              <div className="surface-muted p-5">
-                <p className="text-base font-bold text-zinc-900 dark:text-zinc-50">{t("promo2Title")}</p>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("promo2Body")}</p>
-                <Link href="/publica" className="btn-primary mt-4 w-full">
-                  {t("promo2Cta")}
-                </Link>
-              </div>
-            </aside>
-          </div>
+                      <div className="p-3">
+                        <Link href={`/anunturi/${item.id}`} className="block">
+                          <span className="line-clamp-2 text-sm font-semibold leading-snug text-zinc-900">
+                            {item.title}
+                          </span>
+                        </Link>
+                        <p className="mt-2 text-base font-bold text-emerald-700">
+                          {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
+                        </p>
+                        <p className="mt-1 line-clamp-1 text-xs text-zinc-500">{place}</p>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </section>
+
+        <Link
+          href="/publica"
+          className="fixed bottom-[5.2rem] left-1/2 z-40 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-emerald-600 text-3xl font-bold text-white shadow-[0_10px_24px_rgba(5,150,105,0.45)] md:hidden"
+          aria-label={t("promo2Cta")}
+        >
+          +
+        </Link>
+        <div className="hidden md:block">
+          <section className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+            <Link href="/anunturi" className="surface-card p-5">
+              <p className="text-sm font-bold text-zinc-900">{t("promoTile1Title")}</p>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("promoTile1Body")}</p>
+            </Link>
+            <Link href="/chat" className="surface-card p-5">
+              <p className="text-sm font-bold text-zinc-900">{t("promoTile2Title")}</p>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("promoTile2Body")}</p>
+            </Link>
+            <Link href="/publica" className="surface-card p-5">
+              <p className="text-sm font-bold text-zinc-900">{t("promoTile3Title")}</p>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("promoTile3Body")}</p>
+            </Link>
+          </section>
+        </div>
+        {false ? (
+          <section className="surface-card p-4">
+            <ul className="grid grid-cols-2 gap-3">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <li key={i} className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
+                  <div className="aspect-square animate-pulse bg-zinc-200" />
+                  <div className="space-y-2 p-3">
+                    <div className="h-4 w-full animate-pulse rounded bg-zinc-200" />
+                    <div className="h-4 w-2/3 animate-pulse rounded bg-zinc-200" />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </div>
       <ScrollToTopButton />
     </div>
