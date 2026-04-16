@@ -59,7 +59,7 @@ type Props = {
 const baseInputClass =
   "mt-1 min-h-[52px] w-full rounded-xl border bg-white px-3 py-3 text-base leading-normal md:min-h-[44px] md:rounded-lg md:py-2.5 md:text-sm";
 const okBorder = "border-zinc-300";
-const errBorder = "border-red-500 ring-2 ring-red-500/30";
+const errBorder = "input-error border-red-500 ring-2 ring-red-500/30";
 const LIVE_REQUIRED_FIELDS: ListingFormFieldId[] = [
   "title",
   "description",
@@ -103,8 +103,6 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   const [dismissServerCategoryError, setDismissServerCategoryError] = useState(false);
 
   const formRef = useRef<HTMLFormElement | null>(null);
-  const listingDetailsRef = useRef<HTMLDivElement | null>(null);
-  const prevCategoryIdRef = useRef<string>("");
   const publishRedirectDoneRef = useRef(false);
   const skipDraftSaveRef = useRef(false);
   const [draftHydrated, setDraftHydrated] = useState(false);
@@ -143,7 +141,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     }
     const fieldId = field ? (field === "categoryId" ? "field-categoryId" : `field-${field}`) : null;
     const preferred = fieldId ? root.querySelector<HTMLElement>(`#${fieldId}`) : null;
-    const firstInvalid = root.querySelector<HTMLElement>("[data-error='true']");
+    const firstInvalid = root.querySelector<HTMLElement>(".input-error, [data-error='true']");
     const container = preferred ?? firstInvalid;
     if (!container) {
       return;
@@ -270,19 +268,6 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }, [state]);
 
   useEffect(() => {
-    if (
-      categoryId &&
-      categoryId !== prevCategoryIdRef.current &&
-      isLeafCategoryNode(categoryTree, categoryId)
-    ) {
-      queueMicrotask(() => {
-        listingDetailsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    }
-    prevCategoryIdRef.current = categoryId;
-  }, [categoryId, categoryTree]);
-
-  useEffect(() => {
     if (!liveValidateEnabled) {
       return;
     }
@@ -360,8 +345,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     setPublishValues((p) => ({ ...p, extra: { ...p.extra, [name]: value } }));
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  function handleSubmit() {
     setLiveValidateEnabled(true);
     const cid = categoryId.trim();
     const selectedPath = cid ? getPathLabelsForLeaf(categoryTree, cid) : "";
@@ -463,13 +447,16 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     <form
       ref={formRef}
       noValidate
-      onSubmit={handleSubmit}
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}
       className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm md:space-y-8 md:p-8"
     >
       <section
         id="field-categoryId"
         data-error={categoryFieldError ? "true" : undefined}
-        className="space-y-3"
+        className={`space-y-3 ${categoryFieldError ? "input-error" : ""}`}
       >
         <div>
           <h2 className="text-base font-semibold text-zinc-900">{t("formSectionCategory")}</h2>
@@ -503,7 +490,6 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       </section>
 
       <section
-        ref={listingDetailsRef}
         id="publish-listing-details"
         className="scroll-mt-6 space-y-6 border-t border-zinc-200 pt-6 md:pt-8"
       >

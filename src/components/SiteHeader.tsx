@@ -30,7 +30,7 @@ export async function SiteHeader() {
   const publishHref = localizedHref(locale, "/publica");
 
   return (
-    <header className="static border-b border-zinc-200/80 bg-white md:sticky md:top-0 md:z-40 md:bg-white/90 md:backdrop-blur-md md:dark:border-zinc-800/80 md:dark:bg-zinc-950/90">
+    <header className="static border-b border-zinc-200/80 bg-white md:bg-white/90 md:backdrop-blur-md md:dark:border-zinc-800/80 md:dark:bg-zinc-950/90">
       <div className="hidden bg-emerald-600 px-4 py-1.5 text-center text-[11px] font-medium text-white/95 sm:text-xs md:block">
         {tm("banner")}
       </div>
