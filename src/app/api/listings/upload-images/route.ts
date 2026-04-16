@@ -53,7 +53,9 @@ export async function POST(request: Request) {
     const name = `${crypto.randomUUID()}.${ext}`;
     const fp = path.join(dir, name);
     await writeFile(fp, buf);
-    urls.push(`/uploads/listings/${name}`);
+    // In production (standalone/serverless-like setups), runtime files under /public
+    // may not always be served reliably as static assets. Serve through API route.
+    urls.push(`/api/listings/image/${name}`);
   }
 
   return NextResponse.json({ urls });

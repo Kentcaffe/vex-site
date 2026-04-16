@@ -85,6 +85,9 @@ export function isValidImageRef(s: string): boolean {
   if (t.startsWith("/uploads/")) {
     return /^\/uploads\/listings\/[^/]+$/i.test(t);
   }
+  if (t.startsWith("/api/listings/image/")) {
+    return /^\/api\/listings\/image\/[^/]+$/i.test(t);
+  }
   try {
     const u = new URL(t);
     return u.protocol === "https:" || u.protocol === "http:";
