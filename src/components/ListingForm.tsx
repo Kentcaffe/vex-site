@@ -57,10 +57,9 @@ type Props = {
 };
 
 const baseInputClass =
-  "mt-1 min-h-[48px] w-full rounded-xl border px-3 py-2.5 text-base leading-normal dark:bg-zinc-950 md:min-h-0 md:rounded-lg md:py-2 md:text-sm";
-const okBorder = "border-zinc-300 dark:border-zinc-600";
-const errBorder = "border-red-500 ring-2 ring-red-500/30 dark:border-red-500";
-const HEADER_SCROLL_OFFSET_PX = 80;
+  "mt-1 min-h-[52px] w-full rounded-xl border bg-white px-3 py-3 text-base leading-normal md:min-h-[44px] md:rounded-lg md:py-2.5 md:text-sm";
+const okBorder = "border-zinc-300";
+const errBorder = "border-red-500 ring-2 ring-red-500/30";
 const LIVE_REQUIRED_FIELDS: ListingFormFieldId[] = [
   "title",
   "description",
@@ -103,6 +102,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   /** După eroare server „category”, ascundem mesajul dacă user a schimbat categoria. */
   const [dismissServerCategoryError, setDismissServerCategoryError] = useState(false);
 
+  const formRef = useRef<HTMLFormElement | null>(null);
   const listingDetailsRef = useRef<HTMLDivElement | null>(null);
   const prevCategoryIdRef = useRef<string>("");
   const publishRedirectDoneRef = useRef(false);
@@ -136,20 +136,28 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     });
   }
 
-  function scrollAndFocusField(field: ListingFormFieldId) {
-    const fieldId = field === "categoryId" ? "field-categoryId" : `field-${field}`;
-    const container = document.getElementById(fieldId);
+  function scrollAndFocusField(field?: ListingFormFieldId) {
+    const root = formRef.current;
+    if (!root) {
+      return;
+    }
+    const fieldId = field ? (field === "categoryId" ? "field-categoryId" : `field-${field}`) : null;
+    const preferred = fieldId ? root.querySelector<HTMLElement>(`#${fieldId}`) : null;
+    const firstInvalid = root.querySelector<HTMLElement>("[data-error='true']");
+    const container = preferred ?? firstInvalid;
     if (!container) {
       return;
     }
-    const top = container.getBoundingClientRect().top + window.scrollY - HEADER_SCROLL_OFFSET_PX;
-    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    const focusTarget =
+      container.matches("input, textarea, select, button, [tabindex]:not([tabindex='-1'])")
+        ? container
+        : container.querySelector<HTMLElement>(
+            "input:not([type='hidden']), textarea, select, button, [tabindex]:not([tabindex='-1'])",
+          );
+    container.scrollIntoView({ behavior: "smooth", block: "center" });
     window.setTimeout(() => {
-      const target = container.querySelector<HTMLElement>(
-        "input:not([type='hidden']), textarea, select, button, [tabindex]:not([tabindex='-1'])",
-      );
-      target?.focus({ preventScroll: true });
-    }, 240);
+      focusTarget?.focus({ preventScroll: true });
+    }, 220);
   }
 
   useEffect(() => {
@@ -453,17 +461,22 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   return (
     <form
+      ref={formRef}
       noValidate
       onSubmit={handleSubmit}
-      className="surface-card mx-auto w-full max-w-3xl space-y-6 p-4 sm:space-y-8 sm:p-8"
+      className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm md:space-y-8 md:p-8"
     >
-      <section id="field-categoryId" className="space-y-3">
+      <section
+        id="field-categoryId"
+        data-error={categoryFieldError ? "true" : undefined}
+        className="space-y-3"
+      >
         <div>
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionCategory")}</h2>
+          <h2 className="text-base font-semibold text-zinc-900">{t("formSectionCategory")}</h2>
         </div>
         <div
-          className={`rounded-2xl border border-zinc-200/80 bg-zinc-50/50 p-4 dark:border-zinc-700 dark:bg-zinc-950/40 ${
-            categoryFieldError ? "ring-2 ring-red-500/35 dark:ring-red-500/40" : ""
+          className={`rounded-2xl border border-zinc-200 bg-zinc-50 p-4 ${
+            categoryFieldError ? "ring-2 ring-red-500/35" : ""
           }`}
         >
           <CategorySelector
@@ -492,9 +505,9 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       <section
         ref={listingDetailsRef}
         id="publish-listing-details"
-        className="scroll-mt-6 space-y-5 border-t border-zinc-200 pt-8 dark:border-zinc-800"
+        className="scroll-mt-6 space-y-6 border-t border-zinc-200 pt-6 md:pt-8"
       >
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionListing")}</h2>
+        <h2 className="text-base font-semibold text-zinc-900">{t("formSectionListing")}</h2>
         <div id="field-title">
           <label className="block text-sm font-medium" htmlFor="title">
             {t("title")}
@@ -502,6 +515,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           <input
             id="title"
             name="title"
+            data-error={clientErrors.title ? "true" : undefined}
             maxLength={160}
             value={publishValues.title}
             onChange={(e) => {
@@ -520,6 +534,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           <textarea
             id="description"
             name="description"
+            data-error={clientErrors.description ? "true" : undefined}
             rows={6}
             value={publishValues.description}
             onChange={(e) => {
@@ -533,8 +548,8 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           ) : null}
         </div>
 
-        <div className="space-y-4" id="field-price">
-          <div className="grid gap-4 sm:grid-cols-2 sm:items-end">
+        <div className="space-y-5" id="field-price">
+          <div className="grid gap-5 md:grid-cols-2 md:items-end">
             <div>
               <label className="block text-sm font-medium" htmlFor="price">
                 {t("priceAmount")}
@@ -542,6 +557,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
               <input
                 id="price"
                 name="price"
+                data-error={clientErrors.price ? "true" : undefined}
                 type="number"
                 inputMode="numeric"
                 min={1}
@@ -589,7 +605,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-5 md:grid-cols-2">
           <div id="field-city">
             <label className="block text-sm font-medium" htmlFor="city">
               {t("city")}
@@ -597,6 +613,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             <input
               id="city"
               name="city"
+              data-error={clientErrors.city ? "true" : undefined}
               maxLength={80}
               value={publishValues.city}
               onChange={(e) => {
@@ -643,6 +660,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           <select
             id="condition"
             name="condition"
+            data-error={clientErrors.condition ? "true" : undefined}
             value={publishValues.condition}
             onChange={(e) => {
               setPublishValues((p) => ({ ...p, condition: e.target.value }));
@@ -661,13 +679,13 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       </section>
 
       {isVeh || isRe || (isBrandish && !isVeh) || detailFields.length > 0 ? (
-        <section className="space-y-5 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+        <section className="space-y-6 border-t border-zinc-200 pt-6 md:pt-8">
           <div>
-            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionSpecs")}</h2>
+            <h2 className="text-base font-semibold text-zinc-900">{t("formSectionSpecs")}</h2>
           </div>
 
           {isVeh ? (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 md:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium" htmlFor="brand">
                   {t("brand")}
@@ -726,7 +744,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           ) : null}
 
           {isRe ? (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 md:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium" htmlFor="rooms">
                   {t("rooms")}
@@ -759,7 +777,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           ) : null}
 
           {isBrandish && !isVeh ? (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-5 md:grid-cols-2">
               <div>
                 <label className="block text-sm font-medium" htmlFor="brand2">
                   {t("brand")}
@@ -789,12 +807,12 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             </div>
           ) : null}
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2">
             {detailFields.map((field) => {
               const fname = getDetailFormName(field);
               const val = publishValues.extra[fname] ?? "";
               return (
-                <div key={field.id} className="sm:col-span-1">
+                <div key={field.id}>
                   <label className="block text-sm font-medium" htmlFor={fname}>
                     {detailLabel(field)}
                   </label>
@@ -844,8 +862,8 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
         </section>
       ) : null}
 
-      <section className="space-y-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("formSectionMedia")}</h2>
+      <section className="space-y-5 border-t border-zinc-200 pt-6 md:pt-8">
+        <h2 className="text-base font-semibold text-zinc-900">{t("formSectionMedia")}</h2>
         <div id="field-imagesRaw">
           <label className="block text-sm font-medium" htmlFor="imagesRaw">
             {t("images")}
@@ -854,17 +872,18 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           <textarea
             id="imagesRaw"
             name="imagesRaw"
+            data-error={clientErrors.imagesRaw ? "true" : undefined}
             value={imagesRaw}
             onChange={(e) => {
               setImagesRaw(e.target.value);
             }}
             rows={4}
             aria-invalid={Boolean(clientErrors.imagesRaw)}
-            className={`mt-2 w-full rounded-lg border px-3 py-2 font-mono text-xs dark:bg-zinc-950 ${ring("imagesRaw")}`}
+            className={`mt-2 w-full rounded-lg border bg-white px-3 py-2 font-mono text-xs ${ring("imagesRaw")}`}
             placeholder="https://..."
           />
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <label className="cursor-pointer rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium hover:bg-zinc-50 dark:border-zinc-600 dark:hover:bg-zinc-800">
+            <label className="cursor-pointer rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium hover:bg-zinc-50">
               {t("upload")}
               <input
                 type="file"
@@ -883,7 +902,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
         </div>
       </section>
 
-      {serverMsg ? <p className="text-sm font-medium text-red-600 dark:text-red-400">{serverMsg}</p> : null}
+      {serverMsg ? <p className="text-sm font-medium text-red-600">{serverMsg}</p> : null}
 
       <button
         type="submit"

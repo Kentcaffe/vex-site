@@ -20,18 +20,28 @@ html {
   body {
     font-feature-settings: "kern" 1, "liga" 1;
     text-rendering: optimizeLegibility;
-    background:
-      radial-gradient(circle at top, rgba(5, 150, 105, 0.05), transparent 28%),
-      var(--app-bg);
+    background: var(--app-bg);
     overflow-x: clip;
     -webkit-tap-highlight-color: transparent;
   }
 }
 
 .dark body {
-  background:
-    radial-gradient(circle at top, rgba(16, 185, 129, 0.08), transparent 28%),
-    rgb(9 9 11);
+  background: rgb(9 9 11);
+}
+
+@media (min-width: 768px) {
+  body {
+    background:
+      radial-gradient(circle at top, rgba(5, 150, 105, 0.05), transparent 28%),
+      var(--app-bg);
+  }
+
+  .dark body {
+    background:
+      radial-gradient(circle at top, rgba(16, 185, 129, 0.08), transparent 28%),
+      rgb(9 9 11);
+  }
 }
 
 @layer components {
