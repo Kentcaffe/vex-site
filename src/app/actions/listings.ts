@@ -110,12 +110,32 @@ export async function createListing(
     select: { id: true, slug: true },
   });
   if (!categoryRow) {
-    const fallbackSlug = (categorySlugRaw || parsed.data.categorySlug || "").trim();
-    if (fallbackSlug) {
+    const fallbackSlugs = new Set<string>();
+    const explicitSlug = (categorySlugRaw || parsed.data.categorySlug || "").trim();
+    if (explicitSlug) {
+      fallbackSlugs.add(explicitSlug);
+    }
+    // Accept synthetic fallback ids like "root:transport:transport-autoturisme".
+    if (submittedCategoryId.includes(":")) {
+      const syntheticTail = submittedCategoryId.split(":").filter(Boolean).at(-1)?.trim() ?? "";
+      if (syntheticTail) {
+        fallbackSlugs.add(syntheticTail);
+      }
+    }
+
+    for (const slug of fallbackSlugs) {
       categoryRow = await prisma.category.findUnique({
-        where: { slug: fallbackSlug },
+        where: { slug },
         select: { id: true, slug: true },
       });
+      if (categoryRow) {
+        console.warn("[createListing] category resolved via slug fallback", {
+          submittedCategoryId,
+          slug,
+          resolvedId: categoryRow.id,
+        });
+        break;
+      }
     }
   }
   if (!categoryRow) {
