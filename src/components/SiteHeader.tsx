@@ -36,7 +36,71 @@ export async function SiteHeader() {
       </div>
       <div className="app-shell py-2.5 sm:py-4">
         <div className="rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm md:surface-card-soft md:border-zinc-200/70 md:p-4 md:dark:border-zinc-700">
-          <div className="flex min-w-0 items-center justify-between gap-3">
+          <div className="md:hidden">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <Link
+                href="/"
+                className="block truncate text-xl font-black tracking-tight text-zinc-950"
+                title={tf("tagline")}
+              >
+                {tf("siteName")}
+              </Link>
+              <details className="relative shrink-0">
+                <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 shadow-sm [&::-webkit-details-marker]:hidden">
+                  <UserRound className="h-5 w-5" aria-hidden />
+                  <span className="sr-only">{t("account")}</span>
+                </summary>
+                <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-56 rounded-2xl border border-zinc-200 bg-white p-2 shadow-lg">
+                  <Link
+                    href={accountHref}
+                    className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+                  >
+                    {t("account")}
+                  </Link>
+                  <div className="px-3 py-2">
+                    <LanguageSwitcher />
+                  </div>
+                  {session?.user && isStaff(session.user.role) ? (
+                    <Link
+                      href="/admin"
+                      className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+                    >
+                      {t("admin")}
+                    </Link>
+                  ) : null}
+                  {session?.user ? (
+                    <div className="px-1 pt-1">
+                      <SignOutButton className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-left text-sm font-medium text-zinc-800 hover:bg-zinc-50" />
+                    </div>
+                  ) : null}
+                </div>
+              </details>
+            </div>
+
+            <form action={listingsHref} method="get" className="mt-4 md:hidden">
+              <div className="relative min-w-0">
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" aria-hidden>
+                  ⌕
+                </span>
+                <input
+                  type="search"
+                  name="search"
+                  placeholder={t("searchPlaceholder")}
+                  className={`${searchInputClass} border-zinc-200 bg-white text-zinc-900`}
+                  autoComplete="off"
+                />
+              </div>
+              <button type="submit" className="sr-only">
+                {t("searchSubmit")}
+              </button>
+            </form>
+
+            <Link href={publishHref} className="btn-primary mt-5 flex w-full justify-center">
+              {t("addListingShort")}
+            </Link>
+          </div>
+
+          <div className="mt-4 hidden min-w-0 flex-1 flex-col gap-4 md:flex">
             <div className="min-w-0 lg:max-w-[240px]">
               <Link
                 href="/"
@@ -45,41 +109,10 @@ export async function SiteHeader() {
               >
                 {tf("siteName")}
               </Link>
-              <p className="mt-1 hidden text-[11px] text-zinc-500 md:block md:dark:text-zinc-400">
+              <p className="mt-1 text-[11px] text-zinc-500 md:dark:text-zinc-400">
                 {tm("regionTag")} · {tm("activeListings", { count: listingCount })}
               </p>
-              <p className="mt-1 truncate text-[11px] text-zinc-500 md:hidden">
-                {tm("activeListings", { count: listingCount })}
-              </p>
             </div>
-            <Link href={accountHref} className="btn-secondary min-h-[38px] rounded-lg px-3 py-1.5 text-xs md:hidden">
-              {t("account")}
-            </Link>
-          </div>
-
-          <form action={listingsHref} method="get" className="mt-3 flex flex-col gap-2 md:hidden">
-            <div className="relative min-w-0 flex-1">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" aria-hidden>
-                ⌕
-              </span>
-              <input
-                type="search"
-                name="search"
-                placeholder={t("searchPlaceholder")}
-                className={`${searchInputClass} border-zinc-200 bg-white text-zinc-900`}
-                autoComplete="off"
-              />
-            </div>
-            <button type="submit" className="btn-secondary w-full">
-              {t("searchSubmit")}
-            </button>
-          </form>
-
-          <Link href={publishHref} className="btn-primary mt-3 flex w-full md:hidden">
-            {t("addListingShort")}
-          </Link>
-
-          <div className="mt-4 hidden min-w-0 flex-1 flex-col gap-4 md:flex">
             <form action={listingsHref} method="get" className="flex min-w-0 flex-1 items-stretch gap-3">
               <Link href="/categorii" className="btn-secondary hidden gap-2 px-4 xl:inline-flex">
                 <span className="text-base leading-none" aria-hidden>

@@ -23,6 +23,7 @@ import {
 } from "@/lib/category-tree";
 import { LISTING_MAX_IMAGES, parseImageLines } from "@/lib/listing-form-schema";
 import {
+  liveValidateField,
   validateListingFormClient,
   type ListingFormFieldId,
   type ListingFormValidationMessages,
@@ -59,6 +60,15 @@ const baseInputClass =
   "mt-1 min-h-[48px] w-full rounded-xl border px-3 py-2.5 text-base leading-normal dark:bg-zinc-950 md:min-h-0 md:rounded-lg md:py-2 md:text-sm";
 const okBorder = "border-zinc-300 dark:border-zinc-600";
 const errBorder = "border-red-500 ring-2 ring-red-500/30 dark:border-red-500";
+const HEADER_SCROLL_OFFSET_PX = 80;
+const LIVE_REQUIRED_FIELDS: ListingFormFieldId[] = [
+  "title",
+  "description",
+  "price",
+  "city",
+  "condition",
+  "imagesRaw",
+];
 
 export function ListingForm({ locale, userId, categoryTree }: Props) {
   const router = useRouter();
@@ -89,6 +99,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   const [publishValues, setPublishValues] = useState<PublishFormValues>(emptyPublishFormValues);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [clientErrors, setClientErrors] = useState<Partial<Record<ListingFormFieldId, string>>>({});
+  const [liveValidateEnabled, setLiveValidateEnabled] = useState(false);
   /** După eroare server „category”, ascundem mesajul dacă user a schimbat categoria. */
   const [dismissServerCategoryError, setDismissServerCategoryError] = useState(false);
 
@@ -112,6 +123,33 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   function ring(field: ListingFormFieldId): string {
     return clientErrors[field] ? errBorder : okBorder;
+  }
+
+  function clearFieldError(field: ListingFormFieldId) {
+    setClientErrors((prev) => {
+      if (!prev[field]) {
+        return prev;
+      }
+      const next = { ...prev };
+      delete next[field];
+      return next;
+    });
+  }
+
+  function scrollAndFocusField(field: ListingFormFieldId) {
+    const fieldId = field === "categoryId" ? "field-categoryId" : `field-${field}`;
+    const container = document.getElementById(fieldId);
+    if (!container) {
+      return;
+    }
+    const top = container.getBoundingClientRect().top + window.scrollY - HEADER_SCROLL_OFFSET_PX;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    window.setTimeout(() => {
+      const target = container.querySelector<HTMLElement>(
+        "input:not([type='hidden']), textarea, select, button, [tabindex]:not([tabindex='-1'])",
+      );
+      target?.focus({ preventScroll: true });
+    }, 240);
   }
 
   useEffect(() => {
@@ -236,6 +274,54 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     prevCategoryIdRef.current = categoryId;
   }, [categoryId, categoryTree]);
 
+  useEffect(() => {
+    if (!liveValidateEnabled) {
+      return;
+    }
+    const cid = categoryId.trim();
+    const nextErrors: Partial<Record<ListingFormFieldId, string>> = {};
+    if (!cid) {
+      nextErrors.categoryId = msg.errCategory;
+    } else if (!isLeafCategoryNode(categoryTree, cid)) {
+      nextErrors.categoryId = tVal("errCategoryLeaf");
+    }
+    const liveValues = {
+      categoryId: cid,
+      title: publishValues.title,
+      description: publishValues.description,
+      price: publishValues.price,
+      city: publishValues.city,
+      condition: publishValues.condition,
+      imagesRaw,
+    };
+    for (const field of LIVE_REQUIRED_FIELDS) {
+      const e = liveValidateField(field, liveValues, msg);
+      if (e) {
+        nextErrors[field] = e;
+      }
+    }
+    setClientErrors((prev) => {
+      const merged = { ...prev };
+      delete merged.categoryId;
+      for (const field of LIVE_REQUIRED_FIELDS) {
+        delete merged[field];
+      }
+      return { ...merged, ...nextErrors };
+    });
+  }, [
+    liveValidateEnabled,
+    categoryId,
+    categoryTree,
+    imagesRaw,
+    msg,
+    publishValues.city,
+    publishValues.condition,
+    publishValues.description,
+    publishValues.price,
+    publishValues.title,
+    tVal,
+  ]);
+
   function detailLabel(field: DetailField): string {
     return t(`detail.${field.id}.label`);
   }
@@ -268,6 +354,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setLiveValidateEnabled(true);
     const cid = categoryId.trim();
     const selectedPath = cid ? getPathLabelsForLeaf(categoryTree, cid) : "";
     console.log("[publish] categoryId payload", {
@@ -279,14 +366,14 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     if (!cid) {
       setClientErrors({ categoryId: msg.errCategory });
       queueMicrotask(() => {
-        document.getElementById("field-categoryId")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        scrollAndFocusField("categoryId");
       });
       return;
     }
     if (!isLeafCategoryNode(categoryTree, cid)) {
       setClientErrors({ categoryId: tVal("errCategoryLeaf") });
       queueMicrotask(() => {
-        document.getElementById("field-categoryId")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        scrollAndFocusField("categoryId");
       });
       return;
     }
@@ -309,10 +396,8 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     const v = validateListingFormClient(fd, msg);
     if (!v.ok) {
       setClientErrors(v.errors);
-      const fieldId =
-        v.firstField === "categoryId" ? "field-categoryId" : `field-${v.firstField}`;
       queueMicrotask(() => {
-        document.getElementById(fieldId)?.scrollIntoView({ behavior: "smooth", block: "center" });
+        scrollAndFocusField(v.firstField);
       });
       return;
     }
@@ -359,7 +444,10 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   const categoryFieldError =
     clientErrors.categoryId ??
-    (!dismissServerCategoryError && state?.ok === false && state.error === "category"
+    (!dismissServerCategoryError &&
+    state?.ok === false &&
+    state.error === "category" &&
+    (!categoryId.trim() || !isLeafCategoryNode(categoryTree, categoryId))
       ? t("serverCategory")
       : null);
 
@@ -388,14 +476,13 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
               console.log("Subcategory ID:", nextId);
               setCategoryId(nextId);
               setDismissServerCategoryError(true);
-              setClientErrors((prev) => {
-                if (!prev.categoryId) {
-                  return prev;
-                }
-                const rest = { ...prev };
-                delete rest.categoryId;
-                return rest;
-              });
+              const nextCategoryError =
+                !nextId ? msg.errCategory : isLeafCategoryNode(categoryTree, nextId) ? undefined : tVal("errCategoryLeaf");
+              if (nextCategoryError) {
+                setClientErrors((prev) => ({ ...prev, categoryId: nextCategoryError }));
+              } else {
+                clearFieldError("categoryId");
+              }
             }}
             error={categoryFieldError}
           />
@@ -417,7 +504,9 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             name="title"
             maxLength={160}
             value={publishValues.title}
-            onChange={(e) => setPublishValues((p) => ({ ...p, title: e.target.value }))}
+            onChange={(e) => {
+              setPublishValues((p) => ({ ...p, title: e.target.value }));
+            }}
             aria-invalid={Boolean(clientErrors.title)}
             className={`${baseInputClass} ${ring("title")}`}
           />
@@ -433,7 +522,9 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             name="description"
             rows={6}
             value={publishValues.description}
-            onChange={(e) => setPublishValues((p) => ({ ...p, description: e.target.value }))}
+            onChange={(e) => {
+              setPublishValues((p) => ({ ...p, description: e.target.value }));
+            }}
             aria-invalid={Boolean(clientErrors.description)}
             className={`${baseInputClass} ${ring("description")}`}
           />
@@ -455,7 +546,9 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                 inputMode="numeric"
                 min={1}
                 value={publishValues.price}
-                onChange={(e) => setPublishValues((p) => ({ ...p, price: e.target.value }))}
+                onChange={(e) => {
+                  setPublishValues((p) => ({ ...p, price: e.target.value }));
+                }}
                 aria-invalid={Boolean(clientErrors.price)}
                 className={`${baseInputClass} ${ring("price")}`}
               />
@@ -506,7 +599,9 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
               name="city"
               maxLength={80}
               value={publishValues.city}
-              onChange={(e) => setPublishValues((p) => ({ ...p, city: e.target.value }))}
+              onChange={(e) => {
+                setPublishValues((p) => ({ ...p, city: e.target.value }));
+              }}
               aria-invalid={Boolean(clientErrors.city)}
               className={`${baseInputClass} ${ring("city")}`}
             />
@@ -549,7 +644,9 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             id="condition"
             name="condition"
             value={publishValues.condition}
-            onChange={(e) => setPublishValues((p) => ({ ...p, condition: e.target.value }))}
+            onChange={(e) => {
+              setPublishValues((p) => ({ ...p, condition: e.target.value }));
+            }}
             aria-invalid={Boolean(clientErrors.condition)}
             className={`${baseInputClass} ${ring("condition")}`}
           >
@@ -758,7 +855,9 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             id="imagesRaw"
             name="imagesRaw"
             value={imagesRaw}
-            onChange={(e) => setImagesRaw(e.target.value)}
+            onChange={(e) => {
+              setImagesRaw(e.target.value);
+            }}
             rows={4}
             aria-invalid={Boolean(clientErrors.imagesRaw)}
             className={`mt-2 w-full rounded-lg border px-3 py-2 font-mono text-xs dark:bg-zinc-950 ${ring("imagesRaw")}`}
