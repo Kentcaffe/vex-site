@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { localizedHref } from "@/lib/paths";
+import { CATEGORY_ROOTS, type CatDef } from "../../../prisma/category-tree/index";
 import {
   parseDetailsJsonFromForm,
   sanitizeColumnPayload,
@@ -23,6 +24,49 @@ export type CreateListingState =
       error: "unauthorized" | "validation" | "category" | "session" | "server";
       details?: string;
     };
+
+function categoryLabels(def: CatDef): string {
+  return JSON.stringify({
+    ro: def.ro,
+    ru: def.ru ?? def.ro,
+    en: def.en ?? def.ro,
+  });
+}
+
+async function upsertCategoryTree(defs: CatDef[], parentId: string | null): Promise<void> {
+  let sortOrder = 0;
+  for (const def of defs) {
+    sortOrder += 1;
+    const row = await prisma.category.upsert({
+      where: { slug: def.slug },
+      update: {
+        parentId,
+        sortOrder,
+        labels: categoryLabels(def),
+      },
+      create: {
+        slug: def.slug,
+        parentId,
+        sortOrder,
+        labels: categoryLabels(def),
+      },
+      select: { id: true },
+    });
+    if (def.children?.length) {
+      await upsertCategoryTree(def.children, row.id);
+    }
+  }
+}
+
+async function ensureCategoryTreeInDbIfMissing(): Promise<boolean> {
+  const count = await prisma.category.count();
+  if (count > 0) {
+    return false;
+  }
+  console.warn("[createListing] category table is empty; seeding default category tree");
+  await upsertCategoryTree(CATEGORY_ROOTS, null);
+  return true;
+}
 
 export async function createListing(
   _prev: CreateListingState | undefined,
@@ -123,18 +167,29 @@ export async function createListing(
       }
     }
 
-    for (const slug of fallbackSlugs) {
-      categoryRow = await prisma.category.findUnique({
-        where: { slug },
-        select: { id: true, slug: true },
-      });
-      if (categoryRow) {
-        console.warn("[createListing] category resolved via slug fallback", {
-          submittedCategoryId,
-          slug,
-          resolvedId: categoryRow.id,
+    const resolveByFallbackSlugs = async (): Promise<boolean> => {
+      for (const slug of fallbackSlugs) {
+        categoryRow = await prisma.category.findUnique({
+          where: { slug },
+          select: { id: true, slug: true },
         });
-        break;
+        if (categoryRow) {
+          console.warn("[createListing] category resolved via slug fallback", {
+            submittedCategoryId,
+            slug,
+            resolvedId: categoryRow.id,
+          });
+          return true;
+        }
+      }
+      return false;
+    };
+
+    const resolvedBySlug = await resolveByFallbackSlugs();
+    if (!resolvedBySlug) {
+      const seeded = await ensureCategoryTreeInDbIfMissing();
+      if (seeded) {
+        await resolveByFallbackSlugs();
       }
     }
   }
