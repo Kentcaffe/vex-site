@@ -10,8 +10,7 @@ import { ChatInboxLink } from "@/components/chat/ChatInboxLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
 
-const searchInputClass =
-  "h-12 w-full rounded-xl border border-zinc-200 bg-[#f3f4f6] py-2 pl-10 pr-3 text-base text-zinc-900 shadow-inner outline-none ring-[#0b57d0]/20 placeholder:text-zinc-400 focus:border-[#0b57d0] focus:bg-white focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder:text-zinc-500 dark:focus:bg-zinc-950 md:h-11 md:text-sm";
+const searchInputClass = "field-input h-12 pl-11 md:h-12";
 
 export async function SiteHeader() {
   const session = await auth();
@@ -29,25 +28,25 @@ export async function SiteHeader() {
   const listingsHref = localizedHref(locale, "/anunturi");
 
   return (
-    <header className="border-b border-zinc-200/90 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="bg-zinc-900 px-4 py-1.5 text-center text-[11px] text-zinc-200 sm:text-xs">
+    <header className="sticky top-0 z-40 border-b border-zinc-200/80 bg-white/90 backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-950/90">
+      <div className="bg-emerald-600 px-4 py-1.5 text-center text-[11px] font-medium text-white/95 sm:text-xs">
         {tm("banner")}
       </div>
-      <div className="mx-auto w-full max-w-[1200px] px-4 py-3 sm:px-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:gap-5">
-          <div className="flex min-w-0 items-start justify-between gap-3 lg:block lg:max-w-[220px]">
+      <div className="app-shell py-3 sm:py-4">
+        <div className="surface-card-soft flex flex-col gap-4 p-3 sm:p-4 lg:flex-row lg:items-center lg:gap-5">
+          <div className="flex min-w-0 items-start justify-between gap-3 lg:block lg:max-w-[240px]">
             <div className="min-w-0">
               <Link
                 href="/"
-                className="block text-xl font-black tracking-tight text-[#0b57d0] sm:text-2xl dark:text-blue-400"
+                className="block text-xl font-black tracking-tight text-zinc-950 sm:text-[1.7rem] dark:text-zinc-50"
                 title={tf("tagline")}
               >
                 {tf("siteName")}
               </Link>
-              <p className="mt-0.5 hidden text-[11px] text-zinc-500 sm:block dark:text-zinc-400">
+              <p className="mt-1 hidden text-[11px] text-zinc-500 sm:block dark:text-zinc-400">
                 {tm("regionTag")} · {tm("activeListings", { count: listingCount })}
               </p>
-              <p className="mt-0.5 truncate text-[10px] text-zinc-500 sm:hidden dark:text-zinc-400">
+              <p className="mt-1 truncate text-[11px] text-zinc-500 sm:hidden dark:text-zinc-400">
                 {tm("activeListings", { count: listingCount })}
               </p>
             </div>
@@ -61,10 +60,7 @@ export async function SiteHeader() {
             method="get"
             className="flex min-w-0 flex-1 flex-col gap-2 lg:flex-row lg:items-stretch lg:gap-3"
           >
-            <Link
-              href="/categorii"
-              className="hidden h-12 shrink-0 items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-4 text-sm font-medium text-zinc-800 transition active:bg-zinc-100 lg:inline-flex lg:hover:border-zinc-300 lg:hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:active:bg-zinc-800 lg:dark:hover:border-zinc-600 lg:dark:hover:bg-zinc-800"
-            >
+            <Link href="/categorii" className="btn-secondary hidden gap-2 px-4 lg:inline-flex">
               <span className="text-base leading-none" aria-hidden>
                 ▦
               </span>
@@ -86,20 +82,14 @@ export async function SiteHeader() {
                   autoComplete="off"
                 />
               </div>
-              <button
-                type="submit"
-                className="h-12 w-full shrink-0 touch-manipulation rounded-xl bg-[#0b57d0] px-6 text-base font-semibold text-white shadow-sm transition active:bg-[#0842a0] sm:w-auto sm:min-w-[7.5rem] md:h-11 md:text-sm lg:hover:bg-[#0842a0] lg:dark:hover:bg-blue-600"
-              >
+              <button type="submit" className="btn-primary w-full sm:w-auto sm:min-w-[7.5rem]">
                 {t("searchSubmit")}
               </button>
             </div>
           </form>
 
           <div className="hidden flex-wrap items-center justify-end gap-2 lg:flex lg:shrink-0">
-            <Link
-              href="/publica"
-              className="inline-flex h-11 touch-manipulation items-center justify-center rounded-xl bg-amber-400 px-4 text-sm font-bold text-zinc-900 shadow-sm transition active:brightness-95 lg:hover:bg-amber-300 dark:bg-amber-500 dark:text-zinc-950 lg:dark:hover:bg-amber-400"
-            >
+            <Link href="/publica" className="btn-primary min-h-[44px] rounded-xl px-4">
               {t("addListingShort")}
             </Link>
             <LanguageSwitcher />
@@ -131,19 +121,13 @@ export async function SiteHeader() {
                     <span className="text-xs text-zinc-500">—</span>
                   )}
                 </div>
-                <Link
-                  href="/cont"
-                  className="inline-flex h-9 items-center rounded-lg border border-zinc-300 px-2.5 text-xs font-medium text-zinc-800 active:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-200 dark:active:bg-zinc-800 lg:hover:bg-zinc-50 lg:dark:hover:bg-zinc-800"
-                >
+                <Link href="/cont" className="btn-secondary min-h-[36px] rounded-lg px-3 py-2 text-xs">
                   {t("account")}
                 </Link>
                 <SignOutButton />
               </>
             ) : (
-              <Link
-                href="/cont"
-                className="inline-flex h-11 items-center gap-2 rounded-xl border border-zinc-300 bg-white px-4 text-sm font-semibold text-zinc-800 shadow-sm transition active:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-100 dark:active:bg-zinc-800 lg:hover:border-zinc-400 lg:hover:bg-zinc-50 lg:dark:hover:bg-zinc-800"
-              >
+              <Link href="/cont" className="btn-secondary gap-2 px-4">
                 <UserRound className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
                 {t("account")}
               </Link>
@@ -151,22 +135,22 @@ export async function SiteHeader() {
           </div>
         </div>
 
-        <nav className="mt-3 hidden flex-wrap items-center gap-x-3 gap-y-1 border-t border-zinc-100 pt-3 text-sm dark:border-zinc-800/80 lg:flex">
+        <nav className="mt-3 hidden flex-wrap items-center gap-x-4 gap-y-2 px-1 text-sm dark:border-zinc-800/80 lg:flex">
           <Link
             href="/"
-            className="text-zinc-600 lg:hover:text-[#0b57d0] dark:text-zinc-400 lg:dark:hover:text-blue-400"
+            className="text-zinc-600 lg:hover:text-emerald-700 dark:text-zinc-400 lg:dark:hover:text-emerald-400"
           >
             {t("home")}
           </Link>
           <Link
             href="/categorii"
-            className="font-medium text-[#0b57d0] lg:hover:underline dark:text-blue-400"
+            className="font-medium text-emerald-700 lg:hover:underline dark:text-emerald-400"
           >
             {t("categories")}
           </Link>
           <Link
             href="/anunturi"
-            className="font-medium text-[#0b57d0] lg:hover:underline dark:text-blue-400"
+            className="font-medium text-emerald-700 lg:hover:underline dark:text-emerald-400"
           >
             {t("listings")}
           </Link>

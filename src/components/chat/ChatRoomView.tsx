@@ -155,12 +155,12 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   const remaining = bootstrap.maxBodyLength - draft.length;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-lg shadow-zinc-200/40 ring-1 ring-zinc-900/5 dark:border-zinc-700/80 dark:bg-zinc-900 dark:shadow-black/40 dark:ring-white/5">
+    <div className="surface-card overflow-hidden ring-1 ring-zinc-900/5 dark:ring-white/5">
       {/* Header */}
-      <div className="flex items-start gap-3 border-b border-zinc-100 bg-gradient-to-b from-zinc-50 to-white px-4 py-3 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-900">
+      <div className="flex items-start gap-3 border-b border-zinc-100 bg-gradient-to-b from-zinc-50 to-white px-4 py-4 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-900">
         <Link
           href="/chat"
-          className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
           aria-label={t("backToInbox")}
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -188,7 +188,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
           </p>
           <Link
             href={`/anunturi/${bootstrap.listing.id}`}
-            className="mt-0.5 line-clamp-2 text-xs font-medium text-[#0b57d0] hover:underline dark:text-blue-400"
+            className="mt-0.5 line-clamp-2 text-xs font-medium text-emerald-700 hover:underline dark:text-emerald-400"
           >
             {bootstrap.listing.title}
           </Link>

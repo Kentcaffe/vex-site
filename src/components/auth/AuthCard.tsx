@@ -19,14 +19,14 @@ export function AuthCard({ oauth }: Props) {
 
   return (
     <div className="w-full max-w-[420px]">
-      <div className="rounded-2xl border border-zinc-200/90 bg-white p-8 shadow-[0_12px_40px_-12px_rgba(15,23,42,0.18)] dark:border-zinc-700/80 dark:bg-zinc-900 dark:shadow-black/30 sm:p-9">
+      <div className="surface-card p-8 sm:p-9">
         <header className="text-center">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">{t("cardTitle")}</h1>
           <p className="mt-1.5 text-[14px] leading-relaxed text-zinc-500 dark:text-zinc-400">{t("cardSubtitle")}</p>
         </header>
 
         <div
-          className="mt-8 flex rounded-xl bg-zinc-100/90 p-1 dark:bg-zinc-800/80"
+          className="surface-muted mt-8 flex p-1"
           role="tablist"
           aria-label={t("cardTitle")}
         >

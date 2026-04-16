@@ -353,7 +353,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     <form
       noValidate
       onSubmit={handleSubmit}
-      className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200/90 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 sm:space-y-8 sm:p-8"
+      className="surface-card mx-auto w-full max-w-3xl space-y-6 p-4 sm:space-y-8 sm:p-8"
     >
       <section id="field-categoryId" className="space-y-3">
         <div>

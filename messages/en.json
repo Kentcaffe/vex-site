@@ -265,6 +265,10 @@
     "allCategories": "All categories",
     "browseAllCategories": "Browse full category tree",
     "openCategoryMap": "Category map",
+    "subtitle": "Find the right listings quickly and filter by what matters most.",
+    "resultsCount": "{count} results",
+    "resultsHint": "Listings sorted by newest first.",
+    "publishCta": "Post ad",
     "filters": {
       "title": "Filters",
       "search": "Search listings",
@@ -280,7 +284,9 @@
       "minWithCurrency": "Min price ({currency})",
       "maxWithCurrency": "Max price ({currency})",
       "apply": "Apply",
-      "reset": "Reset"
+      "reset": "Reset",
+      "openMobile": "Filters",
+      "closeMobile": "Close"
     }
   },
   "CategoriesPage": {

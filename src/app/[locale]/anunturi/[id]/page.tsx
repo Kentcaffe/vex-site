@@ -69,26 +69,26 @@ export default async function ListingDetailPage({ params }: Props) {
   const canReport = !!userId && !isOwner;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
+    <div className="app-shell app-section">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-6">
           <ListingGallery images={images} title={listing.title} />
-          <div>
-            <p className="text-xs text-zinc-500">{path}</p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{listing.title}</h1>
-            <p className="mt-3 text-3xl font-bold text-emerald-600 dark:text-emerald-400">
+          <div className="surface-card p-5 sm:p-6">
+            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">{path}</p>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{listing.title}</h1>
+            <p className="mt-4 text-4xl font-bold text-emerald-600 dark:text-emerald-400">
               {formatPrice(listing.price, locale, listing.priceCurrency as PriceCurrencyCode)}
             </p>
             {listing.negotiable ? <p className="mt-1 text-sm text-zinc-500">{t("negotiable")}</p> : null}
           </div>
-          <div>
-            <p className="whitespace-pre-wrap text-zinc-700 dark:text-zinc-300">{listing.description}</p>
+          <div className="surface-card p-5 sm:p-6">
+            <p className="whitespace-pre-wrap text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{listing.description}</p>
           </div>
           <ListingSpecs categorySlug={listing.category.slug} listing={listing} />
         </div>
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{t("factsTitle")}</h2>
+          <div className="surface-card sticky top-24 p-5">
+            <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("factsTitle")}</h2>
             <dl className="mt-3 space-y-2 text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-zinc-500">{t("city")}</dt>
@@ -112,7 +112,7 @@ export default async function ListingDetailPage({ params }: Props) {
                 </div>
               ) : null}
             </dl>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+            <div className="mt-5 flex flex-wrap items-center gap-2">
               <ContactSellerButton listingId={listing.id} sellerUserId={listing.userId} />
               <CopyLinkButton />
             </div>
@@ -128,10 +128,7 @@ export default async function ListingDetailPage({ params }: Props) {
                 <>
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">{t("favoritesLogin")}</p>
                   <div className="mt-2">
-                    <Link
-                      href="/cont"
-                      className="inline-flex rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-                    >
+                    <Link href="/cont" className="btn-secondary min-h-[42px] rounded-lg px-3 py-2 text-sm">
                       {t("favoritesCtaLogin")}
                     </Link>
                   </div>
@@ -148,7 +145,7 @@ export default async function ListingDetailPage({ params }: Props) {
             ) : null}
           </div>
           {canModerate ? (
-            <div className="rounded-2xl border border-zinc-200 bg-amber-50 p-4 dark:border-zinc-800 dark:bg-amber-950/30">
+            <div className="surface-muted p-4">
               <p className="text-xs font-medium text-amber-900 dark:text-amber-200">{t("moderation")}</p>
               <div className="mt-2">
                 <DeleteListingButton listingId={listing.id} />

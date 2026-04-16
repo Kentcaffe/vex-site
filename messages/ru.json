@@ -265,6 +265,10 @@
     "allCategories": "Все категории",
     "browseAllCategories": "Полное дерево категорий",
     "openCategoryMap": "Карта категорий",
+    "subtitle": "Быстро находите нужные объявления и фильтруйте по важным параметрам.",
+    "resultsCount": "{count} результатов",
+    "resultsHint": "Сначала показываются самые новые объявления.",
+    "publishCta": "Подать объявление",
     "filters": {
       "title": "Фильтры",
       "search": "Поиск по объявлениям",
@@ -280,7 +284,9 @@
       "minWithCurrency": "Цена от ({currency})",
       "maxWithCurrency": "Цена до ({currency})",
       "apply": "Применить",
-      "reset": "Сбросить"
+      "reset": "Сбросить",
+      "openMobile": "Фильтры",
+      "closeMobile": "Закрыть"
     }
   },
   "CategoriesPage": {

@@ -54,7 +54,8 @@ export function ChatInboxList({
 
   return (
     <div className="mt-6 space-y-3">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="surface-card p-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <label className="relative block sm:max-w-[360px] sm:flex-1">
           <span className="sr-only">{t("inboxSearchPlaceholder")}</span>
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">⌕</span>
@@ -63,7 +64,7 @@ export function ChatInboxList({
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("inboxSearchPlaceholder")}
-            className="h-10 w-full rounded-xl border border-zinc-200 bg-white py-2 pl-9 pr-3 text-sm outline-none ring-[#0b57d0]/20 focus:border-[#0b57d0] focus:ring-2 dark:border-zinc-700 dark:bg-zinc-900"
+            className="field-input h-11 pl-9"
           />
         </label>
         {unreadTotal > 0 ? (
@@ -71,6 +72,7 @@ export function ChatInboxList({
             {t("unreadBadge", { count: unreadTotal })}
           </span>
         ) : null}
+      </div>
       </div>
 
       {filtered.length === 0 ? (
@@ -91,10 +93,10 @@ export function ChatInboxList({
               <li key={row.roomId}>
                 <Link
                   href={`/chat/room/${row.roomId}`}
-                  className={`group flex gap-3 rounded-2xl border p-4 transition ${
+                  className={`group flex gap-3 rounded-[16px] border p-4 transition ${
                     unread
                       ? "border-emerald-200/80 bg-emerald-50/40 shadow-sm dark:border-emerald-900/40 dark:bg-emerald-950/20"
-                      : "border-zinc-200/90 bg-white hover:border-[#0b57d0]/25 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-blue-500/30"
+                      : "border-zinc-200/90 bg-white shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)] hover:border-emerald-300 hover:shadow-[0_22px_50px_-30px_rgba(5,150,105,0.35)] dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-700"
                   }`}
                 >
                   {row.otherUserAvatarUrl ? (

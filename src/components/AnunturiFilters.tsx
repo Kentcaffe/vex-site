@@ -25,13 +25,15 @@ export function AnunturiFilters({
   const cur = defaultCurrency === "EUR" || defaultCurrency === "MDL" ? defaultCurrency : null;
 
   return (
-    <form
-      method="get"
-      className="rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-    >
+    <form method="get" className="surface-card space-y-4 p-4 sm:p-5">
       {category ? <input type="hidden" name="category" value={category} /> : null}
-      <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{t("title")}</h2>
-      <div className="mt-3">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("title")}</h2>
+          <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{t("search")}</p>
+        </div>
+      </div>
+      <div>
         <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-search">
           {t("search")}
         </label>
@@ -40,10 +42,10 @@ export function AnunturiFilters({
           name="search"
           type="search"
           defaultValue={defaultSearch}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          className="field-input mt-1"
         />
       </div>
-      <div className="mt-3">
+      <div>
         <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-currency">
           {t("currency")}
         </label>
@@ -51,14 +53,14 @@ export function AnunturiFilters({
           id="flt-currency"
           name="currency"
           defaultValue={defaultCurrency || ""}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          className="field-input mt-1"
         >
           <option value="">{t("currencyAll")}</option>
           <option value="MDL">{t("currencyMdl")}</option>
           <option value="EUR">{t("currencyEur")}</option>
         </select>
       </div>
-      <div className="mt-3 grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 md:grid-cols-3">
         <div>
           <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-city">
             {t("city")}
@@ -67,7 +69,7 @@ export function AnunturiFilters({
             id="flt-city"
             name="city"
             defaultValue={defaultCity}
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            className="field-input mt-1"
           />
         </div>
         <div>
@@ -81,7 +83,7 @@ export function AnunturiFilters({
             inputMode="numeric"
             min={0}
             defaultValue={defaultMin}
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            className="field-input mt-1"
           />
         </div>
         <div>
@@ -95,20 +97,17 @@ export function AnunturiFilters({
             inputMode="numeric"
             min={0}
             defaultValue={defaultMax}
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-2 py-1.5 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+            className="field-input mt-1"
           />
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <button
-          type="submit"
-          className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-700"
-        >
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <button type="submit" className="btn-primary flex-1 sm:flex-none">
           {t("apply")}
         </button>
         <Link
           href={category ? `/anunturi?category=${encodeURIComponent(category)}` : "/anunturi"}
-          className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          className="btn-secondary flex-1 sm:flex-none"
         >
           {t("reset")}
         </Link>

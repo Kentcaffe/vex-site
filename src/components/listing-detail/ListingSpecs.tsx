@@ -16,11 +16,11 @@ export async function ListingSpecs({ categorySlug, listing }: Props) {
   }
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{t("specsTitle")}</h2>
-      <dl className="mt-3 grid gap-2 text-sm">
+    <div className="surface-card p-5 sm:p-6">
+      <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("specsTitle")}</h2>
+      <dl className="mt-4 grid gap-3 text-sm">
         {rows.map((row) => (
-          <div key={row.label + row.value} className="flex justify-between gap-4 border-b border-zinc-100 pb-2 last:border-0 dark:border-zinc-800">
+          <div key={row.label + row.value} className="surface-muted flex justify-between gap-4 px-4 py-3">
             <dt className="text-zinc-500">{row.label}</dt>
             <dd className="text-right font-medium text-zinc-900 dark:text-zinc-100">{row.value}</dd>
           </div>

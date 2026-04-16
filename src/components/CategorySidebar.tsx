@@ -76,7 +76,15 @@ function SubTree({
   }
 
   return (
-    <ul className={`space-y-0.5 ${depth === 0 ? "mt-2 border-l-2 border-sky-200/80 pl-2 dark:border-sky-800/60" : depth === 1 ? "ml-1 border-l border-zinc-200 pl-2 dark:border-zinc-700" : "ml-1 border-l border-zinc-100 pl-2 dark:border-zinc-800"}`}>
+    <ul
+      className={`space-y-1 ${
+        depth === 0
+          ? "mt-2 border-l-2 border-emerald-200/80 pl-3 dark:border-emerald-800/60"
+          : depth === 1
+            ? "ml-1 border-l border-zinc-200 pl-3 dark:border-zinc-700"
+            : "ml-1 border-l border-zinc-100 pl-3 dark:border-zinc-800"
+      }`}
+    >
       {kids.map((node) => {
         const active = isActiveSlug(currentCategory, node.slug);
         const hasKids = (byParent.get(node.id)?.length ?? 0) > 0;
@@ -109,7 +117,7 @@ function SubTree({
                 } ${
                   active
                     ? "text-emerald-700 dark:text-emerald-400"
-                    : "text-zinc-600 hover:text-[#0b57d0] dark:text-zinc-400 dark:hover:text-blue-400"
+                    : "text-zinc-600 hover:text-emerald-700 dark:text-zinc-400 dark:hover:text-emerald-400"
                 }`}
               >
                 {labelFor(node, locale)}
@@ -131,20 +139,20 @@ export async function CategorySidebar({ locale, all, currentCategory }: Props) {
   const linkClass = (active: boolean) =>
     active
       ? "font-semibold text-emerald-700 dark:text-emerald-400"
-      : "text-zinc-800 hover:text-[#0b57d0] dark:text-zinc-100 dark:hover:text-blue-400";
+      : "text-zinc-800 hover:text-emerald-700 dark:text-zinc-100 dark:hover:text-emerald-400";
 
   return (
-    <aside className="rounded-2xl border border-zinc-200/90 bg-white p-1 shadow-md dark:border-zinc-700 dark:bg-zinc-900">
-      <div className="border-b border-zinc-100 px-3 pb-3 pt-3 dark:border-zinc-800">
-        <h2 className="text-sm font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("categories")}</h2>
+    <aside className="surface-card p-3">
+      <div className="border-b border-zinc-100 px-2 pb-3 pt-1 dark:border-zinc-800">
+        <h2 className="text-base font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">{t("categories")}</h2>
         <p className="mt-1.5 text-[11px] leading-relaxed text-zinc-500">
-          <Link href="/categorii" className="font-medium text-[#0b57d0] hover:underline dark:text-blue-400">
+          <Link href="/categorii" className="font-medium text-emerald-700 hover:underline dark:text-emerald-400">
             {t("browseAllCategories")}
           </Link>
         </p>
         <Link
           href="/anunturi"
-          className={`mt-2 flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm transition ${linkClass(!currentCategory)}`}
+          className={`mt-3 flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition ${linkClass(!currentCategory)}`}
         >
           <span className="text-base" aria-hidden>
             🔍
@@ -152,7 +160,7 @@ export async function CategorySidebar({ locale, all, currentCategory }: Props) {
           {t("allCategories")}
         </Link>
       </div>
-      <nav className="max-h-[min(70vh,36rem)] overflow-y-auto px-2 py-2 pr-1">
+      <nav className="max-h-[min(70vh,40rem)] overflow-y-auto px-1 py-2 pr-1">
         <ul className="space-y-3">
           {roots.map((root) => {
             const parentActive = isActiveUnder(all, currentCategory, root);
@@ -160,38 +168,48 @@ export async function CategorySidebar({ locale, all, currentCategory }: Props) {
             return (
               <li
                 key={root.id}
-                className="rounded-xl border border-zinc-200/80 bg-gradient-to-b from-white to-zinc-50/90 p-2.5 shadow-sm dark:border-zinc-700/80 dark:from-zinc-900 dark:to-zinc-950/90"
+                className="rounded-[14px] border border-zinc-200/80 bg-zinc-50/70 p-2.5 shadow-sm dark:border-zinc-700/80 dark:bg-zinc-950/60"
               >
-                <div className="flex items-start gap-2 border-b border-zinc-100/90 pb-2 dark:border-zinc-800">
-                  <span className="text-2xl leading-none" aria-hidden>
-                    {rootEmoji}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-1">
-                      <Link
-                        href={`/anunturi?category=${encodeURIComponent(root.slug)}`}
-                        className={`text-sm font-bold leading-tight ${linkClass(parentActive)}`}
-                      >
-                        {labelFor(root, locale)}
-                      </Link>
-                      <Link
-                        href={`/categorii?c=${encodeURIComponent(root.slug)}`}
-                        className="shrink-0 rounded-md bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 hover:bg-sky-100 hover:text-[#0b57d0] dark:bg-zinc-800 dark:hover:bg-sky-950 dark:hover:text-blue-400"
-                        title={t("openCategoryMap")}
-                      >
-                        ⊞
-                      </Link>
+                <details open={parentActive} className="group">
+                  <summary className="flex cursor-pointer list-none items-start gap-2 border-b border-zinc-100/90 pb-2 dark:border-zinc-800">
+                    <span className="text-2xl leading-none" aria-hidden>
+                      {rootEmoji}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-1">
+                        <Link
+                          href={`/anunturi?category=${encodeURIComponent(root.slug)}`}
+                          className={`text-sm font-bold leading-tight ${linkClass(parentActive)}`}
+                        >
+                          {labelFor(root, locale)}
+                        </Link>
+                        <div className="flex items-center gap-1">
+                          <span className="rounded-md bg-zinc-200/70 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 group-open:hidden dark:bg-zinc-800">
+                            +
+                          </span>
+                          <span className="hidden rounded-md bg-zinc-200/70 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 group-open:inline dark:bg-zinc-800">
+                            −
+                          </span>
+                          <Link
+                            href={`/categorii?c=${encodeURIComponent(root.slug)}`}
+                            className="shrink-0 rounded-md bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500 hover:bg-emerald-100 hover:text-emerald-700 dark:bg-zinc-800 dark:hover:bg-emerald-950 dark:hover:text-emerald-400"
+                            title={t("openCategoryMap")}
+                          >
+                            ⊞
+                          </Link>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-                <SubTree
-                  locale={locale}
-                  all={all}
-                  byParent={byParent}
-                  parentId={root.id}
-                  currentCategory={currentCategory}
-                  depth={0}
-                />
+                  </summary>
+                  <SubTree
+                    locale={locale}
+                    all={all}
+                    byParent={byParent}
+                    parentId={root.id}
+                    currentCategory={currentCategory}
+                    depth={0}
+                  />
+                </details>
               </li>
             );
           })}

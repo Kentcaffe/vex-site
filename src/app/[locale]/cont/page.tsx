@@ -47,7 +47,7 @@ export default async function ContPage({ params }: Props) {
   const oauth = getOAuthAvailability();
 
   return (
-    <div className="flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center bg-[#f9fafb] px-4 py-12 dark:bg-zinc-950 sm:px-6">
+    <div className="app-shell flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center px-4 py-12 sm:px-6">
       <AuthForms oauth={oauth} />
     </div>
   );

@@ -50,7 +50,7 @@ export function NotificationsList({ items }: Props) {
         {items.map((n) => (
           <li
             key={n.id}
-            className={`rounded-xl border p-4 shadow-sm ${
+            className={`rounded-[14px] border p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)] ${
               n.read ? "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900" : "border-emerald-300/80 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-950/20"
             }`}
           >
@@ -65,7 +65,7 @@ export function NotificationsList({ items }: Props) {
                   type="button"
                   disabled={pending}
                   onClick={() => startTransition(() => void onMarkRead(n.id))}
-                  className="shrink-0 rounded-lg border border-zinc-300 px-2 py-1 text-xs font-medium text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                  className="btn-secondary min-h-[36px] shrink-0 rounded-lg px-3 py-1 text-xs"
                 >
                   {t("markRead")}
                 </button>

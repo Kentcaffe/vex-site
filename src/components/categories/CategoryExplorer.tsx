@@ -54,35 +54,29 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
   const searchAction = localizedHref(locale, "/anunturi");
 
   return (
-    <div className="w-full max-w-full overflow-x-clip bg-zinc-100/90 pb-12 pt-2 dark:bg-zinc-950">
-      <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+    <div className="app-shell app-section w-full max-w-full overflow-x-clip">
+      <div className="surface-card p-4">
         <form
           action={searchAction}
           method="get"
-          className="mx-auto flex w-full max-w-[1200px] flex-col gap-2 px-4 py-3 sm:flex-row sm:items-stretch sm:gap-2 sm:px-4"
+          className="flex w-full flex-col gap-2 sm:flex-row sm:items-stretch sm:gap-2"
         >
           <input
             type="search"
             name="search"
             placeholder={t("searchPlaceholder")}
-            className="min-h-[48px] min-w-0 flex-1 rounded-xl border border-zinc-300 px-4 text-base text-zinc-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-50 md:text-sm"
+            className="field-input min-w-0 flex-1 text-base md:text-sm"
           />
-          <button
-            type="submit"
-            className="min-h-[48px] w-full shrink-0 touch-manipulation rounded-xl bg-[#0b57d0] px-6 text-base font-semibold text-white active:bg-[#0842a0] sm:w-auto sm:min-w-[120px] md:text-sm lg:hover:bg-[#0842a0]"
-          >
+          <button type="submit" className="btn-primary w-full shrink-0 sm:w-auto sm:min-w-[120px] md:text-sm">
             {t("search")}
           </button>
         </form>
       </div>
 
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-6 px-4 py-6 lg:flex-row lg:items-start lg:px-4">
+      <div className="mt-6 flex w-full flex-col gap-6 lg:flex-row lg:items-start">
         <aside className="w-full shrink-0 lg:w-56">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">{t("sidebarTitle")}</p>
-          <nav
-            className="grid grid-cols-2 gap-2 border-0 sm:gap-2 lg:block lg:space-y-0.5 lg:border lg:border-zinc-200 lg:bg-white lg:p-2 lg:dark:border-zinc-800 lg:dark:bg-zinc-900"
-            aria-label={t("sidebarTitle")}
-          >
+          <nav className="surface-card grid grid-cols-2 gap-2 p-2 lg:block lg:space-y-0.5" aria-label={t("sidebarTitle")}>
             {roots.map((r) => {
               const active = r.slug === root.slug;
               const icon = CATEGORY_ROOT_EMOJI[r.slug] ?? "•";
@@ -92,8 +86,8 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
                   href={`/categorii?c=${encodeURIComponent(r.slug)}`}
                   className={`flex min-h-[56px] items-center justify-center gap-2 rounded-xl border px-3 py-2 text-center text-sm font-medium sm:min-h-0 sm:justify-start sm:text-left lg:rounded lg:border-0 lg:px-2 lg:py-2 ${
                     active
-                      ? "border-sky-200 bg-sky-50 font-semibold text-[#0b57d0] dark:border-sky-900 dark:bg-sky-950/40 dark:text-blue-400"
-                      : "border-zinc-200 bg-white text-[#0b57d0] active:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 lg:border-0 lg:bg-transparent lg:dark:bg-transparent lg:dark:hover:bg-zinc-800 lg:hover:bg-zinc-50"
+                      ? "border-emerald-200 bg-emerald-50 font-semibold text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400"
+                      : "border-zinc-200 bg-white text-zinc-700 active:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 lg:border-0 lg:bg-transparent lg:dark:bg-transparent lg:dark:hover:bg-zinc-800 lg:hover:bg-zinc-50"
                   }`}
                 >
                   <span className="text-xl lg:w-6 lg:text-center" aria-hidden>
@@ -106,7 +100,7 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
           </nav>
         </aside>
 
-        <main className="min-w-0 flex-1">
+        <main className="surface-card min-w-0 flex-1 p-4 sm:p-6">
           <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-2xl">{rootTitle}</h1>
           <div className="mt-6 space-y-8">
             {sections.map((section) => {
@@ -114,21 +108,25 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
               if (section.children.length > 0) {
                 return (
                   <section key={section.id}>
-                    <h2 className="border-b border-zinc-200 pb-2 text-base font-semibold text-zinc-900 dark:border-zinc-700 dark:text-zinc-50">
-                      {sectionTitle}
-                    </h2>
-                    <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                    <details open className="group">
+                      <summary className="flex cursor-pointer list-none items-center justify-between border-b border-zinc-200 pb-2 text-base font-semibold text-zinc-900 dark:border-zinc-700 dark:text-zinc-50">
+                        <span>{sectionTitle}</span>
+                        <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500 group-open:hidden dark:bg-zinc-800">+</span>
+                        <span className="hidden rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500 group-open:inline dark:bg-zinc-800">−</span>
+                      </summary>
+                      <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
                       {section.children.map((leaf) => (
                         <li key={leaf.id} className="min-h-[44px]">
                           <Link
                             href={`/anunturi?category=${encodeURIComponent(leaf.slug)}`}
-                            className="flex min-h-[44px] items-center rounded-lg px-1 py-1 text-base leading-snug text-[#0b57d0] active:bg-zinc-100 dark:text-blue-400 dark:active:bg-zinc-900 lg:min-h-0 lg:text-sm lg:hover:underline"
+                            className="flex min-h-[44px] items-center rounded-lg px-3 py-2 text-base leading-snug text-zinc-700 active:bg-zinc-100 dark:text-zinc-200 dark:active:bg-zinc-900 lg:min-h-0 lg:text-sm lg:hover:text-emerald-700 lg:hover:underline dark:lg:hover:text-emerald-400"
                           >
                             {labelFromJson(leaf.labels, locale)}
                           </Link>
                         </li>
                       ))}
-                    </ul>
+                      </ul>
+                    </details>
                   </section>
                 );
               }
@@ -136,7 +134,7 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
                 <section key={section.id}>
                   <Link
                     href={`/anunturi?category=${encodeURIComponent(section.slug)}`}
-                    className="flex min-h-[48px] items-center text-lg font-semibold text-[#0b57d0] active:opacity-80 dark:text-blue-400 lg:inline lg:min-h-0 lg:text-base lg:hover:underline"
+                    className="flex min-h-[48px] items-center text-lg font-semibold text-emerald-700 active:opacity-80 dark:text-emerald-400 lg:inline lg:min-h-0 lg:text-base lg:hover:underline"
                   >
                     {sectionTitle}
                   </Link>

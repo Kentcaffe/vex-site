@@ -265,6 +265,10 @@
     "allCategories": "Toate categoriile",
     "browseAllCategories": "Vezi toate categoriile (structură completă)",
     "openCategoryMap": "Hartă categorii",
+    "subtitle": "Găsește rapid anunțurile potrivite și filtrează după ce contează pentru tine.",
+    "resultsCount": "{count} rezultate",
+    "resultsHint": "Anunțuri ordonate după cele mai noi publicări.",
+    "publishCta": "Publică anunț",
     "filters": {
       "title": "Filtre",
       "search": "Caută în anunțuri",
@@ -280,7 +284,9 @@
       "minWithCurrency": "Preț min ({currency})",
       "maxWithCurrency": "Preț max ({currency})",
       "apply": "Aplică",
-      "reset": "Resetează"
+      "reset": "Resetează",
+      "openMobile": "Filtre",
+      "closeMobile": "Închide"
     }
   },
   "CategoriesPage": {

@@ -13,17 +13,17 @@ export async function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="w-full max-w-full overflow-x-clip border-t border-zinc-200/90 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+    <footer className="mt-12 w-full max-w-full overflow-x-clip border-t border-zinc-200/80 bg-white/70 dark:border-zinc-800 dark:bg-zinc-950/80">
+      <div className="app-shell py-12 sm:py-16 lg:py-20">
         {/* Brand — același namespace Footer ca în header (siteName, tagline) */}
-        <div className="border-b border-zinc-200/80 pb-12 dark:border-zinc-800">
+        <div className="border-b border-zinc-200/80 pb-10 dark:border-zinc-800">
           <Link
             href="/"
-            className="inline-block text-3xl font-black tracking-tight text-[#0b57d0] transition hover:text-[#0842a0] dark:text-blue-400 dark:hover:text-blue-300"
+            className="inline-block text-3xl font-black tracking-tight text-zinc-950 transition hover:text-emerald-700 dark:text-zinc-50 dark:hover:text-emerald-400"
           >
             {t("siteName")}
           </Link>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("tagline")}</p>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("tagline")}</p>
         </div>
 
         <div className="mt-14 grid grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-14 lg:grid-cols-4 lg:gap-16">

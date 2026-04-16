@@ -29,9 +29,9 @@ export default async function PublicaPage({ params }: Props) {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
-      <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
-      <p className="mt-2 text-zinc-600 dark:text-zinc-400">{t("subtitle")}</p>
+    <div className="app-shell app-section">
+      <h1 className="page-heading text-2xl sm:text-3xl">{t("title")}</h1>
+      <p className="page-subheading mt-2">{t("subtitle")}</p>
       <div className="mt-8">
         <ListingForm locale={locale} userId={session.user.id} categoryTree={categoryTree} />
       </div>

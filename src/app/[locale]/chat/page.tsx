@@ -59,7 +59,7 @@ export default async function ChatInboxPage({ params }: Props) {
 
   const t = await getTranslations("Chat");
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
+    <div className="app-shell app-section max-w-4xl">
       <div className="border-b border-zinc-200/80 pb-6 dark:border-zinc-800">
         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("inboxTitle")}</h1>
         <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("inboxSubtitle")}</p>

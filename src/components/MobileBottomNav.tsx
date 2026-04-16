@@ -39,19 +39,19 @@ export function MobileBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50 border-t border-zinc-200/90 bg-white/95 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-1 shadow-[0_-4px_20px_-4px_rgba(0,0,0,0.08)] backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95 md:hidden"
+      className="fixed bottom-3 left-3 right-3 z-50 rounded-[18px] border border-zinc-200/90 bg-white/95 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[0_18px_40px_-18px_rgba(15,23,42,0.3)] backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/95 md:hidden"
       aria-label={t("bottomNavAria")}
     >
-      <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-0.5 px-1">
+      <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-1 px-1.5">
         {items.map(({ href, label, Icon, badge }) => {
           const active = isActive(pathname, href);
           return (
             <li key={href} className="min-w-0 flex-1">
               <Link
                 href={href}
-                className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1.5 text-[10px] font-semibold leading-tight transition active:scale-[0.97] motion-safe:transition-transform ${
+                className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 rounded-[14px] px-1 py-1.5 text-[10px] font-semibold leading-tight transition active:scale-[0.97] motion-safe:transition-transform ${
                   active
-                    ? "text-[#0b57d0] dark:text-blue-400"
+                    ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
                     : "text-zinc-500 dark:text-zinc-400"
                 }`}
                 aria-current={active ? "page" : undefined}

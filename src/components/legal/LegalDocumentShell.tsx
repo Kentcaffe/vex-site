@@ -19,7 +19,7 @@ export async function LegalDocumentShell({ slug, children }: Props) {
 
   return (
     <div className="min-h-[60vh] w-full max-w-full overflow-x-clip bg-[#f9fafb] dark:bg-zinc-950">
-      <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14 lg:max-w-[42rem] lg:py-16">
+      <div className="app-shell max-w-3xl py-10 sm:py-14 lg:max-w-[46rem] lg:py-16">
         <Link
           href="/"
           className="inline-flex text-sm font-medium text-[#2563eb] transition hover:text-blue-700 hover:underline dark:text-blue-400"
@@ -42,7 +42,7 @@ export async function LegalDocumentShell({ slug, children }: Props) {
           </NavPill>
         </nav>
 
-        <article className="mt-8 rounded-2xl border border-zinc-200/90 bg-white px-4 py-8 text-base leading-relaxed shadow-[0_8px_30px_-12px_rgba(15,23,42,0.12)] dark:border-zinc-800 dark:bg-zinc-900/90 dark:shadow-black/20 sm:mt-10 sm:px-8 sm:py-10 md:px-10">
+        <article className="surface-card mt-8 px-4 py-8 text-base leading-relaxed sm:mt-10 sm:px-8 sm:py-10 md:px-10">
           {children}
         </article>
 

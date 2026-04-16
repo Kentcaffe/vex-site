@@ -163,7 +163,7 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
   }, [user.createdAt, uiLocale]);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:py-10">
+    <div className="app-shell app-section">
       <header className="mb-8 lg:mb-10">
         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-3xl">{t("title")}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{t("subtitle")}</p>
@@ -171,7 +171,7 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
 
       <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
         <aside className="lg:w-64 lg:shrink-0">
-          <nav className="sticky top-20 z-10 flex gap-1 overflow-x-auto rounded-2xl border border-zinc-200/80 bg-white/70 p-2 shadow-sm backdrop-blur-md [-ms-overflow-style:none] [scrollbar-width:none] sm:top-24 lg:flex-col lg:overflow-visible dark:border-zinc-800/80 dark:bg-zinc-900/70 [&::-webkit-scrollbar]:hidden">
+          <nav className="surface-card-soft sticky top-24 z-10 flex gap-1 overflow-x-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] lg:flex-col lg:overflow-visible [&::-webkit-scrollbar]:hidden">
             {navItems.map(({ id, label, icon: Icon }) => {
               const isActive = active === id;
               return (
@@ -181,7 +181,7 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
                   onClick={() => setSection(id)}
                   className={`flex min-w-[9.5rem] shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-colors lg:min-w-0 lg:w-full ${
                     isActive
-                      ? "bg-[#0b57d0]/10 text-[#0b57d0] dark:bg-blue-500/15 dark:text-blue-300"
+                      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
                       : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
                   }`}
                 >
