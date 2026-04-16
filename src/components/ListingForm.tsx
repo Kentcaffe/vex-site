@@ -16,6 +16,7 @@ import {
 import {
   type CategoryTreeNode,
   findLeafSlugById,
+  getPathLabelsForLeaf,
   isLeafCategoryNode,
   normalizeLeafCategoryId,
 } from "@/lib/category-tree";
@@ -267,7 +268,10 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const cid = categoryId.trim();
-    console.log("[publish] categoryId", cid, {
+    const selectedPath = cid ? getPathLabelsForLeaf(categoryTree, cid) : "";
+    console.log("[publish] categoryId payload", {
+      categoryId: cid,
+      selectedPath,
       isLeaf: cid ? isLeafCategoryNode(categoryTree, cid) : false,
     });
 
@@ -287,6 +291,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     }
 
     const fd = buildFormDataFromPublishValues(locale, cid, imagesRaw, publishValues, detailFields);
+    console.log("[publish] formData.categoryId", fd.get("categoryId"));
     const v = validateListingFormClient(fd, msg);
     if (!v.ok) {
       setClientErrors(v.errors);

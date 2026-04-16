@@ -49,6 +49,7 @@ export async function createListing(
     return { ok: false, error: "validation" };
   }
 
+  console.log("[createListing] received categoryId", parsed.data.categoryId);
   const categoryRow = await prisma.category.findUnique({
     where: { id: parsed.data.categoryId },
     select: { id: true, slug: true },
