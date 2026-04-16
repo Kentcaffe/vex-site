@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
+import { ForceLightMode } from "@/components/ForceLightMode";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,10 +13,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
-    { color: "#fafafa" },
-  ],
+  themeColor: "#f8fafc",
 };
 
 const sans = Inter({
@@ -52,8 +50,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         ) : null}
       </head>
       <body
-        className={`${sans.className} min-h-screen bg-zinc-50 text-base text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-50`}
+        className={`${sans.className} min-h-screen bg-zinc-50 text-base text-zinc-900 antialiased`}
       >
+        <ForceLightMode />
         {children}
       </body>
     </html>
