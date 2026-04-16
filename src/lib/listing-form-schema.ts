@@ -118,10 +118,33 @@ export function rawFromFormData(formData: FormData): Record<string, unknown> {
     return s === "" ? undefined : s;
   };
   const categoryIdRaw = g("categoryId");
+  const categoryIdCompatRaw = g("category_id");
   const subcategoryIdRaw = g("subcategory_id");
   const categoryId =
     (categoryIdRaw == null ? "" : String(categoryIdRaw).trim()) ||
+    (categoryIdCompatRaw == null ? "" : String(categoryIdCompatRaw).trim()) ||
     (subcategoryIdRaw == null ? "" : String(subcategoryIdRaw).trim());
+  const rawImages = g("imagesRaw");
+  const imagesCompat = (() => {
+    const val = g("images");
+    if (val == null) {
+      return undefined;
+    }
+    const text = String(val).trim();
+    if (!text) {
+      return undefined;
+    }
+    try {
+      const parsed = JSON.parse(text) as unknown;
+      if (Array.isArray(parsed)) {
+        const onlyStrings = parsed.filter((x): x is string => typeof x === "string");
+        return onlyStrings.join("\n");
+      }
+      return text;
+    } catch {
+      return text;
+    }
+  })();
   return {
     title: g("title") == null ? "" : String(g("title")),
     description: g("description") == null ? "" : String(g("description")),
@@ -142,7 +165,7 @@ export function rawFromFormData(formData: FormData): Record<string, unknown> {
     mileageKm: g("mileageKm"),
     rooms: optStr("rooms"),
     areaSqm: g("areaSqm"),
-    imagesRaw: g("imagesRaw") == null ? undefined : String(g("imagesRaw")),
+    imagesRaw: rawImages == null ? imagesCompat : String(rawImages),
     categoryId,
     categorySlug: optStr("categorySlug"),
     locale: g("locale") == null ? "" : String(g("locale")),

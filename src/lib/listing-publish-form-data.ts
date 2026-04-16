@@ -1,5 +1,6 @@
 import type { DetailField } from "@/lib/listing-detail-config";
 import { getDetailFormName } from "@/lib/listing-detail-config";
+import { parseImageLines } from "@/lib/listing-form-schema";
 import {
   LISTING_DRAFT_STORAGE_VERSION,
   type ListingFormDraftV1,
@@ -136,12 +137,15 @@ export function buildFormDataFromPublishValues(
   detailFields: DetailField[],
 ): FormData {
   const categoryLeafId = categoryId.trim();
+  const imageList = parseImageLines(imagesRaw);
   const fd = new FormData();
   fd.set("locale", locale);
   fd.set("categoryId", categoryLeafId);
+  fd.set("category_id", categoryLeafId);
   fd.set("subcategory_id", categoryLeafId);
   fd.set("categorySlug", categorySlug.trim());
   fd.set("imagesRaw", imagesRaw);
+  fd.set("images", JSON.stringify(imageList));
   fd.set("title", values.title);
   fd.set("description", values.description);
   fd.set("price", values.price);

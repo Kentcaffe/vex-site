@@ -17,8 +17,12 @@ import { asListingCreateInput } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 
 export type CreateListingState =
-  | { ok: true; listingId: string }
-  | { ok: false; error: "unauthorized" | "validation" | "category" | "session" | "server" };
+  | { ok: true; listingId: string; details?: string }
+  | {
+      ok: false;
+      error: "unauthorized" | "validation" | "category" | "session" | "server";
+      details?: string;
+    };
 
 export async function createListing(
   _prev: CreateListingState | undefined,
@@ -30,10 +34,17 @@ export async function createListing(
     Array.from(formData.keys()),
   );
 
+  console.warn("[createListing] request body", {
+    title: String(formData.get("title") ?? ""),
+    price: String(formData.get("price") ?? ""),
+    category_id: String(formData.get("category_id") ?? formData.get("categoryId") ?? ""),
+    images: String(formData.get("images") ?? ""),
+  });
+
   const session = await auth();
   if (!session?.user?.id) {
     console.log("[createListing] ERROR unauthorized: missing session.user.id");
-    return { ok: false, error: "unauthorized" };
+    return { ok: false, error: "unauthorized", details: "Trebuie să fii autentificat pentru a publica." };
   }
 
   const rawCategoryId = String(formData.get("categoryId") ?? "").trim();
@@ -41,7 +52,7 @@ export async function createListing(
   const categorySlugRaw = String(formData.get("categorySlug") ?? "").trim();
   if (!rawCategoryId && !rawSubcategoryId) {
     console.log("[createListing] ERROR category: missing categoryId and subcategory_id");
-    return { ok: false, error: "category" };
+    return { ok: false, error: "category", details: "Lipsește category_id / subcategory_id." };
   }
 
   const raw = rawFromFormData(formData);
@@ -56,7 +67,12 @@ export async function createListing(
   const parsed = listingFormSchema.safeParse(raw);
   if (!parsed.success) {
     console.log("[createListing] ERROR validation: schema parse failed", parsed.error.issues);
-    return { ok: false, error: "validation" };
+    const first = parsed.error.issues[0];
+    return {
+      ok: false,
+      error: "validation",
+      details: `Validare eșuată la câmpul "${String(first?.path?.[0] ?? "necunoscut")}".`,
+    };
   }
 
   const dbUser = await prisma.user.findUnique({
@@ -65,7 +81,7 @@ export async function createListing(
   });
   if (!dbUser) {
     console.log("[createListing] ERROR session: user not found in DB", session.user.id);
-    return { ok: false, error: "session" };
+    return { ok: false, error: "session", details: "Sesiune invalidă. Reautentifică-te." };
   }
 
   const rawImages = parsed.data.imagesRaw ?? null;
@@ -74,7 +90,11 @@ export async function createListing(
     console.log("[createListing] ERROR validation: images invalid", {
       imagesRawLen: String(rawImages ?? "").length,
     });
-    return { ok: false, error: "validation" };
+    return {
+      ok: false,
+      error: "validation",
+      details: "Imaginile nu sunt valide. Trimite array de URL-uri valide.",
+    };
   }
 
   const submittedCategoryId = parsed.data.categoryId.trim();
@@ -104,7 +124,7 @@ export async function createListing(
       submittedSubcategoryId,
       categorySlugRaw,
     });
-    return { ok: false, error: "category" };
+    return { ok: false, error: "category", details: `Categoria nu există în DB: ${submittedCategoryId}` };
   }
 
   const childCount = await prisma.category.count({
@@ -115,7 +135,7 @@ export async function createListing(
       categoryId: categoryRow.id,
       childCount,
     });
-    return { ok: false, error: "category" };
+    return { ok: false, error: "category", details: "Categoria selectată nu este subcategorie finală." };
   }
 
   const slug = categoryRow.slug;
@@ -161,10 +181,14 @@ export async function createListing(
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2003") {
       console.log("[createListing] ERROR validation: prisma FK P2003");
-      return { ok: false, error: "validation" };
+      return { ok: false, error: "validation", details: "Relație invalidă în baza de date (P2003)." };
     }
     console.error("[createListing]", e);
-    return { ok: false, error: "server" };
+    return {
+      ok: false,
+      error: "server",
+      details: e instanceof Error ? e.message : "Eroare internă necunoscută la publicare.",
+    };
   }
 
   revalidatePath(localizedHref(parsed.data.locale, "/anunturi"));
@@ -172,5 +196,5 @@ export async function createListing(
   revalidatePath(localizedHref(parsed.data.locale, `/anunturi/${listingId}`));
 
   console.log("[createListing] SUCCESS", { listingId });
-  return { ok: true, listingId };
+  return { ok: true, listingId, details: "Anunț publicat cu succes." };
 }

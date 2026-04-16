@@ -273,12 +273,12 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     if (!state) {
       return;
     }
-    console.log("[publish] response state:", state);
+    console.warn("[publish] response state:", state);
     if (state.ok === false) {
-      console.log("ERROR:", state);
-      alert("Eroare la publicare");
+      console.warn("ERROR:", state);
+      alert(state.details ?? "Eroare la publicare");
     } else {
-      console.log("SUCCESS");
+      console.warn("SUCCESS");
     }
   }, [state]);
 
@@ -396,9 +396,10 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
     const payload = {
       subcategory_id: cid,
+      category_id: cid,
       categorySlug: selectedSlug,
     };
-    console.log("Submitting payload:", payload);
+    console.warn("Submitting payload:", payload);
     const fd = buildFormDataFromPublishValues(
       locale,
       cid,
@@ -407,9 +408,15 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       publishValues,
       detailFields,
     );
-    console.log("Form data:", debugFormData(fd));
-    console.log("[publish] formData.categoryId", fd.get("categoryId"));
-    console.log("[publish] formData.subcategory_id", fd.get("subcategory_id"));
+    console.warn("Form data:", debugFormData(fd));
+    console.warn("[publish] request body check", {
+      title: fd.get("title"),
+      price: fd.get("price"),
+      category_id: fd.get("category_id"),
+      images: fd.get("images"),
+    });
+    console.warn("[publish] formData.categoryId", fd.get("categoryId"));
+    console.warn("[publish] formData.subcategory_id", fd.get("subcategory_id"));
     const v = validateListingFormClient(fd, msg);
     if (!v.ok) {
       console.log("[publish] validation errors:", v.errors, "firstField:", v.firstField);
@@ -421,10 +428,10 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     }
     console.log("[publish] validation passed");
     setClientErrors({});
-    console.log("[publish] request transport: serverAction:createListing");
+    console.warn("[publish] request transport: serverAction:createListing");
     startTransition(() => {
       formAction(fd);
-      console.log("[publish] request dispatched");
+      console.warn("[publish] request dispatched");
     });
   }
 
@@ -458,11 +465,12 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   const serverMsg =
     state?.ok === false && state.error !== "server" && state.error !== "category"
-      ? state.error === "unauthorized"
+      ? (state.details ??
+        (state.error === "unauthorized"
         ? t("serverUnauthorized")
         : state.error === "session"
           ? t("serverSession")
-          : t("serverValidation")
+          : t("serverValidation")))
       : null;
 
   const categoryFieldError =
@@ -471,7 +479,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     state?.ok === false &&
     state.error === "category" &&
     (!categoryId.trim() || !isLeafCategoryNode(categoryTree, categoryId))
-      ? t("serverCategory")
+      ? (state.details ?? t("serverCategory"))
       : null);
 
   return (
