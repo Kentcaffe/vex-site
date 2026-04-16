@@ -371,23 +371,25 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     setLiveValidateEnabled(true);
     const cid = categoryId.trim();
     const selectedPath = cid ? getPathLabelsForLeaf(categoryTree, cid) : "";
-    console.log("[publish] categoryId payload", {
+    console.warn("[publish] categoryId payload", {
       categoryId: cid,
       selectedPath,
       isLeaf: cid ? isLeafCategoryNode(categoryTree, cid) : false,
     });
 
     if (!cid) {
-      console.log("[publish] blocked: missing subcategory_id");
+      console.warn("[publish] blocked: missing subcategory_id");
       setClientErrors({ categoryId: msg.errCategory });
+      alert(msg.errCategory);
       queueMicrotask(() => {
         scrollAndFocusField("categoryId");
       });
       return;
     }
     if (!isLeafCategoryNode(categoryTree, cid)) {
-      console.log("[publish] blocked: selected category is not a leaf", { subcategory_id: cid });
+      console.warn("[publish] blocked: selected category is not a leaf", { subcategory_id: cid });
       setClientErrors({ categoryId: tVal("errCategoryLeaf") });
+      alert(tVal("errCategoryLeaf"));
       queueMicrotask(() => {
         scrollAndFocusField("categoryId");
       });
@@ -419,14 +421,19 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     console.warn("[publish] formData.subcategory_id", fd.get("subcategory_id"));
     const v = validateListingFormClient(fd, msg);
     if (!v.ok) {
-      console.log("[publish] validation errors:", v.errors, "firstField:", v.firstField);
+      console.warn("[publish] validation errors:", v.errors, "firstField:", v.firstField);
+      const firstErrorText =
+        v.errors[v.firstField] ??
+        Object.values(v.errors).find((e): e is string => typeof e === "string") ??
+        "Formular invalid.";
       setClientErrors(v.errors);
+      alert(firstErrorText);
       queueMicrotask(() => {
         scrollAndFocusField(v.firstField);
       });
       return;
     }
-    console.log("[publish] validation passed");
+    console.warn("[publish] validation passed");
     setClientErrors({});
     console.warn("[publish] request transport: serverAction:createListing");
     startTransition(() => {
