@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useActionState, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { createListing, type CreateListingState } from "@/app/actions/listings";
@@ -422,8 +422,10 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     console.log("[publish] validation passed");
     setClientErrors({});
     console.log("[publish] request transport: serverAction:createListing");
-    formAction(fd);
-    console.log("[publish] request dispatched");
+    startTransition(() => {
+      formAction(fd);
+      console.log("[publish] request dispatched");
+    });
   }
 
   async function onPickImages(files: FileList | null) {
