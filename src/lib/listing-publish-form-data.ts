@@ -130,13 +130,17 @@ export function listingDraftFromPublishValues(
 export function buildFormDataFromPublishValues(
   locale: string,
   categoryId: string,
+  categorySlug: string,
   imagesRaw: string,
   values: PublishFormValues,
   detailFields: DetailField[],
 ): FormData {
+  const categoryLeafId = categoryId.trim();
   const fd = new FormData();
   fd.set("locale", locale);
-  fd.set("categoryId", categoryId.trim());
+  fd.set("categoryId", categoryLeafId);
+  fd.set("subcategory_id", categoryLeafId);
+  fd.set("categorySlug", categorySlug.trim());
   fd.set("imagesRaw", imagesRaw);
   fd.set("title", values.title);
   fd.set("description", values.description);

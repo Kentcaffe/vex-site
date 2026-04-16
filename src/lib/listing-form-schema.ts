@@ -34,6 +34,7 @@ export const listingFormSchema = z.object({
   ),
   imagesRaw: z.string().max(100_000).optional(),
   categoryId: z.string().min(1),
+  categorySlug: z.string().max(150).optional(),
   locale: z.string().min(2).max(5),
 });
 
@@ -116,6 +117,11 @@ export function rawFromFormData(formData: FormData): Record<string, unknown> {
     const s = String(v);
     return s === "" ? undefined : s;
   };
+  const categoryIdRaw = g("categoryId");
+  const subcategoryIdRaw = g("subcategory_id");
+  const categoryId =
+    (categoryIdRaw == null ? "" : String(categoryIdRaw).trim()) ||
+    (subcategoryIdRaw == null ? "" : String(subcategoryIdRaw).trim());
   return {
     title: g("title") == null ? "" : String(g("title")),
     description: g("description") == null ? "" : String(g("description")),
@@ -137,7 +143,8 @@ export function rawFromFormData(formData: FormData): Record<string, unknown> {
     rooms: optStr("rooms"),
     areaSqm: g("areaSqm"),
     imagesRaw: g("imagesRaw") == null ? undefined : String(g("imagesRaw")),
-    categoryId: g("categoryId") == null ? "" : String(g("categoryId")),
+    categoryId,
+    categorySlug: optStr("categorySlug"),
     locale: g("locale") == null ? "" : String(g("locale")),
   };
 }

@@ -15,6 +15,7 @@ import {
 } from "@/lib/listing-detail-config";
 import {
   type CategoryTreeNode,
+  findCategoryNodeById,
   findLeafSlugById,
   getPathLabelsForLeaf,
   isLeafCategoryNode,
@@ -290,8 +291,21 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       return;
     }
 
-    const fd = buildFormDataFromPublishValues(locale, cid, imagesRaw, publishValues, detailFields);
+    const payload = {
+      subcategory_id: cid,
+      categorySlug: selectedSlug,
+    };
+    console.log("Submitting payload:", payload);
+    const fd = buildFormDataFromPublishValues(
+      locale,
+      cid,
+      selectedSlug,
+      imagesRaw,
+      publishValues,
+      detailFields,
+    );
     console.log("[publish] formData.categoryId", fd.get("categoryId"));
+    console.log("[publish] formData.subcategory_id", fd.get("subcategory_id"));
     const v = validateListingFormClient(fd, msg);
     if (!v.ok) {
       setClientErrors(v.errors);
@@ -368,13 +382,18 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             tree={categoryTree}
             value={categoryId}
             onCategoryIdAction={(id) => {
-              setCategoryId(id.trim());
+              const nextId = id.trim();
+              const nextSelected = nextId ? findCategoryNodeById(categoryTree, nextId) : null;
+              console.log("Selected:", nextSelected);
+              console.log("Subcategory ID:", nextId);
+              setCategoryId(nextId);
               setDismissServerCategoryError(true);
               setClientErrors((prev) => {
                 if (!prev.categoryId) {
                   return prev;
                 }
-                const { categoryId: _c, ...rest } = prev;
+                const rest = { ...prev };
+                delete rest.categoryId;
                 return rest;
               });
             }}

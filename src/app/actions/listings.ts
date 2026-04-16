@@ -29,6 +29,13 @@ export async function createListing(
     return { ok: false, error: "unauthorized" };
   }
 
+  const rawCategoryId = String(formData.get("categoryId") ?? "").trim();
+  const rawSubcategoryId = String(formData.get("subcategory_id") ?? "").trim();
+  const categorySlugRaw = String(formData.get("categorySlug") ?? "").trim();
+  if (!rawCategoryId && !rawSubcategoryId) {
+    return { ok: false, error: "category" };
+  }
+
   const raw = rawFromFormData(formData);
   const parsed = listingFormSchema.safeParse(raw);
   if (!parsed.success) {
@@ -49,17 +56,33 @@ export async function createListing(
     return { ok: false, error: "validation" };
   }
 
-  console.log("[createListing] received categoryId", parsed.data.categoryId);
-  const categoryRow = await prisma.category.findUnique({
-    where: { id: parsed.data.categoryId },
+  const submittedCategoryId = parsed.data.categoryId.trim();
+  const submittedSubcategoryId = rawSubcategoryId || submittedCategoryId;
+  console.log("[createListing] received payload", {
+    categoryId: submittedCategoryId,
+    subcategory_id: submittedSubcategoryId,
+    categorySlug: categorySlugRaw || parsed.data.categorySlug || "",
+  });
+
+  let categoryRow = await prisma.category.findUnique({
+    where: { id: submittedCategoryId },
     select: { id: true, slug: true },
   });
+  if (!categoryRow) {
+    const fallbackSlug = (categorySlugRaw || parsed.data.categorySlug || "").trim();
+    if (fallbackSlug) {
+      categoryRow = await prisma.category.findUnique({
+        where: { slug: fallbackSlug },
+        select: { id: true, slug: true },
+      });
+    }
+  }
   if (!categoryRow) {
     return { ok: false, error: "category" };
   }
 
   const childCount = await prisma.category.count({
-    where: { parentId: parsed.data.categoryId },
+    where: { parentId: categoryRow.id },
   });
   if (childCount > 0) {
     return { ok: false, error: "category" };
@@ -99,7 +122,7 @@ export async function createListing(
         areaSqm: cols.areaSqm,
         detailsJson,
         images: JSON.stringify(urls),
-        categoryId: parsed.data.categoryId,
+        categoryId: categoryRow.id,
         userId: session.user.id,
       }),
       select: { id: true },
