@@ -367,7 +367,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }
 
   function handleSubmit() {
-    console.log("handleSubmit() START");
+    console.warn("handleSubmit() START");
     setLiveValidateEnabled(true);
     const cid = categoryId.trim();
     const selectedPath = cid ? getPathLabelsForLeaf(categoryTree, cid) : "";
@@ -480,7 +480,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
-        console.log("SUBMIT TRIGGERED");
+        console.warn("SUBMIT TRIGGERED");
         handleSubmit();
       }}
       className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm md:space-y-8 md:p-8"
@@ -925,6 +925,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       <button
         type="submit"
         disabled={isPending}
+        onClick={(e) => {
+          e.preventDefault();
+          console.warn("SUBMIT BUTTON CLICKED");
+          handleSubmit();
+        }}
         className="inline-flex min-h-[52px] w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-emerald-700 disabled:pointer-events-none disabled:opacity-60 lg:hover:bg-emerald-700"
       >
         {isPending ? (
