@@ -24,8 +24,15 @@ export async function createListing(
   _prev: CreateListingState | undefined,
   formData: FormData,
 ): Promise<CreateListingState> {
+  console.log("[createListing] START");
+  console.log(
+    "[createListing] formData keys",
+    Array.from(formData.keys()),
+  );
+
   const session = await auth();
   if (!session?.user?.id) {
+    console.log("[createListing] ERROR unauthorized: missing session.user.id");
     return { ok: false, error: "unauthorized" };
   }
 
@@ -33,12 +40,22 @@ export async function createListing(
   const rawSubcategoryId = String(formData.get("subcategory_id") ?? "").trim();
   const categorySlugRaw = String(formData.get("categorySlug") ?? "").trim();
   if (!rawCategoryId && !rawSubcategoryId) {
+    console.log("[createListing] ERROR category: missing categoryId and subcategory_id");
     return { ok: false, error: "category" };
   }
 
   const raw = rawFromFormData(formData);
+  console.log("[createListing] parsed raw payload preview", {
+    categoryId: raw.categoryId,
+    titleLen: String(raw.title ?? "").length,
+    descriptionLen: String(raw.description ?? "").length,
+    price: raw.price,
+    city: raw.city,
+    imagesRawLen: String(raw.imagesRaw ?? "").length,
+  });
   const parsed = listingFormSchema.safeParse(raw);
   if (!parsed.success) {
+    console.log("[createListing] ERROR validation: schema parse failed", parsed.error.issues);
     return { ok: false, error: "validation" };
   }
 
@@ -47,12 +64,16 @@ export async function createListing(
     select: { id: true },
   });
   if (!dbUser) {
+    console.log("[createListing] ERROR session: user not found in DB", session.user.id);
     return { ok: false, error: "session" };
   }
 
   const rawImages = parsed.data.imagesRaw ?? null;
   const urls = parseListingImageUrlsStrict(rawImages);
   if (!urls) {
+    console.log("[createListing] ERROR validation: images invalid", {
+      imagesRawLen: String(rawImages ?? "").length,
+    });
     return { ok: false, error: "validation" };
   }
 
@@ -78,6 +99,11 @@ export async function createListing(
     }
   }
   if (!categoryRow) {
+    console.log("[createListing] ERROR category: category not found", {
+      submittedCategoryId,
+      submittedSubcategoryId,
+      categorySlugRaw,
+    });
     return { ok: false, error: "category" };
   }
 
@@ -85,6 +111,10 @@ export async function createListing(
     where: { parentId: categoryRow.id },
   });
   if (childCount > 0) {
+    console.log("[createListing] ERROR category: selected category is not leaf", {
+      categoryId: categoryRow.id,
+      childCount,
+    });
     return { ok: false, error: "category" };
   }
 
@@ -130,6 +160,7 @@ export async function createListing(
     listingId = created.id;
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2003") {
+      console.log("[createListing] ERROR validation: prisma FK P2003");
       return { ok: false, error: "validation" };
     }
     console.error("[createListing]", e);
@@ -140,5 +171,6 @@ export async function createListing(
   revalidatePath(localizedHref(parsed.data.locale, "/"));
   revalidatePath(localizedHref(parsed.data.locale, `/anunturi/${listingId}`));
 
+  console.log("[createListing] SUCCESS", { listingId });
   return { ok: true, listingId };
 }

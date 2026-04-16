@@ -158,6 +158,14 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     }, 220);
   }
 
+  function debugFormData(fd: FormData): Record<string, unknown> {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of fd.entries()) {
+      out[k] = typeof v === "string" && v.length > 300 ? `${v.slice(0, 300)}…` : v;
+    }
+    return out;
+  }
+
   useEffect(() => {
     const loaded = loadListingDraftFromStorage(storageKey, {
       migrateLegacySessionKey: legacyDraftSessionKey,
@@ -262,6 +270,19 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }, [state, toast, t]);
 
   useEffect(() => {
+    if (!state) {
+      return;
+    }
+    console.log("[publish] response state:", state);
+    if (state.ok === false) {
+      console.log("ERROR:", state);
+      alert("Eroare la publicare");
+    } else {
+      console.log("SUCCESS");
+    }
+  }, [state]);
+
+  useEffect(() => {
     if (state?.ok === false && state.error === "category") {
       setDismissServerCategoryError(false);
     }
@@ -346,6 +367,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }
 
   function handleSubmit() {
+    console.log("handleSubmit() START");
     setLiveValidateEnabled(true);
     const cid = categoryId.trim();
     const selectedPath = cid ? getPathLabelsForLeaf(categoryTree, cid) : "";
@@ -356,6 +378,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     });
 
     if (!cid) {
+      console.log("[publish] blocked: missing subcategory_id");
       setClientErrors({ categoryId: msg.errCategory });
       queueMicrotask(() => {
         scrollAndFocusField("categoryId");
@@ -363,6 +386,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       return;
     }
     if (!isLeafCategoryNode(categoryTree, cid)) {
+      console.log("[publish] blocked: selected category is not a leaf", { subcategory_id: cid });
       setClientErrors({ categoryId: tVal("errCategoryLeaf") });
       queueMicrotask(() => {
         scrollAndFocusField("categoryId");
@@ -383,18 +407,23 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       publishValues,
       detailFields,
     );
+    console.log("Form data:", debugFormData(fd));
     console.log("[publish] formData.categoryId", fd.get("categoryId"));
     console.log("[publish] formData.subcategory_id", fd.get("subcategory_id"));
     const v = validateListingFormClient(fd, msg);
     if (!v.ok) {
+      console.log("[publish] validation errors:", v.errors, "firstField:", v.firstField);
       setClientErrors(v.errors);
       queueMicrotask(() => {
         scrollAndFocusField(v.firstField);
       });
       return;
     }
+    console.log("[publish] validation passed");
     setClientErrors({});
+    console.log("[publish] request transport: serverAction:createListing");
     formAction(fd);
+    console.log("[publish] request dispatched");
   }
 
   async function onPickImages(files: FileList | null) {
@@ -449,6 +478,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
+        console.log("SUBMIT TRIGGERED");
         handleSubmit();
       }}
       className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm md:space-y-8 md:p-8"
