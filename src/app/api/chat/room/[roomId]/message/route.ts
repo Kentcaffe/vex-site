@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { CHAT_MESSAGE_MAX, getRoomAccess } from "@/lib/chat-actions";
+import { insertRoomMessage } from "@/lib/chat-realtime-store";
 import { prisma } from "@/lib/prisma";
 
 type Props = { params: Promise<{ roomId: string }> };
@@ -30,17 +31,21 @@ export async function POST(req: Request, { params }: Props) {
     return NextResponse.json({ error: "validation" }, { status: 400 });
   }
 
-  const msg = await prisma.chatMessage.create({
-    data: { roomId, senderId: userId, body: trimmed },
+  const receiverId = userId === access.buyerId ? access.sellerId : access.buyerId;
+  const msg = await insertRoomMessage({
+    roomId,
+    senderId: userId,
+    receiverId,
+    content: trimmed,
   });
   await prisma.chatRoom.update({ where: { id: roomId }, data: { updatedAt: new Date() } });
 
   return NextResponse.json({
     message: {
       id: msg.id,
-      roomId: msg.roomId,
+      roomId: msg.roomId ?? roomId,
       senderId: msg.senderId,
-      body: msg.body,
+      body: msg.content,
       createdAt: msg.createdAt.toISOString(),
     },
   });

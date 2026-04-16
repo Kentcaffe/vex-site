@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { getLastRoomMessage } from "@/lib/chat-realtime-store";
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
@@ -21,36 +22,37 @@ export async function GET() {
         },
       },
       buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
-      messages: { orderBy: { createdAt: "desc" }, take: 1 },
       readStates: { where: { userId }, select: { lastReadAt: true } },
     },
     orderBy: { updatedAt: "desc" },
     take: 50,
   });
 
-  const out = rooms.map((r) => {
+  const out = await Promise.all(rooms.map(async (r) => {
+    const last = await getLastRoomMessage(r.id);
     const seller = r.listing.user;
     const isBuyer = r.buyerId === userId;
     const otherName = isBuyer
       ? seller.name ?? seller.email ?? "Seller"
       : r.buyer.name ?? r.buyer.email ?? "Buyer";
     const otherAvatar = isBuyer ? seller.avatarUrl ?? null : r.buyer.avatarUrl ?? null;
-    const last = r.messages[0];
     const lastReadAt = r.readStates[0]?.lastReadAt;
-    const unread =
-      Boolean(last?.senderId && last.senderId !== userId) &&
-      Boolean(!lastReadAt || last.createdAt.getTime() > lastReadAt.getTime());
+    const unread = Boolean(
+      last &&
+        last.receiverId === userId &&
+        (!lastReadAt || last.createdAt.getTime() > lastReadAt.getTime()),
+    );
     return {
       roomId: r.id,
       listingId: r.listingId,
       listingTitle: r.listing.title,
       otherUserName: otherName,
       otherUserAvatarUrl: otherAvatar,
-      lastMessageBody: last?.body ?? null,
+      lastMessageBody: last?.content ?? null,
       lastMessageAt: last?.createdAt.toISOString() ?? null,
       unread,
     };
-  });
+  }));
 
   return NextResponse.json({ rooms: out });
 }

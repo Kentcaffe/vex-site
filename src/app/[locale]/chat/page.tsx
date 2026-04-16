@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { ChatInboxList } from "@/components/chat/ChatInboxList";
+import { getLastRoomMessage } from "@/lib/chat-realtime-store";
 import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
 
@@ -29,33 +30,34 @@ export default async function ChatInboxPage({ params }: Props) {
         },
       },
       buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
-      messages: { orderBy: { createdAt: "desc" }, take: 1 },
       readStates: { where: { userId }, select: { lastReadAt: true } },
     },
     orderBy: { updatedAt: "desc" },
     take: 50,
   });
 
-  const items = rooms.map((r) => {
+  const items = await Promise.all(rooms.map(async (r) => {
+    const last = await getLastRoomMessage(r.id);
     const seller = r.listing.user;
     const isBuyer = r.buyerId === userId;
     const otherName = isBuyer ? seller.name ?? seller.email ?? "" : r.buyer.name ?? r.buyer.email ?? "";
     const otherAvatar = isBuyer ? seller.avatarUrl ?? null : r.buyer.avatarUrl ?? null;
-    const last = r.messages[0];
     const lastReadAt = r.readStates[0]?.lastReadAt;
-    const unread =
-      Boolean(last?.senderId && last.senderId !== userId) &&
-      Boolean(!lastReadAt || last.createdAt.getTime() > lastReadAt.getTime());
+    const unread = Boolean(
+      last &&
+        last.receiverId === userId &&
+        (!lastReadAt || last.createdAt.getTime() > lastReadAt.getTime()),
+    );
     return {
       roomId: r.id,
       listingTitle: r.listing.title,
       otherUserName: otherName,
       otherUserAvatarUrl: otherAvatar,
-      lastMessageBody: last?.body ?? null,
+      lastMessageBody: last?.content ?? null,
       lastMessageAt: last?.createdAt.toISOString() ?? null,
       unread,
     };
-  });
+  }));
 
   const t = await getTranslations("Chat");
   return (

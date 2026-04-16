@@ -3,8 +3,8 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { useChatSocketContext } from "@/components/chat/chat-socket-context";
 import { chatAvatarHue, chatInitials, sameCalendarDay } from "@/lib/chat-ui";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 export type ChatBootstrap = {
   roomId: string;
@@ -38,12 +38,10 @@ function daySeparatorLabel(d: Date, locale: string, labelToday: string, labelYes
 export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   const t = useTranslations("Chat");
   const locale = useLocale();
-  const { socket, connected } = useChatSocketContext();
+  const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState(bootstrap.messages);
   const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(bootstrap.otherLastReadAt);
   const [draft, setDraft] = useState("");
-  const [typingPeer, setTypingPeer] = useState(false);
-  const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const roomId = bootstrap.roomId;
 
@@ -59,84 +57,78 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   }, [messages.length, scrollToBottom]);
 
   useEffect(() => {
-    if (!socket) {
-      return;
-    }
-    socket.emit("room:join", { roomId }, (err?: string) => {
-      if (err) {
-        console.warn("room:join", err);
-      }
-    });
-    const onNew = (msg: {
-      id: string;
-      roomId: string;
-      senderId: string;
-      body: string;
-      createdAt: string;
-    }) => {
-      if (msg.roomId !== roomId) {
-        return;
-      }
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === msg.id)) {
-          return prev;
-        }
-        return [...prev, { id: msg.id, senderId: msg.senderId, body: msg.body, createdAt: msg.createdAt }];
+    const supabase = createSupabaseBrowserClient();
+    const channel = supabase
+      .channel(`messages-room-${roomId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `room_id=eq.${roomId}`,
+        },
+        (payload) => {
+          const row = payload.new as {
+            id?: string;
+            sender_id?: string;
+            content?: string;
+            created_at?: string;
+          };
+          const id = row.id ?? crypto.randomUUID();
+          const senderId = row.sender_id ?? "";
+          const body = row.content ?? "";
+          const createdAt = row.created_at ?? new Date().toISOString();
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === id)) {
+              return prev;
+            }
+            return [...prev, { id, senderId, body, createdAt }];
+          });
+          if (senderId && senderId !== currentUserId) {
+            void fetch(`/api/chat/room/${roomId}/read`, { method: "POST", credentials: "include" });
+            setOtherLastReadAt(new Date().toISOString());
+          }
+        },
+      )
+      .subscribe((status) => {
+        setConnected(status === "SUBSCRIBED");
       });
-      if (msg.senderId !== currentUserId) {
-        void fetch(`/api/chat/room/${roomId}/read`, { method: "POST", credentials: "include" });
-        socket.emit("read", { roomId });
-      }
-    };
-    const onTyping = (p: { roomId?: string; userId?: string; typing?: boolean }) => {
-      if (p.roomId !== roomId || !p.userId || p.userId === currentUserId) {
-        return;
-      }
-      setTypingPeer(Boolean(p.typing));
-    };
-    const onRead = (p: { roomId?: string; userId?: string; lastReadAt?: string }) => {
-      if (p.roomId !== roomId || !p.lastReadAt || p.userId === currentUserId) {
-        return;
-      }
-      setOtherLastReadAt(p.lastReadAt);
-    };
-    socket.on("message:new", onNew);
-    socket.on("typing", onTyping);
-    socket.on("read:update", onRead);
-    void fetch(`/api/chat/room/${roomId}/read`, { method: "POST", credentials: "include" });
-    socket.emit("read", { roomId });
 
+    void fetch(`/api/chat/room/${roomId}/read`, { method: "POST", credentials: "include" });
     return () => {
-      socket.emit("room:leave", { roomId });
-      socket.off("message:new", onNew);
-      socket.off("typing", onTyping);
-      socket.off("read:update", onRead);
+      channel.unsubscribe();
+      setConnected(false);
     };
-  }, [socket, roomId, currentUserId]);
+  }, [roomId, currentUserId]);
 
   const send = useCallback(async () => {
     const text = draft.trim();
-    if (!text || !socket) {
+    if (!text) {
       return;
     }
-    socket.emit("message:send", { roomId, body: text });
+    const res = await fetch(`/api/chat/room/${roomId}/message`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body: text }),
+    });
+    if (!res.ok) {
+      return;
+    }
+    const data = (await res.json()) as {
+      message?: { id: string; senderId: string; body: string; createdAt: string };
+    };
+    if (data.message) {
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === data.message!.id)) {
+          return prev;
+        }
+        return [...prev, data.message!];
+      });
+    }
     setDraft("");
-    socket.emit("typing", { roomId, typing: false });
-  }, [draft, socket, roomId]);
-
-  const onDraftChange = (v: string) => {
-    setDraft(v);
-    if (!socket) {
-      return;
-    }
-    socket.emit("typing", { roomId, typing: v.length > 0 });
-    if (typingTimer.current) {
-      clearTimeout(typingTimer.current);
-    }
-    typingTimer.current = setTimeout(() => {
-      socket.emit("typing", { roomId, typing: false });
-    }, 2000);
-  };
+  }, [draft, roomId]);
 
   const lastOwn = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -286,16 +278,6 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
           </ul>
         )}
 
-        {typingPeer ? (
-          <div className="mt-3 flex items-center gap-2 pl-10 text-xs text-zinc-500 dark:text-zinc-400" aria-live="polite">
-            <span className="inline-flex gap-1">
-              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 [animation-delay:0ms]" />
-              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 [animation-delay:150ms]" />
-              <span className="inline-block h-1.5 w-1.5 animate-bounce rounded-full bg-zinc-400 [animation-delay:300ms]" />
-            </span>
-            <span className="italic">{t("typing")}</span>
-          </div>
-        ) : null}
         <div ref={bottomRef} className="h-px shrink-0" />
       </div>
 
@@ -310,7 +292,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
         <div className="flex gap-2 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-1.5 shadow-inner dark:border-zinc-700 dark:bg-zinc-950/50">
           <textarea
             value={draft}
-            onChange={(e) => onDraftChange(e.target.value)}
+            onChange={(e) => setDraft(e.target.value)}
             maxLength={bootstrap.maxBodyLength}
             rows={1}
             placeholder={t("placeholder")}

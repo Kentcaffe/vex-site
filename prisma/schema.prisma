@@ -38,10 +38,28 @@ model User {
   favorites     ListingFavorite[]
   passwordResetTokens PasswordResetToken[]
   notifications UserNotification[]
+  sentMessages  Message[]      @relation("MessageSender")
+  receivedMessages Message[]   @relation("MessageReceiver")
   /** JSON: theme, notifications, privacy toggles, activity log snippets, etc. */
   preferences   Json?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now()) @updatedAt
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String   @map("sender_id")
+  sender     User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiverId String   @map("receiver_id")
+  receiver   User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  roomId     String?  @map("room_id")
+  content    String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([roomId, createdAt])
+  @@index([receiverId, createdAt])
+  @@index([senderId, createdAt])
+  @@map("messages")
 }
 
 model PasswordResetToken {

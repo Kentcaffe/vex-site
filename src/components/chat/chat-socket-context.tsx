@@ -1,11 +1,10 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { Socket } from "socket.io-client";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 type ChatSocketContextValue = {
-  socket: Socket | null;
   connected: boolean;
   unreadCount: number;
   refreshUnread: () => Promise<void>;
@@ -16,22 +15,16 @@ const ChatSocketContext = createContext<ChatSocketContextValue | null>(null);
 async function noopRefresh(): Promise<void> {}
 
 const disconnectedValue: ChatSocketContextValue = {
-  socket: null,
   connected: false,
   unreadCount: 0,
   refreshUnread: noopRefresh,
 };
 
-function socketUrl(): string {
-  return process.env.NEXT_PUBLIC_SOCKET_URL ?? "https://vex.md";
-}
-
 function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
   const { data: session } = useAuthSession();
-  const [socket, setSocket] = useState<Socket | null>(null);
   const [connected, setConnected] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const socketRef = useRef<Socket | null>(null);
+  const realtimeRef = useRef<ReturnType<ReturnType<typeof createSupabaseBrowserClient>["channel"]> | null>(null);
 
   const refreshUnread = useCallback(async () => {
     try {
@@ -46,12 +39,17 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  /** Badge mesaje fără să aștepte socket.io (mai puțin JS pe main thread la încărcare). */
+  /** Badge mesaje menținut în sync prin endpoint + Supabase Realtime insert events. */
   useEffect(() => {
     if (!session?.user?.id) {
       return;
     }
-    void refreshUnread();
+    const timer = setTimeout(() => {
+      void refreshUnread();
+    }, 0);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [session?.user?.id, refreshUnread]);
 
   useEffect(() => {
@@ -60,98 +58,52 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    let cancelled = false;
-    let idleId: number | undefined;
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
-    const run = async () => {
-      const { io } = await import("socket.io-client");
-      if (cancelled) {
-        return;
-      }
-      const tokRes = await fetch("/api/chat/token", { credentials: "include" });
-      if (!tokRes.ok || cancelled) {
-        return;
-      }
-      const { token } = (await tokRes.json()) as { token?: string };
-      if (!token || cancelled) {
-        return;
-      }
-      const s = io(socketUrl(), {
-        auth: { token },
-        transports: ["websocket", "polling"],
-        reconnectionAttempts: 10,
-        reconnectionDelay: 2000,
-      });
-      if (cancelled) {
-        s.removeAllListeners();
-        s.disconnect();
-        return;
-      }
-      socketRef.current = s;
-      setSocket(s);
-
-      s.on("connect", () => {
-        if (!cancelled) {
-          setConnected(true);
-        }
-      });
-      s.on("disconnect", () => {
-        if (!cancelled) {
-          setConnected(false);
-        }
-      });
-      s.on("unread:refresh", () => {
-        void refreshUnread();
-      });
-      s.on("chat:notify", (payload: { preview?: string }) => {
-        if (typeof window !== "undefined" && document.hidden && Notification.permission === "granted") {
-          try {
-            new Notification("VEX", { body: payload?.preview ?? "" });
-          } catch {
-            /* ignore */
+    const supabase = createSupabaseBrowserClient();
+    const channel = supabase
+      .channel(`messages-unread-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `receiver_id=eq.${userId}`,
+        },
+        (payload) => {
+          if (typeof window !== "undefined" && document.hidden && Notification.permission === "granted") {
+            try {
+              const preview = typeof payload.new?.content === "string" ? payload.new.content : "";
+              new Notification("VEX", { body: preview.slice(0, 120) });
+            } catch {
+              /* ignore */
+            }
           }
-        }
-        void refreshUnread();
+          void refreshUnread();
+        },
+      )
+      .subscribe((status) => {
+        setConnected(status === "SUBSCRIBED");
       });
-
+    realtimeRef.current = channel;
+    const timer = setTimeout(() => {
       void refreshUnread();
-    };
-
-    const start = () => {
-      void run();
-    };
-
-    if (typeof window !== "undefined" && typeof window.requestIdleCallback === "function") {
-      idleId = window.requestIdleCallback(start, { timeout: 4500 });
-    } else {
-      timeoutId = setTimeout(start, 1);
-    }
+    }, 0);
 
     return () => {
-      cancelled = true;
-      if (idleId !== undefined && typeof window !== "undefined" && "cancelIdleCallback" in window) {
-        window.cancelIdleCallback(idleId);
-      }
-      if (timeoutId !== undefined) {
-        window.clearTimeout(timeoutId);
-      }
-      socketRef.current?.removeAllListeners();
-      socketRef.current?.disconnect();
-      socketRef.current = null;
-      setSocket(null);
+      clearTimeout(timer);
+      realtimeRef.current?.unsubscribe();
+      realtimeRef.current = null;
       setConnected(false);
     };
   }, [session?.user?.id, refreshUnread]);
 
   const value = useMemo(
     () => ({
-      socket,
       connected,
       unreadCount,
       refreshUnread,
     }),
-    [socket, connected, unreadCount, refreshUnread],
+    [connected, unreadCount, refreshUnread],
   );
 
   return <ChatSocketContext.Provider value={value}>{children}</ChatSocketContext.Provider>;

@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { ChatRoomView, type ChatBootstrap } from "@/components/chat/ChatRoomView";
 import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
+import { listRoomMessages } from "@/lib/chat-realtime-store";
 import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
 
@@ -40,11 +41,12 @@ export default async function ChatFromListingPage({ params }: Props) {
     create: { listingId, buyerId: userId },
     update: {},
     include: {
-      messages: { orderBy: { createdAt: "asc" }, take: 200 },
       readStates: { where: { userId: { in: [userId, listing.userId] } } },
       buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
     },
   });
+
+  const messages = await listRoomMessages(room.id, 200);
 
   const seller = listing.user;
   const readByOther = room.readStates.find((s: { userId: string }) => s.userId !== userId);
@@ -63,10 +65,10 @@ export default async function ChatFromListingPage({ params }: Props) {
     otherUserName: seller.name ?? seller.email ?? "",
     otherUserAvatarUrl: seller.avatarUrl ?? null,
     myAvatarUrl: buyerRow.avatarUrl ?? null,
-    messages: room.messages.map((m: { id: string; senderId: string; body: string; createdAt: Date }) => ({
+    messages: messages.map((m: { id: string; senderId: string; content: string; createdAt: Date }) => ({
       id: m.id,
       senderId: m.senderId,
-      body: m.body,
+      body: m.content,
       createdAt: m.createdAt.toISOString(),
     })),
     otherLastReadAt: readByOther?.lastReadAt.toISOString() ?? null,

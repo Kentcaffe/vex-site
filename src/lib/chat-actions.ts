@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { countUnreadRoomMessages } from "@/lib/chat-realtime-store";
 
 export const CHAT_MESSAGE_MAX = 4000;
 
@@ -39,12 +40,10 @@ export async function unreadTotalForUser(userId: string): Promise<number> {
       where: { roomId_userId: { roomId, userId } },
     });
     const since = rs?.lastReadAt ?? new Date(0);
-    const n = await prisma.chatMessage.count({
-      where: {
-        roomId,
-        senderId: { not: userId },
-        createdAt: { gt: since },
-      },
+    const n = await countUnreadRoomMessages({
+      roomId,
+      userId,
+      since,
     });
     total += n;
   }

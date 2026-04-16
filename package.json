@@ -6,10 +6,9 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "concurrently -n next,socket -c blue,magenta \"next dev --webpack\" \"tsx src/socket-server.ts\"",
+    "dev": "next dev --webpack",
     "dev:api": "node backend/server.js",
     "dev:next": "next dev --webpack",
-    "socket": "tsx src/socket-server.ts",
     "build": "next build",
     "build:with-db": "prisma generate && prisma migrate deploy && next build",
     "build:render": "prisma generate && npm run build",
@@ -51,8 +50,6 @@
     "prisma": "^7.7.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "socket.io": "^4.8.3",
-    "socket.io-client": "^4.8.3",
     "zod": "^4.3.6"
   },
   "prisma": {

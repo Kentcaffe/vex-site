@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
+import { listRoomMessages } from "@/lib/chat-realtime-store";
 import { prisma } from "@/lib/prisma";
 
 type Props = { params: Promise<{ listingId: string }> };
@@ -29,14 +30,11 @@ export async function GET(_req: Request, { params }: Props) {
     create: { listingId, buyerId: userId },
     update: {},
     include: {
-      messages: {
-        orderBy: { createdAt: "asc" },
-        take: 200,
-        include: { sender: { select: { id: true, name: true, email: true } } },
-      },
       readStates: { where: { userId: { in: [userId, listing.userId] } } },
     },
   });
+
+  const messages = await listRoomMessages(room.id, 200);
 
   const seller = listing.user;
   const readByOther = room.readStates.find((s) => s.userId !== userId);
@@ -47,10 +45,10 @@ export async function GET(_req: Request, { params }: Props) {
     listing: { id: listing.id, title: listing.title },
     seller: { id: seller.id, name: seller.name ?? seller.email ?? "" },
     meIsBuyer: true,
-    messages: room.messages.map((m) => ({
+    messages: messages.map((m: { id: string; senderId: string; content: string; createdAt: Date }) => ({
       id: m.id,
       senderId: m.senderId,
-      body: m.body,
+      body: m.content,
       createdAt: m.createdAt.toISOString(),
     })),
     otherLastReadAt: readByOther?.lastReadAt.toISOString() ?? null,
