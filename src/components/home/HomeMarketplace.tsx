@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { ChevronRight, MapPin, Search, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
@@ -48,165 +49,207 @@ export async function HomeMarketplace({
   loadError = false,
 }: Props) {
   const t = await getTranslations("Home.marketplace");
+  const tNav = await getTranslations("Nav");
 
   return (
-    <div className="app-shell app-section">
-      <div className="space-y-6 pb-24">
-        <section className="surface-card p-4">
-          <div className="flex items-center justify-between gap-3">
-            <h1 className="text-xl font-bold tracking-tight text-zinc-900">{t("gridTitle")}</h1>
-            <Link href="/cont" className="rounded-full border border-zinc-200 p-2.5 text-zinc-700">
-              <span aria-hidden>👤</span>
-              <span className="sr-only">Cont</span>
+    <div className="app-shell app-section pb-28 md:pb-10">
+      {/* Hero + căutare — mobile-first */}
+      <section className="relative overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-gradient-to-br from-orange-500 via-amber-500 to-orange-600 p-5 shadow-[var(--mp-shadow-lg)] sm:p-7 md:rounded-3xl md:p-8">
+        <div className="pointer-events-none absolute -right-16 -top-24 h-56 w-56 rounded-full bg-white/10 blur-3xl" aria-hidden />
+        <div className="pointer-events-none absolute -bottom-20 -left-10 h-48 w-48 rounded-full bg-black/10 blur-2xl" aria-hidden />
+        <div className="relative">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white/95">
+                <Sparkles className="h-3.5 w-3.5 shrink-0" aria-hidden />
+                {t("gridTitle")}
+              </p>
+              <h1 className="mt-3 max-w-xl text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl">
+                {t("promoTile1Title")}
+              </h1>
+              <p className="mt-2 max-w-lg text-sm leading-relaxed text-white/90">{t("promoTile1Body")}</p>
+            </div>
+            <Link
+              href="/cont"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/30 bg-white/15 text-white shadow-md backdrop-blur-sm transition hover:bg-white/25"
+              aria-label="Cont"
+            >
+              <span className="text-lg" aria-hidden>
+                👤
+              </span>
             </Link>
           </div>
 
-          <form action="/anunturi" method="get" className="sticky top-0 z-20 mt-4 bg-[#f8fafc] py-1">
-            <div className="relative">
-              <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" aria-hidden>
-                ⌕
+          <form action="/anunturi" method="get" className="relative z-10 mt-6">
+            <label htmlFor="home-search" className="sr-only">
+              Caută
+            </label>
+            <div className="relative flex items-center gap-2 rounded-2xl border border-white/25 bg-white p-1.5 shadow-inner sm:rounded-3xl sm:p-2">
+              <span className="pointer-events-none flex h-11 w-11 shrink-0 items-center justify-center text-orange-600" aria-hidden>
+                <Search className="h-5 w-5" strokeWidth={2.25} />
               </span>
               <input
+                id="home-search"
                 type="search"
                 name="search"
-                placeholder="Caută anunțuri..."
-                className="field-input h-[52px] rounded-[20px] border-zinc-200 bg-zinc-100 pl-11 pr-4 text-base"
+                placeholder="Caută anunțuri, categorii, oraș…"
+                className="min-h-[48px] w-full min-w-0 flex-1 border-0 bg-transparent pr-3 text-base text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
                 autoComplete="off"
               />
-            </div>
-          </form>
-        </section>
-
-        <section className="surface-card p-4">
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <h2 className="text-base font-semibold text-zinc-900">{t("categoriesTitle")}</h2>
-            <Link href="/categorii" className="text-sm font-semibold text-[#0b57d0]">
-              {t("viewAll")}
-            </Link>
-          </div>
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-            {rootCategories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/categorii?c=${encodeURIComponent(cat.slug)}`}
-                className="shrink-0 rounded-full border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm"
+              <button
+                type="submit"
+                className="hidden shrink-0 rounded-xl bg-orange-600 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-orange-700 sm:inline-flex"
               >
-                <span className="mr-1.5" aria-hidden>
-                  {emojiForRootSlug(cat.slug)}
-                </span>
-                {labelFor(cat, locale)}
-              </Link>
-            ))}
-          </div>
-        </section>
+                {tNav("searchSubmit")}
+              </button>
+            </div>
+            <p className="mt-2 text-center text-[11px] text-white/75 sm:text-left">Ex.: mașini, telefoane, chirie — direct pe telefon.</p>
+          </form>
+        </div>
+      </section>
 
-        <section className="surface-card p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm text-zinc-500">{listings.length} rezultate</p>
-            <Link href="/anunturi" className="text-sm font-semibold text-emerald-700">
-              {t("viewAll")}
+      {/* Categorii — scroll orizontal */}
+      <section className="mt-5 md:mt-8">
+        <div className="mb-3 flex items-center justify-between gap-2 px-0.5">
+          <h2 className="text-base font-bold text-[var(--mp-text)] sm:text-lg">{t("categoriesTitle")}</h2>
+          <Link
+            href="/categorii"
+            className="inline-flex items-center gap-0.5 text-sm font-semibold text-orange-600 dark:text-orange-400"
+          >
+            {t("viewAll")}
+            <ChevronRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </div>
+        <div className="-mx-1 flex gap-2.5 overflow-x-auto pb-2 pt-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {rootCategories.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/categorii?c=${encodeURIComponent(cat.slug)}`}
+              className="flex min-w-[max-content] shrink-0 items-center gap-2 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] px-4 py-3 text-sm font-semibold text-[var(--mp-text-secondary)] shadow-[var(--mp-shadow)] transition active:scale-[0.98] hover:border-orange-200 hover:bg-[var(--mp-primary-soft)] dark:hover:border-orange-800/50"
+            >
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--mp-surface-muted)] text-lg" aria-hidden>
+                {emojiForRootSlug(cat.slug)}
+              </span>
+              {labelFor(cat, locale)}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Listă anunțuri */}
+      <section className="mt-6 md:mt-8">
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--mp-text-muted)]">
+              {listings.length} {listings.length === 1 ? "anunț" : "anunțuri"}
+            </p>
+            <p className="mt-1 text-sm text-[var(--mp-text-muted)]">Cele mai noi pe platformă</p>
+          </div>
+          <Link
+            href="/anunturi"
+            className="text-sm font-semibold text-orange-600 underline-offset-4 hover:underline dark:text-orange-400"
+          >
+            {t("viewAll")}
+          </Link>
+        </div>
+
+        {loadError ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-900/50 dark:bg-red-950/30">
+            <p className="text-sm font-semibold text-red-800 dark:text-red-200">Eroare la încărcarea anunțurilor.</p>
+            <p className="mt-1 text-sm text-red-700/90 dark:text-red-300/90">Încearcă refresh sau revino în câteva momente.</p>
+          </div>
+        ) : listings.length === 0 ? (
+          <div className="rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-10 text-center shadow-[var(--mp-shadow-md)]">
+            <p className="text-sm text-[var(--mp-text-muted)]">{t("empty")}</p>
+            <Link href="/publica" className="btn-primary mt-5 inline-flex w-full max-w-xs justify-center sm:w-auto">
+              Adaugă primul anunț
             </Link>
           </div>
-
-          {loadError ? (
-            <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-center">
-              <p className="text-sm font-medium text-red-700">Eroare la încărcarea anunțurilor.</p>
-              <p className="mt-1 text-sm text-red-600">Încearcă refresh sau revino în câteva momente.</p>
-            </div>
-          ) : listings.length === 0 ? (
-            <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center">
-              <p className="text-sm text-zinc-600">{t("empty")}</p>
-              <Link href="/publica" className="btn-primary mt-4 w-full sm:w-auto">
-                Adaugă primul anunț
-              </Link>
-            </div>
-          ) : (
-            <ul className="grid grid-cols-2 gap-3">
-              {listings.map((item, index) => {
-                const cover = parseStoredListingImages(item.images)[0];
-                const place = item.city + (item.district ? ` · ${item.district}` : "");
-                return (
-                  <li key={item.id} className="group">
-                    <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
-                      <div className="relative aspect-square bg-zinc-100">
-                        <Link href={`/anunturi/${item.id}`} className="absolute inset-0 z-0 block" aria-label={item.title}>
-                          {cover ? (
-                            <ListingCoverImg
-                              src={cover}
-                              alt=""
-                              priority={index < 2}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center text-sm text-zinc-400">Fără imagine</div>
-                          )}
-                        </Link>
-                        <div className="absolute right-2 top-2 z-10">
-                          <FavoriteButton
-                            listingId={item.id}
-                            initialFavorited={favoritedIds.has(item.id)}
-                            variant="icon"
+        ) : (
+          <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+            {listings.map((item, index) => {
+              const cover = parseStoredListingImages(item.images)[0];
+              const place = item.city + (item.district ? ` · ${item.district}` : "");
+              return (
+                <li key={item.id} className="group">
+                  <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] shadow-[var(--mp-shadow-md)] transition hover:-translate-y-0.5 hover:shadow-[var(--mp-shadow-lg)]">
+                    <div className="relative mp-card-image">
+                      <Link href={`/anunturi/${item.id}`} className="absolute inset-0 z-0 block" aria-label={item.title}>
+                        {cover ? (
+                          <ListingCoverImg
+                            src={cover}
+                            alt=""
+                            priority={index < 4}
+                            className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
                           />
-                        </div>
-                      </div>
-                      <div className="p-3">
-                        <Link href={`/anunturi/${item.id}`} className="block">
-                          <span className="line-clamp-2 text-sm font-semibold leading-snug text-zinc-900">
-                            {item.title}
-                          </span>
-                        </Link>
-                        <p className="mt-2 text-base font-bold text-emerald-700">
-                          {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
-                        </p>
-                        <p className="mt-1 line-clamp-1 text-xs text-zinc-500">{place}</p>
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-[var(--mp-surface-muted)] text-xs text-[var(--mp-text-muted)]">
+                            Fără imagine
+                          </div>
+                        )}
+                      </Link>
+                      <div className="absolute right-2 top-2 z-10">
+                        <FavoriteButton listingId={item.id} initialFavorited={favoritedIds.has(item.id)} variant="icon" />
                       </div>
                     </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-
-        <Link
-          href="/publica"
-          className="fixed bottom-[5.2rem] left-1/2 z-40 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-emerald-600 text-3xl font-bold text-white shadow-[0_10px_24px_rgba(5,150,105,0.45)] md:hidden"
-          aria-label={t("promo2Cta")}
-        >
-          +
-        </Link>
-        <div className="hidden md:block">
-          <section className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-            <Link href="/anunturi" className="surface-card p-5">
-              <p className="text-sm font-bold text-zinc-900">{t("promoTile1Title")}</p>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("promoTile1Body")}</p>
-            </Link>
-            <Link href="/chat" className="surface-card p-5">
-              <p className="text-sm font-bold text-zinc-900">{t("promoTile2Title")}</p>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("promoTile2Body")}</p>
-            </Link>
-            <Link href="/publica" className="surface-card p-5">
-              <p className="text-sm font-bold text-zinc-900">{t("promoTile3Title")}</p>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("promoTile3Body")}</p>
-            </Link>
-          </section>
-        </div>
-        {false ? (
-          <section className="surface-card p-4">
-            <ul className="grid grid-cols-2 gap-3">
-              {Array.from({ length: 4 }).map((_, i) => (
-                <li key={i} className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
-                  <div className="aspect-square animate-pulse bg-zinc-200" />
-                  <div className="space-y-2 p-3">
-                    <div className="h-4 w-full animate-pulse rounded bg-zinc-200" />
-                    <div className="h-4 w-2/3 animate-pulse rounded bg-zinc-200" />
-                  </div>
+                    <div className="flex flex-1 flex-col p-3 sm:p-3.5">
+                      <Link href={`/anunturi/${item.id}`} className="block min-h-0 flex-1">
+                        <span className="line-clamp-2 text-sm font-bold leading-snug text-[var(--mp-text)] group-hover:text-orange-600 dark:group-hover:text-orange-400">
+                          {item.title}
+                        </span>
+                      </Link>
+                      <p className="mt-2 text-base font-extrabold text-orange-600 tabular-nums dark:text-orange-400">
+                        {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
+                      </p>
+                      <p className="mt-1.5 flex items-center gap-1 text-xs text-[var(--mp-text-muted)]">
+                        <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" aria-hidden />
+                        <span className="line-clamp-1">{place}</span>
+                      </p>
+                    </div>
+                  </article>
                 </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      {/* FAB mobil — deasupra bottom nav */}
+      <Link
+        href="/publica"
+        className="fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom,0px))] left-1/2 z-40 flex h-14 w-14 -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-600 text-2xl font-bold text-white shadow-[0_12px_32px_-4px_rgba(234,88,12,0.55)] transition active:scale-95 md:hidden"
+        aria-label={t("promo2Cta")}
+      >
+        +
+      </Link>
+
+      {/* Promo desktop */}
+      <div className="mt-10 hidden md:block">
+        <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Link
+            href="/anunturi"
+            className="group rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-6 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)] dark:hover:border-orange-800/40"
+          >
+            <p className="text-sm font-bold text-[var(--mp-text)]">{t("promoTile1Title")}</p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--mp-text-muted)]">{t("promoTile1Body")}</p>
+          </Link>
+          <Link
+            href="/chat"
+            className="group rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-6 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)] dark:hover:border-orange-800/40"
+          >
+            <p className="text-sm font-bold text-[var(--mp-text)]">{t("promoTile2Title")}</p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--mp-text-muted)]">{t("promoTile2Body")}</p>
+          </Link>
+          <Link
+            href="/publica"
+            className="group rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-6 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)] dark:hover:border-orange-800/40"
+          >
+            <p className="text-sm font-bold text-[var(--mp-text)]">{t("promoTile3Title")}</p>
+            <p className="mt-2 text-sm leading-relaxed text-[var(--mp-text-muted)]">{t("promoTile3Body")}</p>
+          </Link>
+        </section>
       </div>
+
       <ScrollToTopButton />
     </div>
   );

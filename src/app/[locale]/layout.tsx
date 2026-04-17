@@ -34,7 +34,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <div className="flex min-h-screen flex-col overflow-x-clip">
           <SiteHeader />
           <div className="flex min-h-0 flex-1 flex-col pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-0">
-            <main className="min-w-0 flex-1">{children}</main>
+            <main className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</main>
             <SiteFooter />
           </div>
           <MobileBottomNav />

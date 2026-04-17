@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { loadAuthTab, saveAuthTab } from "@/lib/auth-form-persist";
 import { routing } from "@/i18n/routing";
 import { LoginTab } from "@/components/auth/LoginTab";
 import { RegisterTab } from "@/components/auth/RegisterTab";
@@ -16,6 +17,19 @@ export function AuthCard({ oauth }: Props) {
   const locale = useLocale();
   const [tab, setTab] = useState<"login" | "register">("login");
   const callbackUrl = locale === routing.defaultLocale ? "/" : `/${locale}`;
+
+  useEffect(() => {
+    const saved = loadAuthTab();
+    if (saved) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- restabilire din sessionStorage după hidratare (evită mismatch SSR)
+      setTab(saved);
+    }
+  }, []);
+
+  function setTabPersist(next: "login" | "register") {
+    setTab(next);
+    saveAuthTab(next);
+  }
 
   return (
     <div className="w-full max-w-[420px]">
@@ -34,7 +48,7 @@ export function AuthCard({ oauth }: Props) {
             type="button"
             role="tab"
             aria-selected={tab === "login"}
-            onClick={() => setTab("login")}
+            onClick={() => setTabPersist("login")}
             className={`relative flex-1 rounded-lg py-2.5 text-[14px] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563eb]/40 ${
               tab === "login"
                 ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-950 dark:text-zinc-50"
@@ -47,7 +61,7 @@ export function AuthCard({ oauth }: Props) {
             type="button"
             role="tab"
             aria-selected={tab === "register"}
-            onClick={() => setTab("register")}
+            onClick={() => setTabPersist("register")}
             className={`relative flex-1 rounded-lg py-2.5 text-[14px] font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2563eb]/40 ${
               tab === "register"
                 ? "bg-white text-zinc-900 shadow-sm dark:bg-zinc-950 dark:text-zinc-50"

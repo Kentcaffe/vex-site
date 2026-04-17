@@ -147,12 +147,12 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   const remaining = bootstrap.maxBodyLength - draft.length;
 
   return (
-    <div className="surface-card overflow-hidden ring-1 ring-zinc-900/5 dark:ring-white/5">
+    <div className="surface-card flex min-h-0 w-full flex-1 flex-col overflow-hidden ring-1 ring-zinc-900/5 dark:ring-white/5 md:min-h-[560px] md:flex-none">
       {/* Header */}
-      <div className="flex items-start gap-3 border-b border-zinc-100 bg-gradient-to-b from-zinc-50 to-white px-4 py-4 dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-900">
+      <div className="flex shrink-0 items-start gap-3 border-b border-[var(--mp-border)] bg-[var(--mp-surface-muted)] px-4 py-3.5">
         <Link
           href="/chat"
-          className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-200 text-zinc-600 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[var(--mp-border)] text-[var(--mp-text-muted)] transition hover:bg-[var(--mp-surface)]"
           aria-label={t("backToInbox")}
         >
           <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -175,12 +175,12 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-[15px] font-semibold leading-tight text-zinc-900 dark:text-zinc-50">
+          <p className="truncate text-[15px] font-semibold leading-tight text-[var(--mp-text)]">
             {bootstrap.otherUserName}
           </p>
           <Link
             href={`/anunturi/${bootstrap.listing.id}`}
-            className="mt-0.5 line-clamp-2 text-xs font-medium text-emerald-700 hover:underline dark:text-emerald-400"
+            className="mt-0.5 line-clamp-2 text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
           >
             {bootstrap.listing.title}
           </Link>
@@ -206,7 +206,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
         role="log"
         aria-live="polite"
         aria-relevant="additions"
-        className="flex max-h-[min(62vh,560px)] min-h-[280px] flex-col overflow-y-auto bg-zinc-50/90 px-3 py-4 dark:bg-zinc-950/50"
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain bg-[var(--mp-page)] px-3 py-4 [-webkit-overflow-scrolling:touch]"
       >
         {messages.length === 0 ? (
           <p className="mx-auto max-w-sm py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">{t("emptyThread")}</p>
@@ -258,15 +258,15 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
                       <div
                         className={`rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug shadow-sm ${
                           mine
-                            ? "rounded-br-md bg-emerald-600 text-white dark:bg-emerald-600"
-                            : "rounded-bl-md border border-zinc-200/80 bg-white text-zinc-900 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-50"
+                            ? "rounded-br-md bg-[var(--mp-accent-chat)] text-white"
+                            : "rounded-bl-md border border-[var(--mp-border)] bg-[var(--mp-surface)] text-[var(--mp-text)]"
                         }`}
                       >
                         <p className="whitespace-pre-wrap break-words">{m.body}</p>
                       </div>
                       <time
                         dateTime={m.createdAt}
-                        className={`mt-1 px-1 text-[10px] tabular-nums ${mine ? "text-emerald-700/90 dark:text-emerald-300/80" : "text-zinc-400"}`}
+                        className={`mt-1 px-1 text-[10px] tabular-nums ${mine ? "text-[var(--mp-accent-chat)] opacity-90" : "text-[var(--mp-text-muted)]"}`}
                       >
                         {timeStr}
                       </time>
@@ -282,21 +282,21 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
       </div>
 
       {lastOwn && seenOnLastOwn ? (
-        <p className="border-t border-zinc-100 px-4 py-1.5 text-center text-[11px] text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+        <p className="shrink-0 border-t border-[var(--mp-border)] px-4 py-1.5 text-center text-[11px] text-[var(--mp-text-muted)]">
           {t("seen")}
         </p>
       ) : null}
 
       {/* Composer */}
-      <div className="border-t border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex gap-2 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-1.5 shadow-inner dark:border-zinc-700 dark:bg-zinc-950/50">
+      <div className="shrink-0 border-t border-[var(--mp-border)] bg-[var(--mp-surface)] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+        <div className="flex gap-2 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface-muted)] p-1.5 shadow-inner">
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             maxLength={bootstrap.maxBodyLength}
             rows={1}
             placeholder={t("placeholder")}
-            className="max-h-32 min-h-[44px] flex-1 resize-none rounded-xl bg-transparent px-2.5 py-2 text-[15px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0 dark:text-zinc-100 dark:placeholder:text-zinc-500"
+            className="max-h-32 min-h-[48px] flex-1 resize-none rounded-xl bg-transparent px-2.5 py-2.5 text-[15px] text-[var(--mp-text)] placeholder:text-[var(--mp-text-muted)] focus:outline-none focus:ring-0"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -309,7 +309,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
             type="button"
             onClick={() => void send()}
             disabled={!draft.trim() || !connected}
-            className="flex h-11 w-11 shrink-0 items-center justify-center self-end rounded-xl bg-emerald-600 text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex h-11 w-11 shrink-0 items-center justify-center self-end rounded-xl bg-[var(--mp-accent-chat)] text-white shadow-sm transition hover:bg-[var(--mp-accent-chat-hover)] disabled:cursor-not-allowed disabled:opacity-40"
             title={t("send")}
             aria-label={t("send")}
           >

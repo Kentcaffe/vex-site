@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Lock, Mail, Phone, User } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -12,6 +12,7 @@ import type { OauthAvailability } from "@/components/auth/types";
 import { routing } from "@/i18n/routing";
 import { evaluatePasswordRules, passwordMeetsAllRules } from "@/lib/auth-password-rules";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { clearRegisterFields, loadRegisterFields, saveRegisterFields } from "@/lib/auth-form-persist";
 
 type Props = {
   oauth?: OauthAvailability;
@@ -35,8 +36,26 @@ export function RegisterTab({ oauth }: Props) {
   const [phoneErr, setPhoneErr] = useState<string | null>(null);
   const [termsErr, setTermsErr] = useState<string | null>(null);
   const [clientBlock, setClientBlock] = useState<string | null>(null);
+  const [name, setName] = useState("");
+  const [fieldsHydrated, setFieldsHydrated] = useState(false);
 
   const rules = useMemo(() => evaluatePasswordRules(password), [password]);
+
+  useEffect(() => {
+    const saved = loadRegisterFields();
+    if (saved) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- restabilire din sessionStorage după hidratare
+      setName(saved.name);
+      setEmail(saved.email);
+      setPhone(saved.phone);
+    }
+    setFieldsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!fieldsHydrated) return;
+    saveRegisterFields({ name, email, phone });
+  }, [fieldsHydrated, name, email, phone]);
 
   function validateClient(fd: FormData): boolean {
     setRegisterError(null);
@@ -100,6 +119,7 @@ export function RegisterTab({ oauth }: Props) {
           return;
         }
         await fetch("/api/auth/sync-user", { method: "POST", credentials: "include" });
+        clearRegisterFields();
         setRegisterOk(true);
       })
       .finally(() => {
@@ -113,7 +133,16 @@ export function RegisterTab({ oauth }: Props) {
     <div className="space-y-6">
       <form className="space-y-5" onSubmit={onSubmit}>
         <IconField id="reg-name" label={t("nameOptional")} icon={User}>
-          <input id="reg-name" name="name" type="text" maxLength={80} autoComplete="name" className={authInputClass} />
+          <input
+            id="reg-name"
+            name="name"
+            type="text"
+            maxLength={80}
+            autoComplete="name"
+            className={authInputClass}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
         </IconField>
 
         <IconField

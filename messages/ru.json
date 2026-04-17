@@ -24,7 +24,9 @@
     "oauthFacebook": "Войти через Facebook",
     "loginWithEmail": "По email",
     "bottomNavAria": "Основная навигация",
-    "bottomNavPublish": "Добавить"
+    "bottomNavPublish": "Добавить",
+    "themeLight": "Светлая тема",
+    "themeDark": "Тёмная тема"
   },
   "Chat": {
     "title": "Переписка",

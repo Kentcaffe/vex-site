@@ -9,6 +9,7 @@ import { UserRound } from "lucide-react";
 import { ChatInboxLink } from "@/components/chat/ChatInboxLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const searchInputClass = "field-input h-12 pl-11 md:h-12";
 
@@ -30,47 +31,48 @@ export async function SiteHeader() {
   const publishHref = localizedHref(locale, "/publica");
 
   return (
-    <header className="static border-b border-zinc-200/80 bg-white md:bg-white/90 md:backdrop-blur-md md:dark:border-zinc-800/80 md:dark:bg-zinc-950/90">
-      <div className="hidden bg-emerald-600 px-4 py-1.5 text-center text-[11px] font-medium text-white/95 sm:text-xs md:block">
+    <header className="static border-b border-[var(--mp-border)] bg-[var(--mp-page)] md:bg-[var(--mp-nav-glass)] md:backdrop-blur-md md:supports-[backdrop-filter]:bg-[var(--mp-nav-glass)]">
+      <div className="hidden bg-gradient-to-r from-orange-600 to-amber-600 px-4 py-1.5 text-center text-[11px] font-medium text-white/95 sm:text-xs md:block">
         {tm("banner")}
       </div>
       <div className="app-shell py-2.5 sm:py-4">
-        <div className="rounded-2xl border border-zinc-200 bg-white p-3 shadow-sm md:surface-card-soft md:border-zinc-200/70 md:p-4 md:dark:border-zinc-700">
+        <div className="rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-3 shadow-[var(--mp-shadow-md)] md:p-4">
           <div className="md:hidden">
             <div className="flex min-w-0 items-center justify-between gap-3">
               <Link
                 href="/"
-                className="block truncate text-xl font-black tracking-tight text-zinc-950"
+                className="block truncate text-xl font-black tracking-tight text-[var(--mp-text)]"
                 title={tf("tagline")}
               >
                 {tf("siteName")}
               </Link>
               <details className="relative shrink-0">
-                <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-xl border border-zinc-200 bg-white text-zinc-700 shadow-sm [&::-webkit-details-marker]:hidden">
+                <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-xl border border-[var(--mp-border)] bg-[var(--mp-surface)] text-[var(--mp-text-secondary)] shadow-sm [&::-webkit-details-marker]:hidden">
                   <UserRound className="h-5 w-5" aria-hidden />
                   <span className="sr-only">{t("account")}</span>
                 </summary>
-                <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-56 rounded-2xl border border-zinc-200 bg-white p-2 shadow-lg">
+                <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 w-56 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-2 shadow-[var(--mp-shadow-lg)]">
                   <Link
                     href={accountHref}
-                    className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+                    className="block rounded-lg px-3 py-2 text-sm font-medium text-[var(--mp-text)] hover:bg-[var(--mp-surface-muted)]"
                   >
                     {t("account")}
                   </Link>
-                  <div className="px-3 py-2">
+                  <div className="flex items-center justify-between gap-2 px-2 py-2">
                     <LanguageSwitcher />
+                    <ThemeToggle labelLight={t("themeLight")} labelDark={t("themeDark")} />
                   </div>
                   {session?.user && isStaff(session.user.role) ? (
                     <Link
                       href="/admin"
-                      className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+                      className="block rounded-lg px-3 py-2 text-sm font-medium text-[var(--mp-text)] hover:bg-[var(--mp-surface-muted)]"
                     >
                       {t("admin")}
                     </Link>
                   ) : null}
                   {session?.user ? (
                     <div className="px-1 pt-1">
-                      <SignOutButton className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-left text-sm font-medium text-zinc-800 hover:bg-zinc-50" />
+                      <SignOutButton className="w-full rounded-lg border border-[var(--mp-border)] px-3 py-2 text-left text-sm font-medium text-[var(--mp-text)] hover:bg-[var(--mp-surface-muted)]" />
                     </div>
                   ) : null}
                 </div>
@@ -86,7 +88,7 @@ export async function SiteHeader() {
                   type="search"
                   name="search"
                   placeholder={t("searchPlaceholder")}
-                  className={`${searchInputClass} border-zinc-200 bg-white text-zinc-900`}
+                  className={`${searchInputClass} border-[var(--mp-border)] bg-[var(--mp-surface)] text-[var(--mp-text)]`}
                   autoComplete="off"
                 />
               </div>
@@ -101,15 +103,15 @@ export async function SiteHeader() {
           </div>
 
           <div className="mt-4 hidden min-w-0 flex-1 flex-col gap-4 md:flex">
-            <div className="min-w-0 lg:max-w-[240px]">
+            <div className="min-w-0 lg:max-w-[260px]">
               <Link
                 href="/"
-                className="block text-xl font-black tracking-tight text-zinc-950 sm:text-[1.7rem] md:dark:text-zinc-50"
+                className="block text-xl font-black tracking-tight text-[var(--mp-text)] sm:text-[1.7rem]"
                 title={tf("tagline")}
               >
                 {tf("siteName")}
               </Link>
-              <p className="mt-1 text-[11px] text-zinc-500 md:dark:text-zinc-400">
+              <p className="mt-1 text-[11px] text-[var(--mp-text-muted)]">
                 {tm("regionTag")} · {tm("activeListings", { count: listingCount })}
               </p>
             </div>
@@ -144,6 +146,7 @@ export async function SiteHeader() {
               <Link href={publishHref} className="btn-primary min-h-[44px] rounded-xl px-4">
                 {t("addListingShort")}
               </Link>
+              <ThemeToggle labelLight={t("themeLight")} labelDark={t("themeDark")} />
               <LanguageSwitcher />
               {session?.user ? (
                 <>
@@ -188,22 +191,22 @@ export async function SiteHeader() {
           </div>
         </div>
 
-        <nav className="mt-3 hidden flex-wrap items-center gap-x-4 gap-y-2 px-1 text-sm dark:border-zinc-800/80 lg:flex">
+        <nav className="mt-3 hidden flex-wrap items-center gap-x-4 gap-y-2 px-1 text-sm lg:flex">
           <Link
             href="/"
-            className="text-zinc-600 lg:hover:text-emerald-700 dark:text-zinc-400 lg:dark:hover:text-emerald-400"
+            className="text-[var(--mp-text-muted)] transition hover:text-[var(--mp-primary)]"
           >
             {t("home")}
           </Link>
           <Link
             href="/categorii"
-            className="font-medium text-emerald-700 lg:hover:underline dark:text-emerald-400"
+            className="font-semibold text-orange-600 hover:underline dark:text-orange-400"
           >
             {t("categories")}
           </Link>
           <Link
             href="/anunturi"
-            className="font-medium text-emerald-700 lg:hover:underline dark:text-emerald-400"
+            className="font-semibold text-orange-600 hover:underline dark:text-orange-400"
           >
             {t("listings")}
           </Link>
@@ -211,14 +214,14 @@ export async function SiteHeader() {
             <>
               <Link
                 href="/publica"
-                className="text-zinc-600 lg:hover:text-zinc-900 dark:text-zinc-400 lg:dark:hover:text-zinc-100"
+                className="text-[var(--mp-text-secondary)] transition hover:text-[var(--mp-text)]"
               >
                 {t("publish")}
               </Link>
               <ChatInboxLink />
               <Link
                 href="/cont/notificari"
-                className="relative text-zinc-600 lg:hover:text-zinc-900 dark:text-zinc-400 lg:dark:hover:text-zinc-100"
+                className="relative text-[var(--mp-text-muted)] transition hover:text-[var(--mp-text)]"
               >
                 {t("notifications")}
                 {unreadNotifications > 0 ? (
@@ -229,13 +232,13 @@ export async function SiteHeader() {
               </Link>
               <Link
                 href="/cont/favorite"
-                className="text-zinc-600 lg:hover:text-zinc-900 dark:text-zinc-400 lg:dark:hover:text-zinc-100"
+                className="text-[var(--mp-text-muted)] transition hover:text-[var(--mp-text)]"
               >
                 {t("favorites")}
               </Link>
               <Link
                 href="/cont/raporteaza"
-                className="hidden text-zinc-600 md:inline lg:hover:text-zinc-900 dark:text-zinc-400 lg:dark:hover:text-zinc-100"
+                className="hidden text-[var(--mp-text-muted)] transition hover:text-[var(--mp-text)] md:inline"
               >
                 {t("reportContent")}
               </Link>
@@ -244,7 +247,7 @@ export async function SiteHeader() {
           {session?.user && isStaff(session.user.role) ? (
             <Link
               href="/admin"
-              className="text-zinc-600 lg:hover:text-zinc-900 dark:text-zinc-400 lg:dark:hover:text-zinc-100"
+              className="text-[var(--mp-text-muted)] transition hover:text-[var(--mp-text)]"
             >
               {t("admin")}
             </Link>

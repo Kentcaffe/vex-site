@@ -24,7 +24,9 @@
     "oauthFacebook": "Login cu Facebook",
     "loginWithEmail": "Cu email",
     "bottomNavAria": "Navigare principală",
-    "bottomNavPublish": "Adaugă"
+    "bottomNavPublish": "Adaugă",
+    "themeLight": "Comută la tema deschisă",
+    "themeDark": "Comută la tema întunecată"
   },
   "Chat": {
     "title": "Conversație",

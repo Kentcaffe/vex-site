@@ -24,7 +24,9 @@
     "oauthFacebook": "Log in with Facebook",
     "loginWithEmail": "Email",
     "bottomNavAria": "Main navigation",
-    "bottomNavPublish": "Post"
+    "bottomNavPublish": "Post",
+    "themeLight": "Switch to light theme",
+    "themeDark": "Switch to dark theme"
   },
   "Chat": {
     "title": "Conversation",

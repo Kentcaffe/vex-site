@@ -13,7 +13,7 @@ export async function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-12 w-full max-w-full overflow-x-clip border-t border-zinc-200/80 bg-white/70 dark:border-zinc-800 dark:bg-zinc-950/80">
+    <footer className="mt-12 w-full max-w-full overflow-x-clip border-t border-[var(--mp-border)] bg-[var(--mp-surface)]/80 backdrop-blur-sm dark:bg-[var(--mp-surface)]/90">
       <div className="app-shell py-12 sm:py-16 lg:py-20">
         {/* Brand — același namespace Footer ca în header (siteName, tagline) */}
         <div className="border-b border-zinc-200/80 pb-10 dark:border-zinc-800">

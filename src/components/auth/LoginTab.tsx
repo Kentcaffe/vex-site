@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { clearLoginFields, loadLoginFields, saveLoginFields } from "@/lib/auth-form-persist";
 import { AtSign, Lock } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { AuthDivider } from "@/components/auth/AuthDivider";
@@ -23,6 +24,15 @@ export function LoginTab({ callbackUrl, oauth }: Props) {
   const [formError, setFormError] = useState<string | null>(null);
   const [identifierErr, setIdentifierErr] = useState<string | null>(null);
   const [passwordErr, setPasswordErr] = useState<string | null>(null);
+  const [identifier, setIdentifier] = useState("");
+
+  useEffect(() => {
+    const saved = loadLoginFields();
+    if (saved?.identifier) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- restabilire din sessionStorage după hidratare
+      setIdentifier(saved.identifier);
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,6 +65,7 @@ export function LoginTab({ callbackUrl, oauth }: Props) {
       setFormError(t("loginInvalid"));
       return;
     }
+    clearLoginFields();
     router.push(callbackUrl);
     router.refresh();
   }
@@ -77,7 +88,13 @@ export function LoginTab({ callbackUrl, oauth }: Props) {
             type="text"
             autoComplete="username"
             className={authInputClass}
-            onChange={() => setIdentifierErr(null)}
+            value={identifier}
+            onChange={(e) => {
+              const v = e.target.value;
+              setIdentifier(v);
+              saveLoginFields({ identifier: v });
+              setIdentifierErr(null);
+            }}
           />
         </IconField>
         <div className="space-y-1.5">

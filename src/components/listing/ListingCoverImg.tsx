@@ -10,6 +10,8 @@ type Props = {
   className?: string;
   /** Prima imagine vizibilă (ex. grid acasă) — îmbunătățește LCP. */
   priority?: boolean;
+  /** Pentru lazy loading și viewport — ex. `(max-width:640px) 50vw, 25vw` */
+  sizes?: string;
 };
 
 type InnerProps = {
@@ -17,13 +19,14 @@ type InnerProps = {
   alt: string;
   className?: string;
   priority?: boolean;
+  sizes?: string;
 };
 
 /**
  * Imagine anunț: referrer redus (unele CDN-uri blochează altfel) + fallback local dacă URL-ul e mort.
  * `key` pe copil resetează starea la schimbarea sursei (fără effect + setState).
  */
-function ListingCoverImgInner({ src, alt, className, priority }: InnerProps) {
+function ListingCoverImgInner({ src, alt, className, priority, sizes }: InnerProps) {
   const [failed, setFailed] = useState(false);
   const url = failed ? FALLBACK : src;
 
@@ -34,6 +37,7 @@ function ListingCoverImgInner({ src, alt, className, priority }: InnerProps) {
       src={url}
       alt={alt}
       className={className}
+      sizes={sizes ?? "(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 320px"}
       referrerPolicy="no-referrer"
       loading={priority ? "eager" : "lazy"}
       fetchPriority={priority ? "high" : undefined}
@@ -45,9 +49,16 @@ function ListingCoverImgInner({ src, alt, className, priority }: InnerProps) {
   );
 }
 
-export function ListingCoverImg({ src, alt, className, priority }: Props) {
+export function ListingCoverImg({ src, alt, className, priority, sizes }: Props) {
   const normalized = src?.trim() || FALLBACK;
   return (
-    <ListingCoverImgInner key={normalized} src={normalized} alt={alt} className={className} priority={priority} />
+    <ListingCoverImgInner
+      key={normalized}
+      src={normalized}
+      alt={alt}
+      className={className}
+      priority={priority}
+      sizes={sizes}
+    />
   );
 }
