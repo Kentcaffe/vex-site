@@ -223,7 +223,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
                 <Fragment key={m.id}>
                   {showDay ? (
                     <li className="my-4 flex justify-center first:mt-0">
-                      <span className="rounded-full bg-zinc-200/80 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                      <span className="rounded-full bg-zinc-200 px-3 py-1 text-[11px] font-medium uppercase tracking-wide text-[#374151] dark:bg-zinc-700 dark:text-[#d1d5db]">
                         {daySeparatorLabel(d, locale, t("today"), t("yesterday"))}
                       </span>
                     </li>
@@ -241,7 +241,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
                       </div>
                     ) : (
                       <div
-                        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white opacity-95 ${
+                        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${
                           mine ? "shadow-sm" : ""
                         }`}
                         style={{
@@ -266,7 +266,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
                       </div>
                       <time
                         dateTime={m.createdAt}
-                        className={`mt-1 px-1 text-[10px] tabular-nums ${mine ? "text-[var(--mp-accent-chat)] opacity-90" : "text-[var(--mp-text-muted)]"}`}
+                        className={`mt-1 px-1 text-[10px] tabular-nums ${mine ? "text-[#047857] dark:text-emerald-400" : "text-[#374151] dark:text-[#9ca3af]"}`}
                       >
                         {timeStr}
                       </time>

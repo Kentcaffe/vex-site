@@ -31,12 +31,12 @@ function MobileDrawer({
       <button
         type="button"
         aria-label={title}
-        className="absolute inset-0 bg-zinc-950/45 backdrop-blur-[1px]"
+        className="absolute inset-0 bg-zinc-950/60"
         onClick={onClose}
       />
-      <div className="absolute inset-x-0 bottom-0 max-h-[82vh] overflow-y-auto rounded-t-[22px] border border-zinc-200/80 bg-white p-4 shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="absolute inset-x-0 bottom-0 max-h-[82vh] overflow-y-auto rounded-t-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-4 shadow-[var(--mp-shadow-lg)] dark:bg-[var(--mp-surface)]">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{title}</h2>
+          <h2 className="text-base font-semibold text-[#111827] dark:text-[#f9fafb]">{title}</h2>
           <button type="button" className="btn-secondary min-h-[40px] px-3 py-2 text-xs" onClick={onClose}>
             {closeLabel}
           </button>
@@ -53,7 +53,7 @@ export function BrowseShell({ title, subtitle, sidebar, filters, children }: Pro
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   return (
-    <div className="app-shell app-section">
+    <div className="app-shell app-section w-full min-w-0 max-w-full">
       <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl">
           <h1 className="page-heading">{title}</h1>

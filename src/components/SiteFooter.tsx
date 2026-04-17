@@ -2,28 +2,28 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
 const linkClass =
-  "inline-block min-h-[44px] py-1 text-base leading-snug text-zinc-600 sm:min-h-0 sm:text-sm lg:hover:text-emerald-600 dark:text-zinc-400 lg:dark:hover:text-emerald-400";
+  "inline-block min-h-[44px] py-1 text-base leading-snug text-[#374151] sm:min-h-0 sm:text-sm lg:hover:text-[#c2410c] dark:text-[#d1d5db] lg:dark:hover:text-orange-400";
 const mailClass =
-  "inline-block min-h-[44px] py-1 text-base text-zinc-600 sm:min-h-0 sm:text-sm lg:hover:text-emerald-600 dark:text-zinc-400 lg:dark:hover:text-emerald-400";
+  "inline-block min-h-[44px] py-1 text-base text-[#374151] sm:min-h-0 sm:text-sm lg:hover:text-[#c2410c] dark:text-[#d1d5db] lg:dark:hover:text-orange-400";
 const headingClass =
-  "text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-500";
+  "text-[11px] font-semibold uppercase tracking-[0.2em] text-[#374151] dark:text-[#9ca3af]";
 
 export async function SiteFooter() {
   const t = await getTranslations("Footer");
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-12 w-full max-w-full overflow-x-clip border-t border-[var(--mp-border)] bg-[var(--mp-surface)]/80 backdrop-blur-sm dark:bg-[var(--mp-surface)]/90">
-      <div className="app-shell py-12 sm:py-16 lg:py-20">
+    <footer className="mt-12 w-full max-w-full overflow-x-clip border-t border-[var(--mp-border)] bg-[var(--mp-surface)]">
+      <div className="app-shell py-8 sm:py-12 lg:py-16">
         {/* Brand — același namespace Footer ca în header (siteName, tagline) */}
         <div className="border-b border-zinc-200/80 pb-10 dark:border-zinc-800">
           <Link
             href="/"
-            className="inline-block text-3xl font-black tracking-tight text-zinc-950 transition hover:text-emerald-700 dark:text-zinc-50 dark:hover:text-emerald-400"
+            className="inline-block text-3xl font-black tracking-tight text-[#111827] transition hover:text-[#c2410c] dark:text-[#f9fafb] dark:hover:text-orange-400"
           >
             {t("siteName")}
           </Link>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("tagline")}</p>
+          <p className="mt-3 max-w-2xl text-base leading-relaxed text-[#374151] dark:text-[#d1d5db]">{t("tagline")}</p>
         </div>
 
         <div className="mt-14 grid grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-14 lg:grid-cols-4 lg:gap-16">

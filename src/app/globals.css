@@ -4,7 +4,7 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Marketplace tokens — light / dark, contrast ridicat */
+/* Marketplace — contrast ridicat (#111827 / #1f2937), fără text „șters”, umbre premium */
 @layer base {
   :root {
     color-scheme: light;
@@ -14,19 +14,22 @@ html {
     --mp-surface-muted: #f8fafc;
     --mp-border: rgb(226 232 240);
     --mp-border-strong: rgb(203 213 225);
-    --mp-text: #0f172a;
-    --mp-text-secondary: #334155;
-    --mp-text-muted: #64748b;
-    --mp-primary: #ea580c;
-    --mp-primary-hover: #c2410c;
-    --mp-primary-soft: rgb(255 237 213);
-    --mp-accent-chat: #059669;
-    --mp-accent-chat-hover: #047857;
-    --mp-ring: rgb(234 88 12 / 0.35);
-    --mp-shadow: 0 1px 2px rgb(15 23 42 / 0.06);
-    --mp-shadow-md: 0 8px 24px -8px rgb(15 23 42 / 0.12);
-    --mp-shadow-lg: 0 22px 50px -28px rgb(15 23 42 / 0.22);
-    --mp-nav-glass: rgb(255 255 255 / 0.92);
+    /* Text fără opacity — culori directe */
+    --mp-text: #111827;
+    --mp-text-secondary: #1f2937;
+    --mp-text-muted: #374151;
+    --mp-primary: #c2410c;
+    --mp-primary-hover: #9a3412;
+    --mp-primary-soft: #ffedd5;
+    --mp-accent-chat: #047857;
+    --mp-accent-chat-hover: #065f46;
+    --mp-ring: rgb(194 65 12 / 0.35);
+    --mp-shadow: 0 2px 8px rgb(17 24 39 / 0.08);
+    --mp-shadow-md: 0 10px 28px -6px rgb(17 24 39 / 0.14);
+    --mp-shadow-lg: 0 22px 48px -12px rgb(17 24 39 / 0.2);
+    --mp-nav-solid: #ffffff;
+    /* Înălțime bară jos + spațiu safe-area (fără suprapunere conținut) */
+    --mobile-nav-reserve: calc(68px + max(12px, env(safe-area-inset-bottom, 0px)));
   }
 
   .dark {
@@ -35,21 +38,21 @@ html {
     --mp-surface: #111827;
     --mp-surface-elevated: #1e293b;
     --mp-surface-muted: #0f172a;
-    --mp-border: rgb(51 65 85);
-    --mp-border-strong: rgb(71 85 105);
-    --mp-text: #f8fafc;
-    --mp-text-secondary: #e2e8f0;
-    --mp-text-muted: #94a3b8;
-    --mp-primary: #fb923c;
-    --mp-primary-hover: #fdba74;
-    --mp-primary-soft: rgb(124 45 18 / 0.35);
-    --mp-accent-chat: #34d399;
-    --mp-accent-chat-hover: #10b981;
-    --mp-ring: rgb(251 146 60 / 0.4);
-    --mp-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
-    --mp-shadow-md: 0 12px 32px -12px rgb(0 0 0 / 0.45);
-    --mp-shadow-lg: 0 28px 60px -24px rgb(0 0 0 / 0.55);
-    --mp-nav-glass: rgb(17 24 39 / 0.92);
+    --mp-border: rgb(55 65 81);
+    --mp-border-strong: rgb(75 85 99);
+    --mp-text: #f9fafb;
+    --mp-text-secondary: #e5e7eb;
+    --mp-text-muted: #d1d5db;
+    --mp-primary: #ea580c;
+    --mp-primary-hover: #fb923c;
+    --mp-primary-soft: rgb(124 45 18 / 0.45);
+    --mp-accent-chat: #10b981;
+    --mp-accent-chat-hover: #34d399;
+    --mp-ring: rgb(251 146 60 / 0.45);
+    --mp-shadow: 0 2px 10px rgb(0 0 0 / 0.35);
+    --mp-shadow-md: 0 14px 36px -10px rgb(0 0 0 / 0.45);
+    --mp-shadow-lg: 0 26px 56px -16px rgb(0 0 0 / 0.55);
+    --mp-nav-solid: #111827;
   }
 
   body {
@@ -59,6 +62,13 @@ html {
     color: var(--mp-text);
     overflow-x: clip;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Bază 16px pe mobil — evită zoom iOS și text lizibil */
+  @media (max-width: 639px) {
+    html {
+      font-size: 16px;
+    }
   }
 }
 
@@ -117,11 +127,11 @@ html {
   .field-input {
     min-height: 48px;
     width: 100%;
-    border-radius: 0.75rem;
+    border-radius: 0.875rem;
     border: 1px solid var(--mp-border);
     background-color: var(--mp-surface);
     padding: 0.75rem 1rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--mp-text);
     outline: none;
     transition:
@@ -144,20 +154,22 @@ html {
     min-height: 48px;
     align-items: center;
     justify-content: center;
-    border-radius: 0.75rem;
+    border-radius: 0.875rem;
     background-color: var(--mp-primary);
     padding: 0.75rem 1.25rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 600;
-    color: white;
-    box-shadow: var(--mp-shadow);
+    color: #ffffff;
+    box-shadow: var(--mp-shadow-md);
     transition:
       transform 0.14s ease,
-      background-color 0.18s ease;
+      background-color 0.18s ease,
+      box-shadow 0.18s ease;
   }
 
   .btn-primary:hover {
     background-color: var(--mp-primary-hover);
+    box-shadow: var(--mp-shadow-lg);
   }
 
   .btn-primary:active {
@@ -169,11 +181,11 @@ html {
     min-height: 48px;
     align-items: center;
     justify-content: center;
-    border-radius: 0.75rem;
+    border-radius: 0.875rem;
     border: 1px solid var(--mp-border);
     background-color: var(--mp-surface);
     padding: 0.75rem 1.25rem;
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--mp-text-secondary);
     box-shadow: var(--mp-shadow);
@@ -198,18 +210,14 @@ html {
   }
 
   .page-subheading {
-    font-size: 0.875rem;
+    font-size: 1rem;
     line-height: 1.6;
-    color: var(--mp-text-muted);
+    color: var(--mp-text-secondary);
   }
 
   @media (min-width: 640px) {
     .page-heading {
       font-size: 2rem;
-    }
-
-    .page-subheading {
-      font-size: 1rem;
     }
   }
 }
@@ -263,7 +271,6 @@ textarea {
   }
 }
 
-/* Card listing — imagine responsive fără deformare */
 .mp-card-image {
   aspect-ratio: 4 / 3;
   overflow: hidden;

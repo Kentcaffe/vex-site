@@ -39,32 +39,33 @@ export function MobileBottomNav() {
 
   return (
     <nav
-      className="fixed bottom-3 left-3 right-3 z-50 rounded-[22px] border border-[var(--mp-border)] bg-[var(--mp-nav-glass)] pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-1.5 shadow-[var(--mp-shadow-lg)] backdrop-blur-xl md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--mp-border)] bg-[var(--mp-nav-solid)] shadow-[0_-6px_28px_rgb(17_24_39_/_0.1)] md:hidden dark:shadow-[0_-6px_28px_rgb(0_0_0_/_0.35)]"
+      style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 0px))" }}
       aria-label={t("bottomNavAria")}
     >
-      <ul className="mx-auto flex max-w-lg items-stretch justify-between gap-1 px-1.5">
+      <ul className="mx-auto flex h-[68px] max-w-lg min-h-[68px] items-stretch justify-between gap-1 px-4 pt-2">
         {items.map(({ href, label, Icon, badge }) => {
           const active = isActive(pathname, href);
           return (
             <li key={href} className="min-w-0 flex-1">
               <Link
                 href={href}
-                className={`flex min-h-[56px] flex-col items-center justify-center gap-0.5 rounded-[14px] px-1 py-1.5 text-[10px] font-semibold leading-tight transition active:scale-[0.97] motion-safe:transition-transform ${
+                className={`flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-[14px] px-1 py-1 text-sm font-semibold leading-tight transition active:scale-[0.98] ${
                   active
-                    ? "bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300"
-                    : "text-[var(--mp-text-muted)]"
+                    ? "bg-orange-100 text-[#9a3412] dark:bg-orange-950 dark:text-orange-200"
+                    : "text-[#1f2937] dark:text-[#d1d5db]"
                 }`}
                 aria-current={active ? "page" : undefined}
               >
-                <span className="relative flex h-7 w-7 items-center justify-center">
+                <span className="relative flex h-7 w-7 shrink-0 items-center justify-center">
                   <Icon className="h-6 w-6 shrink-0" strokeWidth={active ? 2.25 : 2} aria-hidden />
                   {badge && badge > 0 ? (
-                    <span className="absolute -right-1 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-orange-600 px-1 text-[10px] font-bold leading-none text-white ring-2 ring-[var(--mp-surface)]">
+                    <span className="absolute -right-1.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#c2410c] px-1 text-[11px] font-bold leading-none text-white ring-2 ring-[var(--mp-nav-solid)] dark:bg-orange-500">
                       {badge > 99 ? "99+" : badge}
                     </span>
                   ) : null}
                 </span>
-                <span className="line-clamp-2 w-full text-center">{label}</span>
+                <span className="line-clamp-2 w-full max-w-[4.5rem] text-center text-[13px] leading-tight">{label}</span>
               </Link>
             </li>
           );

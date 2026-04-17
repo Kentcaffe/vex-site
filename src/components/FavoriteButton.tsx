@@ -49,10 +49,10 @@ export function FavoriteButton({ listingId, initialFavorited, variant = "default
           title={err ?? (favorited ? t("saved") : t("save"))}
           aria-label={favorited ? t("saved") : t("save")}
           aria-pressed={favorited}
-          className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-base shadow-sm backdrop-blur-sm transition disabled:opacity-60 ${
+          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 text-base shadow-[var(--mp-shadow)] transition disabled:opacity-60 ${
             favorited
-              ? "border-rose-300/80 bg-white/95 text-rose-600 hover:bg-white dark:border-rose-600/80 dark:bg-zinc-900/95 dark:text-rose-400"
-              : "border-zinc-200/90 bg-white/90 text-zinc-500 hover:bg-white hover:text-zinc-800 dark:border-zinc-600 dark:bg-zinc-900/90 dark:text-zinc-400 dark:hover:text-zinc-100"
+              ? "border-rose-400 bg-white text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-[#1f2937] dark:text-rose-400"
+              : "border-zinc-300 bg-white text-[#374151] hover:border-zinc-400 hover:text-[#111827] dark:border-zinc-600 dark:bg-[#1f2937] dark:text-[#e5e7eb] dark:hover:border-zinc-500"
           }`}
         >
           <span aria-hidden>{favorited ? "♥" : "♡"}</span>

@@ -31,7 +31,7 @@ export async function SiteHeader() {
   const publishHref = localizedHref(locale, "/publica");
 
   return (
-    <header className="static border-b border-[var(--mp-border)] bg-[var(--mp-page)] md:bg-[var(--mp-nav-glass)] md:backdrop-blur-md md:supports-[backdrop-filter]:bg-[var(--mp-nav-glass)]">
+    <header className="static w-full max-w-[100vw] border-b border-[var(--mp-border)] bg-[var(--mp-page)] md:bg-[var(--mp-surface)]">
       <div className="hidden bg-gradient-to-r from-orange-600 to-amber-600 px-4 py-1.5 text-center text-[11px] font-medium text-white/95 sm:text-xs md:block">
         {tm("banner")}
       </div>
