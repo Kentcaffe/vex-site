@@ -1,4 +1,8 @@
 import { useTranslations } from "next-intl";
+import {
+  accountInputReadonlyClass,
+  accountLabelClass,
+} from "@/components/account-settings/account-ui-classes";
 import { ProfileSettingsForm } from "@/components/ProfileSettingsForm";
 import { SectionShell } from "@/components/account-settings/SectionShell";
 
@@ -18,18 +22,13 @@ export function ProfileSection({ locale, user }: { locale: string; user: Profile
     <SectionShell kicker={t("nav.profile")} title={t("profile.heading")} lead={t("profile.lead")}>
       <div className="space-y-4">
         <div>
-          <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400" htmlFor="acc-email-ro">
+          <label className={accountLabelClass} htmlFor="acc-email-ro">
             Email
           </label>
-          <input
-            id="acc-email-ro"
-            readOnly
-            value={user.email}
-            className="mt-1 w-full cursor-not-allowed rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-600 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-400"
-          />
-          <p className="mt-1 text-xs text-zinc-400">{t("profile.emailReadonly")}</p>
+          <input id="acc-email-ro" readOnly value={user.email} className={accountInputReadonlyClass} />
+          <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">{t("profile.emailReadonly")}</p>
         </div>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">{t("profile.avatarHint")}</p>
+        <p className="text-xs text-zinc-600 dark:text-zinc-400">{t("profile.avatarHint")}</p>
         <ProfileSettingsForm
           locale={locale}
           initial={{

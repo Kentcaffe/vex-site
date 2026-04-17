@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { accountLabelClass, accountSelectClass } from "@/components/account-settings/account-ui-classes";
 import { SectionShell } from "@/components/account-settings/SectionShell";
 import { Switch } from "@/components/account-settings/Switch";
 import type { UserPrefsShape } from "@/lib/user-preferences";
@@ -16,7 +17,7 @@ export function PrivacySection({ prefs, setPrefs, savePrefsPatch }: Props) {
     <SectionShell kicker={t("nav.privacy")} title={t("privacy.heading")} lead={t("privacy.lead")}>
       <div className="space-y-6">
         <div>
-          <label className="text-xs font-medium text-zinc-500">{t("privacy.who")}</label>
+          <label className={accountLabelClass}>{t("privacy.who")}</label>
           <select
             value={prefs.profileVisibility}
             onChange={(e) =>
@@ -25,7 +26,7 @@ export function PrivacySection({ prefs, setPrefs, savePrefsPatch }: Props) {
                 profileVisibility: e.target.value as UserPrefsShape["profileVisibility"],
               }))
             }
-            className="mt-1 w-full max-w-md rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className={`${accountSelectClass} max-w-md`}
           >
             <option value="everyone">{t("privacy.whoEveryone")}</option>
             <option value="registered">{t("privacy.whoRegistered")}</option>

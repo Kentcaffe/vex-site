@@ -3,6 +3,11 @@
 import { useActionState } from "react";
 import { useTranslations } from "next-intl";
 import { updateProfile, type UpdateProfileState } from "@/app/actions/profile";
+import {
+  accountInputClass,
+  accountLabelClass,
+  accountTextareaClass,
+} from "@/components/account-settings/account-ui-classes";
 
 type Props = {
   locale: string;
@@ -20,7 +25,10 @@ export function ProfileSettingsForm({ locale, initial }: Props) {
   const [state, action, pending] = useActionState(updateProfile, undefined as UpdateProfileState | undefined);
 
   return (
-    <form action={action} className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <form
+      action={action}
+      className="space-y-4 rounded-2xl border border-zinc-200 bg-white p-5 text-zinc-900 shadow-sm [color-scheme:light] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:[color-scheme:dark]"
+    >
       <input type="hidden" name="locale" value={locale} />
       <div>
         <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("profileTitle")}</h2>
@@ -29,46 +37,28 @@ export function ProfileSettingsForm({ locale, initial }: Props) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label htmlFor="acc-name" className="block text-xs font-medium text-zinc-500">
+          <label htmlFor="acc-name" className={accountLabelClass}>
             {t("profileName")}
           </label>
-          <input
-            id="acc-name"
-            name="name"
-            defaultValue={initial.name}
-            maxLength={80}
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-          />
+          <input id="acc-name" name="name" defaultValue={initial.name} maxLength={80} className={accountInputClass} />
         </div>
         <div>
-          <label htmlFor="acc-phone" className="block text-xs font-medium text-zinc-500">
+          <label htmlFor="acc-phone" className={accountLabelClass}>
             {t("profilePhone")}
           </label>
-          <input
-            id="acc-phone"
-            name="phone"
-            defaultValue={initial.phone}
-            maxLength={32}
-            className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-          />
+          <input id="acc-phone" name="phone" defaultValue={initial.phone} maxLength={32} className={accountInputClass} />
         </div>
       </div>
 
       <div>
-        <label htmlFor="acc-city" className="block text-xs font-medium text-zinc-500">
+        <label htmlFor="acc-city" className={accountLabelClass}>
           {t("profileCity")}
         </label>
-        <input
-          id="acc-city"
-          name="city"
-          defaultValue={initial.city}
-          maxLength={80}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-        />
+        <input id="acc-city" name="city" defaultValue={initial.city} maxLength={80} className={accountInputClass} />
       </div>
 
       <div>
-        <label htmlFor="acc-avatar" className="block text-xs font-medium text-zinc-500">
+        <label htmlFor="acc-avatar" className={accountLabelClass}>
           {t("profileAvatarUrl")}
         </label>
         <input
@@ -78,22 +68,15 @@ export function ProfileSettingsForm({ locale, initial }: Props) {
           placeholder="https://..."
           defaultValue={initial.avatarUrl}
           maxLength={500}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
+          className={accountInputClass}
         />
       </div>
 
       <div>
-        <label htmlFor="acc-bio" className="block text-xs font-medium text-zinc-500">
+        <label htmlFor="acc-bio" className={accountLabelClass}>
           {t("profileBio")}
         </label>
-        <textarea
-          id="acc-bio"
-          name="bio"
-          defaultValue={initial.bio}
-          maxLength={500}
-          rows={4}
-          className="mt-1 w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-600 dark:bg-zinc-950"
-        />
+        <textarea id="acc-bio" name="bio" defaultValue={initial.bio} maxLength={500} rows={4} className={accountTextareaClass} />
       </div>
 
       {state?.ok === false ? (

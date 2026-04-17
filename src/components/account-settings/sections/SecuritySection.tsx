@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { accountInputClass, accountLabelClass } from "@/components/account-settings/account-ui-classes";
 import { SectionShell } from "@/components/account-settings/SectionShell";
 import { Switch } from "@/components/account-settings/Switch";
 import type { UserPrefsShape } from "@/lib/user-preferences";
@@ -25,7 +26,7 @@ export function SecuritySection({ locale, hasPassword, prefs, savePrefsPatch, pw
         <form action={pwAction} className="max-w-md space-y-4">
           <input type="hidden" name="locale" value={locale} />
           <div>
-            <label className="text-xs font-medium text-zinc-500" htmlFor="cur-pw">
+            <label className={accountLabelClass} htmlFor="cur-pw">
               {t("security.current")}
             </label>
             <input
@@ -34,11 +35,11 @@ export function SecuritySection({ locale, hasPassword, prefs, savePrefsPatch, pw
               type="password"
               required
               autoComplete="current-password"
-              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className={accountInputClass}
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-zinc-500" htmlFor="new-pw">
+            <label className={accountLabelClass} htmlFor="new-pw">
               {t("security.new")}
             </label>
             <input
@@ -48,7 +49,7 @@ export function SecuritySection({ locale, hasPassword, prefs, savePrefsPatch, pw
               required
               minLength={8}
               autoComplete="new-password"
-              className="mt-1 w-full rounded-xl border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+              className={accountInputClass}
             />
           </div>
           <button
@@ -65,7 +66,7 @@ export function SecuritySection({ locale, hasPassword, prefs, savePrefsPatch, pw
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{t("security.twoFactor")}</p>
-            <p className="text-xs text-zinc-500">{t("security.twoFactorHint")}</p>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">{t("security.twoFactorHint")}</p>
           </div>
           <Switch
             id="twofa"
@@ -77,7 +78,7 @@ export function SecuritySection({ locale, hasPassword, prefs, savePrefsPatch, pw
 
       <div className="mt-8 border-t border-zinc-100 pt-6 dark:border-zinc-800">
         <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{t("security.loginHistory")}</p>
-        <p className="text-xs text-zinc-500">{t("security.loginHistoryHint")}</p>
+        <p className="text-xs text-zinc-600 dark:text-zinc-400">{t("security.loginHistoryHint")}</p>
         <ul className="mt-4 space-y-2 text-sm">
           <li className="flex items-center justify-between rounded-xl border border-zinc-100 bg-zinc-50/80 px-3 py-2 dark:border-zinc-800 dark:bg-zinc-950/50">
             <span className="text-zinc-600 dark:text-zinc-300">{t("security.mockDevice")}</span>

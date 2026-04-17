@@ -13,8 +13,8 @@ export function ActivitySection({ memberSince, activityLog }: Props) {
 
   return (
     <SectionShell kicker={t("nav.activity")} title={t("activity.heading")} lead={t("activity.lead")}>
-      <p className="text-sm text-zinc-500">
-        {t("activity.memberSince")}: <span className="font-medium text-zinc-800 dark:text-zinc-200">{memberSince}</span>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        {t("activity.memberSince")}: <span className="font-medium text-zinc-900 dark:text-zinc-100">{memberSince}</span>
       </p>
       {activityLog.length === 0 ? (
         <p className="mt-6 rounded-xl border border-dashed border-zinc-200 px-4 py-8 text-center text-sm text-zinc-500 dark:border-zinc-700">

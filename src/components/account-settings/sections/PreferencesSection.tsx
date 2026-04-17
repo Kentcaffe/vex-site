@@ -1,4 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
+import { accountLabelClass, accountSelectClass } from "@/components/account-settings/account-ui-classes";
 import { SectionShell } from "@/components/account-settings/SectionShell";
 import { routing } from "@/i18n/routing";
 import type { ThemePref, UserPrefsShape } from "@/lib/user-preferences";
@@ -20,13 +21,13 @@ export function PreferencesSection({ prefs, setPrefs, savePrefsPatch }: Props) {
     <SectionShell kicker={t("nav.preferences")} title={t("preferences.heading")} lead={t("preferences.lead")}>
       <div className="grid max-w-lg gap-6">
         <div>
-          <label className="text-xs font-medium text-zinc-500">{t("preferences.language")}</label>
+          <label className={accountLabelClass}>{t("preferences.language")}</label>
           <select
             value={uiLocale}
             onChange={(e) => {
               router.replace(pathname, { locale: e.target.value });
             }}
-            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className={accountSelectClass}
           >
             {routing.locales.map((loc) => (
               <option key={loc} value={loc}>
@@ -36,7 +37,7 @@ export function PreferencesSection({ prefs, setPrefs, savePrefsPatch }: Props) {
           </select>
         </div>
         <div>
-          <label className="text-xs font-medium text-zinc-500">{t("preferences.theme")}</label>
+          <label className={accountLabelClass}>{t("preferences.theme")}</label>
           <div className="mt-2 flex flex-wrap gap-2">
             {(
               [
@@ -63,11 +64,11 @@ export function PreferencesSection({ prefs, setPrefs, savePrefsPatch }: Props) {
           </div>
         </div>
         <div>
-          <label className="text-xs font-medium text-zinc-500">{t("preferences.currency")}</label>
+          <label className={accountLabelClass}>{t("preferences.currency")}</label>
           <select
             value={prefs.currency}
             onChange={(e) => setPrefs((p) => ({ ...p, currency: e.target.value }))}
-            className="mt-1 w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-950"
+            className={accountSelectClass}
           >
             {["MDL", "EUR", "RON", "USD"].map((c) => (
               <option key={c} value={c}>

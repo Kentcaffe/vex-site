@@ -1,5 +1,6 @@
 import { useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { accountDangerInputClass } from "@/components/account-settings/account-ui-classes";
 import { exportUserDataAction } from "@/app/actions/account-settings";
 import { SignOutButton } from "@/components/SignOutButton";
 import { SectionShell } from "@/components/account-settings/SectionShell";
@@ -84,7 +85,7 @@ export function AccountSection({ locale, delAction, delPending }: Props) {
           <input
             name="confirm"
             placeholder={t("account.deletePlaceholder")}
-            className="w-full rounded-xl border border-red-200 bg-white px-3 py-2 text-sm dark:border-red-900 dark:bg-zinc-950"
+            className={accountDangerInputClass}
             autoComplete="off"
           />
           <button
