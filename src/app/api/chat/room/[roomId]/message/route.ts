@@ -32,13 +32,22 @@ export async function POST(req: Request, { params }: Props) {
   }
 
   const receiverId = userId === access.buyerId ? access.sellerId : access.buyerId;
-  const msg = await insertRoomMessage({
+  const inserted = await insertRoomMessage({
     roomId,
     senderId: userId,
     receiverId,
     content: trimmed,
   });
-  await prisma.chatRoom.update({ where: { id: roomId }, data: { updatedAt: new Date() } });
+  if (!inserted.ok) {
+    return NextResponse.json({ error: inserted.error }, { status: 400 });
+  }
+  const msg = inserted.message;
+
+  try {
+    await prisma.chatRoom.update({ where: { id: roomId }, data: { updatedAt: new Date() } });
+  } catch (e) {
+    console.error("[POST /api/chat/room/.../message] chatRoom.updatedAt", e);
+  }
 
   return NextResponse.json({
     message: {

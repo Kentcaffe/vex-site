@@ -54,24 +54,41 @@ export async function getLastRoomMessage(roomId: string): Promise<RealtimeMessag
   }
 }
 
+export type InsertRoomMessageResult =
+  | { ok: true; message: RealtimeMessageRow }
+  | { ok: false; error: string };
+
 export async function insertRoomMessage(input: {
   roomId: string;
   senderId: string;
   receiverId: string;
   content: string;
-}): Promise<RealtimeMessageRow> {
-  const rows = await prisma.$queryRaw<RealtimeMessageRow[]>(Prisma.sql`
-    INSERT INTO messages (id, sender_id, receiver_id, room_id, content, created_at)
-    VALUES (${crypto.randomUUID()}, ${input.senderId}, ${input.receiverId}, ${input.roomId}, ${input.content}, NOW())
-    RETURNING
-      id,
-      sender_id AS "senderId",
-      receiver_id AS "receiverId",
-      content,
-      created_at AS "createdAt",
-      room_id AS "roomId"
-  `);
-  return rows[0];
+}): Promise<InsertRoomMessageResult> {
+  try {
+    const rows = await prisma.$queryRaw<RealtimeMessageRow[]>(Prisma.sql`
+      INSERT INTO messages (id, sender_id, receiver_id, room_id, content, created_at)
+      VALUES (${crypto.randomUUID()}, ${input.senderId}, ${input.receiverId}, ${input.roomId}, ${input.content}, NOW())
+      RETURNING
+        id,
+        sender_id AS "senderId",
+        receiver_id AS "receiverId",
+        content,
+        created_at AS "createdAt",
+        room_id AS "roomId"
+    `);
+    const row = rows[0];
+    if (!row) {
+      console.error("[insertRoomMessage] INSERT returned no row");
+      return { ok: false, error: "Mesajul nu a putut fi salvat." };
+    }
+    return { ok: true, message: row };
+  } catch (e) {
+    console.error("[insertRoomMessage]", e);
+    const raw = e instanceof Error ? e.message : String(e);
+    const error =
+      raw.length > 500 ? `${raw.slice(0, 500)}…` : raw;
+    return { ok: false, error };
+  }
 }
 
 export async function countUnreadRoomMessages(input: {
