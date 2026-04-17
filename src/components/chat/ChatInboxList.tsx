@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { chatAvatarHue, chatInitials } from "@/lib/chat-ui";
+import { ChatAvatar } from "@/components/chat/ChatAvatar";
 
 export type InboxItem = {
   roomId: string;
@@ -16,10 +16,11 @@ export type InboxItem = {
 };
 
 export function ChatInboxList({
-  items,
+  items: itemsProp,
 }: {
-  items: InboxItem[];
+  items?: InboxItem[] | null;
 }) {
+  const items = useMemo(() => (Array.isArray(itemsProp) ? itemsProp : []), [itemsProp]);
   const t = useTranslations("Chat");
   const format = useFormatter();
   const [query, setQuery] = useState("");
@@ -83,7 +84,6 @@ export function ChatInboxList({
         <ul className="space-y-2">
           {filtered.map((row) => {
             const unread = row.unread;
-            const hue = chatAvatarHue(row.otherUserName || row.roomId);
             const timeLabel =
               row.lastMessageAt != null
                 ? format.relativeTime(new Date(row.lastMessageAt), { now: new Date() })
@@ -99,22 +99,9 @@ export function ChatInboxList({
                       : "border-zinc-200/90 bg-white shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)] hover:border-emerald-300 hover:shadow-[0_22px_50px_-30px_rgba(5,150,105,0.35)] dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-emerald-700"
                   }`}
                 >
-                  {row.otherUserAvatarUrl ? (
-                    <div className="h-12 w-12 shrink-0 overflow-hidden rounded-2xl border border-zinc-200 shadow-sm dark:border-zinc-700" aria-hidden>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={row.otherUserAvatarUrl} alt="" className="h-full w-full object-cover" />
-                    </div>
-                  ) : (
-                    <div
-                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-sm font-bold text-white shadow-inner"
-                      style={{
-                        background: `linear-gradient(145deg, hsl(${hue}, 55%, 48%), hsl(${hue}, 60%, 38%))`,
-                      }}
-                      aria-hidden
-                    >
-                      {chatInitials(row.otherUserName)}
-                    </div>
-                  )}
+                  <div className="shrink-0" aria-hidden>
+                    <ChatAvatar url={row.otherUserAvatarUrl} name={row.otherUserName} size={48} className="rounded-2xl" />
+                  </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <p className="truncate font-semibold text-zinc-900 dark:text-zinc-50">{row.otherUserName}</p>

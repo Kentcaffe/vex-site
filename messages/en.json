@@ -52,7 +52,9 @@
     "send": "Send",
     "inboxSearchPlaceholder": "Search conversations?",
     "inboxNoResults": "No conversations match your search.",
-    "unreadBadge": "{count} unread"
+    "unreadBadge": "{count} unread",
+    "loadError": "We couldn’t load chat data. Please try again in a moment.",
+    "roomLoadError": "We couldn’t open this conversation."
   },
   "Home": {
     "title": "A local marketplace for classifieds and sales",

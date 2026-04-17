@@ -2,8 +2,10 @@ import { notFound, redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { ChatRoomView, type ChatBootstrap } from "@/components/chat/ChatRoomView";
+import { ChatServerError } from "@/components/chat/ChatServerError";
 import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
+import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
 
@@ -19,69 +21,81 @@ export default async function ChatRoomPage({ params }: Props) {
   }
   const userId = session.user.id;
 
-  const me = await prisma.user.findUnique({ where: { id: userId }, select: { avatarUrl: true } });
-  if (!me) {
-    redirect(localizedHref(locale, "/cont"));
-  }
+  try {
+    const me = await prisma.user.findUnique({ where: { id: userId }, select: { avatarUrl: true } });
+    if (!me) {
+      redirect(localizedHref(locale, "/cont"));
+    }
 
-  const room = await prisma.chatRoom.findFirst({
-    where: {
-      id: roomId,
-      OR: [{ buyerId: userId }, { listing: { userId } }],
-    },
-    include: {
-      listing: {
-        select: {
-          id: true,
-          title: true,
-          userId: true,
-          user: { select: { id: true, name: true, email: true, avatarUrl: true } },
-        },
+    const room = await prisma.chatRoom.findFirst({
+      where: {
+        id: roomId,
+        OR: [{ buyerId: userId }, { listing: { userId } }],
       },
-      buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
-      readStates: true,
-    },
-  });
+      include: {
+        listing: {
+          select: {
+            id: true,
+            title: true,
+            userId: true,
+            user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+          },
+        },
+        buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        readStates: true,
+      },
+    });
 
-  if (!room) {
-    notFound();
+    if (!room) {
+      notFound();
+    }
+
+    const messages = await listRoomMessages(room.id, 200);
+    const messageRows = Array.isArray(messages) ? messages : [];
+
+    const seller = room.listing.user;
+    const isBuyer = userId === room.buyerId;
+    const otherName = isBuyer ? seller.name ?? seller.email ?? "" : room.buyer.name ?? room.buyer.email ?? "";
+    const readByOther = room.readStates.find((s: { userId: string }) => s.userId !== userId);
+    const myRead = room.readStates.find((s: { userId: string }) => s.userId === userId);
+
+    const bootstrap: ChatBootstrap = {
+      roomId: room.id,
+      listing: { id: room.listing.id, title: room.listing.title },
+      seller: {
+        id: seller.id,
+        name: seller.name ?? seller.email ?? "",
+        avatarUrl: resolvePublicMediaUrl(seller.avatarUrl ?? null),
+      },
+      buyer: {
+        id: room.buyer.id,
+        name: room.buyer.name ?? room.buyer.email ?? "",
+        avatarUrl: resolvePublicMediaUrl(room.buyer.avatarUrl ?? null),
+      },
+      meIsBuyer: isBuyer,
+      otherUserName: otherName,
+      otherUserAvatarUrl: resolvePublicMediaUrl(
+        isBuyer ? seller.avatarUrl ?? null : room.buyer.avatarUrl ?? null,
+      ),
+      myAvatarUrl: resolvePublicMediaUrl(me.avatarUrl ?? null),
+      messages: messageRows.map((m: { id: string; senderId: string; content: string; createdAt: Date }) => ({
+        id: m.id,
+        senderId: m.senderId,
+        body: m.content,
+        createdAt: m.createdAt.toISOString(),
+      })),
+      otherLastReadAt: readByOther?.lastReadAt.toISOString() ?? null,
+      myLastReadAt: myRead?.lastReadAt.toISOString() ?? null,
+      maxBodyLength: CHAT_MESSAGE_MAX,
+    };
+
+    return (
+      <div className="flex min-h-[calc(100dvh-5.5rem)] flex-1 flex-col px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 sm:mx-auto sm:min-h-0 sm:max-w-3xl sm:px-6 sm:py-8">
+        <ChatRoomView bootstrap={bootstrap} currentUserId={userId} />
+      </div>
+    );
+  } catch (e) {
+    console.error("[chat/room]", e);
+    return <ChatServerError />;
   }
-
-  const messages = await listRoomMessages(room.id, 200);
-
-  const seller = room.listing.user;
-  const isBuyer = userId === room.buyerId;
-  const otherName = isBuyer ? seller.name ?? seller.email ?? "" : room.buyer.name ?? room.buyer.email ?? "";
-  const readByOther = room.readStates.find((s: { userId: string }) => s.userId !== userId);
-  const myRead = room.readStates.find((s: { userId: string }) => s.userId === userId);
-
-  const bootstrap: ChatBootstrap = {
-    roomId: room.id,
-    listing: { id: room.listing.id, title: room.listing.title },
-    seller: { id: seller.id, name: seller.name ?? seller.email ?? "", avatarUrl: seller.avatarUrl ?? null },
-    buyer: {
-      id: room.buyer.id,
-      name: room.buyer.name ?? room.buyer.email ?? "",
-      avatarUrl: room.buyer.avatarUrl ?? null,
-    },
-    meIsBuyer: isBuyer,
-    otherUserName: otherName,
-    otherUserAvatarUrl: isBuyer ? seller.avatarUrl ?? null : room.buyer.avatarUrl ?? null,
-    myAvatarUrl: me.avatarUrl ?? null,
-    messages: messages.map((m: { id: string; senderId: string; content: string; createdAt: Date }) => ({
-      id: m.id,
-      senderId: m.senderId,
-      body: m.content,
-      createdAt: m.createdAt.toISOString(),
-    })),
-    otherLastReadAt: readByOther?.lastReadAt.toISOString() ?? null,
-    myLastReadAt: myRead?.lastReadAt.toISOString() ?? null,
-    maxBodyLength: CHAT_MESSAGE_MAX,
-  };
-
-  return (
-    <div className="flex min-h-[calc(100dvh-5.5rem)] flex-1 flex-col px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 sm:mx-auto sm:min-h-0 sm:max-w-3xl sm:px-6 sm:py-8">
-      <ChatRoomView bootstrap={bootstrap} currentUserId={userId} />
-    </div>
-  );
 }

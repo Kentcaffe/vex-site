@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { resolvePublicMediaUrl } from "@/lib/media-url";
 
 const FALLBACK = "/marketplace-image-fallback.svg";
 
@@ -50,7 +51,8 @@ function ListingCoverImgInner({ src, alt, className, priority, sizes }: InnerPro
 }
 
 export function ListingCoverImg({ src, alt, className, priority, sizes }: Props) {
-  const normalized = src?.trim() || FALLBACK;
+  const resolved = resolvePublicMediaUrl(src?.trim() || null);
+  const normalized = resolved || FALLBACK;
   return (
     <ListingCoverImgInner
       key={normalized}

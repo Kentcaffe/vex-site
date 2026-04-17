@@ -2,11 +2,19 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { unreadTotalForUser } from "@/lib/chat-actions";
 
+/**
+ * Răspuns stabil pentru client: mereu 200 cu `{ count }` — fără excepții neprinse.
+ */
 export async function GET() {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ count: 0 }, { status: 200 });
+    }
+    const count = await unreadTotalForUser(session.user.id);
+    return NextResponse.json({ count: typeof count === "number" && Number.isFinite(count) ? count : 0 }, { status: 200 });
+  } catch (e) {
+    console.error("[api/chat/unread]", e);
+    return NextResponse.json({ count: 0 }, { status: 200 });
   }
-  const count = await unreadTotalForUser(session.user.id);
-  return NextResponse.json({ count });
 }

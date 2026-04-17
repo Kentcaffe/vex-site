@@ -3,7 +3,8 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { chatAvatarHue, chatInitials, sameCalendarDay } from "@/lib/chat-ui";
+import { ChatAvatar } from "@/components/chat/ChatAvatar";
+import { sameCalendarDay } from "@/lib/chat-ui";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 export type ChatBootstrap = {
@@ -39,14 +40,13 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   const t = useTranslations("Chat");
   const locale = useLocale();
   const [connected, setConnected] = useState(false);
-  const [messages, setMessages] = useState(bootstrap.messages);
+  const [messages, setMessages] = useState(() =>
+    Array.isArray(bootstrap.messages) ? bootstrap.messages : [],
+  );
   const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(bootstrap.otherLastReadAt);
   const [draft, setDraft] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const roomId = bootstrap.roomId;
-
-  const otherHue = useMemo(() => chatAvatarHue(bootstrap.otherUserName || "user"), [bootstrap.otherUserName]);
-  const myHue = useMemo(() => chatAvatarHue(currentUserId), [currentUserId]);
 
   const scrollToBottom = useCallback(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -159,21 +159,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </Link>
-        {bootstrap.otherUserAvatarUrl ? (
-          <div className="h-11 w-11 shrink-0 overflow-hidden rounded-full border border-zinc-200 shadow-sm dark:border-zinc-700">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={bootstrap.otherUserAvatarUrl} alt={bootstrap.otherUserName} className="h-full w-full object-cover" />
-          </div>
-        ) : (
-          <div
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white shadow-inner"
-            style={{
-              background: `linear-gradient(145deg, hsl(${otherHue}, 55%, 48%), hsl(${otherHue}, 60%, 38%))`,
-            }}
-          >
-            {chatInitials(bootstrap.otherUserName)}
-          </div>
-        )}
+        <ChatAvatar url={bootstrap.otherUserAvatarUrl} name={bootstrap.otherUserName} size={44} />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-semibold leading-tight text-[var(--mp-text)]">
             {bootstrap.otherUserName}
@@ -208,11 +194,11 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
         aria-relevant="additions"
         className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain bg-[var(--mp-page)] px-3 py-4 [-webkit-overflow-scrolling:touch]"
       >
-        {messages.length === 0 ? (
+        {(Array.isArray(messages) ? messages : []).length === 0 ? (
           <p className="mx-auto max-w-sm py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">{t("emptyThread")}</p>
         ) : (
           <ul className="space-y-1">
-            {messages.map((m, i) => {
+            {(Array.isArray(messages) ? messages : []).map((m, i) => {
               const mine = m.senderId === currentUserId;
               const d = new Date(m.createdAt);
               const prev = i > 0 ? new Date(messages[i - 1].createdAt) : null;
@@ -229,31 +215,13 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
                     </li>
                   ) : null}
                   <li className={`flex gap-2 ${mine ? "flex-row-reverse" : "flex-row"}`}>
-                    {mine && bootstrap.myAvatarUrl ? (
-                      <div className="mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-full border border-zinc-200 dark:border-zinc-700" aria-hidden>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={bootstrap.myAvatarUrl} alt="" className="h-full w-full object-cover" />
-                      </div>
-                    ) : !mine && bootstrap.otherUserAvatarUrl ? (
-                      <div className="mt-0.5 h-8 w-8 shrink-0 overflow-hidden rounded-full border border-zinc-200 dark:border-zinc-700" aria-hidden>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={bootstrap.otherUserAvatarUrl} alt="" className="h-full w-full object-cover" />
-                      </div>
-                    ) : (
-                      <div
-                        className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white ${
-                          mine ? "shadow-sm" : ""
-                        }`}
-                        style={{
-                          background: mine
-                            ? `linear-gradient(145deg, hsl(${myHue}, 50%, 46%), hsl(${myHue}, 55%, 38%))`
-                            : `linear-gradient(145deg, hsl(${otherHue}, 55%, 48%), hsl(${otherHue}, 60%, 38%))`,
-                        }}
-                        aria-hidden
-                      >
-                        {mine ? chatInitials(t("youLabel")) : chatInitials(bootstrap.otherUserName)}
-                      </div>
-                    )}
+                    <div className="mt-0.5 shrink-0" aria-hidden>
+                      {mine ? (
+                        <ChatAvatar url={bootstrap.myAvatarUrl} name={t("youLabel")} size={32} />
+                      ) : (
+                        <ChatAvatar url={bootstrap.otherUserAvatarUrl} name={bootstrap.otherUserName} size={32} />
+                      )}
+                    </div>
                     <div className={`max-w-[min(85%,420px)] ${mine ? "items-end" : "items-start"} flex flex-col`}>
                       <div
                         className={`rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug shadow-sm ${

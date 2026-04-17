@@ -30,22 +30,27 @@ export async function getRoomAccess(roomId: string, userId: string): Promise<Cha
 }
 
 export async function unreadTotalForUser(userId: string): Promise<number> {
-  const rooms = await prisma.chatRoom.findMany({
-    where: { OR: [{ buyerId: userId }, { listing: { userId } }] },
-    select: { id: true },
-  });
-  let total = 0;
-  for (const { id: roomId } of rooms) {
-    const rs = await prisma.chatReadState.findUnique({
-      where: { roomId_userId: { roomId, userId } },
+  try {
+    const rooms = await prisma.chatRoom.findMany({
+      where: { OR: [{ buyerId: userId }, { listing: { userId } }] },
+      select: { id: true },
     });
-    const since = rs?.lastReadAt ?? new Date(0);
-    const n = await countUnreadRoomMessages({
-      roomId,
-      userId,
-      since,
-    });
-    total += n;
+    let total = 0;
+    for (const { id: roomId } of rooms) {
+      const rs = await prisma.chatReadState.findUnique({
+        where: { roomId_userId: { roomId, userId } },
+      });
+      const since = rs?.lastReadAt ?? new Date(0);
+      const n = await countUnreadRoomMessages({
+        roomId,
+        userId,
+        since,
+      });
+      total += n;
+    }
+    return total;
+  } catch (e) {
+    console.error("[unreadTotalForUser]", e);
+    return 0;
   }
-  return total;
 }
