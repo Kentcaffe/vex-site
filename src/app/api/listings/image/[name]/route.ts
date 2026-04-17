@@ -1,6 +1,7 @@
 import { access, readFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
+import { getSupabaseServiceClient, listingsObjectKey, listingsStorageBucket } from "@/lib/supabase-service-role";
 
 const MIME_BY_EXT: Record<string, string> = {
   jpg: "image/jpeg",
@@ -51,6 +52,26 @@ export async function GET(
       });
     } catch {
       // try next candidate path
+    }
+  }
+
+  const supabase = getSupabaseServiceClient();
+  if (supabase) {
+    const bucket = listingsStorageBucket();
+    const key = listingsObjectKey(name);
+    const { data, error } = await supabase.storage.from(bucket).download(key);
+    if (!error && data) {
+      const ab = await data.arrayBuffer();
+      return new NextResponse(ab, {
+        status: 200,
+        headers: {
+          "Content-Type": contentTypeFor(name),
+          "Cache-Control": "public, max-age=604800, immutable",
+        },
+      });
+    }
+    if (error) {
+      console.error("[api/listings/image] Supabase download:", error.message);
     }
   }
 

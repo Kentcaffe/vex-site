@@ -68,18 +68,6 @@ export function parseImageLines(raw: string | null): string[] {
     .slice(0, LISTING_MAX_IMAGES);
 }
 
-export function parseStoredListingImages(json: string | null): string[] {
-  if (!json) {
-    return [];
-  }
-  try {
-    const v = JSON.parse(json) as unknown;
-    return Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
-  } catch {
-    return [];
-  }
-}
-
 export function isValidImageRef(s: string): boolean {
   const t = s.trim();
   if (t.startsWith("/uploads/")) {
@@ -94,6 +82,47 @@ export function isValidImageRef(s: string): boolean {
   } catch {
     return false;
   }
+}
+
+export function parseStoredListingImages(json: string | null): string[] {
+  if (!json) {
+    return [];
+  }
+  const raw = String(json).trim();
+  if (!raw) {
+    return [];
+  }
+
+  try {
+    const v = JSON.parse(raw) as unknown;
+    if (Array.isArray(v)) {
+      return v
+        .filter((x): x is string => typeof x === "string")
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .filter((s) => isValidImageRef(s));
+    }
+    if (typeof v === "string" && v.trim() && isValidImageRef(v.trim())) {
+      return [v.trim()];
+    }
+  } catch {
+    // text brut (ex. un URL pe linie, fără JSON)
+  }
+
+  const lines = raw
+    .split(/\r?\n/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .filter((s) => isValidImageRef(s));
+  if (lines.length > 0) {
+    return lines.slice(0, LISTING_MAX_IMAGES);
+  }
+
+  if (isValidImageRef(raw)) {
+    return [raw];
+  }
+
+  return [];
 }
 
 export function parseListingImageUrlsStrict(raw: string | null | undefined): string[] | null {

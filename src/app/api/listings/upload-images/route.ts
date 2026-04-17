@@ -2,6 +2,7 @@ import { mkdir, writeFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { getSupabaseServiceClient, listingsObjectKey, listingsStorageBucket } from "@/lib/supabase-service-role";
 
 const MAX_FILES = 8;
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -51,10 +52,28 @@ export async function POST(request: Request) {
     const buf = Buffer.from(await file.arrayBuffer());
     const ext = extFromMime(file.type);
     const name = `${crypto.randomUUID()}.${ext}`;
-    const fp = path.join(dir, name);
-    await writeFile(fp, buf);
-    // In production (standalone/serverless-like setups), runtime files under /public
-    // may not always be served reliably as static assets. Serve through API route.
+    const supabase = getSupabaseServiceClient();
+    const bucket = listingsStorageBucket();
+    const objectKey = listingsObjectKey(name);
+
+    let stored = false;
+    if (supabase) {
+      const { error } = await supabase.storage.from(bucket).upload(objectKey, buf, {
+        contentType: file.type,
+        upsert: true,
+      });
+      if (error) {
+        console.error("[upload-images] Supabase Storage:", error.message);
+      } else {
+        stored = true;
+      }
+    }
+
+    if (!stored) {
+      const fp = path.join(dir, name);
+      await writeFile(fp, buf);
+    }
+
     urls.push(`/api/listings/image/${name}`);
   }
 

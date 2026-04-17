@@ -43,12 +43,10 @@ export function resolvePublicMediaUrl(url: string | null | undefined): string | 
     return `/api/listings/image/${encodeURIComponent(file)}`;
   }
 
+  /** Rămâne pe același origin — fișierele sunt servite de `/api/listings/image` (disc local sau proxy Storage). */
   const apiImg = t.match(/^\/api\/listings\/image\/([^/]+)$/i);
   if (apiImg?.[1]) {
     const file = apiImg[1];
-    if (origin) {
-      return `${origin}/storage/v1/object/public/${bucket}/listings/${encodeURIComponent(file)}`;
-    }
     return `/api/listings/image/${encodeURIComponent(file)}`;
   }
 
