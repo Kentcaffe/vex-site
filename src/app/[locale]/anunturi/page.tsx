@@ -9,6 +9,7 @@ import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PriceCurrencyCode } from "@/lib/currency";
 import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
+import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
@@ -145,8 +146,8 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
                         />
                       </div>
                     ) : (
-                      <div className="flex h-48 items-center justify-center rounded-[14px] border border-dashed border-zinc-300 bg-zinc-50 text-xs text-zinc-400 dark:border-zinc-600 dark:bg-zinc-800 sm:h-36 sm:w-44 sm:shrink-0">
-                        —
+                      <div className="h-48 overflow-hidden rounded-[14px] border border-zinc-200/90 bg-zinc-200/80 dark:border-zinc-600 dark:bg-zinc-800/90 sm:h-36 sm:w-44 sm:shrink-0">
+                        <ListingImagePlaceholder title={t("cardNoImageTitle")} hint={t("cardNoImageHint")} />
                       </div>
                     )}
                     <div className="min-w-0 flex-1">

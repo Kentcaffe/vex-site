@@ -7,6 +7,7 @@ import type { CategoryRow } from "@/lib/category-queries";
 import { emojiForRootSlug } from "@/lib/category-icons";
 import { formatPrice } from "@/lib/formatPrice";
 import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
+import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import type { PriceCurrencyCode } from "@/lib/currency";
 
@@ -50,6 +51,7 @@ export async function HomeMarketplace({
 }: Props) {
   const t = await getTranslations("Home.marketplace");
   const tNav = await getTranslations("Nav");
+  const tList = await getTranslations("Listings");
 
   return (
     <div className="app-shell app-section pb-28 md:pb-10">
@@ -183,9 +185,11 @@ export async function HomeMarketplace({
                             className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
                           />
                         ) : (
-                          <div className="flex h-full items-center justify-center bg-[var(--mp-surface-muted)] text-xs text-[var(--mp-text-muted)]">
-                            Fără imagine
-                          </div>
+                          <ListingImagePlaceholder
+                            title={tList("cardNoImageTitle")}
+                            hint={tList("cardNoImageHint")}
+                            className="bg-zinc-200/80 dark:bg-zinc-800/90"
+                          />
                         )}
                       </Link>
                       <div className="absolute right-2 top-2 z-10">

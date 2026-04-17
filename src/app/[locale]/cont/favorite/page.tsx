@@ -6,6 +6,7 @@ import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PriceCurrencyCode } from "@/lib/currency";
 import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
+import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { localizedHref } from "@/lib/paths";
 import { asListingSelect, type FavoriteRowWithListing } from "@/lib/prisma-listing-casts";
@@ -24,6 +25,7 @@ export default async function FavoriteListPage({ params }: Props) {
   }
 
   const t = await getTranslations("Favorites");
+  const tList = await getTranslations("Listings");
   const [rows, allCats] = await Promise.all([
     prisma.listingFavorite.findMany({
       where: { userId: session.user.id },
@@ -70,8 +72,12 @@ export default async function FavoriteListPage({ params }: Props) {
                       <ListingCoverImg src={cover} alt="" className="h-full w-full object-cover" />
                     </div>
                   ) : (
-                    <div className="flex h-20 w-24 shrink-0 items-center justify-center rounded-xl border border-dashed border-zinc-300 bg-zinc-50 text-xs text-zinc-400 dark:border-zinc-600 dark:bg-zinc-800">
-                      —
+                    <div className="h-20 w-24 shrink-0 overflow-hidden rounded-xl border border-zinc-200/90 bg-zinc-200/80 dark:border-zinc-600 dark:bg-zinc-800/90">
+                      <ListingImagePlaceholder
+                        compact
+                        title={tList("cardNoImageTitle")}
+                        hint={tList("cardNoImageHint")}
+                      />
                     </div>
                   )}
                   <div className="min-w-0 flex-1">

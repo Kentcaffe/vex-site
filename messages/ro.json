@@ -271,6 +271,8 @@
     "resultsCount": "{count} rezultate",
     "resultsHint": "Anunțuri ordonate după cele mai noi publicări.",
     "publishCta": "Publică anunț",
+    "cardNoImageTitle": "Fără imagine",
+    "cardNoImageHint": "Încarcă o poză la editare",
     "filters": {
       "title": "Filtre",
       "search": "Caută în anunțuri",
