@@ -56,9 +56,11 @@ type Props = {
   categoryTree: CategoryTreeNode[];
 };
 
+/** Culori explicite — pe mobil (Safari) fără ele, textul poate fi invizibil în input/textarea. */
 const baseInputClass =
-  "mt-1 min-h-[52px] w-full rounded-xl border bg-white px-3 py-3 text-base leading-normal md:min-h-[44px] md:rounded-lg md:py-2.5 md:text-sm";
-const okBorder = "border-zinc-300";
+  "mt-1 min-h-[52px] w-full rounded-xl border border-zinc-300 bg-white px-3 py-3 text-base leading-normal text-zinc-900 caret-zinc-900 placeholder:text-zinc-500 [color-scheme:light] md:min-h-[44px] md:rounded-lg md:py-2.5 md:text-sm";
+const labelClass = "block text-sm font-medium text-zinc-900";
+const labelClassInline = "flex items-center gap-2 text-sm font-medium text-zinc-900";
 const errBorder = "input-error border-red-500 ring-2 ring-red-500/30";
 const LIVE_REQUIRED_FIELDS: ListingFormFieldId[] = [
   "title",
@@ -120,7 +122,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   const detailFields = useMemo(() => getDetailFieldsForSlug(selectedSlug), [selectedSlug]);
 
   function ring(field: ListingFormFieldId): string {
-    return clientErrors[field] ? errBorder : okBorder;
+    return clientErrors[field] ? errBorder : "";
   }
 
   function clearFieldError(field: ListingFormFieldId) {
@@ -498,7 +500,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
         console.warn("SUBMIT TRIGGERED");
         handleSubmit();
       }}
-      className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm md:space-y-8 md:p-8"
+      className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200 bg-white p-4 text-zinc-900 shadow-sm [color-scheme:light] md:space-y-8 md:p-8"
     >
       <section
         id="field-categoryId"
@@ -538,11 +540,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
       <section
         id="publish-listing-details"
-        className="scroll-mt-6 space-y-6 border-t border-zinc-200 pt-6 md:pt-8"
+        className="scroll-mt-6 space-y-6 border-t border-zinc-200 pt-6 text-zinc-900 md:pt-8"
       >
         <h2 className="text-base font-semibold text-zinc-900">{t("formSectionListing")}</h2>
         <div id="field-title">
-          <label className="block text-sm font-medium" htmlFor="title">
+          <label className={labelClass} htmlFor="title">
             {t("title")}
           </label>
           <input
@@ -561,7 +563,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
         </div>
 
         <div id="field-description">
-          <label className="block text-sm font-medium" htmlFor="description">
+          <label className={labelClass} htmlFor="description">
             {t("description")}
           </label>
           <textarea
@@ -584,7 +586,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
         <div className="space-y-5" id="field-price">
           <div className="grid gap-5 md:grid-cols-2 md:items-end">
             <div>
-              <label className="block text-sm font-medium" htmlFor="price">
+              <label className={labelClass} htmlFor="price">
                 {t("priceAmount")}
               </label>
               <input
@@ -604,7 +606,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
               {clientErrors.price ? <p className="mt-1 text-sm text-red-600">{clientErrors.price}</p> : null}
             </div>
             <div>
-              <label className="block text-sm font-medium" htmlFor="priceCurrency">
+              <label className={labelClass} htmlFor="priceCurrency">
                 {t("priceCurrencyLabel")}
               </label>
               <select
@@ -617,7 +619,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                     priceCurrency: e.target.value === "EUR" ? "EUR" : "MDL",
                   }))
                 }
-                className={`${baseInputClass} ${okBorder}`}
+                className={`${baseInputClass}`}
               >
                 <option value="MDL">{t("priceCurrencyMdl")}</option>
                 <option value="EUR">{t("priceCurrencyEur")}</option>
@@ -625,7 +627,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             </div>
           </div>
           <div>
-            <label className="flex items-center gap-2 text-sm">
+            <label className={labelClassInline}>
               <input
                 name="negotiable"
                 type="checkbox"
@@ -640,7 +642,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
         <div className="grid gap-5 md:grid-cols-2">
           <div id="field-city">
-            <label className="block text-sm font-medium" htmlFor="city">
+            <label className={labelClass} htmlFor="city">
               {t("city")}
             </label>
             <input
@@ -658,7 +660,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             {clientErrors.city ? <p className="mt-1 text-sm text-red-600">{clientErrors.city}</p> : null}
           </div>
           <div>
-            <label className="block text-sm font-medium" htmlFor="district">
+            <label className={labelClass} htmlFor="district">
               {t("district")}
             </label>
             <input
@@ -667,13 +669,13 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
               maxLength={80}
               value={publishValues.district}
               onChange={(e) => setPublishValues((p) => ({ ...p, district: e.target.value }))}
-              className={`${baseInputClass} ${okBorder}`}
+              className={`${baseInputClass}`}
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-sm font-medium" htmlFor="phone">
+          <label className={labelClass} htmlFor="phone">
             {t("phone")}
           </label>
           <input
@@ -682,12 +684,12 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             maxLength={30}
             value={publishValues.phone}
             onChange={(e) => setPublishValues((p) => ({ ...p, phone: e.target.value }))}
-            className={`${baseInputClass} ${okBorder}`}
+            className={`${baseInputClass}`}
           />
         </div>
 
         <div id="field-condition">
-          <label className="block text-sm font-medium" htmlFor="condition">
+          <label className={labelClass} htmlFor="condition">
             {t("condition")}
           </label>
           <select
@@ -712,7 +714,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       </section>
 
       {isVeh || isRe || (isBrandish && !isVeh) || detailFields.length > 0 ? (
-        <section className="space-y-6 border-t border-zinc-200 pt-6 md:pt-8">
+        <section className="space-y-6 border-t border-zinc-200 pt-6 text-zinc-900 md:pt-8">
           <div>
             <h2 className="text-base font-semibold text-zinc-900">{t("formSectionSpecs")}</h2>
           </div>
@@ -720,7 +722,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           {isVeh ? (
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium" htmlFor="brand">
+                <label className={labelClass} htmlFor="brand">
                   {t("brand")}
                 </label>
                 <input
@@ -729,11 +731,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                   maxLength={80}
                   value={publishValues.brand}
                   onChange={(e) => setPublishValues((p) => ({ ...p, brand: e.target.value }))}
-                  className={`${baseInputClass} ${okBorder}`}
+                  className={`${baseInputClass}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium" htmlFor="modelName">
+                <label className={labelClass} htmlFor="modelName">
                   {t("model")}
                 </label>
                 <input
@@ -742,11 +744,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                   maxLength={80}
                   value={publishValues.modelName}
                   onChange={(e) => setPublishValues((p) => ({ ...p, modelName: e.target.value }))}
-                  className={`${baseInputClass} ${okBorder}`}
+                  className={`${baseInputClass}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium" htmlFor="year">
+                <label className={labelClass} htmlFor="year">
                   {t("year")}
                 </label>
                 <input
@@ -756,11 +758,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                   inputMode="numeric"
                   value={publishValues.year}
                   onChange={(e) => setPublishValues((p) => ({ ...p, year: e.target.value }))}
-                  className={`${baseInputClass} ${okBorder}`}
+                  className={`${baseInputClass}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium" htmlFor="mileageKm">
+                <label className={labelClass} htmlFor="mileageKm">
                   {t("mileage")}
                 </label>
                 <input
@@ -770,7 +772,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                   inputMode="numeric"
                   value={publishValues.mileageKm}
                   onChange={(e) => setPublishValues((p) => ({ ...p, mileageKm: e.target.value }))}
-                  className={`${baseInputClass} ${okBorder}`}
+                  className={`${baseInputClass}`}
                 />
               </div>
             </div>
@@ -779,7 +781,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           {isRe ? (
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium" htmlFor="rooms">
+                <label className={labelClass} htmlFor="rooms">
                   {t("rooms")}
                 </label>
                 <input
@@ -788,11 +790,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                   maxLength={40}
                   value={publishValues.rooms}
                   onChange={(e) => setPublishValues((p) => ({ ...p, rooms: e.target.value }))}
-                  className={`${baseInputClass} ${okBorder}`}
+                  className={`${baseInputClass}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium" htmlFor="areaSqm">
+                <label className={labelClass} htmlFor="areaSqm">
                   {t("areaSqm")}
                 </label>
                 <input
@@ -803,7 +805,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                   min={1}
                   value={publishValues.areaSqm}
                   onChange={(e) => setPublishValues((p) => ({ ...p, areaSqm: e.target.value }))}
-                  className={`${baseInputClass} ${okBorder}`}
+                  className={`${baseInputClass}`}
                 />
               </div>
             </div>
@@ -812,7 +814,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
           {isBrandish && !isVeh ? (
             <div className="grid gap-5 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-medium" htmlFor="brand2">
+                <label className={labelClass} htmlFor="brand2">
                   {t("brand")}
                 </label>
                 <input
@@ -821,11 +823,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                   maxLength={80}
                   value={publishValues.brand}
                   onChange={(e) => setPublishValues((p) => ({ ...p, brand: e.target.value }))}
-                  className={`${baseInputClass} ${okBorder}`}
+                  className={`${baseInputClass}`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium" htmlFor="modelName2">
+                <label className={labelClass} htmlFor="modelName2">
                   {t("model")}
                 </label>
                 <input
@@ -834,7 +836,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                   maxLength={80}
                   value={publishValues.modelName}
                   onChange={(e) => setPublishValues((p) => ({ ...p, modelName: e.target.value }))}
-                  className={`${baseInputClass} ${okBorder}`}
+                  className={`${baseInputClass}`}
                 />
               </div>
             </div>
@@ -846,7 +848,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
               const val = publishValues.extra[fname] ?? "";
               return (
                 <div key={field.id}>
-                  <label className="block text-sm font-medium" htmlFor={fname}>
+                  <label className={labelClass} htmlFor={fname}>
                     {detailLabel(field)}
                   </label>
                   {field.input === "select" && field.selectValues ? (
@@ -855,7 +857,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                       name={fname}
                       value={val}
                       onChange={(e) => setExtra(fname, e.target.value)}
-                      className={`${baseInputClass} ${okBorder}`}
+                      className={`${baseInputClass}`}
                     >
                       <option value="">{t("detailOptional")}</option>
                       {field.selectValues.map((v) => (
@@ -872,7 +874,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                       maxLength={field.maxLength ?? 80}
                       value={val}
                       onChange={(e) => setExtra(fname, e.target.value)}
-                      className={`${baseInputClass} ${okBorder}`}
+                      className={`${baseInputClass}`}
                     />
                   ) : null}
                   {field.input === "number" ? (
@@ -885,7 +887,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                       max={field.max}
                       value={val}
                       onChange={(e) => setExtra(fname, e.target.value)}
-                      className={`${baseInputClass} ${okBorder}`}
+                      className={`${baseInputClass}`}
                     />
                   ) : null}
                 </div>
@@ -898,7 +900,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       <section className="space-y-5 border-t border-zinc-200 pt-6 md:pt-8">
         <h2 className="text-base font-semibold text-zinc-900">{t("formSectionMedia")}</h2>
         <div id="field-imagesRaw">
-          <label className="block text-sm font-medium" htmlFor="imagesRaw">
+          <label className={labelClass} htmlFor="imagesRaw">
             {t("images")}
           </label>
           <p className="mt-1 text-xs text-zinc-500">{t("imagesHint")}</p>
@@ -912,11 +914,11 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             }}
             rows={4}
             aria-invalid={Boolean(clientErrors.imagesRaw)}
-            className={`mt-2 w-full rounded-lg border bg-white px-3 py-2 font-mono text-xs ${ring("imagesRaw")}`}
+            className={`mt-2 w-full min-h-[52px] rounded-lg border border-zinc-300 bg-white px-3 py-3 font-mono text-xs leading-normal text-zinc-900 caret-zinc-900 placeholder:text-zinc-500 [color-scheme:light] md:min-h-[44px] md:py-2.5 ${ring("imagesRaw")}`}
             placeholder="https://..."
           />
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <label className="cursor-pointer rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium hover:bg-zinc-50">
+            <label className="cursor-pointer rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-900 hover:bg-zinc-50">
               {t("upload")}
               <input
                 type="file"
