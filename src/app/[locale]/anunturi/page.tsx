@@ -24,6 +24,13 @@ type Props = {
     max?: string;
     search?: string;
     currency?: string;
+    brand?: string;
+    model?: string;
+    fuel?: string;
+    transmission?: string;
+    yearMin?: string;
+    yearMax?: string;
+    mileageMax?: string;
   }>;
 };
 
@@ -41,8 +48,19 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const minN = minRaw ? Number(minRaw) : NaN;
   const maxN = maxRaw ? Number(maxRaw) : NaN;
   const currencyFilter = sp.currency?.trim().toUpperCase();
+  const brand = sp.brand?.trim() || undefined;
+  const model = sp.model?.trim() || undefined;
+  const fuel = sp.fuel?.trim() || undefined;
+  const transmission = sp.transmission?.trim() || undefined;
+  const yearMinRaw = sp.yearMin?.trim();
+  const yearMaxRaw = sp.yearMax?.trim();
+  const mileageMaxRaw = sp.mileageMax?.trim();
+  const yearMin = yearMinRaw ? Number(yearMinRaw) : NaN;
+  const yearMax = yearMaxRaw ? Number(yearMaxRaw) : NaN;
+  const mileageMax = mileageMaxRaw ? Number(mileageMaxRaw) : NaN;
 
   const where: Prisma.ListingWhereInput = {};
+  const andFilters: Prisma.ListingWhereInput[] = [];
 
   if (currencyFilter === "MDL" || currencyFilter === "EUR") {
     Object.assign(where, { priceCurrency: currencyFilter } as Prisma.ListingWhereInput);
@@ -63,6 +81,40 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
     where.OR = [{ title: { contains: searchQ } }, { description: { contains: searchQ } }];
   }
 
+  if (brand) {
+    where.brand = { contains: brand, mode: "insensitive" };
+  }
+
+  if (model) {
+    where.modelName = { contains: model, mode: "insensitive" };
+  }
+
+  if (Number.isFinite(yearMin) || Number.isFinite(yearMax)) {
+    where.year = {};
+    if (Number.isFinite(yearMin)) where.year.gte = yearMin;
+    if (Number.isFinite(yearMax)) where.year.lte = yearMax;
+  }
+
+  if (Number.isFinite(mileageMax)) {
+    where.mileageKm = { lte: mileageMax };
+  }
+
+  if (fuel) {
+    andFilters.push({
+      detailsJson: {
+        contains: `"fuel":"${fuel}"`,
+      },
+    });
+  }
+
+  if (transmission) {
+    andFilters.push({
+      detailsJson: {
+        contains: `"transmission":"${transmission}"`,
+      },
+    });
+  }
+
   if (Number.isFinite(minN) || Number.isFinite(maxN)) {
     where.price = {};
     if (Number.isFinite(minN)) {
@@ -71,6 +123,10 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
     if (Number.isFinite(maxN)) {
       where.price.lte = maxN;
     }
+  }
+
+  if (andFilters.length > 0) {
+    where.AND = andFilters;
   }
 
   const [listingsRaw, allCats] = await Promise.all([
@@ -105,6 +161,13 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
           defaultMax={Number.isFinite(maxN) ? String(maxN) : ""}
           defaultSearch={searchQ ?? ""}
           defaultCurrency={currencyFilter === "MDL" || currencyFilter === "EUR" ? currencyFilter : ""}
+          defaultBrand={brand ?? ""}
+          defaultModel={model ?? ""}
+          defaultFuel={fuel ?? ""}
+          defaultTransmission={transmission ?? ""}
+          defaultYearMin={Number.isFinite(yearMin) ? String(yearMin) : ""}
+          defaultYearMax={Number.isFinite(yearMax) ? String(yearMax) : ""}
+          defaultMileageMax={Number.isFinite(mileageMax) ? String(mileageMax) : ""}
           category={categorySlug}
         />
       }

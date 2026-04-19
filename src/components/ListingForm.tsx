@@ -49,6 +49,7 @@ import {
   saveDraftAdMirror,
   type PublishFormValues,
 } from "@/lib/listing-publish-form-data";
+import { VEHICLE_BRANDS } from "@/lib/vehicle-taxonomy";
 
 type Props = {
   locale: string;
@@ -731,11 +732,17 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                 <input
                   id="brand"
                   name="brand"
+                  list="vehicle-brand-suggestions"
                   maxLength={80}
                   value={publishValues.brand}
                   onChange={(e) => setPublishValues((p) => ({ ...p, brand: e.target.value }))}
                   className={`${baseInputClass}`}
                 />
+                <datalist id="vehicle-brand-suggestions">
+                  {VEHICLE_BRANDS.map((brandName) => (
+                    <option key={brandName} value={brandName} />
+                  ))}
+                </datalist>
               </div>
               <div>
                 <label className={labelClass} htmlFor="modelName">
