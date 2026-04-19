@@ -54,7 +54,9 @@
     "inboxNoResults": "По вашему запросу диалоги не найдены.",
     "unreadBadge": "{count} непрочитанных",
     "loadError": "Не удалось загрузить данные чата. Попробуйте позже.",
-    "roomLoadError": "Не удалось открыть этот чат."
+    "roomLoadError": "Не удалось открыть этот чат.",
+    "newMessageNotificationTitle": "Новое сообщение",
+    "newMessagesBanner": "Новые сообщения"
   },
   "Contact": {
     "metaTitle": "Контакты и поддержка | VEX",

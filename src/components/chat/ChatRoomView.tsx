@@ -4,6 +4,12 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ChatAvatar } from "@/components/chat/ChatAvatar";
+import { normalizeRealtimeInsert } from "@/lib/chat-message-payload";
+import {
+  playIncomingChatSound,
+  requestChatNotificationPermission,
+  showNewChatMessageNotification,
+} from "@/lib/chat-notifications-client";
 import { sameCalendarDay } from "@/lib/chat-ui";
 import { listingSeoPath } from "@/lib/seo";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
@@ -46,21 +52,108 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   );
   const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(bootstrap.otherLastReadAt);
   const [draft, setDraft] = useState("");
+  const [showNewMessagesBanner, setShowNewMessagesBanner] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  /** Utilizatorul e aproape de baza listei (scroll automat la mesaje noi). */
+  const nearBottomRef = useRef(true);
   const roomId = bootstrap.roomId;
 
-  const scrollToBottom = useCallback(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
+    bottomRef.current?.scrollIntoView({ behavior });
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages.length, scrollToBottom]);
+    requestChatNotificationPermission();
+  }, []);
+
+  useEffect(() => {
+    nearBottomRef.current = true;
+    scrollToBottom("auto");
+  }, [roomId, scrollToBottom]);
+
+  const updateNearBottom = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) {
+      return;
+    }
+    const gap = el.scrollHeight - el.scrollTop - el.clientHeight;
+    const near = gap < 96;
+    nearBottomRef.current = near;
+    if (near) {
+      setShowNewMessagesBanner(false);
+    }
+  }, []);
+
+  const appendIncomingMessage = useCallback(
+    (source: "messages" | "ChatMessage", raw: unknown) => {
+      const normalized = normalizeRealtimeInsert(raw, source, roomId);
+      if (!normalized) {
+        return;
+      }
+      const wasNearBottom = nearBottomRef.current;
+      const fromOther = normalized.senderId !== currentUserId;
+
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === normalized.id)) {
+          return prev;
+        }
+        return [
+          ...prev,
+          {
+            id: normalized.id,
+            senderId: normalized.senderId,
+            body: normalized.body,
+            createdAt: normalized.createdAt,
+          },
+        ];
+      });
+
+      if (fromOther) {
+        void fetch(`/api/chat/room/${roomId}/read`, { method: "POST", credentials: "include" });
+        setOtherLastReadAt(new Date().toISOString());
+      }
+
+      queueMicrotask(() => {
+        requestAnimationFrame(() => {
+          if (wasNearBottom) {
+            scrollToBottom("smooth");
+            setShowNewMessagesBanner(false);
+          } else if (fromOther) {
+            setShowNewMessagesBanner(true);
+          }
+        });
+      });
+
+      if (fromOther) {
+        const inBackground = typeof document !== "undefined" && (document.hidden || !document.hasFocus());
+        if (inBackground) {
+          showNewChatMessageNotification(t("newMessageNotificationTitle"), normalized.body);
+          playIncomingChatSound();
+        } else if (!wasNearBottom) {
+          playIncomingChatSound();
+        }
+      }
+    },
+    [currentUserId, roomId, scrollToBottom, t],
+  );
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
     const channel = supabase
-      .channel(`messages-room-${roomId}`)
+      .channel(`marketplace-room-${roomId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "ChatMessage",
+          filter: `roomId=eq.${roomId}`,
+        },
+        (payload) => {
+          appendIncomingMessage("ChatMessage", payload.new);
+        },
+      )
       .on(
         "postgres_changes",
         {
@@ -70,26 +163,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
           filter: `room_id=eq.${roomId}`,
         },
         (payload) => {
-          const row = payload.new as {
-            id?: string;
-            sender_id?: string;
-            content?: string;
-            created_at?: string;
-          };
-          const id = row.id ?? crypto.randomUUID();
-          const senderId = row.sender_id ?? "";
-          const body = row.content ?? "";
-          const createdAt = row.created_at ?? new Date().toISOString();
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === id)) {
-              return prev;
-            }
-            return [...prev, { id, senderId, body, createdAt }];
-          });
-          if (senderId && senderId !== currentUserId) {
-            void fetch(`/api/chat/room/${roomId}/read`, { method: "POST", credentials: "include" });
-            setOtherLastReadAt(new Date().toISOString());
-          }
+          appendIncomingMessage("messages", payload.new);
         },
       )
       .subscribe((status) => {
@@ -98,10 +172,10 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
 
     void fetch(`/api/chat/room/${roomId}/read`, { method: "POST", credentials: "include" });
     return () => {
-      channel.unsubscribe();
+      void supabase.removeChannel(channel);
       setConnected(false);
     };
-  }, [roomId, currentUserId]);
+  }, [appendIncomingMessage, roomId]);
 
   const send = useCallback(async () => {
     const text = draft.trim();
@@ -121,15 +195,20 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
       message?: { id: string; senderId: string; body: string; createdAt: string };
     };
     if (data.message) {
+      nearBottomRef.current = true;
+      setShowNewMessagesBanner(false);
       setMessages((prev) => {
         if (prev.some((m) => m.id === data.message!.id)) {
           return prev;
         }
         return [...prev, data.message!];
       });
+      queueMicrotask(() => {
+        requestAnimationFrame(() => scrollToBottom("smooth"));
+      });
     }
     setDraft("");
-  }, [draft, roomId]);
+  }, [draft, roomId, scrollToBottom]);
 
   const lastOwn = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -192,7 +271,10 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
       </div>
 
       {/* Thread */}
+      <div className="relative flex min-h-0 flex-1 flex-col">
       <div
+        ref={scrollRef}
+        onScroll={updateNearBottom}
         role="log"
         aria-live="polite"
         aria-relevant="additions"
@@ -252,6 +334,22 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
 
         <div ref={bottomRef} className="h-px shrink-0" />
       </div>
+      {showNewMessagesBanner ? (
+        <div className="pointer-events-none absolute bottom-3 left-0 right-0 z-10 flex justify-center px-3">
+          <button
+            type="button"
+            className="pointer-events-auto rounded-full border border-[var(--mp-border)] bg-[var(--mp-surface)] px-4 py-2 text-xs font-semibold text-[var(--mp-accent)] shadow-md transition hover:bg-[var(--mp-surface-muted)]"
+            onClick={() => {
+              nearBottomRef.current = true;
+              setShowNewMessagesBanner(false);
+              scrollToBottom("smooth");
+            }}
+          >
+            {t("newMessagesBanner")}
+          </button>
+        </div>
+      ) : null}
+      </div>
 
       {lastOwn && seenOnLastOwn ? (
         <p className="shrink-0 border-t border-[var(--mp-border)] px-4 py-1.5 text-center text-[11px] text-[var(--mp-text-muted)]">
@@ -261,7 +359,13 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
 
       {/* Composer */}
       <div className="shrink-0 border-t border-[var(--mp-border)] bg-[var(--mp-surface)] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        <div className="flex gap-2 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface-muted)] p-1.5 shadow-inner">
+        <form
+          className="flex gap-2 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface-muted)] p-1.5 shadow-inner"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void send();
+          }}
+        >
           <textarea
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
@@ -278,8 +382,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
             aria-label={t("placeholder")}
           />
           <button
-            type="button"
-            onClick={() => void send()}
+            type="submit"
             disabled={!draft.trim() || !connected}
             className="flex h-11 w-11 shrink-0 items-center justify-center self-end rounded-xl bg-[var(--mp-accent-chat)] text-white shadow-sm transition hover:bg-[var(--mp-accent-chat-hover)] disabled:cursor-not-allowed disabled:opacity-40"
             title={t("send")}
@@ -289,7 +392,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
               <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
             </svg>
           </button>
-        </div>
+        </form>
         <div className="mt-1.5 flex justify-end px-0.5 text-[11px] tabular-nums text-zinc-400">
           <span className={remaining < 120 ? "text-amber-600 dark:text-amber-400" : ""}>
             {remaining} {t("charsLeft")}

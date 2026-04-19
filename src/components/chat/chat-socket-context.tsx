@@ -2,6 +2,10 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
+import {
+  getChatNotificationTitleFromLocale,
+  showNewChatMessageNotification,
+} from "@/lib/chat-notifications-client";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 type ChatSocketContextValue = {
@@ -20,11 +24,21 @@ const disconnectedValue: ChatSocketContextValue = {
   refreshUnread: noopRefresh,
 };
 
+function buildChatMessageRoomFilter(roomIds: string[]): string | null {
+  if (roomIds.length === 0) {
+    return null;
+  }
+  if (roomIds.length === 1) {
+    return `roomId=eq.${roomIds[0]}`;
+  }
+  return `roomId=in.(${roomIds.join(",")})`;
+}
+
 function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
   const { data: session } = useAuthSession();
   const [connected, setConnected] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
-  const realtimeRef = useRef<ReturnType<ReturnType<typeof createSupabaseBrowserClient>["channel"]> | null>(null);
+  const refreshUnreadRef = useRef<() => Promise<void>>(noopRefresh);
 
   const refreshUnread = useCallback(async () => {
     try {
@@ -39,7 +53,9 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  /** Badge mesaje menținut în sync prin endpoint + Supabase Realtime insert events. */
+  refreshUnreadRef.current = refreshUnread;
+
+  /** Badge: endpoint + Realtime (messages + ChatMessage) + polling de siguranță. */
   useEffect(() => {
     if (!session?.user?.id) {
       return;
@@ -59,9 +75,64 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
     }
 
     const supabase = createSupabaseBrowserClient();
-    const channel = supabase
-      .channel(`messages-unread-${userId}`)
-      .on(
+    let cancelled = false;
+    let activeChannel: ReturnType<typeof supabase.channel> | null = null;
+
+    const notifyIfBackground = (body: string) => {
+      if (typeof window === "undefined" || typeof document === "undefined") {
+        return;
+      }
+      if (!document.hidden) {
+        return;
+      }
+      showNewChatMessageNotification(getChatNotificationTitleFromLocale(), body);
+    };
+
+    const connect = async () => {
+      let roomIds: string[] = [];
+      try {
+        const res = await fetch("/api/chat/room-ids", { credentials: "include" });
+        if (res.ok) {
+          const data = (await res.json()) as { roomIds?: string[] };
+          roomIds = Array.isArray(data.roomIds) ? data.roomIds : [];
+        }
+      } catch {
+        /* ignore */
+      }
+      if (cancelled) {
+        return;
+      }
+
+      if (activeChannel) {
+        void supabase.removeChannel(activeChannel);
+        activeChannel = null;
+      }
+
+      const ch = supabase.channel(`messages-unread-${userId}-${Date.now()}`);
+
+      const chatMsgFilter = buildChatMessageRoomFilter(roomIds);
+      if (chatMsgFilter) {
+        ch.on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "ChatMessage",
+            filter: chatMsgFilter,
+          },
+          (payload) => {
+            const row = payload.new as { senderId?: string; body?: string };
+            const senderId = typeof row.senderId === "string" ? row.senderId : "";
+            if (senderId !== userId) {
+              const preview = typeof row.body === "string" ? row.body : "";
+              notifyIfBackground(preview);
+            }
+            void refreshUnreadRef.current();
+          },
+        );
+      }
+
+      ch.on(
         "postgres_changes",
         {
           event: "INSERT",
@@ -70,32 +141,59 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
           filter: `receiver_id=eq.${userId}`,
         },
         (payload) => {
-          if (typeof window !== "undefined" && document.hidden && Notification.permission === "granted") {
-            try {
-              const preview = typeof payload.new?.content === "string" ? payload.new.content : "";
-              new Notification("VEX", { body: preview.slice(0, 120) });
-            } catch {
-              /* ignore */
-            }
-          }
-          void refreshUnread();
+          const preview =
+            typeof payload.new === "object" && payload.new !== null && "content" in payload.new
+              ? String((payload.new as { content?: unknown }).content ?? "")
+              : "";
+          notifyIfBackground(preview);
+          void refreshUnreadRef.current();
         },
-      )
-      .subscribe((status) => {
-        setConnected(status === "SUBSCRIBED");
+      );
+
+      ch.subscribe((status) => {
+        if (!cancelled) {
+          setConnected(status === "SUBSCRIBED");
+        }
       });
-    realtimeRef.current = channel;
-    const timer = setTimeout(() => {
-      void refreshUnread();
+
+      if (cancelled) {
+        void supabase.removeChannel(ch);
+        return;
+      }
+      activeChannel = ch;
+    };
+
+    void connect();
+
+    const bootTimer = setTimeout(() => {
+      void refreshUnreadRef.current();
     }, 0);
 
+    const reconnectInterval = setInterval(() => {
+      void connect();
+    }, 120000);
+
+    const pollUnread = setInterval(() => {
+      void refreshUnreadRef.current();
+    }, 60000);
+
+    const onFocus = () => {
+      void connect();
+    };
+    window.addEventListener("focus", onFocus);
+
     return () => {
-      clearTimeout(timer);
-      realtimeRef.current?.unsubscribe();
-      realtimeRef.current = null;
+      cancelled = true;
+      clearTimeout(bootTimer);
+      clearInterval(reconnectInterval);
+      clearInterval(pollUnread);
+      window.removeEventListener("focus", onFocus);
+      if (activeChannel) {
+        void supabase.removeChannel(activeChannel);
+      }
       setConnected(false);
     };
-  }, [session?.user?.id, refreshUnread]);
+  }, [session?.user?.id]);
 
   const value = useMemo(
     () => ({

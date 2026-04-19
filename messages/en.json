@@ -54,7 +54,9 @@
     "inboxNoResults": "No conversations match your search.",
     "unreadBadge": "{count} unread",
     "loadError": "We couldn’t load chat data. Please try again in a moment.",
-    "roomLoadError": "We couldn’t open this conversation."
+    "roomLoadError": "We couldn’t open this conversation.",
+    "newMessageNotificationTitle": "New message",
+    "newMessagesBanner": "New messages"
   },
   "Contact": {
     "metaTitle": "Contact & support | VEX",

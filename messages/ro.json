@@ -54,7 +54,9 @@
     "inboxNoResults": "Nu am găsit conversații după acest text.",
     "unreadBadge": "{count} necitite",
     "loadError": "Nu am putut încărca datele pentru chat. Încearcă din nou peste câteva momente.",
-    "roomLoadError": "Nu am putut deschide această conversație."
+    "roomLoadError": "Nu am putut deschide această conversație.",
+    "newMessageNotificationTitle": "Mesaj nou",
+    "newMessagesBanner": "Mesaje noi"
   },
   "Contact": {
     "metaTitle": "Contact & suport | VEX",
