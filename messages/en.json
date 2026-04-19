@@ -717,7 +717,8 @@
     "resetRequestSubmit": "Send reset link",
     "resetSending": "Sending?",
     "resetEmailSent": "If an account exists for this email, we sent instructions.",
-    "resetMailNotConfigured": "Email sending is not configured on the server (RESEND + EMAIL_FROM).",
+    "resetEmailSentHint": "📩 If your email is registered, you will receive a reset link (check spam, too).",
+    "resetMailNotConfigured": "Password reset is unavailable: set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
     "resetSendFailed": "Could not send the email. Try again later.",
     "resetOAuthHint": "If you signed up with Google or Facebook, use that button ? there is no separate password.",
     "backToLogin": "Back to sign in",
@@ -729,7 +730,10 @@
     "resetMismatch": "Passwords do not match.",
     "resetPasswordSuccess": "Password updated. You can sign in.",
     "resetSaving": "Saving?",
-    "resetPasswordSubmit": "Save password"
+    "resetPasswordSubmit": "Save password",
+    "resetSessionLoading": "Checking your session…",
+    "resetNoRecoverySession": "Open the reset link from your email on this device, or request a new link below.",
+    "resetUpdateFailed": "Could not update the password. Try again or request a new reset link."
   },
   "Account": {
     "title": "Account",

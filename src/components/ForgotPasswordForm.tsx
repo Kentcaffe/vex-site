@@ -33,17 +33,14 @@ export function ForgotPasswordForm({ disabled = false }: ForgotProps) {
       </div>
       {state?.ok === false ? (
         <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-          {state.error === "mailNotConfigured"
-            ? t("resetMailNotConfigured")
-            : state.error === "sendFailed"
-              ? t("resetSendFailed")
-              : t("validationError")}
+          {state.error === "mailNotConfigured" ? t("resetMailNotConfigured") : t("validationError")}
         </p>
       ) : null}
       {state?.ok === true ? (
-        <p className="text-sm text-emerald-700 dark:text-emerald-400" role="status">
-          {t("resetEmailSent")}
-        </p>
+        <div className="space-y-2" role="status">
+          <p className="text-sm text-emerald-700 dark:text-emerald-400">{t("resetEmailSent")}</p>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("resetEmailSentHint")}</p>
+        </div>
       ) : null}
       <button
         type="submit"

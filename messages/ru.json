@@ -717,7 +717,8 @@
     "resetRequestSubmit": "Отправить ссылку",
     "resetSending": "Отправка…",
     "resetEmailSent": "Если аккаунт с таким email есть, мы отправили инструкции.",
-    "resetMailNotConfigured": "Отправка писем не настроена на сервере (RESEND + EMAIL_FROM).",
+    "resetEmailSentHint": "📩 Если этот email зарегистрирован, вы получите ссылку для сброса (проверьте и спам).",
+    "resetMailNotConfigured": "Сброс пароля недоступен: задайте NEXT_PUBLIC_SUPABASE_URL и NEXT_PUBLIC_SUPABASE_ANON_KEY.",
     "resetSendFailed": "Не удалось отправить письмо. Попробуйте позже.",
     "resetOAuthHint": "Если вы входили через Google или Facebook, используйте эту кнопку — отдельного пароля нет.",
     "backToLogin": "Назад ко входу",
@@ -729,7 +730,10 @@
     "resetMismatch": "Пароли не совпадают.",
     "resetPasswordSuccess": "Пароль обновлён. Можно войти.",
     "resetSaving": "Сохранение…",
-    "resetPasswordSubmit": "Сохранить пароль"
+    "resetPasswordSubmit": "Сохранить пароль",
+    "resetSessionLoading": "Проверяем сессию…",
+    "resetNoRecoverySession": "Откройте ссылку из письма на этом устройстве или запросите новую ниже.",
+    "resetUpdateFailed": "Не удалось обновить пароль. Попробуйте снова или запросите новую ссылку."
   },
   "Account": {
     "title": "Аккаунт",

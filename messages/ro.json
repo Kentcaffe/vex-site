@@ -717,7 +717,8 @@
     "resetRequestSubmit": "Trimite linkul pe email",
     "resetSending": "Se trimite…",
     "resetEmailSent": "Dacă există un cont cu acest email, ți-am trimis instrucțiuni.",
-    "resetMailNotConfigured": "Trimiterea emailurilor nu e configurată pe server (RESEND + EMAIL_FROM).",
+    "resetEmailSentHint": "📩 Dacă emailul există, vei primi un link de resetare (verifică și spam).",
+    "resetMailNotConfigured": "Resetarea parolei nu e disponibilă: setează NEXT_PUBLIC_SUPABASE_URL și NEXT_PUBLIC_SUPABASE_ANON_KEY.",
     "resetSendFailed": "Nu s-a putut trimite emailul. Încearcă mai târziu.",
     "resetOAuthHint": "Dacă te-ai înregistrat cu Google sau Facebook, folosește același buton — nu există parolă separată.",
     "backToLogin": "Înapoi la autentificare",
@@ -729,7 +730,10 @@
     "resetMismatch": "Parolele nu coincid.",
     "resetPasswordSuccess": "Parola a fost actualizată. Te poți autentifica.",
     "resetSaving": "Se salvează…",
-    "resetPasswordSubmit": "Salvează parola"
+    "resetPasswordSubmit": "Salvează parola",
+    "resetSessionLoading": "Verificăm sesiunea…",
+    "resetNoRecoverySession": "Deschide linkul din email pe acest dispozitiv sau cere un link nou mai jos.",
+    "resetUpdateFailed": "Nu s-a putut actualiza parola. Încearcă din nou sau cere un link nou de resetare."
   },
   "Account": {
     "title": "Cont",
