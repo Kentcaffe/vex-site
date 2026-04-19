@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 
 const linkClass =
@@ -17,8 +18,14 @@ export async function SiteFooter() {
       <div className="app-shell py-8 sm:py-12 lg:py-16">
         {/* Brand — același namespace Footer ca în header (siteName, tagline) */}
         <div className="border-b border-zinc-200/80 pb-10">
-          <Link href="/" className="inline-block text-3xl font-black tracking-tight text-zinc-950 transition hover:text-orange-700">
-            {t("siteName")}
+          <Link href="/" className="inline-flex items-center">
+            <Image
+              src="/logo.png"
+              alt="VEX - anunțuri gratuite Moldova"
+              width={140}
+              height={48}
+              className="h-10 w-auto transition-opacity hover:opacity-90"
+            />
           </Link>
           <p className="mt-3 max-w-2xl text-base leading-relaxed text-zinc-700">{t("tagline")}</p>
         </div>

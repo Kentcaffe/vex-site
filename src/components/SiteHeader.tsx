@@ -1,4 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
+import Image from "next/image";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
 import { isStaff } from "@/lib/auth-roles";
@@ -40,10 +41,17 @@ export async function SiteHeader() {
             <div className="flex min-w-0 items-center justify-between gap-3">
               <Link
                 href="/"
-                className="block truncate text-xl font-black tracking-tight text-[var(--mp-text)]"
+                className="inline-flex items-center"
                 title={tf("tagline")}
               >
-                {tf("siteName")}
+                <Image
+                  src="/logo.png"
+                  alt="VEX - anunțuri gratuite Moldova"
+                  width={168}
+                  height={56}
+                  className="h-9 w-auto"
+                  priority
+                />
               </Link>
               <details className="relative shrink-0">
                 <summary className="flex h-10 w-10 cursor-pointer list-none items-center justify-center rounded-xl border border-[var(--mp-border)] bg-[var(--mp-surface)] text-[var(--mp-text-secondary)] shadow-sm [&::-webkit-details-marker]:hidden">
@@ -101,10 +109,17 @@ export async function SiteHeader() {
             <div className="min-w-0 lg:max-w-[260px]">
               <Link
                 href="/"
-                className="block text-xl font-black tracking-tight text-[var(--mp-text)] sm:text-[1.7rem]"
+                className="inline-flex items-center"
                 title={tf("tagline")}
               >
-                {tf("siteName")}
+                <Image
+                  src="/logo.png"
+                  alt="VEX - anunțuri gratuite Moldova"
+                  width={204}
+                  height={68}
+                  className="h-11 w-auto sm:h-12"
+                  priority
+                />
               </Link>
               <p className="mt-1 text-[11px] text-[var(--mp-text-muted)]">
                 {tm("regionTag")} · {tm("activeListings", { count: listingCount })}

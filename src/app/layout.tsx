@@ -5,9 +5,9 @@ import { ThemeScript } from "@/components/theme/ThemeScript";
 import { siteUrl } from "@/lib/seo";
 import "./globals.css";
 
-const SEO_TITLE = "VEX - Anunțuri gratuite în Moldova | Cumpără și vinde rapid";
+const SEO_TITLE = "VEX - Anunțuri gratuite în Moldova";
 const SEO_DESCRIPTION =
-  "VEX este o platformă de anunțuri gratuite din Moldova. Publică anunțuri rapid sau găsește mașini, apartamente, telefoane și multe altele.";
+  "Platformă de anunțuri gratuite din Moldova. Cumpără și vinde rapid pe VEX.";
 const SEO_KEYWORDS = [
   "anunțuri Moldova",
   "cumpăr vând",
@@ -18,22 +18,24 @@ const SEO_KEYWORDS = [
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl()),
-  title: {
-    default: SEO_TITLE,
-    template: "%s | VEX",
-  },
+  title: SEO_TITLE,
   description: SEO_DESCRIPTION,
   keywords: SEO_KEYWORDS,
+  icons: {
+    icon: "/favicon.ico",
+  },
   openGraph: {
     title: "VEX - Anunțuri gratuite în Moldova",
-    description: "Cumpără și vinde rapid pe VEX. Publică anunțuri gratuit.",
+    description: "Cumpără și vinde rapid pe VEX.",
     type: "website",
-    url: siteUrl(),
+    url: "https://vex.md",
     siteName: "VEX",
     images: [
       {
-        url: "/marketplace-image-fallback.svg",
-        alt: "VEX - Anunțuri gratuite în Moldova",
+        url: "https://vex.md/logo.png",
+        width: 512,
+        height: 512,
+        alt: "VEX - anunțuri gratuite Moldova",
       },
     ],
   },
@@ -41,7 +43,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "VEX - Anunțuri Moldova",
     description: "Platformă de anunțuri gratuite",
-    images: ["/marketplace-image-fallback.svg"],
+    images: ["https://vex.md/logo.png"],
   },
   verification: {
     google: "c8RdLZCq_i84jUUQXIatmo8Uoc37kRmu2_fv_t-IQS8",
