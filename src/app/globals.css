@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/**
+ * Tema UI e light-only (ThemeScript + ForceLightTheme). Fără asta, pe iOS cu „Dark
+ * Appearance” varianta Tailwind `dark:` folosea prefers-color-scheme → text aproape alb
+ * (`dark:text-zinc-50`) pe fundaluri deschise (`surface-card`) = ilizibil.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
 html {
   scroll-behavior: smooth;
   background-color: var(--mp-page);
@@ -29,8 +36,8 @@ html {
     --mp-shadow-md: 0 10px 28px -6px rgb(17 24 39 / 0.14);
     --mp-shadow-lg: 0 22px 48px -12px rgb(17 24 39 / 0.2);
     --mp-nav-solid: #ffffff;
-    /* Înălțime bară jos + spațiu safe-area (fără suprapunere conținut) */
-    --mobile-nav-reserve: calc(76px + max(12px, env(safe-area-inset-bottom, 0px)));
+    /* Bară fixă (~72px rând + padding) + safe-area — evită „crop” peste ultimul conținut */
+    --mobile-nav-reserve: calc(92px + max(16px, env(safe-area-inset-bottom, 0px)));
   }
 
   .dark {
