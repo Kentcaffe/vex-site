@@ -487,6 +487,19 @@
     "profileUnauthorized": "Trebuie să fii autentificat.",
     "profileUnknown": "Nu am putut salva profilul. Încearcă din nou."
   },
+  "AccountHub": {
+    "navAria": "Meniu cont",
+    "myListings": "Anunțurile mele",
+    "saved": "Salvate",
+    "support": "Suport live",
+    "settings": "Setări",
+    "logout": "Ieșire",
+    "backToAccount": "Înapoi la cont",
+    "myListingsTitle": "Anunțurile mele",
+    "myListingsSubtitle": "Toate anunțurile tale publicate pe VEX.",
+    "myListingsEmpty": "Nu ai anunțuri publicate încă.",
+    "publishFirst": "Publică un anunț"
+  },
   "Notifications": {
     "title": "Notificări",
     "subtitle": "Mesaje de la moderatori despre reclamațiile tale.",

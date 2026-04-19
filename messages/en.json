@@ -487,6 +487,19 @@
     "profileUnauthorized": "You must be signed in.",
     "profileUnknown": "Could not save profile. Try again."
   },
+  "AccountHub": {
+    "navAria": "Account menu",
+    "myListings": "My listings",
+    "saved": "Saved",
+    "support": "Live support",
+    "settings": "Settings",
+    "logout": "Log out",
+    "backToAccount": "Back to account",
+    "myListingsTitle": "My listings",
+    "myListingsSubtitle": "All listings you’ve published on VEX.",
+    "myListingsEmpty": "You don’t have any listings yet.",
+    "publishFirst": "Post a listing"
+  },
   "Notifications": {
     "title": "Notifications",
     "subtitle": "Updates from moderators about your reports.",

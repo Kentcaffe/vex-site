@@ -1,57 +1,16 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Headphones, MessageCircle, Sparkles, X } from "lucide-react";
+import { Headphones, MessageCircle, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
-import { SupportLiveChat } from "@/components/support/SupportLiveChat";
+import { SupportChatModal } from "@/components/support/SupportChatModal";
 
 export function SupportContactLauncher() {
   const t = useTranslations("Support");
   const { status } = useAuthSession();
   const [open, setOpen] = useState(false);
-  const [ticketId, setTicketId] = useState<string | null>(null);
-  const [loadingTicket, setLoadingTicket] = useState(false);
-  const [ticketError, setTicketError] = useState(false);
-  /** Mesaj Prisma/DB din `debug` când `SUPPORT_API_DEBUG=1` pe server (sau dev). */
-  const [ticketErrorDetail, setTicketErrorDetail] = useState<string | null>(null);
-
-  const ensureTicket = useCallback(async () => {
-    setLoadingTicket(true);
-    setTicketError(false);
-    setTicketErrorDetail(null);
-    try {
-      const res = await fetch("/api/support/ticket", { credentials: "include" });
-      const data = (await res.json().catch(() => ({}))) as {
-        ticket?: { id: string };
-        debug?: { message?: string };
-      };
-      if (!res.ok) {
-        const msg = typeof data.debug?.message === "string" ? data.debug.message : null;
-        setTicketErrorDetail(msg);
-        throw new Error("ticket");
-      }
-      if (!data.ticket?.id) throw new Error("ticket");
-      setTicketId(data.ticket.id);
-    } catch {
-      setTicketId(null);
-      setTicketError(true);
-    } finally {
-      setLoadingTicket(false);
-    }
-  }, []);
-
-  async function handleOpen() {
-    setOpen(true);
-    if (status === "authenticated" && !ticketId) {
-      await ensureTicket();
-    }
-  }
-
-  function handleClose() {
-    setOpen(false);
-  }
 
   return (
     <>
@@ -85,7 +44,7 @@ export function SupportContactLauncher() {
             ) : status === "authenticated" ? (
               <button
                 type="button"
-                onClick={() => void handleOpen()}
+                onClick={() => setOpen(true)}
                 className="inline-flex min-h-[52px] items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-600 px-6 text-base font-semibold text-white shadow-lg shadow-orange-500/30 transition hover:brightness-105 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
               >
                 <MessageCircle className="h-5 w-5" aria-hidden />
@@ -106,59 +65,7 @@ export function SupportContactLauncher() {
         </div>
       </section>
 
-      {open && status === "authenticated" ? (
-        <div
-          className="fixed inset-0 z-[100] flex items-end justify-center bg-zinc-950/50 p-0 backdrop-blur-[2px] sm:items-center sm:p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="support-dialog-title"
-        >
-          <div className="flex h-[min(100dvh,720px)] w-full max-w-lg flex-col sm:max-h-[85vh] sm:rounded-2xl sm:shadow-2xl">
-            <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 sm:rounded-t-2xl">
-              <h3 id="support-dialog-title" className="text-sm font-semibold text-zinc-900">
-                {t("dialogTitle")}
-              </h3>
-              <button
-                type="button"
-                onClick={handleClose}
-                className="rounded-xl p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800"
-                aria-label={t("close")}
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="min-h-0 flex-1 overflow-hidden bg-zinc-100/80 p-2 sm:p-3">
-              {loadingTicket ? (
-                <div className="flex h-full min-h-[280px] items-center justify-center rounded-xl bg-white">
-                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" aria-hidden />
-                </div>
-              ) : ticketError ? (
-                <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-4 rounded-xl bg-white px-4 text-center">
-                  <p className="text-sm text-zinc-700">{t("ticketLoadError")}</p>
-                  {ticketErrorDetail ? (
-                    <pre className="max-h-32 max-w-full overflow-auto rounded-lg bg-zinc-100 px-3 py-2 text-left text-[11px] leading-snug text-zinc-800">
-                      {ticketErrorDetail}
-                    </pre>
-                  ) : null}
-                  <button
-                    type="button"
-                    onClick={() => void ensureTicket()}
-                    className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700"
-                  >
-                    {t("retryTicket")}
-                  </button>
-                </div>
-              ) : ticketId ? (
-                <SupportLiveChat variant="user" ticketId={ticketId} />
-              ) : (
-                <div className="flex h-full min-h-[280px] items-center justify-center rounded-xl bg-white">
-                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" aria-hidden />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <SupportChatModal open={open} onDismissAction={() => setOpen(false)} />
     </>
   );
 }

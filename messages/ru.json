@@ -487,6 +487,19 @@
     "profileUnauthorized": "Нужно войти в аккаунт.",
     "profileUnknown": "Не удалось сохранить профиль. Попробуйте снова."
   },
+  "AccountHub": {
+    "navAria": "Меню аккаунта",
+    "myListings": "Мои объявления",
+    "saved": "Избранное",
+    "support": "Поддержка",
+    "settings": "Настройки",
+    "logout": "Выйти",
+    "backToAccount": "Назад в аккаунт",
+    "myListingsTitle": "Мои объявления",
+    "myListingsSubtitle": "Все ваши объявления на VEX.",
+    "myListingsEmpty": "У вас пока нет объявлений.",
+    "publishFirst": "Разместить объявление"
+  },
   "Notifications": {
     "title": "Уведомления",
     "subtitle": "Сообщения модераторов по вашим жалобам.",

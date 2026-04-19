@@ -1,11 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
-import { AccountSettingsView } from "@/components/account-settings/AccountSettingsView";
+import { AccountHubView } from "@/components/account/AccountHubView";
 import { AuthForms } from "@/components/AuthForms";
 import { getOAuthAvailability } from "@/lib/oauth-env";
-import { type UserForAccountPage, userForAccountPageSelect } from "@/lib/prisma-account-settings";
-import { parsePreferences } from "@/lib/user-preferences";
 import { prisma } from "@/lib/prisma";
 
 type Props = {
@@ -18,28 +16,20 @@ export default async function ContPage({ params }: Props) {
   const session = await auth();
 
   if (session?.user) {
-    const me = (await prisma.user.findUnique({
+    const me = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: userForAccountPageSelect,
-    })) as UserForAccountPage | null;
+      select: { email: true, name: true, avatarUrl: true },
+    });
 
     if (!me) notFound();
 
     return (
-      <AccountSettingsView
-        key={me.updatedAt.toISOString()}
-        locale={locale}
+      <AccountHubView
         user={{
           email: me.email,
           name: me.name,
-          phone: me.phone,
-          city: me.city,
-          bio: me.bio,
           avatarUrl: me.avatarUrl,
-          createdAt: me.createdAt.toISOString(),
         }}
-        hasPassword={Boolean(me.passwordHash)}
-        preferences={parsePreferences(me.preferences)}
       />
     );
   }
