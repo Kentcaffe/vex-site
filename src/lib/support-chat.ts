@@ -18,7 +18,7 @@ export async function getOrCreateActiveSupportTicket(userId: string) {
     const existing = await supportTicket.findFirst({
       where: {
         userId,
-        status: { in: ["OPEN", "PENDING"] },
+        status: "OPEN",
       },
       orderBy: { updatedAt: "desc" },
     });
