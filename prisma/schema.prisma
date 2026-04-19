@@ -245,7 +245,9 @@ model SupportTicket {
   lastMessageAt   DateTime?            @map("last_message_at")
   feedbackRating  Int?                 @map("feedback_rating")
   feedbackSatisfied Boolean?           @map("feedback_satisfied")
+  feedbackMessage String?              @map("feedback_message")
   feedbackAt      DateTime?            @map("feedback_at")
+  closedAt        DateTime?            @map("closed_at")
   messages        SupportMessage[]
 
   @@index([userId, status])

@@ -27,8 +27,32 @@ export async function listRoomMessages(roomId: string, limit = 200): Promise<Rea
       LIMIT ${safeLimit}
     `);
   } catch (e) {
-    console.error("[listRoomMessages]", e);
-    return [];
+    console.error("[listRoomMessages] messages-table query failed, trying ChatMessage fallback", e);
+    try {
+      const fallback = await prisma.chatMessage.findMany({
+        where: { roomId },
+        orderBy: { createdAt: "asc" },
+        take: safeLimit,
+        select: {
+          id: true,
+          senderId: true,
+          body: true,
+          createdAt: true,
+          roomId: true,
+        },
+      });
+      return fallback.map((m) => ({
+        id: m.id,
+        senderId: m.senderId,
+        receiverId: "",
+        content: m.body,
+        createdAt: m.createdAt,
+        roomId: m.roomId,
+      }));
+    } catch (fallbackErr) {
+      console.error("[listRoomMessages] ChatMessage fallback failed", fallbackErr);
+      return [];
+    }
   }
 }
 
@@ -49,8 +73,32 @@ export async function getLastRoomMessage(roomId: string): Promise<RealtimeMessag
     `);
     return rows[0] ?? null;
   } catch (e) {
-    console.error("[getLastRoomMessage]", e);
-    return null;
+    console.error("[getLastRoomMessage] messages-table query failed, trying ChatMessage fallback", e);
+    try {
+      const row = await prisma.chatMessage.findFirst({
+        where: { roomId },
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          senderId: true,
+          body: true,
+          createdAt: true,
+          roomId: true,
+        },
+      });
+      if (!row) return null;
+      return {
+        id: row.id,
+        senderId: row.senderId,
+        receiverId: "",
+        content: row.body,
+        createdAt: row.createdAt,
+        roomId: row.roomId,
+      };
+    } catch (fallbackErr) {
+      console.error("[getLastRoomMessage] ChatMessage fallback failed", fallbackErr);
+      return null;
+    }
   }
 }
 
@@ -65,25 +113,47 @@ export async function insertRoomMessage(input: {
   content: string;
 }): Promise<InsertRoomMessageResult> {
   try {
-    const row = await prisma.message.create({
-      data: {
-        senderId: input.senderId,
-        receiverId: input.receiverId,
-        roomId: input.roomId,
-        content: input.content,
-      },
-    });
-    return {
-      ok: true,
-      message: {
-        id: row.id,
-        senderId: row.senderId,
-        receiverId: row.receiverId,
-        content: row.content,
-        createdAt: row.createdAt,
-        roomId: row.roomId,
-      },
-    };
+    try {
+      const row = await prisma.message.create({
+        data: {
+          senderId: input.senderId,
+          receiverId: input.receiverId,
+          roomId: input.roomId,
+          content: input.content,
+        },
+      });
+      return {
+        ok: true,
+        message: {
+          id: row.id,
+          senderId: row.senderId,
+          receiverId: row.receiverId,
+          content: row.content,
+          createdAt: row.createdAt,
+          roomId: row.roomId,
+        },
+      };
+    } catch (primaryErr) {
+      console.error("[insertRoomMessage] messages-table write failed, trying ChatMessage fallback", primaryErr);
+      const fallback = await prisma.chatMessage.create({
+        data: {
+          roomId: input.roomId,
+          senderId: input.senderId,
+          body: input.content,
+        },
+      });
+      return {
+        ok: true,
+        message: {
+          id: fallback.id,
+          senderId: fallback.senderId,
+          receiverId: input.receiverId,
+          content: fallback.body,
+          createdAt: fallback.createdAt,
+          roomId: fallback.roomId,
+        },
+      };
+    }
   } catch (e) {
     console.error("[insertRoomMessage]", e);
     const raw = e instanceof Error ? e.message : String(e);
@@ -109,7 +179,18 @@ export async function countUnreadRoomMessages(input: {
     const raw = rows[0]?.count ?? 0;
     return typeof raw === "bigint" ? Number(raw) : raw;
   } catch (e) {
-    console.error("[countUnreadRoomMessages]", e);
-    return 0;
+    console.error("[countUnreadRoomMessages] messages-table query failed, trying ChatMessage fallback", e);
+    try {
+      return await prisma.chatMessage.count({
+        where: {
+          roomId: input.roomId,
+          senderId: { not: input.userId },
+          createdAt: { gt: input.since },
+        },
+      });
+    } catch (fallbackErr) {
+      console.error("[countUnreadRoomMessages] ChatMessage fallback failed", fallbackErr);
+      return 0;
+    }
   }
 }
