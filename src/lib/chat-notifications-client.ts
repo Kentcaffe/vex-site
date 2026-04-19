@@ -35,7 +35,7 @@ export function requestChatNotificationPermission(): void {
   });
 }
 
-export function showNewChatMessageNotification(title: string, body: string): void {
+export function showNewChatMessageNotification(title: string, body: string, tag: string = "vex-chat-message"): void {
   if (typeof window === "undefined" || typeof Notification === "undefined") {
     return;
   }
@@ -45,7 +45,7 @@ export function showNewChatMessageNotification(title: string, body: string): voi
   try {
     new Notification(title, {
       body: body.length > 180 ? `${body.slice(0, 177)}…` : body,
-      tag: "vex-chat-message",
+      tag,
     });
   } catch {
     /* ignore */

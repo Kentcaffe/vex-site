@@ -107,7 +107,13 @@
     "feedbackThanks": "Спасибо! Ваш отзыв отправлен.",
     "feedbackError": "Не удалось сохранить отзыв. Попробуйте снова.",
     "feedbackValidationError": "Выберите оценку и удовлетворенность.",
-    "feedbackStarAria": "{count} звезд"
+    "feedbackStarAria": "{count} звезд",
+    "systemBadge": "Система",
+    "systemTicketRegistered": "💬 Ваше обращение зарегистрировано.\nМодератор ответит как можно скорее в зависимости от загрузки.",
+    "moderatorOnlineBadge": "Онлайн",
+    "moderatorJoinedBanner": "🟢 Модератор подключился к чату.",
+    "moderatorTyping": "✍️ Модератор печатает…",
+    "supportReplyNotificationTitle": "Ответ поддержки"
   },
   "Home": {
     "title": "Локальная площадка объявлений и продаж",

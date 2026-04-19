@@ -5,6 +5,9 @@ import type { SupportMessageSenderRole, SupportTicketStatus } from "@/lib/suppor
 
 const BODY_MAX = 6000;
 
+/** Corp mesaj SYSTEM: cheie i18n rezolvată în UI (`systemTicketRegistered`). */
+export const SUPPORT_SYSTEM_BODY_TICKET_REGISTERED = "SYSTEM_TICKET_REGISTERED" as const;
+
 export function normalizeSupportBody(raw: string): { ok: true; body: string } | { ok: false; error: string } {
   const body = raw.trim();
   if (!body) return { ok: false, error: "empty" };
@@ -22,10 +25,14 @@ export async function getOrCreateActiveSupportTicket(userId: string) {
       },
       orderBy: { updatedAt: "desc" },
     });
-    if (existing) return existing;
-    return await supportTicket.create({
+    if (existing) {
+      return existing;
+    }
+    const created = await supportTicket.create({
       data: { userId, status: "OPEN" },
     });
+    await appendSystemSupportMessage(created.id, userId, SUPPORT_SYSTEM_BODY_TICKET_REGISTERED);
+    return created;
   } catch (e) {
     logSupportDbFailure("getOrCreateActiveSupportTicket (SupportTicket findFirst | create)", e);
     throw e;
@@ -77,14 +84,47 @@ export async function listSupportMessages(ticketId: string): Promise<SupportMess
     body: m.body,
     createdAt: m.createdAt.toISOString(),
     senderRole: m.senderRole,
-    senderName: m.senderRole === "ADMIN" ? m.sender.name ?? m.sender.email : m.sender.name,
+    senderName:
+      m.senderRole === "SYSTEM"
+        ? null
+        : m.senderRole === "ADMIN"
+          ? m.sender.name ?? m.sender.email
+          : m.sender.name,
   }));
+}
+
+/** Mesaj de sistem (FK senderId = proprietar ticket — afișare doar după senderRole). */
+export async function appendSystemSupportMessage(ticketId: string, ticketOwnerUserId: string, body: string) {
+  try {
+    await prisma.$transaction(async (tx) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const t = tx as any;
+      await t.supportMessage.create({
+        data: {
+          ticketId,
+          senderId: ticketOwnerUserId,
+          senderRole: "SYSTEM",
+          body,
+        },
+      });
+      await t.supportTicket.update({
+        where: { id: ticketId },
+        data: {
+          lastMessageAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    });
+  } catch (e) {
+    logSupportDbFailure("appendSystemSupportMessage", e);
+    throw e;
+  }
 }
 
 export async function appendSupportMessage(params: {
   ticketId: string;
   senderId: string;
-  senderRole: SupportMessageSenderRole;
+  senderRole: Exclude<SupportMessageSenderRole, "SYSTEM">;
   body: string;
 }) {
   try {

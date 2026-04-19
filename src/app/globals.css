@@ -81,6 +81,21 @@ html {
 }
 
 @layer components {
+  @keyframes support-msg-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .support-msg-enter {
+    animation: support-msg-in 0.38s ease-out both;
+  }
+
   .app-shell {
     margin-inline: auto;
     width: 100%;

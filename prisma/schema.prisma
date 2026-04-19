@@ -28,6 +28,7 @@ enum SupportTicketStatus {
 enum SupportMessageSenderRole {
   USER
   ADMIN
+  SYSTEM
 }
 
 model User {

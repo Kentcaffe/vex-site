@@ -107,7 +107,13 @@
     "feedbackThanks": "Mulțumim! Feedback-ul tău a fost trimis.",
     "feedbackError": "Nu am putut salva feedback-ul. Încearcă din nou.",
     "feedbackValidationError": "Te rugăm să alegi stelele și dacă ai fost mulțumit.",
-    "feedbackStarAria": "{count} stele"
+    "feedbackStarAria": "{count} stele",
+    "systemBadge": "Sistem",
+    "systemTicketRegistered": "💬 Ticket-ul tău a fost înregistrat cu succes.\nUn moderator îți va răspunde în cel mai scurt timp posibil, în funcție de disponibilitate.",
+    "moderatorOnlineBadge": "Online",
+    "moderatorJoinedBanner": "🟢 Un moderator a intrat în conversație.",
+    "moderatorTyping": "✍️ Moderatorul scrie…",
+    "supportReplyNotificationTitle": "Răspuns suport"
   },
   "Home": {
     "title": "Marketplace local pentru anunțuri și vânzări",

@@ -107,7 +107,13 @@
     "feedbackThanks": "Thank you! Your feedback was sent.",
     "feedbackError": "We couldn't save your feedback. Try again.",
     "feedbackValidationError": "Please choose a star rating and satisfaction.",
-    "feedbackStarAria": "{count} stars"
+    "feedbackStarAria": "{count} stars",
+    "systemBadge": "System",
+    "systemTicketRegistered": "💬 Your ticket was registered successfully.\nA moderator will reply as soon as possible, depending on availability.",
+    "moderatorOnlineBadge": "Online",
+    "moderatorJoinedBanner": "🟢 A moderator has joined the conversation.",
+    "moderatorTyping": "✍️ Moderator is typing…",
+    "supportReplyNotificationTitle": "Support reply"
   },
   "Home": {
     "title": "A local marketplace for classifieds and sales",
