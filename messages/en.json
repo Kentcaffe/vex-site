@@ -92,7 +92,20 @@
     "loadError": "We couldn’t load messages.",
     "sendError": "We couldn’t send your message. Try again.",
     "ticketLoadError": "Live support isn’t available right now (database not migrated or service unavailable). Try again or email us.",
-    "retryTicket": "Try again"
+    "retryTicket": "Try again",
+    "feedbackTitle": "How was your experience?",
+    "feedbackBody": "Before closing the ticket, please leave a quick rating.",
+    "feedbackRatingLabel": "Rate us (1-5 stars)",
+    "feedbackSatisfiedLabel": "Were you satisfied with support?",
+    "feedbackSatisfiedYes": "Yes, satisfied",
+    "feedbackSatisfiedNo": "Not really",
+    "feedbackSubmit": "Submit feedback",
+    "feedbackSending": "Sending...",
+    "feedbackSkip": "Close without feedback",
+    "feedbackThanks": "Thank you! Your feedback was sent.",
+    "feedbackError": "We couldn't save your feedback. Try again.",
+    "feedbackValidationError": "Please choose a star rating and satisfaction.",
+    "feedbackStarAria": "{count} stars"
   },
   "Home": {
     "title": "A local marketplace for classifieds and sales",

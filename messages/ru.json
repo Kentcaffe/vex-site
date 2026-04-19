@@ -92,7 +92,20 @@
     "loadError": "Не удалось загрузить сообщения.",
     "sendError": "Не удалось отправить сообщение. Попробуйте снова.",
     "ticketLoadError": "Живой чат сейчас недоступен (БД не обновлена или сервис недоступен). Попробуйте снова или напишите на email.",
-    "retryTicket": "Повторить"
+    "retryTicket": "Повторить",
+    "feedbackTitle": "Как прошла ваша поддержка?",
+    "feedbackBody": "Перед закрытием тикета оставьте короткий отзыв.",
+    "feedbackRatingLabel": "Оцените поддержку (1-5 звезд)",
+    "feedbackSatisfiedLabel": "Вы остались довольны поддержкой?",
+    "feedbackSatisfiedYes": "Да, доволен",
+    "feedbackSatisfiedNo": "Не очень",
+    "feedbackSubmit": "Отправить отзыв",
+    "feedbackSending": "Отправка...",
+    "feedbackSkip": "Закрыть без отзыва",
+    "feedbackThanks": "Спасибо! Ваш отзыв отправлен.",
+    "feedbackError": "Не удалось сохранить отзыв. Попробуйте снова.",
+    "feedbackValidationError": "Выберите оценку и удовлетворенность.",
+    "feedbackStarAria": "{count} звезд"
   },
   "Home": {
     "title": "Локальная площадка объявлений и продаж",

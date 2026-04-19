@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { X } from "lucide-react";
+import { Star, X } from "lucide-react";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 import { SupportLiveChat } from "@/components/support/SupportLiveChat";
 
@@ -19,6 +19,14 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
   const [loadingTicket, setLoadingTicket] = useState(false);
   const [ticketError, setTicketError] = useState(false);
   const [ticketErrorDetail, setTicketErrorDetail] = useState<string | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [threadHasMessages, setThreadHasMessages] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [rating, setRating] = useState(0);
+  const [satisfied, setSatisfied] = useState<boolean | null>(null);
+  const [feedbackSending, setFeedbackSending] = useState(false);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
+  const [feedbackThanks, setFeedbackThanks] = useState(false);
 
   const ensureTicket = useCallback(async () => {
     setLoadingTicket(true);
@@ -27,7 +35,7 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
     try {
       const res = await fetch("/api/support/ticket", { credentials: "include" });
       const data = (await res.json().catch(() => ({}))) as {
-        ticket?: { id: string };
+        ticket?: { id: string; feedbackAt?: string | null };
         message?: string;
         debug?: { message?: string };
       };
@@ -43,6 +51,7 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
       }
       if (!data.ticket?.id) throw new Error("ticket");
       setTicketId(data.ticket.id);
+      setFeedbackSubmitted(Boolean(data.ticket.feedbackAt));
     } catch {
       setTicketId(null);
       setTicketError(true);
@@ -56,8 +65,56 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
       setTicketId(null);
       setTicketError(false);
       setTicketErrorDetail(null);
+      setShowFeedback(false);
+      setThreadHasMessages(false);
+      setFeedbackSubmitted(false);
+      setRating(0);
+      setSatisfied(null);
+      setFeedbackSending(false);
+      setFeedbackError(null);
+      setFeedbackThanks(false);
     }
   }, [open]);
+
+  async function submitFeedback() {
+    if (!ticketId || rating < 1 || satisfied === null) {
+      setFeedbackError(t("feedbackValidationError"));
+      return;
+    }
+    setFeedbackSending(true);
+    setFeedbackError(null);
+    try {
+      const res = await fetch("/api/support/feedback", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ticketId, rating, satisfied }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { message?: string };
+      if (!res.ok) {
+        throw new Error(typeof data.message === "string" ? data.message : "feedback_failed");
+      }
+      setFeedbackSubmitted(true);
+      setFeedbackThanks(true);
+      window.setTimeout(() => {
+        setShowFeedback(false);
+        onDismissAction();
+      }, 900);
+    } catch (err) {
+      const msg = err instanceof Error && err.message !== "feedback_failed" ? err.message : t("feedbackError");
+      setFeedbackError(msg);
+    } finally {
+      setFeedbackSending(false);
+    }
+  }
+
+  function handleClose() {
+    if (ticketId && threadHasMessages && !feedbackSubmitted && !showFeedback) {
+      setShowFeedback(true);
+      return;
+    }
+    onDismissAction();
+  }
 
   useEffect(() => {
     if (!open || status !== "authenticated") return;
@@ -84,7 +141,7 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
           </h3>
           <button
             type="button"
-            onClick={onDismissAction}
+            onClick={handleClose}
             className="rounded-xl p-2 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-800"
             aria-label={t("close")}
           >
@@ -112,8 +169,77 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
                 {t("retryTicket")}
               </button>
             </div>
+          ) : ticketId && showFeedback ? (
+            <div className="flex h-full min-h-[280px] flex-col rounded-xl bg-white p-4 sm:p-5">
+              <h4 className="text-base font-semibold text-zinc-900">{t("feedbackTitle")}</h4>
+              <p className="mt-1 text-sm text-zinc-600">{t("feedbackBody")}</p>
+
+              <p className="mt-4 text-sm font-medium text-zinc-800">{t("feedbackRatingLabel")}</p>
+              <div className="mt-2 flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setRating(value)}
+                    className="rounded-lg p-1.5 text-zinc-400 transition hover:bg-zinc-100"
+                    aria-label={t("feedbackStarAria", { count: value })}
+                  >
+                    <Star
+                      className={`h-6 w-6 ${value <= rating ? "fill-amber-400 text-amber-500" : "text-zinc-300"}`}
+                    />
+                  </button>
+                ))}
+              </div>
+
+              <p className="mt-4 text-sm font-medium text-zinc-800">{t("feedbackSatisfiedLabel")}</p>
+              <div className="mt-2 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setSatisfied(true)}
+                  className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+                    satisfied === true
+                      ? "border-emerald-300 bg-emerald-50 text-emerald-800"
+                      : "border-zinc-200 bg-white text-zinc-700"
+                  }`}
+                >
+                  {t("feedbackSatisfiedYes")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSatisfied(false)}
+                  className={`rounded-xl border px-3 py-2 text-sm font-semibold ${
+                    satisfied === false
+                      ? "border-amber-300 bg-amber-50 text-amber-800"
+                      : "border-zinc-200 bg-white text-zinc-700"
+                  }`}
+                >
+                  {t("feedbackSatisfiedNo")}
+                </button>
+              </div>
+
+              {feedbackError ? <p className="mt-3 text-xs text-red-600">{feedbackError}</p> : null}
+              {feedbackThanks ? <p className="mt-3 text-xs text-emerald-700">{t("feedbackThanks")}</p> : null}
+
+              <div className="mt-auto flex gap-2 pt-6">
+                <button
+                  type="button"
+                  onClick={onDismissAction}
+                  className="flex-1 rounded-xl border border-zinc-300 bg-white px-3 py-2.5 text-sm font-semibold text-zinc-700"
+                >
+                  {t("feedbackSkip")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void submitFeedback()}
+                  disabled={feedbackSending}
+                  className="flex-1 rounded-xl bg-orange-600 px-3 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+                >
+                  {feedbackSending ? t("feedbackSending") : t("feedbackSubmit")}
+                </button>
+              </div>
+            </div>
           ) : ticketId ? (
-            <SupportLiveChat variant="user" ticketId={ticketId} />
+            <SupportLiveChat variant="user" ticketId={ticketId} onThreadHasMessagesAction={setThreadHasMessages} />
           ) : (
             <div className="flex h-full min-h-[280px] items-center justify-center rounded-xl bg-white">
               <div className="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" aria-hidden />

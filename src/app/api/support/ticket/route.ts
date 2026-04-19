@@ -15,6 +15,7 @@ export async function GET() {
         status: ticket.status,
         createdAt: ticket.createdAt.toISOString(),
         lastMessageAt: ticket.lastMessageAt?.toISOString() ?? null,
+        feedbackAt: ticket.feedbackAt?.toISOString() ?? null,
       },
     });
   } catch (err) {

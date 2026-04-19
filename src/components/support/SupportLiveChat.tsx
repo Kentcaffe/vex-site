@@ -11,6 +11,7 @@ type Props = {
   ticketId: string;
   /** Pentru afișare antet admin */
   userEmail?: string | null;
+  onThreadHasMessagesAction?: (hasMessages: boolean) => void;
 };
 
 function formatTime(iso: string, locale: string) {
@@ -27,7 +28,7 @@ function formatTime(iso: string, locale: string) {
   }
 }
 
-export function SupportLiveChat({ variant, ticketId, userEmail }: Props) {
+export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessagesAction }: Props) {
   const t = useTranslations("Support");
   const [locale, setLocale] = useState("ro");
   const [messages, setMessages] = useState<SupportMessageDTO[]>([]);
@@ -90,6 +91,10 @@ export function SupportLiveChat({ variant, ticketId, userEmail }: Props) {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length]);
+
+  useEffect(() => {
+    onThreadHasMessagesAction?.(messages.length > 0);
+  }, [messages.length, onThreadHasMessagesAction]);
 
   /** Realtime + fallback polling */
   useEffect(() => {

@@ -92,7 +92,20 @@
     "loadError": "Nu am putut încărca mesajele.",
     "sendError": "Nu am putut trimite mesajul. Încearcă din nou.",
     "ticketLoadError": "Chatul de suport nu este disponibil momentan. Încearcă din nou sau scrie-ne la asistenta@vex.md.",
-    "retryTicket": "Încearcă din nou"
+    "retryTicket": "Încearcă din nou",
+    "feedbackTitle": "Cum a fost experiența ta?",
+    "feedbackBody": "Înainte să închizi ticketul, lasă-ne un feedback rapid.",
+    "feedbackRatingLabel": "Acordă o notă (1-5 stele)",
+    "feedbackSatisfiedLabel": "Ai fost mulțumit de suport?",
+    "feedbackSatisfiedYes": "Da, mulțumit",
+    "feedbackSatisfiedNo": "Nu prea",
+    "feedbackSubmit": "Trimite feedback",
+    "feedbackSending": "Se trimite...",
+    "feedbackSkip": "Închide fără feedback",
+    "feedbackThanks": "Mulțumim! Feedback-ul tău a fost trimis.",
+    "feedbackError": "Nu am putut salva feedback-ul. Încearcă din nou.",
+    "feedbackValidationError": "Te rugăm să alegi stelele și dacă ai fost mulțumit.",
+    "feedbackStarAria": "{count} stele"
   },
   "Home": {
     "title": "Marketplace local pentru anunțuri și vânzări",
