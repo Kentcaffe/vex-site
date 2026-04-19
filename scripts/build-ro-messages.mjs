@@ -102,7 +102,7 @@ const ro = {
       banner: "Bine ai venit pe VEX — anunțuri locale, simple și rapide.",
       regionTag: "Republica Moldova",
       activeListings: "{count} anunțuri active",
-      gridTitle: "Recomandate pentru tine",
+      gridTitle: "Anun?uri recomandate",
       viewAll: "Toate anunțurile",
       categoriesTitle: "Categorii populare",
       categoriesHint: "Alege rapid domeniul — vezi anunțurile filtrate.",
@@ -804,3 +804,4 @@ assertSameShape(en, ro);
 const out = JSON.stringify(ro, null, 2) + "\n";
 fs.writeFileSync(new URL("../messages/ro.json", import.meta.url), out, "utf8");
 console.log("Wrote messages/ro.json (UTF-8), keys match en.json");
+

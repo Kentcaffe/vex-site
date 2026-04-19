@@ -146,7 +146,7 @@
       "banner": "Bine ai venit pe VEX — anunțuri locale, simple și rapide.",
       "regionTag": "Republica Moldova",
       "activeListings": "{count} anunțuri active",
-      "gridTitle": "Recomandate pentru tine",
+      "gridTitle": "Anun?uri recomandate",
       "viewAll": "Toate anunțurile",
       "categoriesTitle": "Categorii populare",
       "categoriesHint": "Alege rapid domeniul — vezi anunțurile filtrate.",
@@ -998,3 +998,4 @@
     }
   }
 }
+

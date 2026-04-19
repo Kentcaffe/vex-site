@@ -22,7 +22,12 @@ export const metadata: Metadata = {
   description: SEO_DESCRIPTION,
   keywords: SEO_KEYWORDS,
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/logo.png", type: "image/png" },
+      { url: "/favicon.ico" },
+    ],
+    shortcut: "/logo.png",
+    apple: "/logo.png",
   },
   openGraph: {
     title: "VEX - Anunțuri gratuite în Moldova",
