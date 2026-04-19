@@ -20,6 +20,7 @@ type Props = {
   searchParams: Promise<{
     category?: string;
     city?: string;
+    district?: string;
     min?: string;
     max?: string;
     search?: string;
@@ -28,6 +29,10 @@ type Props = {
     model?: string;
     fuel?: string;
     transmission?: string;
+    bodyType?: string;
+    drivetrain?: string;
+    doors?: string;
+    condition?: string;
     yearMin?: string;
     yearMax?: string;
     mileageMax?: string;
@@ -43,6 +48,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const categorySlug = sp.category?.trim() || undefined;
   const searchQ = sp.search?.trim() || undefined;
   const city = sp.city?.trim() || undefined;
+  const district = sp.district?.trim() || undefined;
   const minRaw = sp.min?.trim();
   const maxRaw = sp.max?.trim();
   const minN = minRaw ? Number(minRaw) : NaN;
@@ -52,6 +58,10 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const model = sp.model?.trim() || undefined;
   const fuel = sp.fuel?.trim() || undefined;
   const transmission = sp.transmission?.trim() || undefined;
+  const bodyType = sp.bodyType?.trim() || undefined;
+  const drivetrain = sp.drivetrain?.trim() || undefined;
+  const doors = sp.doors?.trim() || undefined;
+  const condition = sp.condition?.trim() || undefined;
   const yearMinRaw = sp.yearMin?.trim();
   const yearMaxRaw = sp.yearMax?.trim();
   const mileageMaxRaw = sp.mileageMax?.trim();
@@ -74,7 +84,11 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   }
 
   if (city) {
-    where.city = { contains: city };
+    where.city = { contains: city, mode: "insensitive" };
+  }
+
+  if (district) {
+    where.district = { contains: district, mode: "insensitive" };
   }
 
   if (searchQ) {
@@ -99,6 +113,10 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
     where.mileageKm = { lte: mileageMax };
   }
 
+  if (condition === "new" || condition === "used") {
+    where.condition = condition;
+  }
+
   if (fuel) {
     andFilters.push({
       detailsJson: {
@@ -111,6 +129,30 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
     andFilters.push({
       detailsJson: {
         contains: `"transmission":"${transmission}"`,
+      },
+    });
+  }
+
+  if (bodyType) {
+    andFilters.push({
+      detailsJson: {
+        contains: `"body_type":"${bodyType}"`,
+      },
+    });
+  }
+
+  if (drivetrain) {
+    andFilters.push({
+      detailsJson: {
+        contains: `"drivetrain":"${drivetrain}"`,
+      },
+    });
+  }
+
+  if (doors) {
+    andFilters.push({
+      detailsJson: {
+        contains: `"doors":"${doors}"`,
       },
     });
   }
@@ -157,6 +199,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
       filters={
         <AnunturiFilters
           defaultCity={city ?? ""}
+          defaultDistrict={district ?? ""}
           defaultMin={Number.isFinite(minN) ? String(minN) : ""}
           defaultMax={Number.isFinite(maxN) ? String(maxN) : ""}
           defaultSearch={searchQ ?? ""}
@@ -165,6 +208,10 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
           defaultModel={model ?? ""}
           defaultFuel={fuel ?? ""}
           defaultTransmission={transmission ?? ""}
+          defaultBodyType={bodyType ?? ""}
+          defaultDrivetrain={drivetrain ?? ""}
+          defaultDoors={doors ?? ""}
+          defaultCondition={condition === "new" || condition === "used" ? condition : ""}
           defaultYearMin={Number.isFinite(yearMin) ? String(yearMin) : ""}
           defaultYearMax={Number.isFinite(yearMax) ? String(yearMax) : ""}
           defaultMileageMax={Number.isFinite(mileageMax) ? String(mileageMax) : ""}

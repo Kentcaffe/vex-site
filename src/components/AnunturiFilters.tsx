@@ -2,7 +2,15 @@
 
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { VEHICLE_BRANDS, VEHICLE_FUEL_VALUES, VEHICLE_TRANSMISSION_VALUES } from "@/lib/vehicle-taxonomy";
+import {
+  MOLDOVA_CITIES,
+  VEHICLE_BODY_TYPE_VALUES,
+  VEHICLE_BRANDS,
+  VEHICLE_DOOR_VALUES,
+  VEHICLE_DRIVETRAIN_VALUES,
+  VEHICLE_FUEL_VALUES,
+  VEHICLE_TRANSMISSION_VALUES,
+} from "@/lib/vehicle-taxonomy";
 
 type Props = {
   defaultCity?: string;
@@ -15,6 +23,11 @@ type Props = {
   defaultModel?: string;
   defaultFuel?: string;
   defaultTransmission?: string;
+  defaultBodyType?: string;
+  defaultDrivetrain?: string;
+  defaultDoors?: string;
+  defaultCondition?: string;
+  defaultDistrict?: string;
   defaultYearMin?: string;
   defaultYearMax?: string;
   defaultMileageMax?: string;
@@ -31,6 +44,11 @@ export function AnunturiFilters({
   defaultModel = "",
   defaultFuel = "",
   defaultTransmission = "",
+  defaultBodyType = "",
+  defaultDrivetrain = "",
+  defaultDoors = "",
+  defaultCondition = "",
+  defaultDistrict = "",
   defaultYearMin = "",
   defaultYearMax = "",
   defaultMileageMax = "",
@@ -84,8 +102,27 @@ export function AnunturiFilters({
           <input
             id="flt-city"
             name="city"
+            list="flt-city-list"
             defaultValue={defaultCity}
             className="field-input mt-1"
+            placeholder={t("cityPlaceholder")}
+          />
+          <datalist id="flt-city-list">
+            {MOLDOVA_CITIES.map((cityName) => (
+              <option key={cityName} value={cityName} />
+            ))}
+          </datalist>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-district">
+            {t("district")}
+          </label>
+          <input
+            id="flt-district"
+            name="district"
+            defaultValue={defaultDistrict}
+            className="field-input mt-1"
+            placeholder={t("districtPlaceholder")}
           />
         </div>
         <div>
@@ -224,6 +261,55 @@ export function AnunturiFilters({
                       {o.label}
                     </option>
                   ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-body-type">
+                  {t("bodyType")}
+                </label>
+                <select id="flt-body-type" name="bodyType" defaultValue={defaultBodyType} className="field-input mt-1">
+                  <option value="">{t("all")}</option>
+                  {VEHICLE_BODY_TYPE_VALUES.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-drivetrain">
+                  {t("drivetrain")}
+                </label>
+                <select id="flt-drivetrain" name="drivetrain" defaultValue={defaultDrivetrain} className="field-input mt-1">
+                  <option value="">{t("all")}</option>
+                  {VEHICLE_DRIVETRAIN_VALUES.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-doors">
+                  {t("doors")}
+                </label>
+                <select id="flt-doors" name="doors" defaultValue={defaultDoors} className="field-input mt-1">
+                  <option value="">{t("all")}</option>
+                  {VEHICLE_DOOR_VALUES.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-condition">
+                  {t("condition")}
+                </label>
+                <select id="flt-condition" name="condition" defaultValue={defaultCondition} className="field-input mt-1">
+                  <option value="">{t("all")}</option>
+                  <option value="used">{t("conditionUsed")}</option>
+                  <option value="new">{t("conditionNew")}</option>
                 </select>
               </div>
             </div>
