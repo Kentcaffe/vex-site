@@ -16,7 +16,7 @@ import {
 } from "@/lib/listing-detail-config";
 import { SearchableSelect } from "@/components/publish/SearchableSelect";
 import { ELECTRONICS_BRANDS, getElectronicsModelsForBrand } from "@/lib/electronics-taxonomy";
-import { isElectronicsBrandSlug } from "@/lib/listing-profiles";
+import { isElectronicsBrandSlug, needsCoreConditionSlug } from "@/lib/listing-profiles";
 import { LISTING_YEAR_OPTIONS, RE_ROOM_COUNTS } from "@/lib/listing-form-options";
 import {
   type CategoryTreeNode,
@@ -77,15 +77,6 @@ const baseInputClass =
 const labelClass = "block text-sm font-medium text-zinc-900";
 const labelClassInline = "flex items-center gap-2 text-sm font-medium text-zinc-900";
 const errBorder = "input-error border-red-500 ring-2 ring-red-500/30";
-const LIVE_REQUIRED_FIELDS: ListingFormFieldId[] = [
-  "title",
-  "description",
-  "price",
-  "city",
-  "condition",
-  "imagesRaw",
-];
-
 export function ListingForm({ locale, userId, categoryTree, editListingId = null, initialEditSnapshot = null }: Props) {
   const router = useRouter();
   const { toast } = useToast();
@@ -135,6 +126,15 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
   );
 
   const { isVeh, isRe, isBrandish } = getListingFormFlags(selectedSlug);
+  const needsCoreCondition = needsCoreConditionSlug(selectedSlug);
+  const liveRequiredFields = useMemo((): ListingFormFieldId[] => {
+    const fields: ListingFormFieldId[] = ["title", "description", "price", "city"];
+    if (needsCoreCondition) {
+      fields.push("condition");
+    }
+    fields.push("imagesRaw");
+    return fields;
+  }, [needsCoreCondition]);
   const detailFields = useMemo(
     () => getDetailFieldsForSlug(selectedSlug, { brand: publishValues.brand, model: publishValues.modelName }),
     [selectedSlug, publishValues.brand, publishValues.modelName],
@@ -329,6 +329,25 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     }
   }, [state]);
 
+  /** Imobiliare / joburi / servicii: fără „nou/folosit”; restul: new/used obligatoriu când e vizibil. */
+  useEffect(() => {
+    if (!needsCoreCondition) {
+      setPublishValues((p) => ({ ...p, condition: "not_applicable" }));
+    } else {
+      setPublishValues((p) =>
+        p.condition === "not_applicable" ? { ...p, condition: "used" } : p,
+      );
+    }
+    setClientErrors((prev) => {
+      if (!prev.condition) {
+        return prev;
+      }
+      const next = { ...prev };
+      delete next.condition;
+      return next;
+    });
+  }, [needsCoreCondition]);
+
   useEffect(() => {
     if (!liveValidateEnabled) {
       return;
@@ -349,8 +368,8 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       condition: publishValues.condition,
       imagesRaw,
     };
-    for (const field of LIVE_REQUIRED_FIELDS) {
-      const e = liveValidateField(field, liveValues, msg);
+    for (const field of liveRequiredFields) {
+      const e = liveValidateField(field, liveValues, msg, { needsCoreCondition });
       if (e) {
         nextErrors[field] = e;
       }
@@ -358,7 +377,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     setClientErrors((prev) => {
       const merged = { ...prev };
       delete merged.categoryId;
-      for (const field of LIVE_REQUIRED_FIELDS) {
+      for (const field of liveRequiredFields) {
         delete merged[field];
       }
       return { ...merged, ...nextErrors };
@@ -375,6 +394,8 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     publishValues.price,
     publishValues.title,
     tVal,
+    liveRequiredFields,
+    needsCoreCondition,
   ]);
 
   function detailLabel(field: DetailField): string {
@@ -759,29 +780,31 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
           />
         </div>
 
-        <div id="field-condition">
-          <label className={labelClass} htmlFor="condition">
-            {t("condition")}
-          </label>
-          <select
-            id="condition"
-            name="condition"
-            data-error={clientErrors.condition ? "true" : undefined}
-            value={publishValues.condition}
-            onChange={(e) => {
-              setPublishValues((p) => ({ ...p, condition: e.target.value }));
-            }}
-            aria-invalid={Boolean(clientErrors.condition)}
-            className={`${baseInputClass} ${ring("condition")}`}
-          >
-            <option value="new">{t("conditionNew")}</option>
-            <option value="used">{t("conditionUsed")}</option>
-            <option value="not_applicable">{t("conditionNA")}</option>
-          </select>
-          {clientErrors.condition ? (
-            <p className="mt-1 text-sm text-red-600">{clientErrors.condition}</p>
-          ) : null}
-        </div>
+        {needsCoreCondition ? (
+          <div id="field-condition">
+            <label className={labelClass} htmlFor="condition">
+              {t("condition")}
+            </label>
+            <select
+              id="condition"
+              name="condition"
+              data-error={clientErrors.condition ? "true" : undefined}
+              value={["new", "used"].includes(publishValues.condition) ? publishValues.condition : "used"}
+              onChange={(e) => {
+                setPublishValues((p) => ({ ...p, condition: e.target.value }));
+                clearFieldError("condition");
+              }}
+              aria-invalid={Boolean(clientErrors.condition)}
+              className={`${baseInputClass} ${ring("condition")}`}
+            >
+              <option value="new">{t("conditionNew")}</option>
+              <option value="used">{t("conditionUsed")}</option>
+            </select>
+            {clientErrors.condition ? (
+              <p className="mt-1 text-sm text-red-600">{clientErrors.condition}</p>
+            ) : null}
+          </div>
+        ) : null}
       </section>
 
       {isVeh ||

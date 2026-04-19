@@ -75,3 +75,24 @@ export function isFashionSlug(slug: string): boolean {
 export function isAnimalSlug(slug: string): boolean {
   return /^animale-/.test(slug);
 }
+
+/**
+ * Câmpul global „Stare” (nou / folosit) din formularul principal.
+ * Fără sens pentru: imobiliare (există „Stare proprietate” în detalii), joburi, servicii.
+ */
+export function needsCoreConditionSlug(slug: string): boolean {
+  const s = slug.trim();
+  if (!s) {
+    return false;
+  }
+  if (isRealEstateSlug(s)) {
+    return false;
+  }
+  if (isJobSlug(s)) {
+    return false;
+  }
+  if (isServiceJobLeafSlug(s)) {
+    return false;
+  }
+  return true;
+}

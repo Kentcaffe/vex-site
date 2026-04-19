@@ -131,10 +131,16 @@ export type ListingLiveValues = {
   imagesRaw: string;
 };
 
+export type LiveValidateFieldOptions = {
+  /** Dacă false, câmpul „Stare” nu e afișat (nu validăm). Dacă true, acceptăm doar new/used. */
+  needsCoreCondition?: boolean;
+};
+
 export function liveValidateField(
   field: keyof ListingLiveValues,
   values: ListingLiveValues,
   msg: ListingFormValidationMessages,
+  options?: LiveValidateFieldOptions,
 ): string | undefined {
   switch (field) {
     case "categoryId": {
@@ -185,6 +191,16 @@ export function liveValidateField(
       return undefined;
     }
     case "condition": {
+      const need = options?.needsCoreCondition;
+      if (need === false) {
+        return undefined;
+      }
+      if (need === true) {
+        if (!["new", "used"].includes(values.condition)) {
+          return msg.errCondition;
+        }
+        return undefined;
+      }
       if (!["new", "used", "not_applicable"].includes(values.condition)) {
         return msg.errCondition;
       }
