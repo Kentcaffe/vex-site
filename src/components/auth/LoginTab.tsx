@@ -9,6 +9,7 @@ import { AuthDivider } from "@/components/auth/AuthDivider";
 import { authInputClass, IconField } from "@/components/auth/IconField";
 import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import type { OauthAvailability } from "@/components/auth/types";
+import { loginErrorMessageKey } from "@/lib/auth-supabase-errors";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 type Props = {
@@ -62,7 +63,7 @@ export function LoginTab({ callbackUrl, oauth }: Props) {
     await fetch("/api/auth/sync-user", { method: "POST", credentials: "include" });
     setPending(false);
     if (error) {
-      setFormError(t("loginInvalid"));
+      setFormError(t(loginErrorMessageKey(error)));
       return;
     }
     clearLoginFields();

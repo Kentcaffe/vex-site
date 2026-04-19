@@ -27,7 +27,8 @@ export function RegisterTab({ oauth }: Props) {
   const callbackUrl = locale === routing.defaultLocale ? "/" : `/${locale}`;
   const [regPending, setRegPending] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
-  const [registerOk, setRegisterOk] = useState(false);
+  /** `session`: logged in immediately; `confirmEmail`: Supabase sent a confirmation link first */
+  const [registerOutcome, setRegisterOutcome] = useState<null | "session" | "confirmEmail">(null);
   const [password, setPassword] = useState("");
   const [pwdTouched, setPwdTouched] = useState(false);
   const [email, setEmail] = useState("");
@@ -59,7 +60,7 @@ export function RegisterTab({ oauth }: Props) {
 
   function validateClient(fd: FormData): boolean {
     setRegisterError(null);
-    setRegisterOk(false);
+    setRegisterOutcome(null);
     setClientBlock(null);
     setEmailErr(null);
     setPhoneErr(null);
@@ -113,14 +114,18 @@ export function RegisterTab({ oauth }: Props) {
           },
         },
       })
-      .then(async ({ error }) => {
+      .then(async ({ data, error }) => {
         if (error) {
           setRegisterError(t("validationError"));
           return;
         }
-        await fetch("/api/auth/sync-user", { method: "POST", credentials: "include" });
         clearRegisterFields();
-        setRegisterOk(true);
+        if (data.session) {
+          await fetch("/api/auth/sync-user", { method: "POST", credentials: "include" });
+          setRegisterOutcome("session");
+        } else {
+          setRegisterOutcome("confirmEmail");
+        }
       })
       .finally(() => {
         setRegPending(false);
@@ -249,9 +254,14 @@ export function RegisterTab({ oauth }: Props) {
             {registerError}
           </p>
         ) : null}
-        {registerOk ? (
+        {registerOutcome === "session" ? (
           <p className="rounded-lg bg-emerald-50 px-3 py-2 text-[13px] font-medium text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-200" role="status">
             {t("registerSuccess")}
+          </p>
+        ) : null}
+        {registerOutcome === "confirmEmail" ? (
+          <p className="rounded-lg bg-sky-50 px-3 py-2 text-[13px] font-medium text-sky-900 dark:bg-sky-950/40 dark:text-sky-100" role="status">
+            {t("registerConfirmEmail")}
           </p>
         ) : null}
 
