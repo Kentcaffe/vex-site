@@ -28,10 +28,16 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
       const res = await fetch("/api/support/ticket", { credentials: "include" });
       const data = (await res.json().catch(() => ({}))) as {
         ticket?: { id: string };
+        message?: string;
         debug?: { message?: string };
       };
       if (!res.ok) {
-        const msg = typeof data.debug?.message === "string" ? data.debug.message : null;
+        const msg =
+          typeof data.message === "string"
+            ? data.message
+            : typeof data.debug?.message === "string"
+              ? data.debug.message
+              : null;
         setTicketErrorDetail(msg);
         throw new Error("ticket");
       }
