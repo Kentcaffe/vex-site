@@ -33,6 +33,11 @@ export async function SiteFooter() {
             <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-500">{t("colContactIntro")}</p>
             <ul className="space-y-3">
               <li>
+                <Link href="/contact" className={`${linkClass} font-semibold text-orange-700 dark:text-orange-400`}>
+                  {t("linkContactPage")}
+                </Link>
+              </li>
+              <li>
                 <a href="mailto:support@vex.md" className={mailClass}>
                   support@vex.md
                 </a>

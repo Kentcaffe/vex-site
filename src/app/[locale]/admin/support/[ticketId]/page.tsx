@@ -1,0 +1,52 @@
+import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { Link } from "@/i18n/navigation";
+import { AdminSupportTicketClient } from "@/components/support";
+import { prisma } from "@/lib/prisma";
+
+type Props = { params: Promise<{ locale: string; ticketId: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Admin" });
+  return { title: t("supportDetailTitle") };
+}
+
+export default async function AdminSupportTicketPage({ params }: Props) {
+  const { locale, ticketId } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("Admin");
+
+  const ticket = await prisma.supportTicket.findUnique({
+    where: { id: ticketId },
+    include: {
+      user: { select: { email: true, name: true } },
+    },
+  });
+
+  if (!ticket) notFound();
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-center gap-3">
+        <Link href="/admin/support" className="text-sm font-medium text-emerald-700 hover:underline">
+          ← {t("supportBack")}
+        </Link>
+      </div>
+      <h1 className="mt-4 text-2xl font-bold tracking-tight text-zinc-900">{t("supportDetailHeading")}</h1>
+      <p className="mt-1 text-sm text-zinc-500">
+        {ticket.user.email}
+        {ticket.user.name ? ` · ${ticket.user.name}` : ""}
+      </p>
+
+      <div className="mt-6">
+        <AdminSupportTicketClient
+          ticketId={ticket.id}
+          initialStatus={ticket.status}
+          userEmail={ticket.user.email}
+        />
+      </div>
+    </div>
+  );
+}

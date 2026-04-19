@@ -6,9 +6,10 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "next dev --webpack",
+    "dev": "prisma generate && next dev --webpack",
     "dev:api": "node backend/server.js",
     "dev:next": "next dev --webpack",
+    "prebuild": "prisma generate",
     "build": "next build",
     "build:with-db": "prisma generate && prisma migrate deploy && next build",
     "build:render": "prisma generate && npm run build",

@@ -12,9 +12,12 @@ export default async function AdminDashboardPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("Admin");
 
-  const [listingCount, userCount, lp, lr, ld, op, or, od] = await Promise.all([
+  const [listingCount, userCount, supportOpen, lp, lr, ld, op, or, od] = await Promise.all([
     prisma.listing.count(),
     prisma.user.count(),
+    prisma.supportTicket.count({
+      where: { status: { in: ["OPEN", "PENDING"] } },
+    }),
     prisma.listingReport.count({ where: { status: "PENDING" } }),
     prisma.listingReport.count({ where: { status: "REVIEWED" } }),
     prisma.listingReport.count({ where: { status: "DISMISSED" } }),
@@ -64,6 +67,16 @@ export default async function AdminDashboardPage({ params }: Props) {
           >
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{t("statUsers")}</p>
             <p className="mt-2 text-3xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">{userCount}</p>
+            <p className="mt-4 text-xs font-medium text-emerald-700 dark:text-emerald-400">{t("openSection")} →</p>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/admin/support"
+            className="block h-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-orange-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-orange-800"
+          >
+            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{t("statSupportOpen")}</p>
+            <p className="mt-2 text-3xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">{supportOpen}</p>
             <p className="mt-4 text-xs font-medium text-emerald-700 dark:text-emerald-400">{t("openSection")} →</p>
           </Link>
         </li>

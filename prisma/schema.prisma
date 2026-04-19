@@ -18,6 +18,18 @@ enum ReportStatus {
   DISMISSED
 }
 
+enum SupportTicketStatus {
+  OPEN
+  PENDING
+  RESOLVED
+  CLOSED
+}
+
+enum SupportMessageSenderRole {
+  USER
+  STAFF
+}
+
 model User {
   id            String         @id @default(cuid())
   supabaseAuthId String?       @unique
@@ -40,6 +52,8 @@ model User {
   notifications UserNotification[]
   sentMessages  Message[]      @relation("MessageSender")
   receivedMessages Message[]   @relation("MessageReceiver")
+  supportTickets SupportTicket[]
+  supportMessagesSent SupportMessage[] @relation("SupportMessages")
   /** JSON: theme, notifications, privacy toggles, activity log snippets, etc. */
   preferences   Json?
   createdAt     DateTime       @default(now())
@@ -218,4 +232,35 @@ model ChatReadState {
   lastReadAt DateTime @default(now())
 
   @@unique([roomId, userId])
+}
+
+/** Live support (separat de ChatRoom marketplace). */
+model SupportTicket {
+  id              String               @id @default(cuid())
+  userId          String               @map("user_id")
+  user            User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status          SupportTicketStatus  @default(OPEN)
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+  lastMessageAt   DateTime?            @map("last_message_at")
+  messages        SupportMessage[]
+
+  @@index([userId, status])
+  @@index([lastMessageAt])
+  @@index([status, lastMessageAt])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id          String                   @id @default(cuid())
+  ticketId    String                   @map("ticket_id")
+  ticket      SupportTicket            @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId    String                   @map("sender_id")
+  sender      User                     @relation("SupportMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  senderRole  SupportMessageSenderRole @map("sender_role")
+  body        String
+  createdAt   DateTime                 @default(now()) @map("created_at")
+
+  @@index([ticketId, createdAt])
+  @@map("support_messages")
 }
