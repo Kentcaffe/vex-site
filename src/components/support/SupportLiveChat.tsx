@@ -51,10 +51,16 @@ export function SupportLiveChat({ variant, ticketId, userEmail }: Props) {
     });
     const data = (await res.json().catch(() => ({}))) as {
       messages?: SupportMessageDTO[];
+      message?: string;
       debug?: { message?: string };
     };
     if (!res.ok) {
-      const detail = typeof data.debug?.message === "string" ? data.debug.message : null;
+      const detail =
+        typeof data.message === "string"
+          ? data.message
+          : typeof data.debug?.message === "string"
+            ? data.debug.message
+            : null;
       throw new Error(detail ?? "load_failed");
     }
     setMessages(data.messages ?? []);
@@ -135,10 +141,16 @@ export function SupportLiveChat({ variant, ticketId, userEmail }: Props) {
       });
       const data = (await res.json().catch(() => ({}))) as {
         messages?: SupportMessageDTO[];
+        message?: string;
         debug?: { message?: string };
       };
       if (!res.ok) {
-        const detail = typeof data.debug?.message === "string" ? data.debug.message : null;
+        const detail =
+          typeof data.message === "string"
+            ? data.message
+            : typeof data.debug?.message === "string"
+              ? data.debug.message
+              : null;
         throw new Error(detail ?? "send_failed");
       }
       setMessages(data.messages ?? []);

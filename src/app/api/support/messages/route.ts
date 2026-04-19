@@ -8,7 +8,6 @@ import {
   listSupportMessages,
   normalizeSupportBody,
 } from "@/lib/support-chat";
-import { serializeSupportDbError, supportApiDebugEnabled } from "@/lib/support-db-log";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -29,11 +28,9 @@ export async function GET(req: Request) {
     const messages = await listSupportMessages(ticketId);
     return NextResponse.json({ messages });
   } catch (e) {
-    const body: Record<string, unknown> = { error: "service_unavailable" };
-    if (supportApiDebugEnabled()) {
-      body.debug = serializeSupportDbError(e);
-    }
-    return NextResponse.json(body, { status: 503 });
+    console.error("[GET /api/support/messages]", e);
+    const message = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }
 }
 
@@ -88,10 +85,8 @@ export async function POST(req: Request) {
     const messages = await listSupportMessages(ticketId);
     return NextResponse.json({ ok: true, messages });
   } catch (e) {
-    const body: Record<string, unknown> = { error: "service_unavailable" };
-    if (supportApiDebugEnabled()) {
-      body.debug = serializeSupportDbError(e);
-    }
-    return NextResponse.json(body, { status: 503 });
+    console.error("[POST /api/support/messages]", e);
+    const message = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }
 }
