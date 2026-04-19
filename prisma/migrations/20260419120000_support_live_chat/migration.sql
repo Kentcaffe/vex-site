@@ -2,7 +2,7 @@
 CREATE TYPE "SupportTicketStatus" AS ENUM ('OPEN', 'PENDING', 'RESOLVED', 'CLOSED');
 
 -- CreateEnum
-CREATE TYPE "SupportMessageSenderRole" AS ENUM ('USER', 'STAFF');
+CREATE TYPE "SupportMessageSenderRole" AS ENUM ('USER', 'ADMIN');
 
 -- CreateTable
 CREATE TABLE "support_tickets" (

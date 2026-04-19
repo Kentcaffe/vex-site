@@ -197,7 +197,7 @@ export function SupportLiveChat({ variant, ticketId, userEmail }: Props) {
               <p className="px-2 text-center text-sm leading-relaxed text-zinc-500">{t("emptyThread")}</p>
             ) : null}
             {messages.map((m) => {
-              const isStaffMsg = m.senderRole === "STAFF";
+              const isStaffMsg = m.senderRole === "ADMIN";
               const isMine = variant === "user" ? !isStaffMsg : isStaffMsg;
               const bubble =
                 variant === "user"

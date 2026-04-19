@@ -70,7 +70,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "ticket_closed" }, { status: 400 });
     }
 
-    const senderRole = staff ? "STAFF" : "USER";
+    const senderRole = staff ? "ADMIN" : "USER";
     if (!staff && full?.userId !== session.user.id) {
       return NextResponse.json({ error: "forbidden" }, { status: 403 });
     }

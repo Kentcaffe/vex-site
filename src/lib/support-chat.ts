@@ -77,7 +77,7 @@ export async function listSupportMessages(ticketId: string): Promise<SupportMess
     body: m.body,
     createdAt: m.createdAt.toISOString(),
     senderRole: m.senderRole,
-    senderName: m.senderRole === "STAFF" ? m.sender.name ?? m.sender.email : m.sender.name,
+    senderName: m.senderRole === "ADMIN" ? m.sender.name ?? m.sender.email : m.sender.name,
   }));
 }
 
