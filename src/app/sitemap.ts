@@ -1,17 +1,18 @@
 import type { MetadataRoute } from "next";
 import { localizedHref } from "@/lib/paths";
 import { routing } from "@/i18n/routing";
+import { getRootCategories } from "@/lib/category-queries";
+import { prisma } from "@/lib/prisma";
+import { listingSeoPath } from "@/lib/seo";
 
 const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "https://vex.md").replace(/\/$/, "");
 
-/**
- * Pagini statice publice pentru indexare.
- * Nu există rute /contact sau /despre — ajutor / cum funcționează acoperă informații similare.
- */
+/** Pagini statice publice pentru indexare. */
 const staticPages: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
   { path: "/anunturi", priority: 0.9 },
   { path: "/categorii", priority: 0.9 },
+  { path: "/contact", priority: 0.8 },
   { path: "/ajutor", priority: 0.75 },
   { path: "/cum-functioneaza", priority: 0.75 },
   { path: "/siguranta", priority: 0.65 },
@@ -21,10 +22,18 @@ const staticPages: { path: string; priority: number }[] = [
   { path: "/politica-cookie", priority: 0.45 },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const lastModified = new Date();
 
   const entries: MetadataRoute.Sitemap = [];
+  const [roots, latestListings] = await Promise.all([
+    getRootCategories(),
+    prisma.listing.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 500,
+      select: { id: true, title: true, city: true, updatedAt: true },
+    }),
+  ]);
 
   for (const locale of routing.locales) {
     for (const { path, priority } of staticPages) {
@@ -34,6 +43,26 @@ export default function sitemap(): MetadataRoute.Sitemap {
         lastModified,
         changeFrequency: "weekly",
         priority,
+      });
+    }
+
+    for (const root of roots) {
+      const href = localizedHref(locale, `/categorii?c=${encodeURIComponent(root.slug)}`);
+      entries.push({
+        url: `${baseUrl}${href}`,
+        lastModified,
+        changeFrequency: "weekly",
+        priority: 0.8,
+      });
+    }
+
+    for (const item of latestListings) {
+      const href = localizedHref(locale, listingSeoPath(item));
+      entries.push({
+        url: `${baseUrl}${href}`,
+        lastModified: item.updatedAt,
+        changeFrequency: "daily",
+        priority: 0.85,
       });
     }
   }

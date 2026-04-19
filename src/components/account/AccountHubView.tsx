@@ -78,7 +78,7 @@ export function AccountHubView({ user }: Props) {
         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-white bg-zinc-100 shadow-md ring-2 ring-orange-100">
           {avatarSrc ? (
             // eslint-disable-next-line @next/next/no-img-element -- URL extern din profil
-            <img src={avatarSrc} alt="" className="h-full w-full object-cover" />
+            <img src={avatarSrc} alt={`${displayName} avatar`} className="h-full w-full object-cover" />
           ) : (
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-orange-400 to-amber-600 text-lg font-bold text-white">
               {displayName.slice(0, 1).toUpperCase()}

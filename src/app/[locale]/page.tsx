@@ -3,9 +3,9 @@ import { setRequestLocale } from "next-intl/server";
 import { HomeLanding } from "@/components/home/HomeLanding";
 
 export const metadata: Metadata = {
-  title: "Anunțuri gratuite Moldova | Vex.md",
+  title: "VEX - Anunțuri gratuite în Moldova | Cumpără și vinde rapid",
   description:
-    "Publică și găsește anunțuri gratuite în Moldova. Auto, imobiliare, electronice și multe altele.",
+    "VEX este o platformă de anunțuri gratuite din Moldova. Publică anunțuri rapid sau găsește mașini, apartamente, telefoane și multe altele.",
 };
 
 type Props = {

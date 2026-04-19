@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { ChatAvatar } from "@/components/chat/ChatAvatar";
 import { sameCalendarDay } from "@/lib/chat-ui";
+import { listingSeoPath } from "@/lib/seo";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 export type ChatBootstrap = {
@@ -165,7 +166,10 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
             {bootstrap.otherUserName}
           </p>
           <Link
-            href={`/anunturi/${bootstrap.listing.id}`}
+            href={listingSeoPath({
+              id: bootstrap.listing.id,
+              title: bootstrap.listing.title,
+            })}
             className="mt-0.5 line-clamp-2 text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
           >
             {bootstrap.listing.title}

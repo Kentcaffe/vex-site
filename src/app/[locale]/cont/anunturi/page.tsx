@@ -11,6 +11,7 @@ import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { localizedHref } from "@/lib/paths";
 import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
+import { listingSeoPath } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -71,15 +72,20 @@ export default async function ContMyListingsPage({ params }: Props) {
           {rows.map((item) => {
             const path = categoryPathLabels(allCats, item.categoryId, locale);
             const cover = parseStoredListingImages(item.images)[0];
+            const listingHref = listingSeoPath({ id: item.id, title: item.title, city: item.city });
             return (
               <li key={item.id}>
                 <Link
-                  href={`/anunturi/${item.id}`}
+                  href={listingHref}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200/90 bg-white shadow-sm transition hover:border-emerald-300 hover:shadow-md"
                 >
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-100">
                     {cover ? (
-                      <ListingCoverImg src={cover} alt="" className="h-full w-full object-cover transition group-hover:scale-[1.02]" />
+                      <ListingCoverImg
+                        src={cover}
+                        alt={`${item.title} de vânzare în ${item.city}`}
+                        className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                      />
                     ) : (
                       <ListingImagePlaceholder title={tList("cardNoImageTitle")} hint={tList("cardNoImageHint")} />
                     )}

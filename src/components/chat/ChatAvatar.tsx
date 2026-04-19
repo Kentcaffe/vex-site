@@ -45,7 +45,7 @@ export function ChatAvatar({ url, name, size = 44, className }: Props) {
       {/* eslint-disable-next-line @next/next/no-img-element -- URL dinamic */}
       <img
         src={resolved}
-        alt=""
+        alt={`${name} avatar`}
         className="h-full w-full object-cover"
         onError={() => setFailed(true)}
       />

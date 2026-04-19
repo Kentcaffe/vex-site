@@ -7,6 +7,7 @@ import { createListing, type CreateListingState } from "@/app/actions/listings";
 import { CategorySelector } from "@/components/publish/CategorySelector";
 import { useToast } from "@/components/ui/SimpleToast";
 import { localizedHref } from "@/lib/paths";
+import { listingSeoPath } from "@/lib/seo";
 import {
   getDetailFieldsForSlug,
   getDetailFormName,
@@ -262,7 +263,9 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     clearDraftAdMirror(draftAdKey);
     skipDraftSaveRef.current = true;
     toast("success", t("success"));
-    router.push(localizedHref(locale, `/anunturi/${state.listingId}`));
+    const city = typeof publishValues.city === "string" ? publishValues.city : "";
+    const title = typeof publishValues.title === "string" ? publishValues.title : "";
+    router.push(localizedHref(locale, listingSeoPath({ id: state.listingId, title, city })));
   }, [state, storageKey, legacyDraftSessionKey, draftAdKey, router, toast, t, locale]);
 
   useEffect(() => {

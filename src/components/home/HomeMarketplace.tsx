@@ -10,6 +10,7 @@ import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import type { PriceCurrencyCode } from "@/lib/currency";
+import { listingSeoPath } from "@/lib/seo";
 
 type LabelJson = { ro?: string; ru?: string; en?: string };
 
@@ -170,15 +171,16 @@ export async function HomeMarketplace({
             {listings.map((item, index) => {
               const cover = parseStoredListingImages(item.images)[0];
               const place = item.city + (item.district ? ` · ${item.district}` : "");
+              const listingHref = listingSeoPath({ id: item.id, title: item.title, city: item.city });
               return (
                 <li key={item.id} className="group">
                   <article className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] shadow-[var(--mp-shadow-md)] transition hover:-translate-y-0.5 hover:shadow-[var(--mp-shadow-lg)]">
                     <div className="relative mp-card-image">
-                      <Link href={`/anunturi/${item.id}`} className="absolute inset-0 z-0 block" aria-label={item.title}>
+                      <Link href={listingHref} className="absolute inset-0 z-0 block" aria-label={item.title}>
                         {cover ? (
                           <ListingCoverImg
                             src={cover}
-                            alt=""
+                            alt={`${item.title} de vânzare în ${item.city}`}
                             priority={index < 4}
                             className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
                           />
@@ -195,7 +197,7 @@ export async function HomeMarketplace({
                       </div>
                     </div>
                     <div className="flex flex-1 flex-col p-3.5 sm:p-3.5">
-                      <Link href={`/anunturi/${item.id}`} className="block min-h-0 flex-1">
+                      <Link href={listingHref} className="block min-h-0 flex-1">
                         <span className="line-clamp-2 text-base font-bold leading-snug text-zinc-900 group-hover:text-[#c2410c]">
                           {item.title}
                         </span>

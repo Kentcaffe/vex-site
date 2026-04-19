@@ -42,7 +42,7 @@ export function ListingGallery({ images, title }: Props) {
                 i === idx ? "border-emerald-600" : "border-transparent opacity-80 hover:opacity-100"
               }`}
             >
-              <ListingCoverImg src={src} alt="" className="h-full w-full object-cover" />
+              <ListingCoverImg src={src} alt={`${title} - foto ${i + 1}`} className="h-full w-full object-cover" />
             </button>
           ))}
         </div>

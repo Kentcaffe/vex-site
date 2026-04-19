@@ -13,6 +13,7 @@ import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceh
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
+import { listingSeoPath } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -130,17 +131,18 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
             {listings.map((item, index) => {
               const path = categoryPathLabels(allCats, item.categoryId, locale);
               const cover = parseStoredListingImages(item.images)[0];
+              const listingHref = listingSeoPath({ id: item.id, title: item.title, city: item.city });
               return (
                 <li key={item.id}>
                   <Link
-                    href={`/anunturi/${item.id}`}
+                    href={listingHref}
                     className="group flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-4 shadow-[var(--mp-shadow-md)] transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)] sm:flex-row"
                   >
                     {cover ? (
                       <div className="h-48 overflow-hidden rounded-[14px] border border-zinc-200 bg-zinc-100 sm:h-36 sm:w-44 sm:shrink-0">
                         <ListingCoverImg
                           src={cover}
-                          alt=""
+                          alt={`${item.title} de vânzare în ${item.city}`}
                           priority={index < 2}
                           className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]"
                         />

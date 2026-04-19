@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { useState, useTransition } from "react";
 import { deleteListingFromReport, setReportStatus } from "@/app/actions/admin-reports";
 import { Link, useRouter } from "@/i18n/navigation";
+import { listingSeoPath } from "@/lib/seo";
 
 function reasonLabel(t: (key: string) => string, code: string): string {
   const map: Record<string, string> = {
@@ -78,7 +79,10 @@ export function ReportQueueRow({ report: initial, locale }: RowProps) {
           </span>
         </div>
         <p className="font-medium text-zinc-900 dark:text-zinc-50">
-          <Link href={`/anunturi/${initial.listing.id}`} className="text-emerald-700 hover:underline dark:text-emerald-400">
+          <Link
+            href={listingSeoPath({ id: initial.listing.id, title: initial.listing.title })}
+            className="text-emerald-700 hover:underline dark:text-emerald-400"
+          >
             {initial.listing.title}
           </Link>
         </p>

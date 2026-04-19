@@ -6,6 +6,7 @@ import { formatPrice } from "@/lib/formatPrice";
 import type { PriceCurrencyCode } from "@/lib/currency";
 import type { ListingPayloadWithCategory } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
+import { listingSeoPath } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -49,7 +50,7 @@ export default async function AdminListingsPage({ params }: Props) {
                   <tr key={item.id} className="align-top transition hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40">
                     <td className="px-4 py-3">
                       <Link
-                        href={`/anunturi/${item.id}`}
+                        href={listingSeoPath({ id: item.id, title: item.title, city: item.city })}
                         className="font-semibold text-emerald-700 hover:underline dark:text-emerald-400"
                       >
                         {item.title}

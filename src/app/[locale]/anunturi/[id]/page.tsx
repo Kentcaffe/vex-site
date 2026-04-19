@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
@@ -15,11 +16,56 @@ import type { PriceCurrencyCode } from "@/lib/currency";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import type { ListingPayloadWithCategory } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
+import { resolvePublicMediaUrl } from "@/lib/media-url";
+import { listingSeoPath } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
 };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const listing = await prisma.listing.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      title: true,
+      city: true,
+      description: true,
+      images: true,
+    },
+  });
+  if (!listing) {
+    return {
+      title: "Anunț indisponibil",
+      description: "Acest anunț nu mai este disponibil pe VEX.",
+    };
+  }
+
+  const image = resolvePublicMediaUrl(parseStoredListingImages(listing.images)[0] ?? null) ?? "/marketplace-image-fallback.svg";
+  const description = `${listing.title} de vânzare în ${listing.city} pe VEX. Vezi poze și detalii complete.`;
+
+  return {
+    title: `${listing.title} de vânzare în ${listing.city}`,
+    description,
+    alternates: {
+      canonical: listingSeoPath({ id: listing.id, title: listing.title, city: listing.city }),
+    },
+    openGraph: {
+      title: listing.title,
+      description,
+      type: "article",
+      images: [{ url: image, alt: listing.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: listing.title,
+      description,
+      images: [image],
+    },
+  };
+}
 
 function conditionLabel(
   condition: string,

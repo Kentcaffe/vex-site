@@ -11,6 +11,7 @@ import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { localizedHref } from "@/lib/paths";
 import { asListingSelect, type FavoriteRowWithListing } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
+import { listingSeoPath } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -68,15 +69,16 @@ export default async function FavoriteListPage({ params }: Props) {
           {rows.map(({ listing: item }) => {
             const path = categoryPathLabels(allCats, item.categoryId, locale);
             const cover = parseStoredListingImages(item.images)[0];
+            const listingHref = listingSeoPath({ id: item.id, title: item.title, city: item.city });
             return (
               <li key={item.id}>
                 <Link
-                  href={`/anunturi/${item.id}`}
+                  href={listingHref}
                   className="group flex gap-4 rounded-[16px] border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md sm:p-5"
                 >
                   {cover ? (
                     <div className="h-20 w-24 shrink-0 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100">
-                      <ListingCoverImg src={cover} alt="" className="h-full w-full object-cover" />
+                      <ListingCoverImg src={cover} alt={`${item.title} de vânzare în ${item.city}`} className="h-full w-full object-cover" />
                     </div>
                   ) : (
                     <div className="h-20 w-24 shrink-0 overflow-hidden rounded-xl border border-zinc-200/90 bg-zinc-200/80">
