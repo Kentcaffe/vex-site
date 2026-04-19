@@ -49,6 +49,7 @@ import {
   saveDraftAdMirror,
   type PublishFormValues,
 } from "@/lib/listing-publish-form-data";
+import { getModelsForBrand } from "@/lib/vehicle-models-by-brand";
 import { VEHICLE_BRANDS } from "@/lib/vehicle-taxonomy";
 
 type Props = {
@@ -122,6 +123,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
 
   const { isVeh, isRe, isBrandish } = getListingFormFlags(selectedSlug);
   const detailFields = useMemo(() => getDetailFieldsForSlug(selectedSlug), [selectedSlug]);
+  const vehicleModelSuggestions = useMemo(() => getModelsForBrand(publishValues.brand), [publishValues.brand]);
 
   function ring(field: ListingFormFieldId): string {
     return clientErrors[field] ? errBorder : "";
@@ -524,10 +526,23 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
             value={categoryId}
             onCategoryIdAction={(id) => {
               const nextId = id.trim();
+              const prevId = categoryId.trim();
               const nextSelected = nextId ? findCategoryNodeById(categoryTree, nextId) : null;
               console.log("Selected:", nextSelected);
               console.log("Subcategory ID:", nextId);
               setCategoryId(nextId);
+              if (nextId !== prevId) {
+                setPublishValues((p) => ({
+                  ...p,
+                  extra: {},
+                  brand: "",
+                  modelName: "",
+                  year: "",
+                  mileageKm: "",
+                  rooms: "",
+                  areaSqm: "",
+                }));
+              }
               setDismissServerCategoryError(true);
               const nextCategoryError =
                 !nextId ? msg.errCategory : isLeafCategoryNode(categoryTree, nextId) ? undefined : tVal("errCategoryLeaf");
@@ -735,7 +750,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                   list="vehicle-brand-suggestions"
                   maxLength={80}
                   value={publishValues.brand}
-                  onChange={(e) => setPublishValues((p) => ({ ...p, brand: e.target.value }))}
+                  onChange={(e) => setPublishValues((p) => ({ ...p, brand: e.target.value, modelName: "" }))}
                   className={`${baseInputClass}`}
                 />
                 <datalist id="vehicle-brand-suggestions">
@@ -751,11 +766,17 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                 <input
                   id="modelName"
                   name="modelName"
+                  list="vehicle-model-suggestions"
                   maxLength={80}
                   value={publishValues.modelName}
                   onChange={(e) => setPublishValues((p) => ({ ...p, modelName: e.target.value }))}
                   className={`${baseInputClass}`}
                 />
+                <datalist id="vehicle-model-suggestions">
+                  {vehicleModelSuggestions.map((m) => (
+                    <option key={m} value={m} />
+                  ))}
+                </datalist>
               </div>
               <div>
                 <label className={labelClass} htmlFor="year">

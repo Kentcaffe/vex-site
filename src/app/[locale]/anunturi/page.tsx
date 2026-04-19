@@ -69,6 +69,9 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const yearMax = yearMaxRaw ? Number(yearMaxRaw) : NaN;
   const mileageMax = mileageMaxRaw ? Number(mileageMaxRaw) : NaN;
 
+  /** Filtre marcă/model/an/combustibil etc. doar în categorii transport (evită rezultate goale fără categorie). */
+  const applyTransportVehicleFilters = Boolean(categorySlug?.startsWith("transport"));
+
   const where: Prisma.ListingWhereInput = {};
   const andFilters: Prisma.ListingWhereInput[] = [];
 
@@ -95,66 +98,68 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
     where.OR = [{ title: { contains: searchQ } }, { description: { contains: searchQ } }];
   }
 
-  if (brand) {
-    where.brand = { contains: brand, mode: "insensitive" };
-  }
+  if (applyTransportVehicleFilters) {
+    if (brand) {
+      where.brand = { contains: brand, mode: "insensitive" };
+    }
 
-  if (model) {
-    where.modelName = { contains: model, mode: "insensitive" };
-  }
+    if (model) {
+      where.modelName = { contains: model, mode: "insensitive" };
+    }
 
-  if (Number.isFinite(yearMin) || Number.isFinite(yearMax)) {
-    where.year = {};
-    if (Number.isFinite(yearMin)) where.year.gte = yearMin;
-    if (Number.isFinite(yearMax)) where.year.lte = yearMax;
-  }
+    if (Number.isFinite(yearMin) || Number.isFinite(yearMax)) {
+      where.year = {};
+      if (Number.isFinite(yearMin)) where.year.gte = yearMin;
+      if (Number.isFinite(yearMax)) where.year.lte = yearMax;
+    }
 
-  if (Number.isFinite(mileageMax)) {
-    where.mileageKm = { lte: mileageMax };
+    if (Number.isFinite(mileageMax)) {
+      where.mileageKm = { lte: mileageMax };
+    }
+
+    if (fuel) {
+      andFilters.push({
+        detailsJson: {
+          contains: `"fuel":"${fuel}"`,
+        },
+      });
+    }
+
+    if (transmission) {
+      andFilters.push({
+        detailsJson: {
+          contains: `"transmission":"${transmission}"`,
+        },
+      });
+    }
+
+    if (bodyType) {
+      andFilters.push({
+        detailsJson: {
+          contains: `"body_type":"${bodyType}"`,
+        },
+      });
+    }
+
+    if (drivetrain) {
+      andFilters.push({
+        detailsJson: {
+          contains: `"drivetrain":"${drivetrain}"`,
+        },
+      });
+    }
+
+    if (doors) {
+      andFilters.push({
+        detailsJson: {
+          contains: `"doors":"${doors}"`,
+        },
+      });
+    }
   }
 
   if (condition === "new" || condition === "used") {
     where.condition = condition;
-  }
-
-  if (fuel) {
-    andFilters.push({
-      detailsJson: {
-        contains: `"fuel":"${fuel}"`,
-      },
-    });
-  }
-
-  if (transmission) {
-    andFilters.push({
-      detailsJson: {
-        contains: `"transmission":"${transmission}"`,
-      },
-    });
-  }
-
-  if (bodyType) {
-    andFilters.push({
-      detailsJson: {
-        contains: `"body_type":"${bodyType}"`,
-      },
-    });
-  }
-
-  if (drivetrain) {
-    andFilters.push({
-      detailsJson: {
-        contains: `"drivetrain":"${drivetrain}"`,
-      },
-    });
-  }
-
-  if (doors) {
-    andFilters.push({
-      detailsJson: {
-        contains: `"doors":"${doors}"`,
-      },
-    });
   }
 
   if (Number.isFinite(minN) || Number.isFinite(maxN)) {
