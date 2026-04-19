@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { localizedHref } from "@/lib/paths";
+import { routing } from "@/i18n/routing";
+import { listingSeoPath } from "@/lib/seo";
 import { CATEGORY_ROOTS, type CatDef } from "../../../prisma/category-tree/index";
 import {
   parseDetailsJsonFromForm,
@@ -268,8 +270,245 @@ export async function createListing(
 
   revalidatePath(localizedHref(parsed.data.locale, "/anunturi"));
   revalidatePath(localizedHref(parsed.data.locale, "/"));
+  revalidatePath(localizedHref(parsed.data.locale, "/cont/anunturi"));
   revalidatePath(localizedHref(parsed.data.locale, `/anunturi/${listingId}`));
 
   console.log("[createListing] SUCCESS", { listingId });
   return { ok: true, listingId, details: "Anunț publicat cu succes." };
+}
+
+/** Publicare nouă sau actualizare dacă există `listingId` în FormData. */
+export async function saveListing(
+  prev: CreateListingState | undefined,
+  formData: FormData,
+): Promise<CreateListingState> {
+  if (String(formData.get("listingId") ?? "").trim()) {
+    return updateOwnListing(prev, formData);
+  }
+  return createListing(prev, formData);
+}
+
+export async function updateOwnListing(
+  _prev: CreateListingState | undefined,
+  formData: FormData,
+): Promise<CreateListingState> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: "unauthorized", details: "Trebuie să fii autentificat." };
+  }
+
+  const listingId = String(formData.get("listingId") ?? "").trim();
+  if (!listingId) {
+    return { ok: false, error: "validation", details: "Lipsește identificatorul anunțului." };
+  }
+
+  const existing = await prisma.listing.findFirst({
+    where: { id: listingId, userId: session.user.id },
+    select: { id: true, title: true, city: true },
+  });
+  if (!existing) {
+    return { ok: false, error: "validation", details: "Anunțul nu există sau nu îți aparține." };
+  }
+
+  const rawCategoryId = String(formData.get("categoryId") ?? "").trim();
+  const rawSubcategoryId = String(formData.get("subcategory_id") ?? "").trim();
+  const categorySlugRaw = String(formData.get("categorySlug") ?? "").trim();
+  if (!rawCategoryId && !rawSubcategoryId) {
+    return { ok: false, error: "category", details: "Lipsește categoria." };
+  }
+
+  const raw = rawFromFormData(formData);
+  const parsed = listingFormSchema.safeParse(raw);
+  if (!parsed.success) {
+    const first = parsed.error.issues[0];
+    return {
+      ok: false,
+      error: "validation",
+      details: `Validare eșuată la câmpul "${String(first?.path?.[0] ?? "necunoscut")}".`,
+    };
+  }
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true },
+  });
+  if (!dbUser) {
+    return { ok: false, error: "session", details: "Sesiune invalidă. Reautentifică-te." };
+  }
+
+  const rawImages = parsed.data.imagesRaw ?? null;
+  const urls = parseListingImageUrlsStrict(rawImages);
+  if (!urls) {
+    return {
+      ok: false,
+      error: "validation",
+      details: "Imaginile nu sunt valide. Minim 1, maxim 8 URL-uri valide.",
+    };
+  }
+
+  const submittedCategoryId = parsed.data.categoryId.trim();
+  const submittedSubcategoryId = rawSubcategoryId || submittedCategoryId;
+
+  let categoryRow = await prisma.category.findUnique({
+    where: { id: submittedCategoryId },
+    select: { id: true, slug: true },
+  });
+  if (!categoryRow) {
+    const fallbackSlugs = new Set<string>();
+    const explicitSlug = (categorySlugRaw || parsed.data.categorySlug || "").trim();
+    if (explicitSlug) {
+      fallbackSlugs.add(explicitSlug);
+    }
+    if (submittedCategoryId.includes(":")) {
+      const syntheticTail = submittedCategoryId.split(":").filter(Boolean).at(-1)?.trim() ?? "";
+      if (syntheticTail) {
+        fallbackSlugs.add(syntheticTail);
+      }
+    }
+
+    const resolveByFallbackSlugs = async (): Promise<boolean> => {
+      for (const slug of fallbackSlugs) {
+        categoryRow = await prisma.category.findUnique({
+          where: { slug },
+          select: { id: true, slug: true },
+        });
+        if (categoryRow) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    const resolvedBySlug = await resolveByFallbackSlugs();
+    if (!resolvedBySlug) {
+      const seeded = await ensureCategoryTreeInDbIfMissing();
+      if (seeded) {
+        await resolveByFallbackSlugs();
+      }
+    }
+  }
+  if (!categoryRow) {
+    return { ok: false, error: "category", details: `Categoria nu există în DB: ${submittedCategoryId}` };
+  }
+
+  const childCount = await prisma.category.count({
+    where: { parentId: categoryRow.id },
+  });
+  if (childCount > 0) {
+    return { ok: false, error: "category", details: "Categoria selectată nu este subcategorie finală." };
+  }
+
+  const slug = categoryRow.slug;
+  const cols = sanitizeColumnPayload(slug, {
+    brand: parsed.data.brand,
+    modelName: parsed.data.modelName,
+    year: parsed.data.year,
+    mileageKm: parsed.data.mileageKm,
+    rooms: parsed.data.rooms,
+    areaSqm: parsed.data.areaSqm,
+  });
+
+  const detailsObj = parseDetailsJsonFromForm(slug, (name) => formData.get(name));
+  const detailsJson = detailsObj;
+
+  try {
+    await prisma.listing.update({
+      where: { id: listingId },
+      data: {
+        title: parsed.data.title.trim(),
+        description: parsed.data.description.trim(),
+        price: parsed.data.price,
+        priceCurrency: parsed.data.priceCurrency,
+        negotiable: parsed.data.negotiable ?? false,
+        city: parsed.data.city.trim(),
+        district: parsed.data.district?.trim() || null,
+        phone: parsed.data.phone?.trim() || null,
+        condition: parsed.data.condition,
+        brand: cols.brand,
+        modelName: cols.modelName,
+        year: cols.year,
+        mileageKm: cols.mileageKm,
+        rooms: cols.rooms,
+        areaSqm: cols.areaSqm,
+        detailsJson,
+        images: JSON.stringify(urls),
+        categoryId: categoryRow.id,
+      },
+    });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2003") {
+      return { ok: false, error: "validation", details: "Relație invalidă în baza de date (P2003)." };
+    }
+    console.error("[updateOwnListing]", e);
+    return {
+      ok: false,
+      error: "server",
+      details: e instanceof Error ? e.message : "Eroare la salvare.",
+    };
+  }
+
+  const pathOld = listingSeoPath({
+    id: listingId,
+    title: existing.title,
+    city: existing.city,
+  });
+  const pathNew = listingSeoPath({
+    id: listingId,
+    title: parsed.data.title.trim(),
+    city: parsed.data.city.trim(),
+  });
+
+  for (const locale of routing.locales) {
+    revalidatePath(localizedHref(locale, "/"));
+    revalidatePath(localizedHref(locale, "/anunturi"));
+    revalidatePath(localizedHref(locale, "/cont/anunturi"));
+    revalidatePath(localizedHref(locale, `/anunturi/${listingId}`));
+    revalidatePath(localizedHref(locale, pathOld));
+    if (pathNew !== pathOld) {
+      revalidatePath(localizedHref(locale, pathNew));
+    }
+  }
+
+  return { ok: true, listingId, details: "Anunț actualizat." };
+}
+
+export type DeleteOwnListingResult =
+  | { ok: true }
+  | { ok: false; error: "unauthorized" | "not_found" | "server" };
+
+export async function deleteOwnListing(listingId: string): Promise<DeleteOwnListingResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: "unauthorized" };
+  }
+  const id = listingId.trim();
+  if (!id) {
+    return { ok: false, error: "not_found" };
+  }
+
+  const row = await prisma.listing.findFirst({
+    where: { id, userId: session.user.id },
+    select: { id: true, title: true, city: true },
+  });
+  if (!row) {
+    return { ok: false, error: "not_found" };
+  }
+
+  try {
+    await prisma.listing.delete({ where: { id } });
+  } catch (e) {
+    console.error("[deleteOwnListing]", e);
+    return { ok: false, error: "server" };
+  }
+
+  const pathSeo = listingSeoPath({ id: row.id, title: row.title, city: row.city });
+  for (const locale of routing.locales) {
+    revalidatePath(localizedHref(locale, "/"));
+    revalidatePath(localizedHref(locale, "/anunturi"));
+    revalidatePath(localizedHref(locale, "/cont/anunturi"));
+    revalidatePath(localizedHref(locale, pathSeo));
+    revalidatePath(localizedHref(locale, `/anunturi/${row.id}`));
+  }
+
+  return { ok: true };
 }

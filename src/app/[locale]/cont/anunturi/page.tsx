@@ -5,10 +5,9 @@ import { Link } from "@/i18n/navigation";
 import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PriceCurrencyCode } from "@/lib/currency";
-import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
-import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { localizedHref } from "@/lib/paths";
+import { MyListingCard } from "@/components/account/MyListingCard";
 import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 import { listingSeoPath } from "@/lib/seo";
@@ -73,38 +72,22 @@ export default async function ContMyListingsPage({ params }: Props) {
             const path = categoryPathLabels(allCats, item.categoryId, locale);
             const cover = parseStoredListingImages(item.images)[0];
             const listingHref = listingSeoPath({ id: item.id, title: item.title, city: item.city });
+            const editHref = localizedHref(locale, `/cont/anunturi/${item.id}/edit`);
+            const metaLine = `${path} · ${item.city}${item.district ? ` · ${item.district}` : ""}`;
             return (
-              <li key={item.id}>
-                <Link
-                  href={listingHref}
-                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200/90 bg-white shadow-sm transition hover:border-emerald-300 hover:shadow-md"
-                >
-                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-100">
-                    {cover ? (
-                      <ListingCoverImg
-                        src={cover}
-                        alt={`${item.title} de vânzare în ${item.city}`}
-                        className="h-full w-full object-cover transition group-hover:scale-[1.02]"
-                      />
-                    ) : (
-                      <ListingImagePlaceholder title={tList("cardNoImageTitle")} hint={tList("cardNoImageHint")} />
-                    )}
-                  </div>
-                  <div className="flex min-h-0 flex-1 flex-col p-4">
-                    <h2 className="line-clamp-2 text-base font-semibold text-zinc-900 group-hover:text-emerald-800">
-                      {item.title}
-                    </h2>
-                    <p className="mt-1 line-clamp-1 text-xs text-zinc-500">{path}</p>
-                    <p className="mt-2 text-lg font-bold text-emerald-600">
-                      {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
-                    </p>
-                    <p className="mt-1 text-sm text-zinc-500">
-                      {item.city}
-                      {item.district ? ` · ${item.district}` : ""}
-                    </p>
-                  </div>
-                </Link>
-              </li>
+              <MyListingCard
+                key={item.id}
+                listingId={item.id}
+                viewHref={listingHref}
+                editHref={editHref}
+                redirectAfterDeleteHref={localizedHref(locale, "/cont/anunturi")}
+                title={item.title}
+                coverSrc={cover ?? null}
+                priceText={formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
+                metaLine={metaLine}
+                listTitle={tList("cardNoImageTitle")}
+                listHint={tList("cardNoImageHint")}
+              />
             );
           })}
         </ul>

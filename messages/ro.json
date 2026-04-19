@@ -418,6 +418,13 @@
     "reportHint": "Ceva nu e în regulă? Semnalează pentru moderare.",
     "favoritesLogin": "Ai nevoie de cont pentru a salva anunțuri. Autentifică-te, apoi revino la această pagină.",
     "favoritesCtaLogin": "Autentifică-te ca să salvezi",
+    "ownerActionsTitle": "Anunțul tău",
+    "ownerEdit": "Editează",
+    "ownerDelete": "Șterge",
+    "ownerDeleteConfirm": "Ștergi definitiv acest anunț? Nu se poate anula.",
+    "ownerDeleting": "Se șterge…",
+    "ownerDeleteError": "Nu s-a putut șterge. Încearcă din nou.",
+    "ownerDeleteLogin": "Autentifică-te pentru a gestiona anunțul.",
     "spec": {
       "brand": "Marcă",
       "model": "Model",
@@ -740,7 +747,14 @@
     "myListingsTitle": "Anunțurile mele",
     "myListingsSubtitle": "Toate anunțurile tale publicate pe VEX.",
     "myListingsEmpty": "Nu ai anunțuri publicate încă.",
-    "publishFirst": "Publică un anunț"
+    "publishFirst": "Publică un anunț",
+    "myListingView": "Vezi",
+    "myListingEdit": "Editează",
+    "myListingDelete": "Șterge",
+    "myListingDeleteConfirm": "Ștergi definitiv acest anunț? Nu se poate anula.",
+    "myListingDeleting": "Se șterge…",
+    "myListingDeleteError": "Nu s-a putut șterge. Încearcă din nou.",
+    "myListingDeleteLogin": "Autentifică-te pentru a gestiona anunțurile."
   },
   "Notifications": {
     "title": "Notificări",
@@ -796,6 +810,8 @@
   "Publish": {
     "title": "Publică anunț",
     "subtitle": "Completează câmpurile de mai jos.",
+    "editTitle": "Editează anunțul",
+    "editSubtitle": "Actualizează detaliile și salvează.",
     "noCategories": "Nu există categorii configurate."
   },
   "Admin": {
@@ -970,8 +986,11 @@
     "imageCount": "{count} / {max} imagini",
     "uploadTooMany": "Prea multe imagini (max. 8).",
     "submit": "Publică anunțul",
+    "submitUpdate": "Salvează modificările",
     "submitting": "Se publică…",
+    "submittingUpdate": "Se salvează…",
     "success": "Anunț publicat cu succes.",
+    "successUpdated": "Anunț actualizat.",
     "serverUnauthorized": "Trebuie să fii autentificat.",
     "serverValidation": "Verifică câmpurile și încearcă din nou.",
     "serverCategory": "Categorie invalidă (alege o subcategorie).",

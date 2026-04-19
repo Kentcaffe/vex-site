@@ -3,7 +3,7 @@
 import { startTransition, useActionState, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { createListing, type CreateListingState } from "@/app/actions/listings";
+import { saveListing, type CreateListingState } from "@/app/actions/listings";
 import { CategorySelector } from "@/components/publish/CategorySelector";
 import { useToast } from "@/components/ui/SimpleToast";
 import { localizedHref } from "@/lib/paths";
@@ -61,6 +61,13 @@ type Props = {
   /** Ciorna e salvată per cont (localStorage). */
   userId: string;
   categoryTree: CategoryTreeNode[];
+  /** Editare anunț existent (proprietar). */
+  editListingId?: string | null;
+  initialEditSnapshot?: {
+    categoryId: string;
+    imagesRaw: string;
+    publishValues: PublishFormValues;
+  } | null;
 };
 
 /** Culori explicite — pe mobil (Safari) fără ele, textul poate fi invizibil în input/textarea. */
@@ -78,7 +85,7 @@ const LIVE_REQUIRED_FIELDS: ListingFormFieldId[] = [
   "imagesRaw",
 ];
 
-export function ListingForm({ locale, userId, categoryTree }: Props) {
+export function ListingForm({ locale, userId, categoryTree, editListingId = null, initialEditSnapshot = null }: Props) {
   const router = useRouter();
   const { toast } = useToast();
   const t = useTranslations("ListingForm");
@@ -99,9 +106,10 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   );
 
   const [state, formAction, isPending] = useActionState(
-    createListing,
+    saveListing,
     undefined as CreateListingState | undefined,
   );
+  const isEditMode = Boolean(editListingId);
   const [categoryId, setCategoryId] = useState("");
   const [imagesRaw, setImagesRaw] = useState("");
   const [publishValues, setPublishValues] = useState<PublishFormValues>(emptyPublishFormValues);
@@ -185,6 +193,17 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
   }
 
   useEffect(() => {
+    if (isEditMode && initialEditSnapshot) {
+      skipDraftSaveRef.current = true;
+      setCategoryId(normalizeLeafCategoryId(categoryTree, initialEditSnapshot.categoryId));
+      setImagesRaw(initialEditSnapshot.imagesRaw);
+      setPublishValues(initialEditSnapshot.publishValues);
+      queueMicrotask(() => {
+        skipDraftSaveRef.current = false;
+      });
+      setDraftHydrated(true);
+      return;
+    }
     const loaded = loadListingDraftFromStorage(storageKey, {
       migrateLegacySessionKey: legacyDraftSessionKey,
     });
@@ -232,7 +251,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     setDraftHydrated(true);
     // categoryTree vine din server o dată; nu reîncărca ciorna la fiecare rerandare.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- doar la mount / chei storage
-  }, [storageKey, legacyDraftSessionKey, draftAdKey]);
+  }, [storageKey, legacyDraftSessionKey, draftAdKey, isEditMode, initialEditSnapshot, categoryTree]);
 
   const scheduleDraftPersist = useCallback(() => {
     if (saveDraftTimerRef.current) {
@@ -240,6 +259,9 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     }
     saveDraftTimerRef.current = setTimeout(() => {
       saveDraftTimerRef.current = null;
+      if (isEditMode) {
+        return;
+      }
       if (skipDraftSaveRef.current) {
         return;
       }
@@ -252,7 +274,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       saveListingDraftToStorage(storageKey, draft);
       saveDraftAdMirror(draftAdKey, draft);
     }, 450);
-  }, [categoryId, imagesRaw, publishValues, storageKey, legacyDraftSessionKey, draftAdKey]);
+  }, [categoryId, imagesRaw, publishValues, storageKey, legacyDraftSessionKey, draftAdKey, isEditMode]);
 
   useEffect(() => {
     if (!draftHydrated) {
@@ -274,33 +296,22 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       return;
     }
     publishRedirectDoneRef.current = true;
-    clearListingDraftStorage(storageKey, legacyDraftSessionKey);
-    clearDraftAdMirror(draftAdKey);
+    if (!isEditMode) {
+      clearListingDraftStorage(storageKey, legacyDraftSessionKey);
+      clearDraftAdMirror(draftAdKey);
+    }
     skipDraftSaveRef.current = true;
-    toast("success", t("success"));
+    toast("success", isEditMode ? t("successUpdated") : t("success"));
     const city = typeof publishValues.city === "string" ? publishValues.city : "";
     const title = typeof publishValues.title === "string" ? publishValues.title : "";
     router.push(localizedHref(locale, listingSeoPath({ id: state.listingId, title, city })));
-  }, [state, storageKey, legacyDraftSessionKey, draftAdKey, router, toast, t, locale]);
+  }, [state, storageKey, legacyDraftSessionKey, draftAdKey, router, toast, t, locale, isEditMode]);
 
   useEffect(() => {
     if (state?.ok === false && state.error === "server") {
       toast("error", t("serverPublishError"));
     }
   }, [state, toast, t]);
-
-  useEffect(() => {
-    if (!state) {
-      return;
-    }
-    console.warn("[publish] response state:", state);
-    if (state.ok === false) {
-      console.warn("ERROR:", state);
-      alert(state.details ?? "Eroare la publicare");
-    } else {
-      console.warn("SUCCESS");
-    }
-  }, [state]);
 
   useEffect(() => {
     if (state?.ok === false && state.error === "category") {
@@ -416,7 +427,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     if (!cid) {
       console.warn("[publish] blocked: missing subcategory_id");
       setClientErrors({ categoryId: msg.errCategory });
-      alert(msg.errCategory);
+      toast("error", msg.errCategory);
       queueMicrotask(() => {
         scrollAndFocusField("categoryId");
       });
@@ -425,7 +436,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     if (!isLeafCategoryNode(categoryTree, cid)) {
       console.warn("[publish] blocked: selected category is not a leaf", { subcategory_id: cid });
       setClientErrors({ categoryId: tVal("errCategoryLeaf") });
-      alert(tVal("errCategoryLeaf"));
+      toast("error", tVal("errCategoryLeaf"));
       queueMicrotask(() => {
         scrollAndFocusField("categoryId");
       });
@@ -445,6 +456,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       imagesRaw,
       publishValues,
       detailFields,
+      editListingId,
     );
     console.warn("Form data:", debugFormData(fd));
     console.warn("[publish] request body check", {
@@ -463,7 +475,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
         Object.values(v.errors).find((e): e is string => typeof e === "string") ??
         "Formular invalid.";
       setClientErrors(v.errors);
-      alert(firstErrorText);
+      toast("error", firstErrorText);
       queueMicrotask(() => {
         scrollAndFocusField(v.firstField);
       });
@@ -471,7 +483,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
     }
     console.warn("[publish] validation passed");
     setClientErrors({});
-    console.warn("[publish] request transport: serverAction:createListing");
+    console.warn("[publish] request transport: serverAction:saveListing");
     startTransition(() => {
       formAction(fd);
       console.warn("[publish] request dispatched");
@@ -531,7 +543,6 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       noValidate
       onSubmit={(e) => {
         e.preventDefault();
-        console.warn("SUBMIT TRIGGERED");
         handleSubmit();
       }}
       className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200 bg-white p-4 text-zinc-900 shadow-sm [color-scheme:light] md:space-y-8 md:p-8"
@@ -1062,12 +1073,7 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
       <button
         type="submit"
         disabled={isPending}
-        onClick={(e) => {
-          e.preventDefault();
-          console.warn("SUBMIT BUTTON CLICKED");
-          handleSubmit();
-        }}
-        className="inline-flex min-h-[52px] w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-emerald-700 disabled:pointer-events-none disabled:opacity-60 lg:hover:bg-emerald-700"
+        className="inline-flex min-h-[52px] w-full touch-manipulation items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-3.5 text-base font-semibold text-white shadow-sm transition active:bg-emerald-700 disabled:opacity-60 lg:hover:bg-emerald-700"
       >
         {isPending ? (
           <>
@@ -1085,8 +1091,10 @@ export function ListingForm({ locale, userId, categoryTree }: Props) {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            {t("submitting")}
+            {isEditMode ? t("submittingUpdate") : t("submitting")}
           </>
+        ) : isEditMode ? (
+          t("submitUpdate")
         ) : (
           t("submit")
         )}

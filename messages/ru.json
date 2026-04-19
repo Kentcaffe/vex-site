@@ -417,6 +417,13 @@
     "favoritesHint": "Сохраните объявление, чтобы быстро найти его позже.",
     "favoritesLogin": "Нужен аккаунт, чтобы сохранять объявления. Войдите и вернитесь на эту страницу.",
     "favoritesCtaLogin": "Войти, чтобы сохранить",
+    "ownerActionsTitle": "Ваше объявление",
+    "ownerEdit": "Изменить",
+    "ownerDelete": "Удалить",
+    "ownerDeleteConfirm": "Удалить объявление безвозвратно?",
+    "ownerDeleting": "Удаление…",
+    "ownerDeleteError": "Не удалось удалить. Попробуйте снова.",
+    "ownerDeleteLogin": "Войдите, чтобы управлять объявлением.",
     "reportHint": "Что-то не так? Сообщите модераторам.",
     "spec": {
       "brand": "Марка",
@@ -740,7 +747,14 @@
     "myListingsTitle": "Мои объявления",
     "myListingsSubtitle": "Все ваши объявления на VEX.",
     "myListingsEmpty": "У вас пока нет объявлений.",
-    "publishFirst": "Разместить объявление"
+    "publishFirst": "Разместить объявление",
+    "myListingView": "Открыть",
+    "myListingEdit": "Изменить",
+    "myListingDelete": "Удалить",
+    "myListingDeleteConfirm": "Удалить объявление безвозвратно?",
+    "myListingDeleting": "Удаление…",
+    "myListingDeleteError": "Не удалось удалить. Попробуйте снова.",
+    "myListingDeleteLogin": "Войдите, чтобы управлять объявлениями."
   },
   "Notifications": {
     "title": "Уведомления",
@@ -796,6 +810,8 @@
   "Publish": {
     "title": "Разместить объявление",
     "subtitle": "Заполните поля ниже.",
+    "editTitle": "Редактировать объявление",
+    "editSubtitle": "Обновите данные и сохраните.",
     "noCategories": "Категории не настроены."
   },
   "Admin": {
@@ -970,8 +986,11 @@
     "imageCount": "{count} / {max} изображений",
     "uploadTooMany": "Слишком много изображений (макс. 8).",
     "submit": "Опубликовать",
+    "submitUpdate": "Сохранить изменения",
     "submitting": "Публикация…",
+    "submittingUpdate": "Сохранение…",
     "success": "Объявление опубликовано.",
+    "successUpdated": "Объявление обновлено.",
     "serverUnauthorized": "Нужно войти в аккаунт.",
     "serverValidation": "Проверьте поля и попробуйте снова.",
     "serverCategory": "Неверная категория (выберите подкатегорию).",

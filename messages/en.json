@@ -418,6 +418,13 @@
     "reportHint": "See something wrong? Tell us.",
     "favoritesLogin": "You need an account to save ads. Sign in and come back to this page.",
     "favoritesCtaLogin": "Sign in to save",
+    "ownerActionsTitle": "Your listing",
+    "ownerEdit": "Edit",
+    "ownerDelete": "Delete",
+    "ownerDeleteConfirm": "Delete this listing permanently? This cannot be undone.",
+    "ownerDeleting": "Deleting…",
+    "ownerDeleteError": "Could not delete. Try again.",
+    "ownerDeleteLogin": "Sign in to manage your listing.",
     "spec": {
       "brand": "Brand",
       "model": "Model",
@@ -740,7 +747,14 @@
     "myListingsTitle": "My listings",
     "myListingsSubtitle": "All listings you’ve published on VEX.",
     "myListingsEmpty": "You don’t have any listings yet.",
-    "publishFirst": "Post a listing"
+    "publishFirst": "Post a listing",
+    "myListingView": "View",
+    "myListingEdit": "Edit",
+    "myListingDelete": "Delete",
+    "myListingDeleteConfirm": "Delete this listing permanently? This cannot be undone.",
+    "myListingDeleting": "Deleting…",
+    "myListingDeleteError": "Could not delete. Try again.",
+    "myListingDeleteLogin": "Sign in to manage your listings."
   },
   "Notifications": {
     "title": "Notifications",
@@ -796,6 +810,8 @@
   "Publish": {
     "title": "Post an ad",
     "subtitle": "Fill in the fields below.",
+    "editTitle": "Edit listing",
+    "editSubtitle": "Update your ad and save changes.",
     "noCategories": "No categories configured."
   },
   "Admin": {
@@ -970,8 +986,11 @@
     "imageCount": "{count} / {max} images",
     "uploadTooMany": "Too many images (max 8).",
     "submit": "Publish",
+    "submitUpdate": "Save changes",
     "submitting": "Publishing?",
+    "submittingUpdate": "Saving…",
     "success": "Listing published successfully.",
+    "successUpdated": "Listing updated.",
     "serverUnauthorized": "You must be signed in.",
     "serverValidation": "Please check the fields and try again.",
     "serverCategory": "Invalid category (pick a leaf subcategory).",

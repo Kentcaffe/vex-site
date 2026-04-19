@@ -135,10 +135,16 @@ export function buildFormDataFromPublishValues(
   imagesRaw: string,
   values: PublishFormValues,
   detailFields: DetailField[],
+  /** Dacă e setat, serverul face update (proprietar). */
+  listingIdForUpdate?: string | null,
 ): FormData {
   const categoryLeafId = categoryId.trim();
   const imageList = parseImageLines(imagesRaw);
   const fd = new FormData();
+  const lid = listingIdForUpdate?.trim();
+  if (lid) {
+    fd.set("listingId", lid);
+  }
   fd.set("locale", locale);
   fd.set("categoryId", categoryLeafId);
   fd.set("category_id", categoryLeafId);

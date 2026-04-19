@@ -19,6 +19,8 @@ import { prisma } from "@/lib/prisma";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { listingSeoPath } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
+import { localizedHref } from "@/lib/paths";
+import { OwnListingDeleteButton } from "@/components/account/OwnListingDeleteButton";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -186,6 +188,24 @@ export default async function ListingDetailPage({ params }: Props) {
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">{t("reportHint")}</p>
                 <div className="mt-2">
                   <ReportListingButton listingId={listing.id} />
+                </div>
+              </div>
+            ) : null}
+            {isOwner ? (
+              <div className="mt-4 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+                <p className="text-xs font-medium text-zinc-600 dark:text-zinc-300">{t("ownerActionsTitle")}</p>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  <Link
+                    href={localizedHref(locale, `/cont/anunturi/${listing.id}/edit`)}
+                    className="inline-flex min-h-[48px] flex-1 touch-manipulation items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm font-semibold text-emerald-900 transition active:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-100 dark:active:bg-emerald-950/80 sm:flex-none"
+                  >
+                    {t("ownerEdit")}
+                  </Link>
+                  <OwnListingDeleteButton
+                    listingId={listing.id}
+                    redirectHref={localizedHref(locale, "/cont/anunturi")}
+                    variant="detail"
+                  />
                 </div>
               </div>
             ) : null}
