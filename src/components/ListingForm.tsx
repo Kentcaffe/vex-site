@@ -53,6 +53,7 @@ import {
   saveDraftAdMirror,
   type PublishFormValues,
 } from "@/lib/listing-publish-form-data";
+import { MOLDOVA_CITY_SET, moldovaCitySelectOptions } from "@/lib/moldova-cities";
 import { getModelsForBrand } from "@/lib/vehicle-models-by-brand";
 import { VEHICLE_BRANDS } from "@/lib/vehicle-taxonomy";
 
@@ -144,6 +145,15 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     [publishValues.brand],
   );
   const isElectronics = isElectronicsBrandSlug(selectedSlug);
+
+  const citySelectOptions = useMemo(() => {
+    const base = moldovaCitySelectOptions();
+    const cur = publishValues.city.trim();
+    if (cur && !MOLDOVA_CITY_SET.has(cur)) {
+      return [{ value: cur, label: cur }, ...base];
+    }
+    return base;
+  }, [publishValues.city]);
 
   function ring(field: ListingFormFieldId): string {
     return clientErrors[field] ? errBorder : "";
@@ -699,21 +709,24 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
         </div>
 
         <div className="grid gap-5 md:grid-cols-2">
-          <div id="field-city">
+          <div id="field-city" data-error={clientErrors.city ? "true" : undefined}>
             <label className={labelClass} htmlFor="city">
               {t("city")}
             </label>
-            <input
+            <SearchableSelect
               id="city"
-              name="city"
-              data-error={clientErrors.city ? "true" : undefined}
-              maxLength={80}
               value={publishValues.city}
-              onChange={(e) => {
-                setPublishValues((p) => ({ ...p, city: e.target.value }));
+              onChange={(v) => {
+                setPublishValues((p) => ({ ...p, city: v }));
+                clearFieldError("city");
               }}
-              aria-invalid={Boolean(clientErrors.city)}
-              className={`${baseInputClass} ${ring("city")}`}
+              options={citySelectOptions}
+              placeholder={t("citySelectPlaceholder")}
+              searchPlaceholder={t("citySearchPlaceholder")}
+              emptyLabel={t("cityEmptyOption")}
+              noResultsLabel={t("cityNoResults")}
+              invalid={Boolean(clientErrors.city)}
+              aria-label={t("city")}
             />
             {clientErrors.city ? <p className="mt-1 text-sm text-red-600">{clientErrors.city}</p> : null}
           </div>

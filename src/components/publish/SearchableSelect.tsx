@@ -15,6 +15,8 @@ type Props = {
   searchPlaceholder?: string;
   noResultsLabel?: string;
   className?: string;
+  /** Vizual + aria-invalid pentru erori de validare */
+  invalid?: boolean;
   disabled?: boolean;
   "aria-label"?: string;
 };
@@ -29,6 +31,7 @@ export function SearchableSelect({
   searchPlaceholder = "Caută…",
   noResultsLabel = "Niciun rezultat",
   className = "",
+  invalid = false,
   disabled = false,
   "aria-label": ariaLabel,
 }: Props) {
@@ -81,12 +84,15 @@ export function SearchableSelect({
         id={id}
         type="button"
         disabled={disabled}
+        aria-invalid={invalid}
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={open ? listId : undefined}
         aria-label={ariaLabel}
         onClick={() => !disabled && setOpen((o) => !o)}
-        className="mt-1 flex min-h-[52px] w-full items-center justify-between gap-2 rounded-xl border border-zinc-300 bg-white px-3 py-3 text-left text-base text-zinc-900 md:min-h-[44px] md:rounded-lg md:py-2.5 md:text-sm"
+        className={`mt-1 flex min-h-[52px] w-full items-center justify-between gap-2 rounded-xl border bg-white px-3 py-3 text-left text-base text-zinc-900 md:min-h-[44px] md:rounded-lg md:py-2.5 md:text-sm ${
+          invalid ? "border-red-500 ring-2 ring-red-500/30" : "border-zinc-300"
+        }`}
       >
         <span className={selected ? "text-zinc-900" : "text-zinc-500"}>{selected?.label ?? placeholder}</span>
         <ChevronDown className={`h-4 w-4 shrink-0 text-zinc-500 transition ${open ? "rotate-180" : ""}`} aria-hidden />

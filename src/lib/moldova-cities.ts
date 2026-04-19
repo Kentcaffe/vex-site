@@ -1,0 +1,82 @@
+/**
+ * Localități cu statut de oraș / municipiu în Republica Moldova
+ * (inclusiv orașe din stânga Nistrului folosite frecvent în anunțuri).
+ * Lista este sortată cu locale românesc pentru afișare.
+ */
+const RAW: readonly string[] = [
+  "Anenii Noi",
+  "Bălți",
+  "Basarabeasca",
+  "Bender",
+  "Biruința",
+  "Briceni",
+  "Bucovăț",
+  "Cahul",
+  "Camenca",
+  "Cantemir",
+  "Căinari",
+  "Călărași",
+  "Căușeni",
+  "Ceadâr-Lunga",
+  "Chișinău",
+  "Cimișlia",
+  "Codru",
+  "Comrat",
+  "Cornești",
+  "Costești",
+  "Crasnoe",
+  "Cricova",
+  "Criuleni",
+  "Cupcini",
+  "Dondușeni",
+  "Drochia",
+  "Dubăsari",
+  "Dnestrovsc",
+  "Durlești",
+  "Edineț",
+  "Fălești",
+  "Florești",
+  "Frunză",
+  "Ghindești",
+  "Glodeni",
+  "Grigoriopol",
+  "Hîncești",
+  "Ialoveni",
+  "Iargara",
+  "Leova",
+  "Lipcani",
+  "Maiac",
+  "Mărculești",
+  "Nisporeni",
+  "Ocnița",
+  "Orhei",
+  "Otaci",
+  "Rezina",
+  "Rîbnița",
+  "Rîșcani",
+  "Slobozia",
+  "Soroca",
+  "Stăuceni",
+  "Strășeni",
+  "Sîngera",
+  "Sîngerei",
+  "Șoldănești",
+  "Ștefan Vodă",
+  "Taraclia",
+  "Telenești",
+  "Tiraspol",
+  "Tiraspolul Nou",
+  "Tvardița",
+  "Ungheni",
+  "Vadul lui Vodă",
+  "Vatra",
+  "Vulcănești",
+];
+
+export const MOLDOVA_CITIES: readonly string[] = [...RAW].sort((a, b) => a.localeCompare(b, "ro"));
+
+export const MOLDOVA_CITY_SET = new Set<string>(MOLDOVA_CITIES);
+
+export function moldovaCitySelectOptions(): { value: string; label: string }[] {
+  return MOLDOVA_CITIES.map((c) => ({ value: c, label: c }));
+}
