@@ -370,6 +370,21 @@
       "bodyType": "Tip caroserie",
       "drivetrain": "Tip tracțiune",
       "doors": "Număr de uși",
+      "vehicleExtraSection": "Motor, locuri, culoare",
+      "engineL": "Motor (litri)",
+      "seats": "Locuri",
+      "color": "Culoare caroserie",
+      "realEstateSection": "Detalii imobil",
+      "rooms": "Camere",
+      "areaMin": "Suprafață minimă (m²)",
+      "areaMax": "Suprafață maximă (m²)",
+      "propertyType": "Tip proprietate",
+      "furnished": "Mobilat",
+      "propertyCondition": "Stare imobil",
+      "electronicsSection": "Detalii produs",
+      "productType": "Tip produs",
+      "electronicsCondition": "Stare produs",
+      "storageGb": "Memorie (GB)",
       "condition": "Stare",
       "conditionNew": "Nou",
       "conditionUsed": "Folosit",
@@ -437,7 +452,187 @@
       "salary_to": "Salariu până la",
       "size_label": "Mărime",
       "age_months": "Vârstă (luni)",
-      "vaccinated": "Vaccinat"
+      "vaccinated": "Vaccinat",
+      "generation": "Generație",
+      "engine_l": "Motor (litri)",
+      "seats": "Locuri",
+      "property_type": "Tip proprietate",
+      "total_floors": "Total etaje",
+      "property_condition": "Stare imobil",
+      "product_type": "Tip produs",
+      "electronics_condition": "Stare produs"
+    },
+    "specValue": {
+      "property_type": {
+        "apartment": "Apartament",
+        "house": "Casă",
+        "studio": "Garsonieră",
+        "land": "Teren",
+        "forest": "Pădure",
+        "agricultural": "Teren agricol"
+      },
+      "property_condition": {
+        "new": "Nou / finisat",
+        "good": "Bună",
+        "livable": "Locuibilă",
+        "needs_renovation": "Necesită renovare",
+        "shell": "La roșu / nefinisat"
+      },
+      "electronics_condition": {
+        "new": "Nou",
+        "used": "Folosit",
+        "refurbished": "Resigilat / recondiționat"
+      },
+      "product_type": {
+        "smartphone": "Smartphone",
+        "classic_phone": "Telefon clasic",
+        "tablet": "Tabletă",
+        "smartwatch": "Smartwatch",
+        "laptop": "Laptop",
+        "desktop": "PC birou",
+        "monitor": "Monitor",
+        "components": "Componente",
+        "peripherals": "Periferice",
+        "other": "Altul"
+      },
+      "fuel": {
+        "petrol": "Benzină",
+        "diesel": "Motorină",
+        "electric": "Electric",
+        "hybrid": "Hibrid",
+        "lpg": "GPL"
+      },
+      "transmission": {
+        "manual": "Manuală",
+        "automatic": "Automată"
+      },
+      "body_type": {
+        "sedan": "Sedan",
+        "hatchback": "Hatchback",
+        "suv": "SUV",
+        "mpv": "Monovolum",
+        "coupe": "Coupe",
+        "convertible": "Decapotabilă",
+        "wagon": "Break",
+        "pickup": "Pick-up",
+        "van": "Furgonetă",
+        "other": "Altul"
+      },
+      "drivetrain": {
+        "fwd": "Față",
+        "rwd": "Spate",
+        "awd": "Integrală (AWD)",
+        "4wd": "4×4"
+      },
+      "doors": {
+        "2": "2 uși",
+        "3": "3 uși",
+        "4": "4 uși",
+        "5": "5 uși"
+      },
+      "seats": {
+        "2": "2 locuri",
+        "3": "3 locuri",
+        "4": "4 locuri",
+        "5": "5 locuri",
+        "6": "6 locuri",
+        "7": "7 locuri",
+        "8": "8 locuri",
+        "9": "9 locuri"
+      },
+      "color": {
+        "white": "Alb",
+        "black": "Negru",
+        "gray": "Gri",
+        "silver": "Argintiu",
+        "blue": "Albastru",
+        "red": "Roșu",
+        "green": "Verde",
+        "brown": "Maro",
+        "orange": "Portocaliu",
+        "yellow": "Galben",
+        "beige": "Bej",
+        "other": "Altă culoare"
+      },
+      "engine_l": {
+        "0.8": "0,8 l",
+        "1.0": "1,0 l",
+        "1.2": "1,2 l",
+        "1.3": "1,3 l",
+        "1.4": "1,4 l",
+        "1.5": "1,5 l",
+        "1.6": "1,6 l",
+        "1.8": "1,8 l",
+        "2.0": "2,0 l",
+        "2.2": "2,2 l",
+        "2.5": "2,5 l",
+        "3.0": "3,0 l",
+        "3.5": "3,5 l",
+        "4.0": "4,0 l",
+        "4.4": "4,4 l",
+        "5.0": "5,0 l",
+        "6.0": "6,0 l",
+        "electric": "Electric"
+      },
+      "floor": {
+        "1": "Etaj 1",
+        "2": "Etaj 2",
+        "3": "Etaj 3",
+        "4": "Etaj 4",
+        "5": "Etaj 5",
+        "6": "Etaj 6",
+        "7": "Etaj 7",
+        "8": "Etaj 8",
+        "9": "Etaj 9",
+        "10": "Etaj 10",
+        "11": "Etaj 11",
+        "12": "Etaj 12",
+        "13": "Etaj 13",
+        "14": "Etaj 14",
+        "15": "Etaj 15",
+        "16": "Etaj 16",
+        "17": "Etaj 17",
+        "18": "Etaj 18",
+        "19": "Etaj 19",
+        "20": "Etaj 20",
+        "basement": "Subsol",
+        "ground": "Parter",
+        "21plus": "Peste etaj 20"
+      },
+      "total_floors": {
+        "1": "1 etaj",
+        "2": "2 etaje",
+        "3": "3 etaje",
+        "4": "4 etaje",
+        "5": "5 etaje",
+        "6": "6 etaje",
+        "7": "7 etaje",
+        "8": "8 etaje",
+        "9": "9 etaje",
+        "10": "10 etaje",
+        "11": "11 etaje",
+        "12": "12 etaje",
+        "13": "13 etaje",
+        "14": "14 etaje",
+        "15": "15 etaje",
+        "16": "16 etaje",
+        "17": "17 etaje",
+        "18": "18 etaje",
+        "19": "19 etaje",
+        "20": "20 etaje",
+        "21plus": "Peste 20 etaje"
+      },
+      "furnished": {
+        "yes": "Mobilat",
+        "no": "Nemobilat",
+        "partial": "Parțial mobilat"
+      },
+      "building_type": {
+        "block": "Bloc",
+        "house": "Casă",
+        "new_build": "Construcție nouă",
+        "other": "Altul"
+      }
     }
   },
   "Auth": {
@@ -782,6 +977,11 @@
     "serverSession": "Sesiune invalidă.",
     "serverPublishError": "Eroare la publicare. Încearcă din nou.",
     "detailOptional": "— opțional —",
+    "pickBrand": "Alege marca",
+    "pickModel": "Alege modelul",
+    "searchableSearch": "Caută în listă…",
+    "searchableEmpty": "Niciun rezultat",
+    "generationNA": "— (alege marcă și model)",
     "fuel": {
       "petrol": "Benzină",
       "diesel": "Motorină",
@@ -816,6 +1016,16 @@
       "3": "3",
       "4": "4",
       "5": "5"
+    },
+    "seats": {
+      "2": "2 locuri",
+      "3": "3 locuri",
+      "4": "4 locuri",
+      "5": "5 locuri",
+      "6": "6 locuri",
+      "7": "7 locuri",
+      "8": "8 locuri",
+      "9": "9 locuri"
     },
     "furnished": {
       "yes": "Mobilat",
@@ -921,7 +1131,145 @@
       },
       "vaccinated": {
         "label": "Vaccinat"
+      },
+      "generation": {
+        "label": "Generație"
+      },
+      "engine_l": {
+        "label": "Motor (litri)"
+      },
+      "seats": {
+        "label": "Locuri"
+      },
+      "property_type": {
+        "label": "Tip proprietate"
+      },
+      "total_floors": {
+        "label": "Total etaje"
+      },
+      "property_condition": {
+        "label": "Stare imobil"
+      },
+      "product_type": {
+        "label": "Tip produs"
+      },
+      "electronics_condition": {
+        "label": "Stare produs"
       }
+    },
+    "property_type": {
+      "apartment": "Apartament",
+      "house": "Casă",
+      "studio": "Garsonieră",
+      "land": "Teren",
+      "forest": "Pădure",
+      "agricultural": "Teren agricol"
+    },
+    "property_condition": {
+      "new": "Nou / finisat",
+      "good": "Bună",
+      "livable": "Locuibilă",
+      "needs_renovation": "Necesită renovare",
+      "shell": "La roșu / nefinisat"
+    },
+    "electronics_condition": {
+      "new": "Nou",
+      "used": "Folosit",
+      "refurbished": "Resigilat / recondiționat"
+    },
+    "product_type": {
+      "smartphone": "Smartphone",
+      "classic_phone": "Telefon clasic",
+      "tablet": "Tabletă",
+      "smartwatch": "Smartwatch",
+      "laptop": "Laptop",
+      "desktop": "PC birou",
+      "monitor": "Monitor",
+      "components": "Componente",
+      "peripherals": "Periferice",
+      "other": "Altul"
+    },
+    "floor": {
+      "1": "Etaj 1",
+      "2": "Etaj 2",
+      "3": "Etaj 3",
+      "4": "Etaj 4",
+      "5": "Etaj 5",
+      "6": "Etaj 6",
+      "7": "Etaj 7",
+      "8": "Etaj 8",
+      "9": "Etaj 9",
+      "10": "Etaj 10",
+      "11": "Etaj 11",
+      "12": "Etaj 12",
+      "13": "Etaj 13",
+      "14": "Etaj 14",
+      "15": "Etaj 15",
+      "16": "Etaj 16",
+      "17": "Etaj 17",
+      "18": "Etaj 18",
+      "19": "Etaj 19",
+      "20": "Etaj 20",
+      "basement": "Subsol",
+      "ground": "Parter",
+      "21plus": "Peste etaj 20"
+    },
+    "total_floors": {
+      "1": "1 etaj",
+      "2": "2 etaje",
+      "3": "3 etaje",
+      "4": "4 etaje",
+      "5": "5 etaje",
+      "6": "6 etaje",
+      "7": "7 etaje",
+      "8": "8 etaje",
+      "9": "9 etaje",
+      "10": "10 etaje",
+      "11": "11 etaje",
+      "12": "12 etaje",
+      "13": "13 etaje",
+      "14": "14 etaje",
+      "15": "15 etaje",
+      "16": "16 etaje",
+      "17": "17 etaje",
+      "18": "18 etaje",
+      "19": "19 etaje",
+      "20": "20 etaje",
+      "21plus": "Peste 20 etaje"
+    },
+    "color": {
+      "white": "Alb",
+      "black": "Negru",
+      "gray": "Gri",
+      "silver": "Argintiu",
+      "blue": "Albastru",
+      "red": "Roșu",
+      "green": "Verde",
+      "brown": "Maro",
+      "orange": "Portocaliu",
+      "yellow": "Galben",
+      "beige": "Bej",
+      "other": "Altă culoare"
+    },
+    "engine_l": {
+      "0.8": "0,8 l",
+      "1.0": "1,0 l",
+      "1.2": "1,2 l",
+      "1.3": "1,3 l",
+      "1.4": "1,4 l",
+      "1.5": "1,5 l",
+      "1.6": "1,6 l",
+      "1.8": "1,8 l",
+      "2.0": "2,0 l",
+      "2.2": "2,2 l",
+      "2.5": "2,5 l",
+      "3.0": "3,0 l",
+      "3.5": "3,5 l",
+      "4.0": "4,0 l",
+      "4.4": "4,4 l",
+      "5.0": "5,0 l",
+      "6.0": "6,0 l",
+      "electric": "Electric (fără litri)"
     },
     "validation": {
       "errCategory": "Alege o categorie.",
@@ -1031,4 +1379,3 @@
     }
   }
 }
-

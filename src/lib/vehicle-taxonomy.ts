@@ -44,6 +44,7 @@ export const VEHICLE_BODY_TYPE_VALUES = [
   { value: "sedan", label: "Sedan" },
   { value: "hatchback", label: "Hatchback" },
   { value: "suv", label: "SUV" },
+  { value: "mpv", label: "Monovolum" },
   { value: "wagon", label: "Combi" },
   { value: "coupe", label: "Coupe" },
   { value: "convertible", label: "Cabrio" },

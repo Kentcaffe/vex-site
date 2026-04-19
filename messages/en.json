@@ -370,6 +370,21 @@
       "bodyType": "Body type",
       "drivetrain": "Drivetrain",
       "doors": "Number of doors",
+      "vehicleExtraSection": "Engine, seats, color",
+      "engineL": "Engine (L)",
+      "seats": "Seats",
+      "color": "Exterior color",
+      "realEstateSection": "Property details",
+      "rooms": "Rooms",
+      "areaMin": "Min area (m²)",
+      "areaMax": "Max area (m²)",
+      "propertyType": "Property type",
+      "furnished": "Furnished",
+      "propertyCondition": "Property condition",
+      "electronicsSection": "Product details",
+      "productType": "Product type",
+      "electronicsCondition": "Item condition",
+      "storageGb": "Storage (GB)",
       "condition": "Condition",
       "conditionNew": "New",
       "conditionUsed": "Used",
@@ -437,7 +452,187 @@
       "salary_to": "Salary to",
       "size_label": "Size",
       "age_months": "Age (months)",
-      "vaccinated": "Vaccinated"
+      "vaccinated": "Vaccinated",
+      "generation": "Generation",
+      "engine_l": "Engine (liters)",
+      "seats": "Seats",
+      "property_type": "Property type",
+      "total_floors": "Total floors",
+      "property_condition": "Property condition",
+      "product_type": "Product type",
+      "electronics_condition": "Product condition"
+    },
+    "specValue": {
+      "property_type": {
+        "apartment": "Apartment",
+        "house": "House",
+        "studio": "Studio",
+        "land": "Land",
+        "forest": "Forest",
+        "agricultural": "Farmland"
+      },
+      "property_condition": {
+        "new": "New / finished",
+        "good": "Good",
+        "livable": "Livable",
+        "needs_renovation": "Needs renovation",
+        "shell": "Shell / unfinished"
+      },
+      "electronics_condition": {
+        "new": "New",
+        "used": "Used",
+        "refurbished": "Refurbished"
+      },
+      "product_type": {
+        "smartphone": "Smartphone",
+        "classic_phone": "Classic phone",
+        "tablet": "Tablet",
+        "smartwatch": "Smartwatch",
+        "laptop": "Laptop",
+        "desktop": "Desktop PC",
+        "monitor": "Monitor",
+        "components": "Components",
+        "peripherals": "Peripherals",
+        "other": "Other"
+      },
+      "fuel": {
+        "petrol": "Petrol",
+        "diesel": "Diesel",
+        "electric": "Electric",
+        "hybrid": "Hybrid",
+        "lpg": "LPG"
+      },
+      "transmission": {
+        "manual": "Manual",
+        "automatic": "Automatic"
+      },
+      "body_type": {
+        "sedan": "Sedan",
+        "hatchback": "Hatchback",
+        "suv": "SUV",
+        "mpv": "MPV",
+        "coupe": "Coupe",
+        "convertible": "Convertible",
+        "wagon": "Wagon",
+        "pickup": "Pickup",
+        "van": "Van",
+        "other": "Other"
+      },
+      "drivetrain": {
+        "fwd": "FWD",
+        "rwd": "RWD",
+        "awd": "AWD",
+        "4wd": "4x4"
+      },
+      "doors": {
+        "2": "2 doors",
+        "3": "3 doors",
+        "4": "4 doors",
+        "5": "5 doors"
+      },
+      "seats": {
+        "2": "2 seats",
+        "3": "3 seats",
+        "4": "4 seats",
+        "5": "5 seats",
+        "6": "6 seats",
+        "7": "7 seats",
+        "8": "8 seats",
+        "9": "9 seats"
+      },
+      "color": {
+        "white": "White",
+        "black": "Black",
+        "gray": "Gray",
+        "silver": "Silver",
+        "blue": "Blue",
+        "red": "Red",
+        "green": "Green",
+        "brown": "Brown",
+        "orange": "Orange",
+        "yellow": "Yellow",
+        "beige": "Beige",
+        "other": "Other color"
+      },
+      "engine_l": {
+        "0.8": "0.8 L",
+        "1.0": "1.0 L",
+        "1.2": "1.2 L",
+        "1.3": "1.3 L",
+        "1.4": "1.4 L",
+        "1.5": "1.5 L",
+        "1.6": "1.6 L",
+        "1.8": "1.8 L",
+        "2.0": "2.0 L",
+        "2.2": "2.2 L",
+        "2.5": "2.5 L",
+        "3.0": "3.0 L",
+        "3.5": "3.5 L",
+        "4.0": "4.0 L",
+        "4.4": "4.4 L",
+        "5.0": "5.0 L",
+        "6.0": "6.0 L",
+        "electric": "Electric"
+      },
+      "floor": {
+        "basement": "Basement",
+        "ground": "Ground floor",
+        "1": "Floor 1",
+        "2": "Floor 2",
+        "3": "Floor 3",
+        "4": "Floor 4",
+        "5": "Floor 5",
+        "6": "Floor 6",
+        "7": "Floor 7",
+        "8": "Floor 8",
+        "9": "Floor 9",
+        "10": "Floor 10",
+        "11": "Floor 11",
+        "12": "Floor 12",
+        "13": "Floor 13",
+        "14": "Floor 14",
+        "15": "Floor 15",
+        "16": "Floor 16",
+        "17": "Floor 17",
+        "18": "Floor 18",
+        "19": "Floor 19",
+        "20": "Floor 20",
+        "21plus": "Above floor 20"
+      },
+      "total_floors": {
+        "1": "1 floor",
+        "2": "2 floors",
+        "3": "3 floors",
+        "4": "4 floors",
+        "5": "5 floors",
+        "6": "6 floors",
+        "7": "7 floors",
+        "8": "8 floors",
+        "9": "9 floors",
+        "10": "10 floors",
+        "11": "11 floors",
+        "12": "12 floors",
+        "13": "13 floors",
+        "14": "14 floors",
+        "15": "15 floors",
+        "16": "16 floors",
+        "17": "17 floors",
+        "18": "18 floors",
+        "19": "19 floors",
+        "20": "20 floors",
+        "21plus": "More than 20 floors"
+      },
+      "furnished": {
+        "yes": "Furnished",
+        "no": "Unfurnished",
+        "partial": "Partially furnished"
+      },
+      "building_type": {
+        "block": "Block",
+        "house": "House",
+        "new_build": "New build",
+        "other": "Other"
+      }
     }
   },
   "Auth": {
@@ -781,7 +976,12 @@
     "serverCategory": "Invalid category (pick a leaf subcategory).",
     "serverSession": "Invalid session.",
     "serverPublishError": "Could not publish. Please try again.",
-    "detailOptional": "? optional ?",
+    "detailOptional": "— optional —",
+    "pickBrand": "Choose brand",
+    "pickModel": "Choose model",
+    "searchableSearch": "Search in list…",
+    "searchableEmpty": "No results",
+    "generationNA": "— (pick brand and model)",
     "fuel": {
       "petrol": "Petrol",
       "diesel": "Diesel",
@@ -816,6 +1016,16 @@
       "3": "3",
       "4": "4",
       "5": "5"
+    },
+    "seats": {
+      "2": "2 seats",
+      "3": "3 seats",
+      "4": "4 seats",
+      "5": "5 seats",
+      "6": "6 seats",
+      "7": "7 seats",
+      "8": "8 seats",
+      "9": "9 seats"
     },
     "furnished": {
       "yes": "Furnished",
@@ -921,7 +1131,145 @@
       },
       "vaccinated": {
         "label": "Vaccinated"
+      },
+      "generation": {
+        "label": "Generation"
+      },
+      "engine_l": {
+        "label": "Engine (liters)"
+      },
+      "seats": {
+        "label": "Seats"
+      },
+      "property_type": {
+        "label": "Property type"
+      },
+      "total_floors": {
+        "label": "Total floors"
+      },
+      "property_condition": {
+        "label": "Property condition"
+      },
+      "product_type": {
+        "label": "Product type"
+      },
+      "electronics_condition": {
+        "label": "Product condition"
       }
+    },
+    "property_type": {
+      "apartment": "Apartment",
+      "house": "House",
+      "studio": "Studio",
+      "land": "Land",
+      "forest": "Forest",
+      "agricultural": "Farmland"
+    },
+    "property_condition": {
+      "new": "New / finished",
+      "good": "Good",
+      "livable": "Livable",
+      "needs_renovation": "Needs renovation",
+      "shell": "Shell / unfinished"
+    },
+    "electronics_condition": {
+      "new": "New",
+      "used": "Used",
+      "refurbished": "Refurbished"
+    },
+    "product_type": {
+      "smartphone": "Smartphone",
+      "classic_phone": "Classic phone",
+      "tablet": "Tablet",
+      "smartwatch": "Smartwatch",
+      "laptop": "Laptop",
+      "desktop": "Desktop PC",
+      "monitor": "Monitor",
+      "components": "Components",
+      "peripherals": "Peripherals",
+      "other": "Other"
+    },
+    "floor": {
+      "basement": "Basement",
+      "ground": "Ground floor",
+      "1": "Floor 1",
+      "2": "Floor 2",
+      "3": "Floor 3",
+      "4": "Floor 4",
+      "5": "Floor 5",
+      "6": "Floor 6",
+      "7": "Floor 7",
+      "8": "Floor 8",
+      "9": "Floor 9",
+      "10": "Floor 10",
+      "11": "Floor 11",
+      "12": "Floor 12",
+      "13": "Floor 13",
+      "14": "Floor 14",
+      "15": "Floor 15",
+      "16": "Floor 16",
+      "17": "Floor 17",
+      "18": "Floor 18",
+      "19": "Floor 19",
+      "20": "Floor 20",
+      "21plus": "Above floor 20"
+    },
+    "total_floors": {
+      "1": "1 floor",
+      "2": "2 floors",
+      "3": "3 floors",
+      "4": "4 floors",
+      "5": "5 floors",
+      "6": "6 floors",
+      "7": "7 floors",
+      "8": "8 floors",
+      "9": "9 floors",
+      "10": "10 floors",
+      "11": "11 floors",
+      "12": "12 floors",
+      "13": "13 floors",
+      "14": "14 floors",
+      "15": "15 floors",
+      "16": "16 floors",
+      "17": "17 floors",
+      "18": "18 floors",
+      "19": "19 floors",
+      "20": "20 floors",
+      "21plus": "More than 20 floors"
+    },
+    "color": {
+      "white": "White",
+      "black": "Black",
+      "gray": "Gray",
+      "silver": "Silver",
+      "blue": "Blue",
+      "red": "Red",
+      "green": "Green",
+      "brown": "Brown",
+      "orange": "Orange",
+      "yellow": "Yellow",
+      "beige": "Beige",
+      "other": "Other color"
+    },
+    "engine_l": {
+      "0.8": "0.8 L",
+      "1.0": "1.0 L",
+      "1.2": "1.2 L",
+      "1.3": "1.3 L",
+      "1.4": "1.4 L",
+      "1.5": "1.5 L",
+      "1.6": "1.6 L",
+      "1.8": "1.8 L",
+      "2.0": "2.0 L",
+      "2.2": "2.2 L",
+      "2.5": "2.5 L",
+      "3.0": "3.0 L",
+      "3.5": "3.5 L",
+      "4.0": "4.0 L",
+      "4.4": "4.4 L",
+      "5.0": "5.0 L",
+      "6.0": "6.0 L",
+      "electric": "Electric"
     },
     "validation": {
       "errCategory": "Pick a category.",

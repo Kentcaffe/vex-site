@@ -55,6 +55,11 @@ export function isLaptopPcSlug(slug: string): boolean {
   );
 }
 
+/** Telefoane / laptopuri / PC — marcă și model în coloane + detalii dinamice comune. */
+export function isElectronicsBrandSlug(slug: string): boolean {
+  return isPhoneTabletSlug(slug) || isLaptopPcSlug(slug);
+}
+
 export function isServiceJobLeafSlug(slug: string): boolean {
   return slug === "reparatii-auto" || /^servicii-/.test(slug);
 }

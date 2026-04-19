@@ -51,7 +51,7 @@ export function HomeHeroSearchForm({ action }: Props) {
         </button>
       </div>
 
-      <div className="rounded-2xl border border-white/20 bg-white/10 p-3 backdrop-blur-sm sm:p-4">
+      <div className="hidden rounded-2xl border border-white/20 bg-white/10 p-3 backdrop-blur-sm md:block md:p-4">
         <label className="flex cursor-pointer items-start gap-3 text-sm font-medium text-white">
           <input
             type="checkbox"
@@ -143,7 +143,7 @@ export function HomeHeroSearchForm({ action }: Props) {
         </div>
       </div>
 
-      <p className="text-center text-sm text-amber-100 sm:text-left">{t("heroExamples")}</p>
+      <p className="hidden text-center text-sm text-amber-100 md:block md:text-left">{t("heroExamples")}</p>
 
       <button
         type="submit"

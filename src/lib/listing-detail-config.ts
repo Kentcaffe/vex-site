@@ -1,6 +1,30 @@
 import type { Listing } from "@prisma/client";
 import {
+  ELECTRONICS_CONDITION,
+  ELECTRONICS_PRODUCT_PC,
+  ELECTRONICS_PRODUCT_PHONE,
+  ENGINE_LITER_OPTIONS,
+  RAM_GB_LAPTOP,
+  RAM_GB_PHONE,
+  RE_FLOOR_OPTIONS,
+  RE_PROPERTY_CONDITION,
+  RE_PROPERTY_TYPES,
+  RE_ROOM_COUNTS,
+  RE_TOTAL_FLOORS,
+  SCREEN_INCH_BUCKETS,
+  STORAGE_GB_LAPTOP,
+  STORAGE_GB_PHONE,
+  VEHICLE_BODY_TYPE_KEYS,
+  VEHICLE_COLOR_KEYS,
+  VEHICLE_DOOR_KEYS,
+  VEHICLE_DRIVETRAIN_KEYS,
+  VEHICLE_FUEL_KEYS,
+  VEHICLE_SEAT_OPTIONS,
+  VEHICLE_TRANSMISSION_KEYS,
+} from "@/lib/listing-form-options";
+import {
   isAnimalSlug,
+  isBrandModelOnlySlug,
   isFashionSlug,
   isJobSlug,
   isLaptopPcSlug,
@@ -9,8 +33,8 @@ import {
   isRealEstateSlug,
   isServiceJobLeafSlug,
   isVehicleWithOdometer,
-  isBrandModelOnlySlug,
 } from "@/lib/listing-profiles";
+import { getGenerationOptions } from "@/lib/vehicle-generations";
 
 const KNOWN_DETAIL_KEYS: Record<string, string> = {
   fuel: "specExtra.fuel",
@@ -24,11 +48,19 @@ const KNOWN_DETAIL_KEYS: Record<string, string> = {
   body_type: "specExtra.body_type",
   drivetrain: "specExtra.drivetrain",
   engine_cc: "specExtra.engine_cc",
+  engine_l: "specExtra.engine_l",
   power_hp: "specExtra.power_hp",
   doors: "specExtra.doors",
+  seats: "specExtra.seats",
+  generation: "specExtra.generation",
   furnished: "specExtra.furnished",
   building_type: "specExtra.building_type",
   land_area_sqm: "specExtra.land_area_sqm",
+  property_type: "specExtra.property_type",
+  total_floors: "specExtra.total_floors",
+  property_condition: "specExtra.property_condition",
+  product_type: "specExtra.product_type",
+  electronics_condition: "specExtra.electronics_condition",
   battery_health: "specExtra.battery_health",
   screen_inch: "specExtra.screen_inch",
   processor: "specExtra.processor",
@@ -59,54 +91,55 @@ export type DetailField = {
   input: "text" | "number" | "select";
   selectValues?: string[];
   selectGroup?: string;
+  /** Listă lungă: combobox cu căutare în formularul de publicare */
+  searchable?: boolean;
   min?: number;
   max?: number;
   numberStep?: string;
   maxLength?: number;
 };
 
+export type SpecRow = {
+  label: string;
+  value: string;
+  /** Cheie din detailsJson — pentru traducerea valorii în UI */
+  detailKey?: string;
+};
+
 export function getDetailFormName(field: DetailField): string {
   return `d_${field.id}`;
 }
 
-const FUEL = ["petrol", "diesel", "electric", "hybrid", "lpg"] as const;
-const TRANSMISSION = ["manual", "automatic"] as const;
-const BODY_CAR = [
-  "sedan",
-  "hatchback",
-  "suv",
-  "mpv",
-  "coupe",
-  "convertible",
-  "wagon",
-  "pickup",
-  "van",
-  "other",
-] as const;
-const DRIVETRAIN = ["fwd", "rwd", "awd", "4wd"] as const;
-const DOORS = ["2", "3", "4", "5"] as const;
 const FURNISHED = ["yes", "no", "partial"] as const;
 const BUILDING = ["block", "house", "new_build", "other"] as const;
 const EMPLOYMENT = ["full_time", "part_time", "contract", "remote", "internship"] as const;
 const VACC = ["yes", "no", "unknown"] as const;
 
-function vehicleDetailsForSlug(slug: string): DetailField[] {
+function vehicleDetailsForSlug(slug: string, ctx?: { brand?: string; model?: string }): DetailField[] {
   const moto = isMotoLikeSlug(slug);
-  const base: DetailField[] = [
-    { id: "fuel", input: "select", selectGroup: "fuel", selectValues: [...FUEL] },
-    { id: "transmission", input: "select", selectGroup: "transmission", selectValues: [...TRANSMISSION] },
-    { id: "color", input: "text", maxLength: 40 },
-    { id: "engine_cc", input: "number", min: 0, max: 20000 },
-  ];
-  if (!moto) {
-    base.push(
-      { id: "body_type", input: "select", selectValues: [...BODY_CAR] },
-      { id: "drivetrain", input: "select", selectValues: [...DRIVETRAIN] },
-      { id: "power_hp", input: "number", min: 1, max: 3000 },
-      { id: "doors", input: "select", selectValues: [...DOORS] },
-    );
+  if (moto) {
+    return [
+      { id: "fuel", input: "select", selectGroup: "fuel", selectValues: [...VEHICLE_FUEL_KEYS] },
+      { id: "transmission", input: "select", selectGroup: "transmission", selectValues: [...VEHICLE_TRANSMISSION_KEYS] },
+      { id: "color", input: "select", selectValues: [...VEHICLE_COLOR_KEYS], searchable: true },
+      { id: "engine_cc", input: "number", min: 50, max: 3000 },
+    ];
   }
-  return base;
+  const brand = ctx?.brand ?? "";
+  const model = ctx?.model ?? "";
+  const gens = getGenerationOptions(brand, model).filter((g) => g !== "n_a");
+  const genValues = gens.length ? gens : ["n_a"];
+  return [
+    { id: "generation", input: "select", selectValues: genValues },
+    { id: "fuel", input: "select", selectGroup: "fuel", selectValues: [...VEHICLE_FUEL_KEYS] },
+    { id: "engine_l", input: "select", selectValues: [...ENGINE_LITER_OPTIONS] },
+    { id: "transmission", input: "select", selectGroup: "transmission", selectValues: [...VEHICLE_TRANSMISSION_KEYS] },
+    { id: "body_type", input: "select", selectValues: [...VEHICLE_BODY_TYPE_KEYS], searchable: true },
+    { id: "drivetrain", input: "select", selectValues: [...VEHICLE_DRIVETRAIN_KEYS] },
+    { id: "doors", input: "select", selectValues: [...VEHICLE_DOOR_KEYS] },
+    { id: "seats", input: "select", selectValues: [...VEHICLE_SEAT_OPTIONS] },
+    { id: "color", input: "select", selectValues: [...VEHICLE_COLOR_KEYS], searchable: true },
+  ];
 }
 
 function partsAccessoryDetails(): DetailField[] {
@@ -118,11 +151,17 @@ function partsAccessoryDetails(): DetailField[] {
 
 function realEstateDetails(slug: string): DetailField[] {
   if (/teren|padure|agricol/.test(slug)) {
-    return [{ id: "land_area_sqm", input: "number", min: 1, max: 999_999_999 }];
+    return [
+      { id: "property_type", input: "select", selectValues: ["land", "forest", "agricultural"] },
+      { id: "land_area_sqm", input: "number", min: 1, max: 999_999_999 },
+    ];
   }
   const out: DetailField[] = [
+    { id: "property_type", input: "select", selectValues: [...RE_PROPERTY_TYPES] },
+    { id: "floor", input: "select", selectValues: [...RE_FLOOR_OPTIONS] },
+    { id: "total_floors", input: "select", selectValues: [...RE_TOTAL_FLOORS] },
+    { id: "property_condition", input: "select", selectValues: [...RE_PROPERTY_CONDITION] },
     { id: "furnished", input: "select", selectValues: [...FURNISHED] },
-    { id: "floor", input: "text", maxLength: 40 },
   ];
   if (/apartament|garsonier|case-/.test(slug) || slug === "apartamente" || slug === "case") {
     out.push({ id: "building_type", input: "select", selectValues: [...BUILDING] });
@@ -130,22 +169,26 @@ function realEstateDetails(slug: string): DetailField[] {
   return out;
 }
 
-function phoneDetails(): DetailField[] {
-  return [
-    { id: "storage_gb", input: "number", min: 1, max: 2048 },
-    { id: "ram_gb", input: "number", min: 1, max: 32 },
-    { id: "battery_health", input: "number", min: 0, max: 100 },
-    { id: "color", input: "text", maxLength: 40 },
+function electronicsDetails(slug: string): DetailField[] {
+  const phone = isPhoneTabletSlug(slug);
+  const products = phone ? [...ELECTRONICS_PRODUCT_PHONE] : [...ELECTRONICS_PRODUCT_PC];
+  const storageOpts = phone ? [...STORAGE_GB_PHONE] : [...STORAGE_GB_LAPTOP];
+  const ramOpts = phone ? [...RAM_GB_PHONE] : [...RAM_GB_LAPTOP];
+  const base: DetailField[] = [
+    { id: "product_type", input: "select", selectValues: products },
+    { id: "electronics_condition", input: "select", selectValues: [...ELECTRONICS_CONDITION] },
+    { id: "storage_gb", input: "select", selectValues: storageOpts, searchable: true },
   ];
-}
-
-function laptopDetails(): DetailField[] {
-  return [
-    { id: "storage_gb", input: "number", min: 1, max: 8192 },
-    { id: "ram_gb", input: "number", min: 1, max: 128 },
-    { id: "screen_inch", input: "number", min: 10, max: 22 },
-    { id: "processor", input: "text", maxLength: 100 },
-  ];
+  if (!phone) {
+    base.push(
+      { id: "ram_gb", input: "select", selectValues: ramOpts, searchable: true },
+      { id: "screen_inch", input: "select", selectValues: [...SCREEN_INCH_BUCKETS] },
+    );
+  } else {
+    base.push({ id: "ram_gb", input: "select", selectValues: ramOpts, searchable: true });
+  }
+  base.push({ id: "color", input: "select", selectValues: [...VEHICLE_COLOR_KEYS], searchable: true });
+  return base;
 }
 
 function serviceDetails(): DetailField[] {
@@ -189,9 +232,9 @@ export function getListingFormFlags(slug: string): {
   };
 }
 
-export function getDetailFieldsForSlug(slug: string): DetailField[] {
+export function getDetailFieldsForSlug(slug: string, ctx?: { brand?: string; model?: string }): DetailField[] {
   if (isVehicleWithOdometer(slug)) {
-    return vehicleDetailsForSlug(slug);
+    return vehicleDetailsForSlug(slug, ctx);
   }
   if (/^transport-(piese|accesorii|scule)-/.test(slug)) {
     return partsAccessoryDetails();
@@ -199,11 +242,8 @@ export function getDetailFieldsForSlug(slug: string): DetailField[] {
   if (isRealEstateSlug(slug)) {
     return realEstateDetails(slug);
   }
-  if (isPhoneTabletSlug(slug)) {
-    return phoneDetails();
-  }
-  if (isLaptopPcSlug(slug)) {
-    return laptopDetails();
+  if (isPhoneTabletSlug(slug) || isLaptopPcSlug(slug)) {
+    return electronicsDetails(slug);
   }
   if (isServiceJobLeafSlug(slug)) {
     return serviceDetails();
@@ -235,6 +275,9 @@ export function parseDetailsJsonFromForm(
     }
     const s = String(v).trim();
     if (!s) {
+      continue;
+    }
+    if (s === "n_a") {
       continue;
     }
     if (f.input === "number") {
@@ -290,8 +333,8 @@ export function getListingSpecEntries(
   categorySlug: string,
   listing: ListingSpecsSource,
   tDetail: (key: string) => string,
-): { label: string; value: string }[] {
-  const rows: { label: string; value: string }[] = [];
+): SpecRow[] {
+  const rows: SpecRow[] = [];
 
   const add = (labelKey: string, value: string | number | null | undefined) => {
     if (value === null || value === undefined || value === "") {
@@ -319,11 +362,15 @@ export function getListingSpecEntries(
         if (raw === null || raw === undefined || raw === "") {
           continue;
         }
+        const sv = String(raw);
+        if (sv === "n_a") {
+          continue;
+        }
         const mapped = Object.prototype.hasOwnProperty.call(KNOWN_DETAIL_KEYS, key)
           ? KNOWN_DETAIL_KEYS[key]
           : undefined;
         const label = mapped ? tDetail(mapped) : humanizeKey(key);
-        rows.push({ label, value: String(raw) });
+        rows.push({ label, value: sv, detailKey: key });
       }
     } catch {
       /* ignore */

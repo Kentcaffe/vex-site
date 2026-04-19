@@ -14,6 +14,27 @@ import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 import { listingSeoPath } from "@/lib/seo";
+import {
+  ELECTRONICS_CONDITION,
+  ELECTRONICS_PRODUCT_ALL,
+  ENGINE_LITER_OPTIONS,
+  RE_FURNISHED_VALUES,
+  RE_PROPERTY_CONDITION,
+  RE_PROPERTY_TYPE_FILTER,
+  RE_ROOM_COUNTS,
+  STORAGE_GB_FILTER_VALUES,
+  VEHICLE_BODY_TYPE_KEYS,
+  VEHICLE_COLOR_KEYS,
+  VEHICLE_DOOR_KEYS,
+  VEHICLE_DRIVETRAIN_KEYS,
+  VEHICLE_FUEL_KEYS,
+  VEHICLE_SEAT_OPTIONS,
+  VEHICLE_TRANSMISSION_KEYS,
+} from "@/lib/listing-form-options";
+
+function allows<T extends string>(v: string | undefined, list: readonly T[]): v is T {
+  return typeof v === "string" && (list as readonly string[]).includes(v);
+}
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -32,6 +53,18 @@ type Props = {
     bodyType?: string;
     drivetrain?: string;
     doors?: string;
+    seats?: string;
+    engineL?: string;
+    color?: string;
+    rooms?: string;
+    areaMin?: string;
+    areaMax?: string;
+    propertyType?: string;
+    furnished?: string;
+    propertyCondition?: string;
+    productType?: string;
+    electronicsCondition?: string;
+    storageGb?: string;
     condition?: string;
     yearMin?: string;
     yearMax?: string;
@@ -61,6 +94,18 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const bodyType = sp.bodyType?.trim() || undefined;
   const drivetrain = sp.drivetrain?.trim() || undefined;
   const doors = sp.doors?.trim() || undefined;
+  const seats = sp.seats?.trim() || undefined;
+  const engineL = sp.engineL?.trim() || undefined;
+  const color = sp.color?.trim() || undefined;
+  const rooms = sp.rooms?.trim() || undefined;
+  const areaMinRaw = sp.areaMin?.trim();
+  const areaMaxRaw = sp.areaMax?.trim();
+  const propertyType = sp.propertyType?.trim() || undefined;
+  const furnished = sp.furnished?.trim() || undefined;
+  const propertyCondition = sp.propertyCondition?.trim() || undefined;
+  const productType = sp.productType?.trim() || undefined;
+  const electronicsCondition = sp.electronicsCondition?.trim() || undefined;
+  const storageGb = sp.storageGb?.trim() || undefined;
   const condition = sp.condition?.trim() || undefined;
   const yearMinRaw = sp.yearMin?.trim();
   const yearMaxRaw = sp.yearMax?.trim();
@@ -68,9 +113,13 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const yearMin = yearMinRaw ? Number(yearMinRaw) : NaN;
   const yearMax = yearMaxRaw ? Number(yearMaxRaw) : NaN;
   const mileageMax = mileageMaxRaw ? Number(mileageMaxRaw) : NaN;
+  const areaMin = areaMinRaw ? Number(areaMinRaw) : NaN;
+  const areaMax = areaMaxRaw ? Number(areaMaxRaw) : NaN;
 
   /** Filtre marcă/model/an/combustibil etc. doar în categorii transport (evită rezultate goale fără categorie). */
   const applyTransportVehicleFilters = Boolean(categorySlug?.startsWith("transport"));
+  const applyImobiliareFilters = Boolean(categorySlug?.startsWith("imobiliare"));
+  const applyElectronicsFilters = Boolean(categorySlug?.startsWith("electronice"));
 
   const where: Prisma.ListingWhereInput = {};
   const andFilters: Prisma.ListingWhereInput[] = [];
@@ -117,44 +166,78 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
       where.mileageKm = { lte: mileageMax };
     }
 
-    if (fuel) {
-      andFilters.push({
-        detailsJson: {
-          contains: `"fuel":"${fuel}"`,
-        },
-      });
+    if (allows(fuel, VEHICLE_FUEL_KEYS)) {
+      andFilters.push({ detailsJson: { contains: `"fuel":"${fuel}"` } });
     }
 
-    if (transmission) {
-      andFilters.push({
-        detailsJson: {
-          contains: `"transmission":"${transmission}"`,
-        },
-      });
+    if (allows(transmission, VEHICLE_TRANSMISSION_KEYS)) {
+      andFilters.push({ detailsJson: { contains: `"transmission":"${transmission}"` } });
     }
 
-    if (bodyType) {
-      andFilters.push({
-        detailsJson: {
-          contains: `"body_type":"${bodyType}"`,
-        },
-      });
+    if (allows(bodyType, VEHICLE_BODY_TYPE_KEYS)) {
+      andFilters.push({ detailsJson: { contains: `"body_type":"${bodyType}"` } });
     }
 
-    if (drivetrain) {
-      andFilters.push({
-        detailsJson: {
-          contains: `"drivetrain":"${drivetrain}"`,
-        },
-      });
+    if (allows(drivetrain, VEHICLE_DRIVETRAIN_KEYS)) {
+      andFilters.push({ detailsJson: { contains: `"drivetrain":"${drivetrain}"` } });
     }
 
-    if (doors) {
-      andFilters.push({
-        detailsJson: {
-          contains: `"doors":"${doors}"`,
-        },
-      });
+    if (allows(doors, VEHICLE_DOOR_KEYS)) {
+      andFilters.push({ detailsJson: { contains: `"doors":"${doors}"` } });
+    }
+
+    if (allows(seats, VEHICLE_SEAT_OPTIONS)) {
+      andFilters.push({ detailsJson: { contains: `"seats":"${seats}"` } });
+    }
+
+    if (allows(engineL, ENGINE_LITER_OPTIONS)) {
+      andFilters.push({ detailsJson: { contains: `"engine_l":"${engineL}"` } });
+    }
+
+    if (allows(color, VEHICLE_COLOR_KEYS)) {
+      andFilters.push({ detailsJson: { contains: `"color":"${color}"` } });
+    }
+  }
+
+  if (applyImobiliareFilters) {
+    if (allows(rooms, RE_ROOM_COUNTS)) {
+      where.rooms = rooms;
+    }
+
+    if (Number.isFinite(areaMin) || Number.isFinite(areaMax)) {
+      where.areaSqm = {};
+      if (Number.isFinite(areaMin)) where.areaSqm.gte = areaMin;
+      if (Number.isFinite(areaMax)) where.areaSqm.lte = areaMax;
+    }
+
+    if (allows(propertyType, RE_PROPERTY_TYPE_FILTER)) {
+      andFilters.push({ detailsJson: { contains: `"property_type":"${propertyType}"` } });
+    }
+
+    if (allows(furnished, RE_FURNISHED_VALUES)) {
+      andFilters.push({ detailsJson: { contains: `"furnished":"${furnished}"` } });
+    }
+
+    if (allows(propertyCondition, RE_PROPERTY_CONDITION)) {
+      andFilters.push({ detailsJson: { contains: `"property_condition":"${propertyCondition}"` } });
+    }
+  }
+
+  if (applyElectronicsFilters) {
+    if (allows(productType, ELECTRONICS_PRODUCT_ALL)) {
+      andFilters.push({ detailsJson: { contains: `"product_type":"${productType}"` } });
+    }
+
+    if (allows(electronicsCondition, ELECTRONICS_CONDITION)) {
+      andFilters.push({ detailsJson: { contains: `"electronics_condition":"${electronicsCondition}"` } });
+    }
+
+    if (allows(storageGb, STORAGE_GB_FILTER_VALUES)) {
+      andFilters.push({ detailsJson: { contains: `"storage_gb":"${storageGb}"` } });
+    }
+
+    if (allows(color, VEHICLE_COLOR_KEYS)) {
+      andFilters.push({ detailsJson: { contains: `"color":"${color}"` } });
     }
   }
 
@@ -220,6 +303,18 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
           defaultYearMin={Number.isFinite(yearMin) ? String(yearMin) : ""}
           defaultYearMax={Number.isFinite(yearMax) ? String(yearMax) : ""}
           defaultMileageMax={Number.isFinite(mileageMax) ? String(mileageMax) : ""}
+          defaultSeats={seats ?? ""}
+          defaultEngineL={engineL ?? ""}
+          defaultColor={color ?? ""}
+          defaultRooms={rooms ?? ""}
+          defaultAreaMin={Number.isFinite(areaMin) ? String(areaMin) : ""}
+          defaultAreaMax={Number.isFinite(areaMax) ? String(areaMax) : ""}
+          defaultPropertyType={propertyType ?? ""}
+          defaultFurnished={furnished ?? ""}
+          defaultPropertyCondition={propertyCondition ?? ""}
+          defaultProductType={productType ?? ""}
+          defaultElectronicsCondition={electronicsCondition ?? ""}
+          defaultStorageGb={storageGb ?? ""}
           category={categorySlug}
         />
       }

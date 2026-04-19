@@ -3,6 +3,18 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import {
+  ELECTRONICS_CONDITION,
+  ELECTRONICS_PRODUCT_ALL,
+  ENGINE_LITER_OPTIONS,
+  RE_FURNISHED_VALUES,
+  RE_PROPERTY_CONDITION,
+  RE_PROPERTY_TYPE_FILTER,
+  RE_ROOM_COUNTS,
+  STORAGE_GB_FILTER_VALUES,
+  VEHICLE_COLOR_KEYS,
+  VEHICLE_SEAT_OPTIONS,
+} from "@/lib/listing-form-options";
+import {
   MOLDOVA_CITIES,
   VEHICLE_BODY_TYPE_VALUES,
   VEHICLE_BRANDS,
@@ -26,6 +38,18 @@ type Props = {
   defaultBodyType?: string;
   defaultDrivetrain?: string;
   defaultDoors?: string;
+  defaultSeats?: string;
+  defaultEngineL?: string;
+  defaultColor?: string;
+  defaultRooms?: string;
+  defaultAreaMin?: string;
+  defaultAreaMax?: string;
+  defaultPropertyType?: string;
+  defaultFurnished?: string;
+  defaultPropertyCondition?: string;
+  defaultProductType?: string;
+  defaultElectronicsCondition?: string;
+  defaultStorageGb?: string;
   defaultCondition?: string;
   defaultDistrict?: string;
   defaultYearMin?: string;
@@ -47,6 +71,18 @@ export function AnunturiFilters({
   defaultBodyType = "",
   defaultDrivetrain = "",
   defaultDoors = "",
+  defaultSeats = "",
+  defaultEngineL = "",
+  defaultColor = "",
+  defaultRooms = "",
+  defaultAreaMin = "",
+  defaultAreaMax = "",
+  defaultPropertyType = "",
+  defaultFurnished = "",
+  defaultPropertyCondition = "",
+  defaultProductType = "",
+  defaultElectronicsCondition = "",
+  defaultStorageGb = "",
   defaultCondition = "",
   defaultDistrict = "",
   defaultYearMin = "",
@@ -55,8 +91,11 @@ export function AnunturiFilters({
   category,
 }: Props) {
   const t = useTranslations("Listings.filters");
+  const tForm = useTranslations("ListingForm");
   const cur = defaultCurrency === "EUR" || defaultCurrency === "MDL" ? defaultCurrency : null;
   const isVehicleCategory = (category ?? "").startsWith("transport");
+  const isReCategory = (category ?? "").startsWith("imobiliare");
+  const isElectronicsCategory = (category ?? "").startsWith("electronice");
 
   return (
     <form method="get" className="surface-card space-y-4 p-4 sm:p-5">
@@ -152,6 +191,23 @@ export function AnunturiFilters({
             defaultValue={defaultMax}
             className="field-input mt-1"
           />
+        </div>
+      </div>
+      <div className="grid gap-3 md:grid-cols-3">
+        <div>
+          <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-condition-global">
+            {t("condition")}
+          </label>
+          <select
+            id="flt-condition-global"
+            name="condition"
+            defaultValue={defaultCondition}
+            className="field-input mt-1"
+          >
+            <option value="">{t("all")}</option>
+            <option value="used">{t("conditionUsed")}</option>
+            <option value="new">{t("conditionNew")}</option>
+          </select>
         </div>
       </div>
       {isVehicleCategory ? (
@@ -302,19 +358,218 @@ export function AnunturiFilters({
                   ))}
                 </select>
               </div>
+            </div>
+          </details>
+
+          <details open className="rounded-xl border border-zinc-200/90 bg-zinc-50/60 p-3">
+            <summary className="cursor-pointer list-none text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              {t("vehicleExtraSection")}
+            </summary>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
               <div>
-                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-condition">
-                  {t("condition")}
+                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-engine-l">
+                  {t("engineL")}
                 </label>
-                <select id="flt-condition" name="condition" defaultValue={defaultCondition} className="field-input mt-1">
+                <select id="flt-engine-l" name="engineL" defaultValue={defaultEngineL} className="field-input mt-1">
                   <option value="">{t("all")}</option>
-                  <option value="used">{t("conditionUsed")}</option>
-                  <option value="new">{t("conditionNew")}</option>
+                  {ENGINE_LITER_OPTIONS.map((v) => (
+                    <option key={v} value={v}>
+                      {tForm(`engine_l.${v}`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-seats">
+                  {t("seats")}
+                </label>
+                <select id="flt-seats" name="seats" defaultValue={defaultSeats} className="field-input mt-1">
+                  <option value="">{t("all")}</option>
+                  {VEHICLE_SEAT_OPTIONS.map((v) => (
+                    <option key={v} value={v}>
+                      {tForm(`seats.${v}`)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-color-veh">
+                  {t("color")}
+                </label>
+                <select id="flt-color-veh" name="color" defaultValue={defaultColor} className="field-input mt-1">
+                  <option value="">{t("all")}</option>
+                  {VEHICLE_COLOR_KEYS.map((v) => (
+                    <option key={v} value={v}>
+                      {tForm(`color.${v}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
           </details>
         </>
+      ) : null}
+
+      {isReCategory ? (
+        <details open className="rounded-xl border border-zinc-200/90 bg-zinc-50/60 p-3 dark:border-zinc-700/80 dark:bg-zinc-900/40">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            {t("realEstateSection")}
+          </summary>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-rooms">
+                {t("rooms")}
+              </label>
+              <select id="flt-rooms" name="rooms" defaultValue={defaultRooms} className="field-input mt-1">
+                <option value="">{t("all")}</option>
+                {RE_ROOM_COUNTS.map((v) => (
+                  <option key={v} value={v}>
+                    {v}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-area-min">
+                {t("areaMin")}
+              </label>
+              <input
+                id="flt-area-min"
+                name="areaMin"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                defaultValue={defaultAreaMin}
+                className="field-input mt-1"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-area-max">
+                {t("areaMax")}
+              </label>
+              <input
+                id="flt-area-max"
+                name="areaMax"
+                type="number"
+                inputMode="numeric"
+                min={0}
+                defaultValue={defaultAreaMax}
+                className="field-input mt-1"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-property-type">
+                {t("propertyType")}
+              </label>
+              <select id="flt-property-type" name="propertyType" defaultValue={defaultPropertyType} className="field-input mt-1">
+                <option value="">{t("all")}</option>
+                {RE_PROPERTY_TYPE_FILTER.map((v) => (
+                  <option key={v} value={v}>
+                    {tForm(`property_type.${v}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-furnished">
+                {t("furnished")}
+              </label>
+              <select id="flt-furnished" name="furnished" defaultValue={defaultFurnished} className="field-input mt-1">
+                <option value="">{t("all")}</option>
+                {RE_FURNISHED_VALUES.map((v) => (
+                  <option key={v} value={v}>
+                    {tForm(`furnished.${v}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-property-condition">
+                {t("propertyCondition")}
+              </label>
+              <select
+                id="flt-property-condition"
+                name="propertyCondition"
+                defaultValue={defaultPropertyCondition}
+                className="field-input mt-1"
+              >
+                <option value="">{t("all")}</option>
+                {RE_PROPERTY_CONDITION.map((v) => (
+                  <option key={v} value={v}>
+                    {tForm(`property_condition.${v}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </details>
+      ) : null}
+
+      {isElectronicsCategory ? (
+        <details open className="rounded-xl border border-zinc-200/90 bg-zinc-50/60 p-3 dark:border-zinc-700/80 dark:bg-zinc-900/40">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            {t("electronicsSection")}
+          </summary>
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-product-type">
+                {t("productType")}
+              </label>
+              <select id="flt-product-type" name="productType" defaultValue={defaultProductType} className="field-input mt-1">
+                <option value="">{t("all")}</option>
+                {ELECTRONICS_PRODUCT_ALL.map((v) => (
+                  <option key={v} value={v}>
+                    {tForm(`product_type.${v}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-electronics-condition">
+                {t("electronicsCondition")}
+              </label>
+              <select
+                id="flt-electronics-condition"
+                name="electronicsCondition"
+                defaultValue={defaultElectronicsCondition}
+                className="field-input mt-1"
+              >
+                <option value="">{t("all")}</option>
+                {ELECTRONICS_CONDITION.map((v) => (
+                  <option key={v} value={v}>
+                    {tForm(`electronics_condition.${v}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-storage-gb">
+                {t("storageGb")}
+              </label>
+              <select id="flt-storage-gb" name="storageGb" defaultValue={defaultStorageGb} className="field-input mt-1">
+                <option value="">{t("all")}</option>
+                {STORAGE_GB_FILTER_VALUES.map((v) => (
+                  <option key={v} value={v}>
+                    {`${v} GB`}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-color-el">
+                {t("color")}
+              </label>
+              <select id="flt-color-el" name="color" defaultValue={defaultColor} className="field-input mt-1">
+                <option value="">{t("all")}</option>
+                {VEHICLE_COLOR_KEYS.map((v) => (
+                  <option key={v} value={v}>
+                    {tForm(`color.${v}`)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </details>
       ) : null}
       <div className="flex flex-col gap-2 sm:flex-row">
         <button type="submit" className="btn-primary flex-1 sm:flex-none">
