@@ -28,10 +28,22 @@ export default async function AdminSupportListPage({ params }: Props) {
   const t = await getTranslations("Admin");
 
   const statusLabel = (s: string) => {
+    const key = `supportStatus_${String(s).toUpperCase()}` as "supportStatus_OPEN";
     try {
-      return t(`supportStatus_${s}` as "supportStatus_OPEN");
+      return t(key);
     } catch {
       return s || "UNKNOWN";
+    }
+  };
+
+  const formatUpdated = (last: Date | null, updated: Date, loc: string) => {
+    try {
+      const d = last ?? updated;
+      const dt = d instanceof Date ? d : new Date(d);
+      if (Number.isNaN(dt.getTime())) return "—";
+      return dt.toLocaleString(loc);
+    } catch {
+      return "—";
     }
   };
 
@@ -89,8 +101,8 @@ export default async function AdminSupportListPage({ params }: Props) {
               tickets.map((row: TicketRow) => (
                 <tr key={row.id} className="border-b border-zinc-100 transition hover:bg-zinc-50/80">
                   <td className="px-4 py-3 align-top">
-                    <p className="font-medium text-zinc-900">{row.user.email}</p>
-                    {row.user.name ? <p className="text-xs text-zinc-500">{row.user.name}</p> : null}
+                    <p className="font-medium text-zinc-900">{row.user?.email ?? "—"}</p>
+                    {row.user?.name ? <p className="text-xs text-zinc-500">{row.user.name}</p> : null}
                   </td>
                   <td className="px-4 py-3 align-top">
                     <span className="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-semibold text-zinc-800">
@@ -101,7 +113,7 @@ export default async function AdminSupportListPage({ params }: Props) {
                     <span className="line-clamp-2">{row.messages[0]?.body ?? "—"}</span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 align-top text-zinc-500">
-                    {(row.lastMessageAt ?? row.updatedAt).toLocaleString(locale)}
+                    {formatUpdated(row.lastMessageAt, row.updatedAt, locale)}
                   </td>
                   <td className="px-4 py-3 align-top">
                     <Link

@@ -51,14 +51,18 @@ export async function HomeLanding({ locale }: Props) {
 
   let favoritedIds = new Set<string>();
   if (session?.user?.id && listings.length > 0) {
-    const favs = await prisma.listingFavorite.findMany({
-      where: {
-        userId: session.user.id,
-        listingId: { in: listings.map((l) => l.id) },
-      },
-      select: { listingId: true },
-    });
-    favoritedIds = new Set(favs.map((f) => f.listingId));
+    try {
+      const favs = await prisma.listingFavorite.findMany({
+        where: {
+          userId: session.user.id,
+          listingId: { in: listings.map((l) => l.id) },
+        },
+        select: { listingId: true },
+      });
+      favoritedIds = new Set(favs.map((f) => f.listingId));
+    } catch (e) {
+      console.error("[home] favorites load error", e);
+    }
   }
 
   return (

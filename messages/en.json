@@ -334,6 +334,7 @@
     "browseAllCategories": "Browse full category tree",
     "openCategoryMap": "Category map",
     "subtitle": "Find the right listings quickly and filter by what matters most.",
+    "browseLoadError": "We couldn’t load listings from the database. Your ads are usually still saved — check server logs and Prisma/DB connectivity, then reload.",
     "resultsCount": "{count} results",
     "resultsHint": "Listings sorted by newest first.",
     "publishCta": "Post ad",

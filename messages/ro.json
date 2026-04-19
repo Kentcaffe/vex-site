@@ -334,6 +334,7 @@
     "browseAllCategories": "Vezi toate categoriile (structură completă)",
     "openCategoryMap": "Hartă categorii",
     "subtitle": "Găsește rapid anunțurile potrivite și filtrează după ce contează pentru tine.",
+    "browseLoadError": "Nu s-au putut încărca anunțurile din baza de date. De obicei anunțurile tale există în continuare — verifică logurile serverului și conexiunea Prisma/DB, apoi reîncarcă.",
     "resultsCount": "{count} rezultate",
     "resultsHint": "Anunțuri ordonate după cele mai noi publicări.",
     "publishCta": "Publică anunț",

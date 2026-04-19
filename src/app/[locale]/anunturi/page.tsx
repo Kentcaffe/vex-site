@@ -259,25 +259,34 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
     where.AND = andFilters;
   }
 
-  const [listingsRaw, allCats] = await Promise.all([
-    prisma.listing.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: 80,
-      select: asListingSelect({
-        id: true,
-        title: true,
-        price: true,
-        priceCurrency: true,
-        city: true,
-        district: true,
-        images: true,
-        categoryId: true,
+  let listings: ListingBrowseRow[] = [];
+  let allCats: Awaited<ReturnType<typeof getAllCategories>> = [];
+  let browseLoadError = false;
+  try {
+    const [listingsRaw, cats] = await Promise.all([
+      prisma.listing.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: 80,
+        select: asListingSelect({
+          id: true,
+          title: true,
+          price: true,
+          priceCurrency: true,
+          city: true,
+          district: true,
+          images: true,
+          categoryId: true,
+        }),
       }),
-    }),
-    getAllCategories(),
-  ]);
-  const listings = listingsRaw as unknown as ListingBrowseRow[];
+      getAllCategories(),
+    ]);
+    listings = listingsRaw as unknown as ListingBrowseRow[];
+    allCats = cats;
+  } catch (e) {
+    browseLoadError = true;
+    console.error("[anunturi] listing query failed", e);
+  }
 
   return (
     <BrowseShell
@@ -320,6 +329,11 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
       }
     >
       <div className="surface-card w-full min-w-0 p-4 sm:p-5">
+        {browseLoadError ? (
+          <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+            {t("browseLoadError")}
+          </div>
+        ) : null}
         <div className="mb-4 flex flex-col gap-3 border-b border-[var(--mp-border)] pb-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-600">

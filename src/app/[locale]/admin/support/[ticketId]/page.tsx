@@ -40,6 +40,19 @@ export default async function AdminSupportTicketPage({ params }: Props) {
 
   if (!ticket) notFound();
 
+  const userEmail = ticket.user?.email ?? "";
+  const userName = ticket.user?.name ?? null;
+  if (!userEmail) {
+    return (
+      <div>
+        <p className="text-zinc-700">{t("supportDbUnavailable")}</p>
+        <Link href="/admin/support" className="mt-4 inline-block text-sm font-semibold text-emerald-700 hover:underline">
+          ← {t("supportBack")}
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3">
@@ -49,15 +62,15 @@ export default async function AdminSupportTicketPage({ params }: Props) {
       </div>
       <h1 className="mt-4 text-2xl font-bold tracking-tight text-zinc-900">{t("supportDetailHeading")}</h1>
       <p className="mt-1 text-sm text-zinc-500">
-        {ticket.user.email}
-        {ticket.user.name ? ` · ${ticket.user.name}` : ""}
+        {userEmail}
+        {userName ? ` · ${userName}` : ""}
       </p>
 
       <div className="mt-6">
         <AdminSupportTicketClient
           ticketId={ticket.id}
           initialStatus={ticket.status}
-          userEmail={ticket.user.email}
+          userEmail={userEmail}
         />
       </div>
     </div>
