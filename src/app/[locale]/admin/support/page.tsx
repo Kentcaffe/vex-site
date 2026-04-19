@@ -27,8 +27,13 @@ export default async function AdminSupportListPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("Admin");
 
-  const statusLabel = (s: string) =>
-    t(`supportStatus_${s}` as "supportStatus_OPEN");
+  const statusLabel = (s: string) => {
+    try {
+      return t(`supportStatus_${s}` as "supportStatus_OPEN");
+    } catch {
+      return s || "UNKNOWN";
+    }
+  };
 
   let tickets: SupportListRow[] = [];
   let supportDbError = false;
@@ -89,7 +94,7 @@ export default async function AdminSupportListPage({ params }: Props) {
                   </td>
                   <td className="px-4 py-3 align-top">
                     <span className="inline-flex rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-semibold text-zinc-800">
-                      {statusLabel(row.status)}
+                      {statusLabel(String(row.status ?? ""))}
                     </span>
                   </td>
                   <td className="max-w-xs px-4 py-3 align-top text-zinc-600">
