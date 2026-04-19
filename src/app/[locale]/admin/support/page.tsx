@@ -1,7 +1,18 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import type { SupportTicketStatus } from "@/lib/support-enums";
 import { Link } from "@/i18n/navigation";
-import { prisma } from "@/lib/prisma";
+import { supportTicket } from "@/lib/prisma-delegates";
+
+/** Rând listă — tip explicit (Prisma 7 nu exportă `SupportTicketGetPayload` pe namespace-ul `Prisma`). */
+type SupportListRow = {
+  id: string;
+  status: SupportTicketStatus;
+  user: { email: string; name: string | null };
+  messages: { body: string }[];
+  lastMessageAt: Date | null;
+  updatedAt: Date;
+};
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -19,24 +30,37 @@ export default async function AdminSupportListPage({ params }: Props) {
   const statusLabel = (s: string) =>
     t(`supportStatus_${s}` as "supportStatus_OPEN");
 
-  const tickets = await prisma.supportTicket.findMany({
-    orderBy: [{ lastMessageAt: "desc" }, { updatedAt: "desc" }],
-    take: 200,
-    include: {
-      user: { select: { email: true, name: true } },
-      messages: {
-        orderBy: { createdAt: "desc" },
-        take: 1,
-        select: { body: true },
+  let tickets: SupportListRow[] = [];
+  let supportDbError = false;
+  try {
+    tickets = await supportTicket.findMany({
+      orderBy: [{ lastMessageAt: "desc" }, { updatedAt: "desc" }],
+      take: 200,
+      include: {
+        user: { select: { email: true, name: true } },
+        messages: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { body: true },
+        },
       },
-    },
-  });
+    });
+  } catch (e) {
+    console.error("[admin/support list]", e);
+    supportDbError = true;
+  }
   type TicketRow = (typeof tickets)[number];
 
   return (
     <div>
       <h1 className="text-2xl font-bold tracking-tight text-zinc-900">{t("supportTitle")}</h1>
       <p className="mt-2 max-w-2xl text-zinc-600">{t("supportSubtitle")}</p>
+
+      {supportDbError ? (
+        <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+          {t("supportDbUnavailable")}
+        </div>
+      ) : null}
 
       <div className="mt-8 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm">
         <table className="w-full min-w-[640px] border-collapse text-left text-sm">

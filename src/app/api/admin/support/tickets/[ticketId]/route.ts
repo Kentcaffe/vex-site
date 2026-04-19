@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { isStaff } from "@/lib/auth-roles";
-import { prisma } from "@/lib/prisma";
+import { supportTicket } from "@/lib/prisma-delegates";
 import { setTicketStatus } from "@/lib/support-chat";
 import { isSupportTicketStatus } from "@/lib/support-enums";
 
@@ -26,7 +26,7 @@ export async function PATCH(req: Request, { params }: Props) {
   if (!isSupportTicketStatus(status)) {
     return NextResponse.json({ error: "invalid_status" }, { status: 400 });
   }
-  const ticket = await prisma.supportTicket.findUnique({ where: { id: ticketId }, select: { id: true } });
+  const ticket = await supportTicket.findUnique({ where: { id: ticketId }, select: { id: true } });
   if (!ticket) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }

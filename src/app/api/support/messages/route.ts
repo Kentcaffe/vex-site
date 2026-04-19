@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { isStaff } from "@/lib/auth-roles";
-import { prisma } from "@/lib/prisma";
+import { supportTicket } from "@/lib/prisma-delegates";
 import {
   appendSupportMessage,
   assertTicketAccess,
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: access.error }, { status: access.error === "not_found" ? 404 : 403 });
   }
 
-  const full = await prisma.supportTicket.findUnique({
+  const full = await supportTicket.findUnique({
     where: { id: ticketId },
     select: { status: true, userId: true },
   });

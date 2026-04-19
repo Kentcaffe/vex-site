@@ -39,7 +39,7 @@ export async function POST(req: Request, { params }: Props) {
     content: trimmed,
   });
   if (!inserted.ok) {
-    return NextResponse.json({ error: inserted.error }, { status: 400 });
+    return NextResponse.json({ error: inserted.error }, { status: 500 });
   }
   const msg = inserted.message;
 

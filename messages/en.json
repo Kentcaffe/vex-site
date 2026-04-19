@@ -90,7 +90,9 @@
     "send": "Send",
     "hintEnter": "Enter to send · Shift+Enter for new line",
     "loadError": "We couldn’t load messages.",
-    "sendError": "We couldn’t send your message. Try again."
+    "sendError": "We couldn’t send your message. Try again.",
+    "ticketLoadError": "Live support isn’t available right now (database not migrated or service unavailable). Try again or email us.",
+    "retryTicket": "Try again"
   },
   "Home": {
     "title": "A local marketplace for classifieds and sales",
@@ -588,6 +590,7 @@
     "supportColUpdated": "Updated",
     "supportColAction": "Action",
     "supportEmpty": "No support tickets yet.",
+    "supportDbUnavailable": "Support tables aren’t available. Run Prisma migrations on the server (e.g. npx prisma migrate deploy) and reload.",
     "supportOpen": "Open",
     "supportDetailTitle": "Support ticket",
     "supportDetailHeading": "Support conversation",

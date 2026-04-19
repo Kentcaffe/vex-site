@@ -90,7 +90,9 @@
     "send": "Trimite",
     "hintEnter": "Enter trimite · Shift+Enter linie nouă",
     "loadError": "Nu am putut încărca mesajele.",
-    "sendError": "Nu am putut trimite mesajul. Încearcă din nou."
+    "sendError": "Nu am putut trimite mesajul. Încearcă din nou.",
+    "ticketLoadError": "Suportul live nu e disponibil momentan (baza de date nu e actualizată sau serviciul e indisponibil). Încearcă din nou sau scrie-ne pe email.",
+    "retryTicket": "Încearcă din nou"
   },
   "Home": {
     "title": "Marketplace local pentru anunțuri și vânzări",
@@ -588,6 +590,7 @@
     "supportColUpdated": "Actualizat",
     "supportColAction": "Acțiune",
     "supportEmpty": "Încă nu există tickete de suport.",
+    "supportDbUnavailable": "Tabelele de suport nu sunt disponibile. Rulează migrările Prisma pe server (ex.: npx prisma migrate deploy) și reîncarcă pagina.",
     "supportOpen": "Deschide",
     "supportDetailTitle": "Ticket suport",
     "supportDetailHeading": "Conversație suport",

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { supportMessage, supportTicket } from "@/lib/prisma-delegates";
 import type { SupportMessageSenderRole, SupportTicketStatus } from "@/lib/support-enums";
 
 const BODY_MAX = 6000;
@@ -12,7 +13,7 @@ export function normalizeSupportBody(raw: string): { ok: true; body: string } | 
 
 /** Un singur fir activ (deschis sau în așteptare) per utilizator. */
 export async function getOrCreateActiveSupportTicket(userId: string) {
-  const existing = await prisma.supportTicket.findFirst({
+  const existing = await supportTicket.findFirst({
     where: {
       userId,
       status: { in: ["OPEN", "PENDING"] },
@@ -20,13 +21,13 @@ export async function getOrCreateActiveSupportTicket(userId: string) {
     orderBy: { updatedAt: "desc" },
   });
   if (existing) return existing;
-  return prisma.supportTicket.create({
+  return supportTicket.create({
     data: { userId, status: "OPEN" },
   });
 }
 
 export async function assertTicketAccess(ticketId: string, userId: string, isStaff: boolean) {
-  const ticket = await prisma.supportTicket.findUnique({
+  const ticket = await supportTicket.findUnique({
     where: { id: ticketId },
     select: { id: true, userId: true, status: true, createdAt: true, lastMessageAt: true },
   });
@@ -45,7 +46,7 @@ export type SupportMessageDTO = {
 };
 
 export async function listSupportMessages(ticketId: string): Promise<SupportMessageDTO[]> {
-  const rows = await prisma.supportMessage.findMany({
+  const rows = await supportMessage.findMany({
     where: { ticketId },
     orderBy: { createdAt: "asc" },
     include: {
@@ -69,7 +70,9 @@ export async function appendSupportMessage(params: {
   body: string;
 }) {
   const msg = await prisma.$transaction(async (tx) => {
-    const created = await tx.supportMessage.create({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- delegate-urile pe `tx` lipsesc din unele cache-uri TS (vezi prisma-delegates).
+    const t = tx as any;
+    const created = await t.supportMessage.create({
       data: {
         ticketId: params.ticketId,
         senderId: params.senderId,
@@ -77,7 +80,7 @@ export async function appendSupportMessage(params: {
         body: params.body,
       },
     });
-    await tx.supportTicket.update({
+    await t.supportTicket.update({
       where: { id: params.ticketId },
       data: {
         lastMessageAt: new Date(),
@@ -94,7 +97,7 @@ export async function appendSupportMessage(params: {
 }
 
 export async function setTicketStatus(ticketId: string, status: SupportTicketStatus) {
-  await prisma.supportTicket.update({
+  await supportTicket.update({
     where: { id: ticketId },
     data: { status },
   });

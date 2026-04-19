@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
 import { otherContentReport } from "@/lib/prisma-delegates";
+import { countOpenSupportTicketsSafe } from "@/lib/support-db-safe";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -15,9 +16,7 @@ export default async function AdminDashboardPage({ params }: Props) {
   const [listingCount, userCount, supportOpen, lp, lr, ld, op, or, od] = await Promise.all([
     prisma.listing.count(),
     prisma.user.count(),
-    prisma.supportTicket.count({
-      where: { status: { in: ["OPEN", "PENDING"] } },
-    }),
+    countOpenSupportTicketsSafe(),
     prisma.listingReport.count({ where: { status: "PENDING" } }),
     prisma.listingReport.count({ where: { status: "REVIEWED" } }),
     prisma.listingReport.count({ where: { status: "DISMISSED" } }),

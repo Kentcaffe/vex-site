@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { Link } from "@/i18n/navigation";
 import { AdminSupportTicketClient } from "@/components/support";
-import { prisma } from "@/lib/prisma";
+import { supportTicket } from "@/lib/prisma-delegates";
 
 type Props = { params: Promise<{ locale: string; ticketId: string }> };
 
@@ -18,12 +18,25 @@ export default async function AdminSupportTicketPage({ params }: Props) {
   setRequestLocale(locale);
   const t = await getTranslations("Admin");
 
-  const ticket = await prisma.supportTicket.findUnique({
-    where: { id: ticketId },
-    include: {
-      user: { select: { email: true, name: true } },
-    },
-  });
+  let ticket;
+  try {
+    ticket = await supportTicket.findUnique({
+      where: { id: ticketId },
+      include: {
+        user: { select: { email: true, name: true } },
+      },
+    });
+  } catch (e) {
+    console.error("[admin/support ticket]", e);
+    return (
+      <div>
+        <p className="text-zinc-700">{t("supportDbUnavailable")}</p>
+        <Link href="/admin/support" className="mt-4 inline-block text-sm font-semibold text-emerald-700 hover:underline">
+          ← {t("supportBack")}
+        </Link>
+      </div>
+    );
+  }
 
   if (!ticket) notFound();
 

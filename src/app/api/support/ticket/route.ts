@@ -7,13 +7,18 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  const ticket = await getOrCreateActiveSupportTicket(session.user.id);
-  return NextResponse.json({
-    ticket: {
-      id: ticket.id,
-      status: ticket.status,
-      createdAt: ticket.createdAt.toISOString(),
-      lastMessageAt: ticket.lastMessageAt?.toISOString() ?? null,
-    },
-  });
+  try {
+    const ticket = await getOrCreateActiveSupportTicket(session.user.id);
+    return NextResponse.json({
+      ticket: {
+        id: ticket.id,
+        status: ticket.status,
+        createdAt: ticket.createdAt.toISOString(),
+        lastMessageAt: ticket.lastMessageAt?.toISOString() ?? null,
+      },
+    });
+  } catch (e) {
+    console.error("[GET /api/support/ticket]", e);
+    return NextResponse.json({ error: "service_unavailable" }, { status: 503 });
+  }
 }

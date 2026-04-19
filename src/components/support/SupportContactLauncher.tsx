@@ -13,9 +13,11 @@ export function SupportContactLauncher() {
   const [open, setOpen] = useState(false);
   const [ticketId, setTicketId] = useState<string | null>(null);
   const [loadingTicket, setLoadingTicket] = useState(false);
+  const [ticketError, setTicketError] = useState(false);
 
   const ensureTicket = useCallback(async () => {
     setLoadingTicket(true);
+    setTicketError(false);
     try {
       const res = await fetch("/api/support/ticket", { credentials: "include" });
       if (!res.ok) throw new Error("ticket");
@@ -23,6 +25,7 @@ export function SupportContactLauncher() {
       setTicketId(data.ticket.id);
     } catch {
       setTicketId(null);
+      setTicketError(true);
     } finally {
       setLoadingTicket(false);
     }
@@ -114,12 +117,27 @@ export function SupportContactLauncher() {
               </button>
             </div>
             <div className="min-h-0 flex-1 overflow-hidden bg-zinc-100/80 p-2 sm:p-3">
-              {loadingTicket || !ticketId ? (
+              {loadingTicket ? (
                 <div className="flex h-full min-h-[280px] items-center justify-center rounded-xl bg-white">
                   <div className="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" aria-hidden />
                 </div>
-              ) : (
+              ) : ticketError ? (
+                <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-4 rounded-xl bg-white px-4 text-center">
+                  <p className="text-sm text-zinc-700">{t("ticketLoadError")}</p>
+                  <button
+                    type="button"
+                    onClick={() => void ensureTicket()}
+                    className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-700"
+                  >
+                    {t("retryTicket")}
+                  </button>
+                </div>
+              ) : ticketId ? (
                 <SupportLiveChat variant="user" ticketId={ticketId} />
+              ) : (
+                <div className="flex h-full min-h-[280px] items-center justify-center rounded-xl bg-white">
+                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" aria-hidden />
+                </div>
               )}
             </div>
           </div>
