@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import type { SupportTicketStatus } from "@/lib/support-enums";
+import { SUPPORT_TICKET_STATUSES, type SupportTicketStatus } from "@/lib/support-enums";
 import { SupportLiveChat } from "@/components/support/SupportLiveChat";
 
 type Props = {
@@ -40,7 +40,7 @@ export function AdminSupportTicketClient({ ticketId, initialStatus, userEmail }:
           onChange={(e) => void changeStatus(e.target.value as SupportTicketStatus)}
           className="min-h-[44px] rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm font-medium text-zinc-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
         >
-          {(["OPEN", "PENDING", "RESOLVED", "CLOSED"] as const).map((s) => (
+          {SUPPORT_TICKET_STATUSES.map((s) => (
             <option key={s} value={s}>
               {t(`supportStatus_${s}`)}
             </option>

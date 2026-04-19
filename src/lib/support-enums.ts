@@ -1,5 +1,5 @@
 /** Aliniat la `schema.prisma` — folosit unde vrem tipuri stabile fără a depinde de regenerarea clientului. */
-export const SUPPORT_TICKET_STATUSES = ["OPEN", "PENDING", "RESOLVED", "CLOSED"] as const;
+export const SUPPORT_TICKET_STATUSES = ["OPEN", "RESOLVED", "CLOSED"] as const;
 export type SupportTicketStatus = (typeof SUPPORT_TICKET_STATUSES)[number];
 
 export const SUPPORT_MESSAGE_SENDER_ROLES = ["USER", "STAFF"] as const;

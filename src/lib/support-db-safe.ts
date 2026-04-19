@@ -4,7 +4,7 @@ import { supportTicket } from "@/lib/prisma-delegates";
 export async function countOpenSupportTicketsSafe(): Promise<number> {
   try {
     return await supportTicket.count({
-      where: { status: { in: ["OPEN", "PENDING"] } },
+      where: { status: "OPEN" },
     });
   } catch (e) {
     console.error("[countOpenSupportTicketsSafe]", e);

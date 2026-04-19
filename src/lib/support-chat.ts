@@ -12,7 +12,7 @@ export function normalizeSupportBody(raw: string): { ok: true; body: string } | 
   return { ok: true, body };
 }
 
-/** Un singur fir activ (deschis sau în așteptare) per utilizator. */
+/** Un singur fir activ (OPEN) per utilizator. */
 export async function getOrCreateActiveSupportTicket(userId: string) {
   try {
     const existing = await supportTicket.findFirst({
@@ -104,10 +104,7 @@ export async function appendSupportMessage(params: {
         data: {
           lastMessageAt: new Date(),
           updatedAt: new Date(),
-          status:
-            params.senderRole === "USER"
-              ? ("PENDING" as SupportTicketStatus)
-              : ("OPEN" as SupportTicketStatus),
+          status: "OPEN" as SupportTicketStatus,
         },
       });
       return created;
