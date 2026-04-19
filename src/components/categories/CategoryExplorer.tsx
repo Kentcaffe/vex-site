@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
 import { CATEGORY_ROOT_EMOJI } from "@/lib/category-icons";
+import { getSubcategoryLucideIcon } from "@/lib/category-subcategory-icons";
 import { getAllCategories } from "@/lib/category-queries";
 
 type Cat = {
@@ -105,41 +106,56 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
 
         <main className="surface-card min-w-0 flex-1 p-4 sm:p-6">
           <h1 className="text-xl font-bold text-zinc-950 sm:text-2xl">{rootTitle}</h1>
-          <div className="mt-6 space-y-8">
+          <div className="mt-6 space-y-10">
             {sections.map((section) => {
               const sectionTitle = labelFromJson(section.labels, locale);
               if (section.children.length > 0) {
                 return (
-                  <section key={section.id}>
-                    <details open className="group">
-                      <summary className="flex cursor-pointer list-none items-center justify-between border-b border-zinc-200 pb-2 text-base font-bold text-zinc-950">
-                        <span>{sectionTitle}</span>
-                        <span className="rounded-md bg-zinc-200 px-2 py-0.5 text-xs font-bold text-zinc-800 group-open:hidden">+</span>
-                        <span className="hidden rounded-md bg-zinc-200 px-2 py-0.5 text-xs font-bold text-zinc-800 group-open:inline">−</span>
-                      </summary>
-                      <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
-                      {section.children.map((leaf) => (
-                        <li key={leaf.id} className="min-h-[44px]">
-                          <Link
-                            href={`/anunturi?category=${encodeURIComponent(leaf.slug)}`}
-                            className="flex min-h-[44px] items-center rounded-lg px-3 py-2 text-base font-medium leading-snug text-zinc-900 active:bg-zinc-100 lg:min-h-0 lg:text-sm lg:hover:text-emerald-800 lg:hover:underline"
-                          >
-                            {labelFromJson(leaf.labels, locale)}
-                          </Link>
-                        </li>
-                      ))}
-                      </ul>
-                    </details>
+                  <section key={section.id} aria-labelledby={`cat-section-${section.id}`}>
+                    <h2 id={`cat-section-${section.id}`} className="mb-4 text-lg font-bold tracking-tight text-zinc-950 sm:text-xl">
+                      {sectionTitle}
+                    </h2>
+                    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {section.children.map((leaf) => {
+                        const Icon = getSubcategoryLucideIcon(leaf.slug);
+                        const leafTitle = labelFromJson(leaf.labels, locale);
+                        return (
+                          <li key={leaf.id}>
+                            <Link
+                              href={`/anunturi?category=${encodeURIComponent(leaf.slug)}`}
+                              className="group flex min-h-[44px] items-center gap-3 rounded-xl border border-zinc-200/90 bg-zinc-50/40 px-4 py-3 shadow-sm transition-[background-color,box-shadow,border-color] hover:border-zinc-300 hover:bg-white hover:shadow-md active:bg-zinc-100"
+                            >
+                              <span
+                                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100/80"
+                                aria-hidden
+                              >
+                                <Icon className="h-6 w-6 shrink-0" strokeWidth={1.75} />
+                              </span>
+                              <span className="min-w-0 flex-1 text-base font-medium leading-snug text-zinc-900">
+                                {leafTitle}
+                              </span>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
                   </section>
                 );
               }
+              const SectionIcon = getSubcategoryLucideIcon(section.slug);
               return (
                 <section key={section.id}>
                   <Link
                     href={`/anunturi?category=${encodeURIComponent(section.slug)}`}
-                    className="flex min-h-[48px] items-center text-lg font-bold text-emerald-800 active:opacity-90 lg:inline lg:min-h-0 lg:text-base lg:hover:underline"
+                    className="group flex min-h-[44px] items-center gap-3 rounded-xl border border-zinc-200/90 bg-zinc-50/40 px-4 py-3 shadow-sm transition-[background-color,box-shadow,border-color] hover:border-zinc-300 hover:bg-white hover:shadow-md active:bg-zinc-100 sm:max-w-xl"
                   >
-                    {sectionTitle}
+                    <span
+                      className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100/80"
+                      aria-hidden
+                    >
+                      <SectionIcon className="h-6 w-6 shrink-0" strokeWidth={1.75} />
+                    </span>
+                    <span className="min-w-0 flex-1 text-base font-semibold leading-snug text-zinc-900">{sectionTitle}</span>
                   </Link>
                 </section>
               );
