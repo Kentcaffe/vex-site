@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getOrCreateActiveSupportTicket } from "@/lib/support-chat";
-import { serializeSupportDbError, supportApiDebugEnabled } from "@/lib/support-db-log";
 
 export async function GET() {
   const session = await auth();
@@ -18,11 +17,9 @@ export async function GET() {
         lastMessageAt: ticket.lastMessageAt?.toISOString() ?? null,
       },
     });
-  } catch (e) {
-    const body: Record<string, unknown> = { error: "service_unavailable" };
-    if (supportApiDebugEnabled()) {
-      body.debug = serializeSupportDbError(e);
-    }
-    return NextResponse.json(body, { status: 503 });
+  } catch (err) {
+    console.error("[GET /api/support/ticket]", err);
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }
 }
