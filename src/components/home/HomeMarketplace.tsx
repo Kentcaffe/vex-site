@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { ChevronRight, MapPin, Search, Sparkles } from "lucide-react";
+import { ChevronRight, MapPin, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
@@ -11,6 +11,8 @@ import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceh
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import type { PriceCurrencyCode } from "@/lib/currency";
 import { listingSeoPath } from "@/lib/seo";
+import { localizedHref } from "@/lib/paths";
+import { HomeHeroSearchForm } from "@/components/home/HomeHeroSearchForm";
 
 type LabelJson = { ro?: string; ru?: string; en?: string };
 
@@ -51,8 +53,8 @@ export async function HomeMarketplace({
   loadError = false,
 }: Props) {
   const t = await getTranslations("Home.marketplace");
-  const tNav = await getTranslations("Nav");
   const tList = await getTranslations("Listings");
+  const anunturiAction = localizedHref(locale, "/anunturi");
 
   return (
     <div className="app-shell app-section w-full min-w-0 pb-8 md:pb-10">
@@ -84,31 +86,7 @@ export async function HomeMarketplace({
             </Link>
           </div>
 
-          <form action="/anunturi" method="get" className="relative z-10 mt-6">
-            <label htmlFor="home-search" className="sr-only">
-              Caută
-            </label>
-            <div className="relative flex items-center gap-2 rounded-2xl border border-white/25 bg-white p-1.5 shadow-inner sm:rounded-3xl sm:p-2">
-              <span className="pointer-events-none flex h-11 w-11 shrink-0 items-center justify-center text-orange-600" aria-hidden>
-                <Search className="h-5 w-5" strokeWidth={2.25} />
-              </span>
-              <input
-                id="home-search"
-                type="search"
-                name="search"
-                placeholder="Caută anunțuri, categorii, oraș…"
-                className="min-h-[48px] w-full min-w-0 flex-1 border-0 bg-transparent pr-3 text-base text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-0"
-                autoComplete="off"
-              />
-              <button
-                type="submit"
-                className="hidden shrink-0 rounded-xl bg-[#9a3412] px-5 py-3 text-base font-semibold text-white shadow-[var(--mp-shadow-md)] transition hover:bg-[#7c2d12] sm:inline-flex"
-              >
-                {tNav("searchSubmit")}
-              </button>
-            </div>
-            <p className="mt-2 text-center text-sm text-amber-100 sm:text-left">Ex.: mașini, telefoane, chirie — direct pe telefon.</p>
-          </form>
+          <HomeHeroSearchForm action={anunturiAction} />
         </div>
       </section>
 

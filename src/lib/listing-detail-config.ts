@@ -287,7 +287,7 @@ export function sanitizeColumnPayload(
 }
 
 export function getListingSpecEntries(
-  _categorySlug: string,
+  categorySlug: string,
   listing: ListingSpecsSource,
   tDetail: (key: string) => string,
 ): { label: string; value: string }[] {
@@ -307,10 +307,15 @@ export function getListingSpecEntries(
   add("spec.rooms", listing.rooms);
   add("spec.areaSqm", listing.areaSqm);
 
+  const allowedDetailKeys = new Set(getDetailFieldsForSlug(categorySlug).map((f) => f.id));
+
   if (listing.detailsJson) {
     try {
       const obj = JSON.parse(listing.detailsJson) as Record<string, unknown>;
       for (const [key, raw] of Object.entries(obj)) {
+        if (!allowedDetailKeys.has(key)) {
+          continue;
+        }
         if (raw === null || raw === undefined || raw === "") {
           continue;
         }
