@@ -63,16 +63,16 @@
     "title": "Contact",
     "subtitle": "Alege canalul care ți se potrivește — răspundem cât mai repede în timpul programului.",
     "emailSupportTitle": "Suport tehnic",
-    "emailSupportBody": "Pentru probleme la cont, autentificare, anunțuri blocate sau erori pe site.",
+    "emailSupportBody": "Pentru probleme legate de cont, autentificare, anunțuri sau erori pe platformă, ne poți contacta direct prin email.",
     "emailGeneralTitle": "Informații generale",
     "emailGeneralBody": "Pentru colaborări, presă sau alte solicitări care nu țin de suport tehnic.",
-    "regionNote": "Echipa operează din Republica Moldova; orele de răspuns pot varia în weekend și sărbători."
+    "regionNote": "Echipa noastră operează din Republica Moldova, iar timpul de răspuns poate varia în weekend și în zilele de sărbătoare."
   },
   "Support": {
     "liveBadge": "Live",
     "contactSectionTitle": "Live chat cu echipa",
-    "contactSectionLead": "Răspuns direct în chat, fără să ieși din site. Ideal pentru întrebări rapide despre cont, plată sau moderare.",
-    "contactSectionHint": "Trebuie să fii autentificat. Conversația este privată și separată de mesajele pentru anunțuri.",
+    "contactSectionLead": "Primești răspuns rapid direct în chat, fără să părăsești site-ul. Ideal pentru întrebări legate de cont, anunțuri sau alte situații urgente.",
+    "contactSectionHint": "Conversațiile sunt confidențiale și gestionate de echipa noastră de suport. Pentru a utiliza chat-ul, este necesar să fii autentificat.",
     "openChat": "Deschide chatul",
     "loginToChat": "Autentifică-te pentru chat",
     "dialogTitle": "Suport live",
@@ -207,7 +207,7 @@
       "title": "Cum funcționează VEX",
       "p1": "Creezi un cont sau te autentifici, alegi categoria potrivită și publici anunțul cu poze și detalii. Cumpărătorii te pot contacta prin mesaje pe platformă.",
       "p2": "Nu percepem comision la publicare pentru anunțurile obișnuite; verifică mereu termenii actuali în pagina Termeni.",
-      "p3": "Pentru întrebări despre cont sau probleme tehnice: support@vex.md. Pentru colaborări: contact@vex.md."
+      "p3": "Pentru întrebări despre cont sau probleme tehnice: asistenta@vex.md. Pentru colaborări: contact@vex.md."
     },
     "faq": {
       "metaTitle": "Întrebări frecvente",
@@ -218,7 +218,7 @@
       "q2": "Cum mă contactează cineva?",
       "a2": "Prin sistemul de mesaje după ce ești autentificat, sau prin datele pe care le alegi să le afișezi în anunț (ex. telefon).",
       "q3": "Cum șterg contul sau datele?",
-      "a3": "Din setările contului și conform paginii Ștergere date (GDPR). Pentru ajutor: support@vex.md."
+      "a3": "Din setările contului și conform paginii Ștergere date (GDPR). Pentru ajutor: asistenta@vex.md."
     },
     "antiFraud": {
       "metaTitle": "Sfaturi anti-fraudă",
@@ -230,7 +230,7 @@
       "tip3": "Nu trimite coduri SMS, parole sau date bancare prin chat.",
       "tip4": "Bănuiești un anunț fals? Folosește „Raportează” pe pagina anunțului.",
       "tip5": "Prețuri mult sub piață sau presiune pentru decizie rapidă = semnal de alarmă.",
-      "outro": "În caz de încercare de fraudă, păstrează capturi de ecran și contactează support@vex.md."
+      "outro": "În caz de încercare de fraudă, păstrează capturi de ecran și contactează asistenta@vex.md."
     },
     "cookies": {
       "metaTitle": "Politica cookie",
@@ -239,7 +239,7 @@
       "p1": "Site-ul poate folosi cookie-uri necesare pentru funcționare (sesiune, autentificare, securitate) și, unde este cazul, pentru preferințe sau analiză agregată.",
       "p2": "Poți controla cookie-urile din setările browserului; limitarea cookie-urilor poate afecta unele funcții (ex. menținerea sesiunii).",
       "p3": "Pentru date personale asociate contului, vezi Politica de confidențialitate și pagina Ștergere date.",
-      "p4": "Întrebări: contact@vex.md sau support@vex.md."
+      "p4": "Întrebări: contact@vex.md sau asistenta@vex.md."
     },
     "reportAd": {
       "metaTitle": "Raportează un anunț",

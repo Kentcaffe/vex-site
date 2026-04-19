@@ -35,8 +35,8 @@ export async function SiteFooter() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@vex.md" className={mailClass}>
-                  support@vex.md
+                <a href="mailto:asistenta@vex.md" className={mailClass}>
+                  asistenta@vex.md
                 </a>
                 <span className="mt-0.5 block text-[11px] text-zinc-500">{t("emailSupportHint")}</span>
               </li>

@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = `${t("pageTitle")} | VEX`;
   return {
     title,
-    description: "Ștergerea datelor personale pe VEX (vex.md) — cereri GDPR, termene, contact support@vex.md.",
+    description: "Ștergerea datelor personale pe VEX (vex.md) — cereri GDPR, termene, contact asistenta@vex.md.",
     openGraph: { title, type: "article" },
   };
 }

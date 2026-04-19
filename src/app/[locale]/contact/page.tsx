@@ -34,8 +34,8 @@ export default async function ContactPage({ params }: Props) {
           </div>
           <h2 className="mt-4 text-lg font-bold text-zinc-900">{t("emailSupportTitle")}</h2>
           <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("emailSupportBody")}</p>
-          <a href="mailto:support@vex.md" className="mt-4 inline-flex min-h-[44px] items-center text-base font-semibold text-orange-700 underline-offset-4 hover:underline">
-            support@vex.md
+          <a href="mailto:asistenta@vex.md" className="mt-4 inline-flex min-h-[44px] items-center text-base font-semibold text-orange-700 underline-offset-4 hover:underline">
+            asistenta@vex.md
           </a>
         </div>
         <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-[var(--mp-shadow-md)]">

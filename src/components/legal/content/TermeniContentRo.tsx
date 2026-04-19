@@ -41,8 +41,8 @@ export function TermeniContentRo() {
         <p>
           Pentru anumite funcții (publicare, mesagerie, favorite etc.) poate fi necesară crearea unui cont cu date valide (de exemplu e-mail, număr de telefon). Sunteți responsabil(ă)
           pentru păstrarea confidențialității credențialelor și pentru toate acțiunile efectuate prin contul dumneavoastră. Ne puteți notifica imediat la{" "}
-          <a href="mailto:support@vex.md" className="font-medium text-[#2563eb] underline hover:no-underline">
-            support@vex.md
+          <a href="mailto:asistenta@vex.md" className="font-medium text-[#2563eb] underline hover:no-underline">
+            asistenta@vex.md
           </a>{" "}
           dacă suspectați utilizare neautorizată.
         </p>
@@ -130,8 +130,8 @@ export function TermeniContentRo() {
         <h2 className={h2Class}>12. Contact</h2>
         <p>
           Pentru întrebări legate de acești Termeni și Condiții:{" "}
-          <a href="mailto:support@vex.md" className="font-semibold text-[#2563eb] underline hover:no-underline">
-            support@vex.md
+          <a href="mailto:asistenta@vex.md" className="font-semibold text-[#2563eb] underline hover:no-underline">
+            asistenta@vex.md
           </a>
         </p>
       </section>

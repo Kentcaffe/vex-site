@@ -22,8 +22,8 @@ export function StergereDateContentRo() {
         <h3 className="mt-6 text-base font-semibold text-zinc-800 dark:text-zinc-200">b) Prin e-mail</h3>
         <p className="mt-2">
           Puteți trimite o cerere la{" "}
-          <a href="mailto:support@vex.md" className="font-semibold text-[#2563eb] underline hover:no-underline">
-            support@vex.md
+          <a href="mailto:asistenta@vex.md" className="font-semibold text-[#2563eb] underline hover:no-underline">
+            asistenta@vex.md
           </a>{" "}
           folosind adresa de e-mail asociată contului (sau identificarea necesară pentru a vă verifica identitatea). Includeți subiectul clar, de exemplu: „Cerere ștergere date GDPR
           — VEX”.
@@ -73,8 +73,8 @@ export function StergereDateContentRo() {
         <h2 className={h2Class}>6. Contact</h2>
         <p>
           Pentru cereri de ștergere și întrebări legate de prelucrarea datelor:{" "}
-          <a href="mailto:support@vex.md" className="font-semibold text-[#2563eb] underline hover:no-underline">
-            support@vex.md
+          <a href="mailto:asistenta@vex.md" className="font-semibold text-[#2563eb] underline hover:no-underline">
+            asistenta@vex.md
           </a>
         </p>
       </section>
