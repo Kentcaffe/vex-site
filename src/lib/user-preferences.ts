@@ -20,7 +20,7 @@ export const defaultUserPreferences: UserPrefsShape = {
   notifyEmail: true,
   notifyPush: true,
   notifyMessages: true,
-  theme: "system",
+  theme: "light",
   currency: "MDL",
   profileVisibility: "registered",
   showEmailPublic: false,
@@ -38,8 +38,7 @@ export function parsePreferences(raw: Prisma.JsonValue | null | undefined): User
     notifyEmail: typeof o.notifyEmail === "boolean" ? o.notifyEmail : defaultUserPreferences.notifyEmail,
     notifyPush: typeof o.notifyPush === "boolean" ? o.notifyPush : defaultUserPreferences.notifyPush,
     notifyMessages: typeof o.notifyMessages === "boolean" ? o.notifyMessages : defaultUserPreferences.notifyMessages,
-    theme:
-      o.theme === "light" || o.theme === "dark" || o.theme === "system" ? o.theme : defaultUserPreferences.theme,
+    theme: "light",
     currency: typeof o.currency === "string" && o.currency.length > 0 ? o.currency : defaultUserPreferences.currency,
     profileVisibility:
       o.profileVisibility === "everyone" || o.profileVisibility === "registered" || o.profileVisibility === "minimal"

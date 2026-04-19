@@ -111,20 +111,20 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
       <div className="surface-card w-full min-w-0 p-4 sm:p-5">
         <div className="mb-4 flex flex-col gap-3 border-b border-[var(--mp-border)] pb-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#374151] dark:text-[#9ca3af]">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-600">
               {t("resultsCount", { count: listings.length })}
             </p>
-            <p className="mt-1 text-base text-[#374151] dark:text-[#d1d5db]">
+            <p className="mt-1 text-base text-zinc-700">
               {searchQ ? `${t("filters.search")}: ${searchQ}` : t("resultsHint")}
             </p>
           </div>
-          <Link href="/publica" className="btn-primary">
+          <Link href="/publica" className="btn-primary hidden min-h-[44px] md:inline-flex">
             {t("publishCta")}
           </Link>
         </div>
 
         {listings.length === 0 ? (
-          <div className="surface-muted p-8 text-center text-sm text-zinc-500 dark:text-zinc-400">{t("empty")}</div>
+          <div className="surface-muted p-8 text-center text-sm text-zinc-600">{t("empty")}</div>
         ) : (
           <ul className="space-y-4">
             {listings.map((item, index) => {
@@ -134,10 +134,10 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
                 <li key={item.id}>
                   <Link
                     href={`/anunturi/${item.id}`}
-                    className="group flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-4 shadow-[var(--mp-shadow-md)] transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)] dark:hover:border-orange-800/80 sm:flex-row"
+                    className="group flex w-full min-w-0 flex-col gap-4 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-4 shadow-[var(--mp-shadow-md)] transition hover:-translate-y-0.5 hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)] sm:flex-row"
                   >
                     {cover ? (
-                      <div className="h-48 overflow-hidden rounded-[14px] border border-zinc-200 bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 sm:h-36 sm:w-44 sm:shrink-0">
+                      <div className="h-48 overflow-hidden rounded-[14px] border border-zinc-200 bg-zinc-100 sm:h-36 sm:w-44 sm:shrink-0">
                         <ListingCoverImg
                           src={cover}
                           alt=""
@@ -146,21 +146,21 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
                         />
                       </div>
                     ) : (
-                      <div className="h-48 w-full min-w-0 overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-zinc-200 dark:bg-zinc-800 sm:h-36 sm:w-44 sm:shrink-0">
+                      <div className="h-48 w-full min-w-0 overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-zinc-200 sm:h-36 sm:w-44 sm:shrink-0">
                         <ListingImagePlaceholder title={t("cardNoImageTitle")} hint={t("cardNoImageHint")} />
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-start justify-between gap-3">
-                        <h2 className="max-w-2xl text-base font-bold leading-snug text-[#111827] transition group-hover:text-[#c2410c] dark:text-[#f9fafb] dark:group-hover:text-orange-400 sm:text-lg">
+                        <h2 className="max-w-2xl text-base font-bold leading-snug text-zinc-900 transition group-hover:text-[#c2410c] sm:text-lg">
                           {item.title}
                         </h2>
-                        <span className="shrink-0 rounded-full bg-orange-100 px-3 py-1.5 text-base font-bold text-[#9a3412] dark:bg-orange-950 dark:text-orange-300">
+                        <span className="shrink-0 rounded-full bg-orange-100 px-3 py-1.5 text-base font-bold text-[#9a3412]">
                           {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
                         </span>
                       </div>
-                      <p className="mt-2 text-xs font-medium uppercase tracking-wide text-[#374151] dark:text-[#9ca3af]">{path}</p>
-                      <p className="mt-3 text-base leading-relaxed text-[#374151] dark:text-[#d1d5db]">
+                      <p className="mt-2 text-xs font-medium uppercase tracking-wide text-zinc-600">{path}</p>
+                      <p className="mt-3 text-base leading-relaxed text-zinc-700">
                         {item.city}
                         {item.district ? ` · ${item.district}` : ""}
                       </p>

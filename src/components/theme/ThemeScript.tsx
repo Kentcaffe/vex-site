@@ -1,5 +1,5 @@
-/** Evită flash la încărcare — trebuie înainte de paint. */
+/** Tema fixă light — rulează înainte de paint (fără flash dark / fără conflict cu preferințe sistem). */
 export function ThemeScript() {
-  const code = `(function(){try{var k='vex-theme';var t=localStorage.getItem(k);var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var r=document.documentElement;r.classList.toggle('dark',d);r.style.colorScheme=d?'dark':'light';}catch(e){}})();`;
+  const code = `(function(){try{var r=document.documentElement;r.classList.remove('dark');r.style.colorScheme='light';localStorage.setItem('vex-theme','light');}catch(e){}})();`;
   return <script dangerouslySetInnerHTML={{ __html: code }} />;
 }

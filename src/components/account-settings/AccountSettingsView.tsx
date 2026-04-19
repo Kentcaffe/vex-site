@@ -97,19 +97,6 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
     }
   }, [delState, locale, t, toast]);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    if (prefs.theme === "dark") {
-      root.classList.add("dark");
-    } else if (prefs.theme === "light") {
-      root.classList.remove("dark");
-    } else {
-      const mq = window.matchMedia("(prefers-color-scheme: dark)");
-      if (mq.matches) root.classList.add("dark");
-      else root.classList.remove("dark");
-    }
-  }, [prefs.theme]);
-
   async function savePrefsPatch(patch: Partial<UserPrefsShape>) {
     const next = { ...prefs, ...patch };
     setPrefs(next);
@@ -164,9 +151,9 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
 
   return (
     <div className="app-shell app-section">
-      <header className="mb-8 text-zinc-900 dark:text-zinc-50 lg:mb-10">
+      <header className="mb-8 text-zinc-900 lg:mb-10">
         <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("title")}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{t("subtitle")}</p>
+        <p className="mt-2 max-w-2xl text-base leading-relaxed text-zinc-600">{t("subtitle")}</p>
       </header>
 
       <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
@@ -179,10 +166,10 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
                   key={id}
                   type="button"
                   onClick={() => setSection(id)}
-                  className={`flex min-w-[9.5rem] shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors lg:min-w-0 lg:w-full ${
+                  className={`flex min-h-[44px] min-w-[9.5rem] shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors lg:min-w-0 lg:w-full ${
                     isActive
-                      ? "bg-emerald-100 text-emerald-950 ring-1 ring-emerald-200/90 dark:bg-emerald-950/55 dark:text-emerald-200 dark:ring-emerald-800"
-                      : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                      ? "bg-emerald-100 text-emerald-950 ring-1 ring-emerald-200/90"
+                      : "text-zinc-700 hover:bg-zinc-100"
                   }`}
                 >
                   <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />

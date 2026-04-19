@@ -2,7 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { accountLabelClass, accountSelectClass } from "@/components/account-settings/account-ui-classes";
 import { SectionShell } from "@/components/account-settings/SectionShell";
 import { routing } from "@/i18n/routing";
-import type { ThemePref, UserPrefsShape } from "@/lib/user-preferences";
+import type { UserPrefsShape } from "@/lib/user-preferences";
 import { usePathname, useRouter } from "@/i18n/navigation";
 
 type Props = {
@@ -37,33 +37,6 @@ export function PreferencesSection({ prefs, setPrefs, savePrefsPatch }: Props) {
           </select>
         </div>
         <div>
-          <label className={accountLabelClass}>{t("preferences.theme")}</label>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {(
-              [
-                ["light", t("preferences.themeLight")],
-                ["dark", t("preferences.themeDark")],
-                ["system", t("preferences.themeSystem")],
-              ] as const
-            ).map(([val, lab]) => (
-              <button
-                key={val}
-                type="button"
-                onClick={() => {
-                  setPrefs((p) => ({ ...p, theme: val as ThemePref }));
-                }}
-                className={`rounded-full px-4 py-1.5 text-xs font-semibold transition-colors ${
-                  prefs.theme === val
-                    ? "bg-[#0b57d0] text-white"
-                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300"
-                }`}
-              >
-                {lab}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div>
           <label className={accountLabelClass}>{t("preferences.currency")}</label>
           <select
             value={prefs.currency}
@@ -80,7 +53,7 @@ export function PreferencesSection({ prefs, setPrefs, savePrefsPatch }: Props) {
         <button
           type="button"
           onClick={() => void savePrefsPatch(prefs)}
-          className="w-fit rounded-xl bg-[#0b57d0] px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#0842a0]"
+          className="inline-flex min-h-[44px] min-w-[120px] items-center justify-center rounded-xl bg-[#0b57d0] px-5 text-sm font-semibold text-white shadow-sm hover:bg-[#0842a0]"
         >
           {t("preferences.save")}
         </button>

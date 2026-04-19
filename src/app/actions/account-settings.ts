@@ -73,7 +73,7 @@ export async function updateUserPreferences(
   }
 
   const current = parsePreferences(user.preferences);
-  const merged = mergePreferences(current, patch as Partial<UserPrefsShape>);
+  const merged = mergePreferences(current, { ...patch, theme: "light" } as Partial<UserPrefsShape>);
   const withLog = pushActivity(merged, "preferences_updated");
   const json = JSON.parse(JSON.stringify(withLog)) as Prisma.InputJsonValue;
 

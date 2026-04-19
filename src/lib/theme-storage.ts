@@ -26,25 +26,24 @@ export function setStoredTheme(mode: StoredTheme | null): void {
   }
 }
 
-/** Aplică clasa `dark` pe `<html>` după preferință stocată sau sistem. */
+/** Aplicația folosește exclusiv tema light pe `<html>`. */
 export function applyThemeFromStorage(): void {
   if (typeof document === "undefined") return;
   const root = document.documentElement;
-  const stored = getStoredTheme();
-  const prefersDark =
-    typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const dark = stored === "dark" || (stored !== "light" && prefersDark);
-  root.classList.toggle("dark", dark);
-  root.style.colorScheme = dark ? "dark" : "light";
+  root.classList.remove("dark");
+  root.style.colorScheme = "light";
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, "light");
+  } catch {
+    /* ignore */
+  }
 }
 
-export function setThemeAndApply(mode: StoredTheme | null): void {
-  setStoredTheme(mode);
+export function setThemeAndApply(_mode: StoredTheme | null): void {
+  setStoredTheme("light");
   applyThemeFromStorage();
 }
 
 export function toggleTheme(): void {
-  const root = document.documentElement;
-  const next: StoredTheme = root.classList.contains("dark") ? "light" : "dark";
-  setThemeAndApply(next);
+  applyThemeFromStorage();
 }

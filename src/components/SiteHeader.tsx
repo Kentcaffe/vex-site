@@ -9,7 +9,6 @@ import { UserRound } from "lucide-react";
 import { ChatInboxLink } from "@/components/chat/ChatInboxLink";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SignOutButton } from "@/components/SignOutButton";
-import { ThemeToggle } from "@/components/theme/ThemeToggle";
 
 const searchInputClass = "field-input h-12 pl-11 md:h-12";
 
@@ -60,7 +59,6 @@ export async function SiteHeader() {
                   </Link>
                   <div className="flex items-center justify-between gap-2 px-2 py-2">
                     <LanguageSwitcher />
-                    <ThemeToggle labelLight={t("themeLight")} labelDark={t("themeDark")} />
                   </div>
                   {session?.user && isStaff(session.user.role) ? (
                     <Link
@@ -97,9 +95,6 @@ export async function SiteHeader() {
               </button>
             </form>
 
-            <Link href={publishHref} className="btn-primary mt-5 flex w-full justify-center">
-              {t("addListingShort")}
-            </Link>
           </div>
 
           <div className="mt-4 hidden min-w-0 flex-1 flex-col gap-4 md:flex">
@@ -146,19 +141,18 @@ export async function SiteHeader() {
               <Link href={publishHref} className="btn-primary min-h-[44px] rounded-xl px-4">
                 {t("addListingShort")}
               </Link>
-              <ThemeToggle labelLight={t("themeLight")} labelDark={t("themeDark")} />
               <LanguageSwitcher />
               {session?.user ? (
                 <>
                   <div className="hidden min-w-0 max-w-[200px] flex-col items-end text-right leading-tight xl:flex">
                     {session.user.name?.trim() ? (
                       <>
-                        <span className="truncate text-xs font-semibold text-zinc-900 dark:text-zinc-50">
+                        <span className="truncate text-xs font-semibold text-zinc-900">
                           {session.user.name.trim()}
                         </span>
                         {session.user.email ? (
                           <span
-                            className="truncate text-[11px] text-zinc-500 dark:text-zinc-400"
+                            className="truncate text-[11px] text-zinc-500"
                             title={session.user.email}
                           >
                             {session.user.email}
@@ -167,7 +161,7 @@ export async function SiteHeader() {
                       </>
                     ) : session.user.email ? (
                       <span
-                        className="truncate text-xs font-semibold text-zinc-900 dark:text-zinc-50"
+                        className="truncate text-xs font-semibold text-zinc-900"
                         title={session.user.email}
                       >
                         {session.user.email}
@@ -200,13 +194,13 @@ export async function SiteHeader() {
           </Link>
           <Link
             href="/categorii"
-            className="font-semibold text-orange-600 hover:underline dark:text-orange-400"
+            className="font-semibold text-orange-600 hover:underline"
           >
             {t("categories")}
           </Link>
           <Link
             href="/anunturi"
-            className="font-semibold text-orange-600 hover:underline dark:text-orange-400"
+            className="font-semibold text-orange-600 hover:underline"
           >
             {t("listings")}
           </Link>

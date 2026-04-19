@@ -2,6 +2,7 @@
 
 html {
   scroll-behavior: smooth;
+  background-color: var(--mp-page);
 }
 
 /* Marketplace — contrast ridicat (#111827 / #1f2937), fără text „șters”, umbre premium */
@@ -29,7 +30,7 @@ html {
     --mp-shadow-lg: 0 22px 48px -12px rgb(17 24 39 / 0.2);
     --mp-nav-solid: #ffffff;
     /* Înălțime bară jos + spațiu safe-area (fără suprapunere conținut) */
-    --mobile-nav-reserve: calc(68px + max(12px, env(safe-area-inset-bottom, 0px)));
+    --mobile-nav-reserve: calc(76px + max(12px, env(safe-area-inset-bottom, 0px)));
   }
 
   .dark {

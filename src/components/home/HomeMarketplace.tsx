@@ -54,7 +54,7 @@ export async function HomeMarketplace({
   const tList = await getTranslations("Listings");
 
   return (
-    <div className="app-shell app-section w-full min-w-0 pb-6 md:pb-10">
+    <div className="app-shell app-section w-full min-w-0 pb-8 md:pb-10">
       {/* Hero + căutare — mobile-first */}
       <section className="relative w-full min-w-0 overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-gradient-to-br from-orange-600 via-amber-500 to-orange-700 p-4 shadow-[var(--mp-shadow-lg)] sm:p-7 md:rounded-3xl md:p-8">
         <div className="relative w-full">
@@ -111,23 +111,23 @@ export async function HomeMarketplace({
       {/* Categorii — scroll orizontal */}
       <section className="mt-5 md:mt-8">
         <div className="mb-3 flex items-center justify-between gap-2 px-0.5">
-          <h2 className="text-lg font-bold text-[#111827] dark:text-[#f9fafb]">{t("categoriesTitle")}</h2>
+          <h2 className="text-lg font-bold text-zinc-900">{t("categoriesTitle")}</h2>
           <Link
             href="/categorii"
-            className="inline-flex items-center gap-0.5 text-sm font-semibold text-orange-600 dark:text-orange-400"
+            className="inline-flex min-h-[44px] items-center gap-0.5 text-sm font-semibold text-orange-600"
           >
             {t("viewAll")}
             <ChevronRight className="h-4 w-4" aria-hidden />
           </Link>
         </div>
-        <div className="-mx-1 flex gap-2.5 overflow-x-auto pb-2 pt-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="-mx-1 flex gap-3 overflow-x-auto pb-3 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {rootCategories.map((cat) => (
             <Link
               key={cat.id}
               href={`/categorii?c=${encodeURIComponent(cat.slug)}`}
-              className="flex min-w-[max-content] shrink-0 items-center gap-2 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] px-4 py-3 text-base font-semibold text-[#1f2937] shadow-[var(--mp-shadow-md)] transition active:scale-[0.98] hover:border-orange-300 hover:bg-[var(--mp-primary-soft)] dark:text-[#e5e7eb] dark:hover:border-orange-700"
+              className="flex min-h-[48px] min-w-[max-content] shrink-0 items-center gap-2.5 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] px-4 py-3 text-base font-semibold text-zinc-800 shadow-[var(--mp-shadow-md)] transition active:scale-[0.98] hover:border-orange-300 hover:bg-[var(--mp-primary-soft)]"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--mp-surface-muted)] text-lg" aria-hidden>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--mp-surface-muted)] text-lg" aria-hidden>
                 {emojiForRootSlug(cat.slug)}
               </span>
               {labelFor(cat, locale)}
@@ -140,33 +140,33 @@ export async function HomeMarketplace({
       <section className="mt-6 md:mt-8">
         <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--mp-text-muted)]">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-600">
               {listings.length} {listings.length === 1 ? "anunț" : "anunțuri"}
             </p>
-            <p className="mt-1 text-sm text-[var(--mp-text-muted)]">Cele mai noi pe platformă</p>
+            <p className="mt-1 text-sm text-zinc-600">Cele mai noi pe platformă</p>
           </div>
           <Link
             href="/anunturi"
-            className="text-sm font-semibold text-orange-600 underline-offset-4 hover:underline dark:text-orange-400"
+            className="inline-flex min-h-[44px] items-center text-sm font-semibold text-orange-600 underline-offset-4 hover:underline"
           >
             {t("viewAll")}
           </Link>
         </div>
 
         {loadError ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center dark:border-red-900/50 dark:bg-red-950/30">
-            <p className="text-sm font-semibold text-red-800 dark:text-red-200">Eroare la încărcarea anunțurilor.</p>
-            <p className="mt-1 text-base text-red-800 dark:text-red-200">Încearcă refresh sau revino în câteva momente.</p>
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
+            <p className="text-sm font-semibold text-red-800">Eroare la încărcarea anunțurilor.</p>
+            <p className="mt-1 text-base text-red-800">Încearcă refresh sau revino în câteva momente.</p>
           </div>
         ) : listings.length === 0 ? (
           <div className="rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-10 text-center shadow-[var(--mp-shadow-md)]">
-            <p className="text-sm text-[var(--mp-text-muted)]">{t("empty")}</p>
-            <Link href="/publica" className="btn-primary mt-5 inline-flex w-full max-w-xs justify-center sm:w-auto">
-              Adaugă primul anunț
-            </Link>
+            <p className="text-base text-zinc-800">{t("empty")}</p>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-zinc-600">
+              Apasă butonul portocaliu cu „+” din bara de jos pentru a publica primul anunț.
+            </p>
           </div>
         ) : (
-          <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-3.5 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
             {listings.map((item, index) => {
               const cover = parseStoredListingImages(item.images)[0];
               const place = item.city + (item.district ? ` · ${item.district}` : "");
@@ -186,7 +186,7 @@ export async function HomeMarketplace({
                           <ListingImagePlaceholder
                             title={tList("cardNoImageTitle")}
                             hint={tList("cardNoImageHint")}
-                            className="bg-zinc-200 dark:bg-zinc-800"
+                            className="bg-zinc-200"
                           />
                         )}
                       </Link>
@@ -194,17 +194,17 @@ export async function HomeMarketplace({
                         <FavoriteButton listingId={item.id} initialFavorited={favoritedIds.has(item.id)} variant="icon" />
                       </div>
                     </div>
-                    <div className="flex flex-1 flex-col p-4 sm:p-3.5">
+                    <div className="flex flex-1 flex-col p-3.5 sm:p-3.5">
                       <Link href={`/anunturi/${item.id}`} className="block min-h-0 flex-1">
-                        <span className="line-clamp-2 text-base font-bold leading-snug text-[#111827] group-hover:text-[#c2410c] dark:text-[#f9fafb] dark:group-hover:text-orange-400">
+                        <span className="line-clamp-2 text-base font-bold leading-snug text-zinc-900 group-hover:text-[#c2410c]">
                           {item.title}
                         </span>
                       </Link>
-                      <p className="mt-2 text-base font-extrabold text-[#c2410c] tabular-nums dark:text-orange-400">
+                      <p className="mt-2 text-base font-extrabold text-[#c2410c] tabular-nums">
                         {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
                       </p>
-                      <p className="mt-1.5 flex items-center gap-1 text-sm text-[#374151] dark:text-[#d1d5db]">
-                        <MapPin className="h-4 w-4 shrink-0 text-[#374151] dark:text-[#d1d5db]" aria-hidden />
+                      <p className="mt-1.5 flex items-center gap-1 text-sm text-zinc-700">
+                        <MapPin className="h-4 w-4 shrink-0 text-zinc-600" aria-hidden />
                         <span className="line-clamp-1">{place}</span>
                       </p>
                     </div>
@@ -216,35 +216,26 @@ export async function HomeMarketplace({
         )}
       </section>
 
-      {/* FAB mobil — deasupra bottom nav */}
-      <Link
-        href="/publica"
-        className="fixed bottom-[calc(var(--mobile-nav-reserve)+12px)] left-1/2 z-[55] flex h-14 w-14 max-w-[100vw] -translate-x-1/2 items-center justify-center rounded-full bg-gradient-to-br from-[#ea580c] to-[#c2410c] text-2xl font-bold text-white shadow-[var(--mp-shadow-lg)] transition active:scale-95 md:hidden"
-        aria-label={t("promo2Cta")}
-      >
-        +
-      </Link>
-
       {/* Promo desktop */}
       <div className="mt-10 hidden md:block">
         <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <Link
             href="/anunturi"
-            className="group rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-6 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)] dark:hover:border-orange-800/40"
+            className="group rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-6 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)]"
           >
             <p className="text-sm font-bold text-[var(--mp-text)]">{t("promoTile1Title")}</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--mp-text-muted)]">{t("promoTile1Body")}</p>
           </Link>
           <Link
             href="/chat"
-            className="group rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-6 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)] dark:hover:border-orange-800/40"
+            className="group rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-6 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)]"
           >
             <p className="text-sm font-bold text-[var(--mp-text)]">{t("promoTile2Title")}</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--mp-text-muted)]">{t("promoTile2Body")}</p>
           </Link>
           <Link
             href="/publica"
-            className="group rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-6 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)] dark:hover:border-orange-800/40"
+            className="group rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-6 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:shadow-[var(--mp-shadow-lg)]"
           >
             <p className="text-sm font-bold text-[var(--mp-text)]">{t("promoTile3Title")}</p>
             <p className="mt-2 text-sm leading-relaxed text-[var(--mp-text-muted)]">{t("promoTile3Body")}</p>
