@@ -21,11 +21,9 @@ export const metadata: Metadata = {
   title: SEO_TITLE,
   description: SEO_DESCRIPTION,
   keywords: SEO_KEYWORDS,
+  manifest: "/site.webmanifest",
   icons: {
-    icon: [
-      { url: "/logo.png", type: "image/png" },
-      { url: "/favicon.ico" },
-    ],
+    icon: [{ url: "/logo.png", type: "image/png", sizes: "512x512" }],
     shortcut: "/logo.png",
     apple: "/logo.png",
   },
@@ -83,11 +81,23 @@ function supabaseOrigin(): string | null {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const preconnect = supabaseOrigin();
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "VEX",
+    url: "https://vex.md",
+    logo: "https://vex.md/logo.png",
+  };
 
   return (
     <html lang="ro" suppressHydrationWarning className={sans.variable}>
       <head>
         <ThemeScript />
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger -- JSON-LD SEO metadata
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         {preconnect ? (
           <>
             <link rel="preconnect" href={preconnect} crossOrigin="anonymous" />
