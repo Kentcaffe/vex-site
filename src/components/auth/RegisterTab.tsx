@@ -11,6 +11,7 @@ import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import type { OauthAvailability } from "@/components/auth/types";
 import { routing } from "@/i18n/routing";
 import { evaluatePasswordRules, passwordMeetsAllRules } from "@/lib/auth-password-rules";
+import { ResendConfirmationEmail } from "@/components/auth/ResendConfirmationEmail";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import { clearRegisterFields, loadRegisterFields, saveRegisterFields } from "@/lib/auth-form-persist";
 
@@ -29,6 +30,8 @@ export function RegisterTab({ oauth }: Props) {
   const [registerError, setRegisterError] = useState<string | null>(null);
   /** `session`: logged in immediately; `confirmEmail`: Supabase sent a confirmation link first */
   const [registerOutcome, setRegisterOutcome] = useState<null | "session" | "confirmEmail">(null);
+  /** Email folosit la resend confirmation (păstrat după clearRegisterFields) */
+  const [pendingConfirmEmail, setPendingConfirmEmail] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [pwdTouched, setPwdTouched] = useState(false);
   const [email, setEmail] = useState("");
@@ -61,6 +64,7 @@ export function RegisterTab({ oauth }: Props) {
   function validateClient(fd: FormData): boolean {
     setRegisterError(null);
     setRegisterOutcome(null);
+    setPendingConfirmEmail(null);
     setClientBlock(null);
     setEmailErr(null);
     setPhoneErr(null);
@@ -121,9 +125,11 @@ export function RegisterTab({ oauth }: Props) {
         }
         clearRegisterFields();
         if (data.session) {
+          setPendingConfirmEmail(null);
           await fetch("/api/auth/sync-user", { method: "POST", credentials: "include" });
           setRegisterOutcome("session");
         } else {
+          setPendingConfirmEmail(email);
           setRegisterOutcome("confirmEmail");
         }
       })
@@ -259,10 +265,19 @@ export function RegisterTab({ oauth }: Props) {
             {t("registerSuccess")}
           </p>
         ) : null}
-        {registerOutcome === "confirmEmail" ? (
-          <p className="rounded-lg bg-sky-50 px-3 py-2 text-[13px] font-medium text-sky-900 dark:bg-sky-950/40 dark:text-sky-100" role="status">
-            {t("registerConfirmEmail")}
-          </p>
+        {registerOutcome === "confirmEmail" && pendingConfirmEmail ? (
+          <div
+            className="space-y-4 rounded-xl border border-orange-100 bg-gradient-to-b from-orange-50/90 to-amber-50/40 p-4 dark:border-orange-900/35 dark:from-orange-950/30 dark:to-amber-950/20"
+            role="status"
+          >
+            <p className="text-[14px] font-medium leading-relaxed text-zinc-800 dark:text-zinc-100">
+              {t("confirmEmailHeadline")}
+            </p>
+            <p className="text-[13px] leading-relaxed text-zinc-600 dark:text-zinc-400">
+              {t("confirmEmailSpamHint")}
+            </p>
+            <ResendConfirmationEmail email={pendingConfirmEmail} callbackPath={callbackUrl} />
+          </div>
         ) : null}
 
         <button
