@@ -75,8 +75,11 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
 
       <div className="mt-6 flex w-full flex-col gap-6 lg:flex-row lg:items-start">
         <aside className="w-full shrink-0 lg:w-56">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">{t("sidebarTitle")}</p>
-          <nav className="surface-card grid grid-cols-2 gap-2 p-2 lg:block lg:space-y-0.5" aria-label={t("sidebarTitle")}>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-600">{t("sidebarTitle")}</p>
+          <nav
+            className="surface-card grid grid-cols-1 gap-2 p-2 sm:grid-cols-2 lg:block lg:space-y-0.5"
+            aria-label={t("sidebarTitle")}
+          >
             {roots.map((r) => {
               const active = r.slug === root.slug;
               const icon = CATEGORY_ROOT_EMOJI[r.slug] ?? "•";
@@ -84,10 +87,10 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
                 <Link
                   key={r.id}
                   href={`/categorii?c=${encodeURIComponent(r.slug)}`}
-                  className={`flex min-h-[56px] items-center justify-center gap-2 rounded-xl border px-3 py-2 text-center text-sm font-medium sm:min-h-0 sm:justify-start sm:text-left lg:rounded lg:border-0 lg:px-2 lg:py-2 ${
+                  className={`flex min-h-[52px] items-center justify-center gap-2 rounded-xl border px-3 py-2.5 text-center text-sm font-semibold sm:min-h-0 sm:justify-start sm:text-left lg:rounded lg:border-0 lg:px-2 lg:py-2 ${
                     active
-                      ? "border-emerald-200 bg-emerald-50 font-semibold text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400"
-                      : "border-zinc-200 bg-white text-zinc-700 active:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 lg:border-0 lg:bg-transparent lg:dark:bg-transparent lg:dark:hover:bg-zinc-800 lg:hover:bg-zinc-50"
+                      ? "border-emerald-600 bg-emerald-100 text-emerald-950 shadow-sm"
+                      : "border-zinc-200 bg-white text-zinc-900 active:bg-zinc-100 lg:border-0 lg:bg-transparent lg:hover:bg-zinc-50"
                   }`}
                 >
                   <span className="text-xl lg:w-6 lg:text-center" aria-hidden>
@@ -101,7 +104,7 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
         </aside>
 
         <main className="surface-card min-w-0 flex-1 p-4 sm:p-6">
-          <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 sm:text-2xl">{rootTitle}</h1>
+          <h1 className="text-xl font-bold text-zinc-950 sm:text-2xl">{rootTitle}</h1>
           <div className="mt-6 space-y-8">
             {sections.map((section) => {
               const sectionTitle = labelFromJson(section.labels, locale);
@@ -109,17 +112,17 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
                 return (
                   <section key={section.id}>
                     <details open className="group">
-                      <summary className="flex cursor-pointer list-none items-center justify-between border-b border-zinc-200 pb-2 text-base font-semibold text-zinc-900 dark:border-zinc-700 dark:text-zinc-50">
+                      <summary className="flex cursor-pointer list-none items-center justify-between border-b border-zinc-200 pb-2 text-base font-bold text-zinc-950">
                         <span>{sectionTitle}</span>
-                        <span className="rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500 group-open:hidden dark:bg-zinc-800">+</span>
-                        <span className="hidden rounded-md bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500 group-open:inline dark:bg-zinc-800">−</span>
+                        <span className="rounded-md bg-zinc-200 px-2 py-0.5 text-xs font-bold text-zinc-800 group-open:hidden">+</span>
+                        <span className="hidden rounded-md bg-zinc-200 px-2 py-0.5 text-xs font-bold text-zinc-800 group-open:inline">−</span>
                       </summary>
                       <ul className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
                       {section.children.map((leaf) => (
                         <li key={leaf.id} className="min-h-[44px]">
                           <Link
                             href={`/anunturi?category=${encodeURIComponent(leaf.slug)}`}
-                            className="flex min-h-[44px] items-center rounded-lg px-3 py-2 text-base leading-snug text-zinc-700 active:bg-zinc-100 dark:text-zinc-200 dark:active:bg-zinc-900 lg:min-h-0 lg:text-sm lg:hover:text-emerald-700 lg:hover:underline dark:lg:hover:text-emerald-400"
+                            className="flex min-h-[44px] items-center rounded-lg px-3 py-2 text-base font-medium leading-snug text-zinc-900 active:bg-zinc-100 lg:min-h-0 lg:text-sm lg:hover:text-emerald-800 lg:hover:underline"
                           >
                             {labelFromJson(leaf.labels, locale)}
                           </Link>
@@ -134,7 +137,7 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
                 <section key={section.id}>
                   <Link
                     href={`/anunturi?category=${encodeURIComponent(section.slug)}`}
-                    className="flex min-h-[48px] items-center text-lg font-semibold text-emerald-700 active:opacity-80 dark:text-emerald-400 lg:inline lg:min-h-0 lg:text-base lg:hover:underline"
+                    className="flex min-h-[48px] items-center text-lg font-bold text-emerald-800 active:opacity-90 lg:inline lg:min-h-0 lg:text-base lg:hover:underline"
                   >
                     {sectionTitle}
                   </Link>
