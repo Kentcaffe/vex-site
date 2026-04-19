@@ -8,7 +8,7 @@ import {
   requestChatNotificationPermission,
   showNewChatMessageNotification,
 } from "@/lib/chat-notifications-client";
-import { SUPPORT_SYSTEM_BODY_TICKET_REGISTERED, type SupportMessageDTO } from "@/lib/support-chat";
+import { SUPPORT_SYSTEM_BODY_TICKET_REGISTERED, type SupportMessageDTO } from "@/lib/support-chat-types";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 type Props = {

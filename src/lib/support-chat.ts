@@ -1,12 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { supportMessage, supportTicket } from "@/lib/prisma-delegates";
 import { logSupportDbFailure } from "@/lib/support-db-log";
+import {
+  SUPPORT_SYSTEM_BODY_TICKET_REGISTERED,
+  type SupportMessageDTO,
+} from "@/lib/support-chat-types";
 import type { SupportMessageSenderRole, SupportTicketStatus } from "@/lib/support-enums";
 
-const BODY_MAX = 6000;
+export { SUPPORT_SYSTEM_BODY_TICKET_REGISTERED, type SupportMessageDTO } from "@/lib/support-chat-types";
 
-/** Corp mesaj SYSTEM: cheie i18n rezolvată în UI (`systemTicketRegistered`). */
-export const SUPPORT_SYSTEM_BODY_TICKET_REGISTERED = "SYSTEM_TICKET_REGISTERED" as const;
+const BODY_MAX = 6000;
 
 export function normalizeSupportBody(raw: string): { ok: true; body: string } | { ok: false; error: string } {
   const body = raw.trim();
@@ -54,15 +57,6 @@ export async function assertTicketAccess(ticketId: string, userId: string, isSta
   if (!isStaff && ticket.userId !== userId) return { ok: false as const, error: "forbidden" as const };
   return { ok: true as const, ticket };
 }
-
-export type SupportMessageDTO = {
-  id: string;
-  ticketId: string;
-  body: string;
-  createdAt: string;
-  senderRole: SupportMessageSenderRole;
-  senderName: string | null;
-};
 
 export async function listSupportMessages(ticketId: string): Promise<SupportMessageDTO[]> {
   let rows;
