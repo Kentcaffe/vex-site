@@ -14,14 +14,25 @@ export function SupportContactLauncher() {
   const [ticketId, setTicketId] = useState<string | null>(null);
   const [loadingTicket, setLoadingTicket] = useState(false);
   const [ticketError, setTicketError] = useState(false);
+  /** Mesaj Prisma/DB din `debug` când `SUPPORT_API_DEBUG=1` pe server (sau dev). */
+  const [ticketErrorDetail, setTicketErrorDetail] = useState<string | null>(null);
 
   const ensureTicket = useCallback(async () => {
     setLoadingTicket(true);
     setTicketError(false);
+    setTicketErrorDetail(null);
     try {
       const res = await fetch("/api/support/ticket", { credentials: "include" });
-      if (!res.ok) throw new Error("ticket");
-      const data = (await res.json()) as { ticket: { id: string } };
+      const data = (await res.json().catch(() => ({}))) as {
+        ticket?: { id: string };
+        debug?: { message?: string };
+      };
+      if (!res.ok) {
+        const msg = typeof data.debug?.message === "string" ? data.debug.message : null;
+        setTicketErrorDetail(msg);
+        throw new Error("ticket");
+      }
+      if (!data.ticket?.id) throw new Error("ticket");
       setTicketId(data.ticket.id);
     } catch {
       setTicketId(null);
@@ -124,6 +135,11 @@ export function SupportContactLauncher() {
               ) : ticketError ? (
                 <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-4 rounded-xl bg-white px-4 text-center">
                   <p className="text-sm text-zinc-700">{t("ticketLoadError")}</p>
+                  {ticketErrorDetail ? (
+                    <pre className="max-h-32 max-w-full overflow-auto rounded-lg bg-zinc-100 px-3 py-2 text-left text-[11px] leading-snug text-zinc-800">
+                      {ticketErrorDetail}
+                    </pre>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => void ensureTicket()}

@@ -8,6 +8,7 @@ import {
   listSupportMessages,
   normalizeSupportBody,
 } from "@/lib/support-chat";
+import { serializeSupportDbError, supportApiDebugEnabled } from "@/lib/support-db-log";
 
 export async function GET(req: Request) {
   const session = await auth();
@@ -20,12 +21,20 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "missing_ticket" }, { status: 400 });
   }
   const staff = isStaff(session.user.role);
-  const access = await assertTicketAccess(ticketId, session.user.id, staff);
-  if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.error === "not_found" ? 404 : 403 });
+  try {
+    const access = await assertTicketAccess(ticketId, session.user.id, staff);
+    if (!access.ok) {
+      return NextResponse.json({ error: access.error }, { status: access.error === "not_found" ? 404 : 403 });
+    }
+    const messages = await listSupportMessages(ticketId);
+    return NextResponse.json({ messages });
+  } catch (e) {
+    const body: Record<string, unknown> = { error: "service_unavailable" };
+    if (supportApiDebugEnabled()) {
+      body.debug = serializeSupportDbError(e);
+    }
+    return NextResponse.json(body, { status: 503 });
   }
-  const messages = await listSupportMessages(ticketId);
-  return NextResponse.json({ messages });
 }
 
 export async function POST(req: Request) {
@@ -50,31 +59,39 @@ export async function POST(req: Request) {
   }
 
   const staff = isStaff(session.user.role);
-  const access = await assertTicketAccess(ticketId, session.user.id, staff);
-  if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.error === "not_found" ? 404 : 403 });
+  try {
+    const access = await assertTicketAccess(ticketId, session.user.id, staff);
+    if (!access.ok) {
+      return NextResponse.json({ error: access.error }, { status: access.error === "not_found" ? 404 : 403 });
+    }
+
+    const full = await supportTicket.findUnique({
+      where: { id: ticketId },
+      select: { status: true, userId: true },
+    });
+    if (full?.status === "CLOSED" && !staff) {
+      return NextResponse.json({ error: "ticket_closed" }, { status: 400 });
+    }
+
+    const senderRole = staff ? "STAFF" : "USER";
+    if (!staff && full?.userId !== session.user.id) {
+      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    }
+
+    await appendSupportMessage({
+      ticketId,
+      senderId: session.user.id,
+      senderRole,
+      body: norm.body,
+    });
+
+    const messages = await listSupportMessages(ticketId);
+    return NextResponse.json({ ok: true, messages });
+  } catch (e) {
+    const body: Record<string, unknown> = { error: "service_unavailable" };
+    if (supportApiDebugEnabled()) {
+      body.debug = serializeSupportDbError(e);
+    }
+    return NextResponse.json(body, { status: 503 });
   }
-
-  const full = await supportTicket.findUnique({
-    where: { id: ticketId },
-    select: { status: true, userId: true },
-  });
-  if (full?.status === "CLOSED" && !staff) {
-    return NextResponse.json({ error: "ticket_closed" }, { status: 400 });
-  }
-
-  const senderRole = staff ? "STAFF" : "USER";
-  if (!staff && full?.userId !== session.user.id) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
-
-  await appendSupportMessage({
-    ticketId,
-    senderId: session.user.id,
-    senderRole,
-    body: norm.body,
-  });
-
-  const messages = await listSupportMessages(ticketId);
-  return NextResponse.json({ ok: true, messages });
 }

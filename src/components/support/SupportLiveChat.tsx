@@ -49,11 +49,15 @@ export function SupportLiveChat({ variant, ticketId, userEmail }: Props) {
     const res = await fetch(`/api/support/messages?ticketId=${encodeURIComponent(ticketId)}`, {
       credentials: "include",
     });
+    const data = (await res.json().catch(() => ({}))) as {
+      messages?: SupportMessageDTO[];
+      debug?: { message?: string };
+    };
     if (!res.ok) {
-      throw new Error("load_failed");
+      const detail = typeof data.debug?.message === "string" ? data.debug.message : null;
+      throw new Error(detail ?? "load_failed");
     }
-    const data = (await res.json()) as { messages: SupportMessageDTO[] };
-    setMessages(data.messages);
+    setMessages(data.messages ?? []);
   }, [ticketId]);
 
   useEffect(() => {
@@ -63,8 +67,11 @@ export function SupportLiveChat({ variant, ticketId, userEmail }: Props) {
       setError(null);
       try {
         await loadMessages();
-      } catch {
-        if (!cancelled) setError(t("loadError"));
+      } catch (err) {
+        if (!cancelled) {
+          const msg = err instanceof Error && err.message !== "load_failed" ? err.message : t("loadError");
+          setError(msg);
+        }
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -95,7 +102,10 @@ export function SupportLiveChat({ variant, ticketId, userEmail }: Props) {
           void loadMessages();
         },
       )
-      .subscribe((status) => {
+      .subscribe((status, err) => {
+        if (err) {
+          console.error("[SupportLiveChat] Supabase Realtime subscribe error:", err.message, err);
+        }
         setLive(status === "SUBSCRIBED");
       });
 
@@ -123,14 +133,19 @@ export function SupportLiveChat({ variant, ticketId, userEmail }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ticketId, body }),
       });
+      const data = (await res.json().catch(() => ({}))) as {
+        messages?: SupportMessageDTO[];
+        debug?: { message?: string };
+      };
       if (!res.ok) {
-        throw new Error("send_failed");
+        const detail = typeof data.debug?.message === "string" ? data.debug.message : null;
+        throw new Error(detail ?? "send_failed");
       }
-      const data = (await res.json()) as { messages: SupportMessageDTO[] };
-      setMessages(data.messages);
+      setMessages(data.messages ?? []);
       setDraft("");
-    } catch {
-      setError(t("sendError"));
+    } catch (err) {
+      const msg = err instanceof Error && err.message !== "send_failed" ? err.message : t("sendError");
+      setError(msg);
     } finally {
       setSending(false);
     }
