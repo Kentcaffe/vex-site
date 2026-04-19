@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
+import { getEmailConfirmationRedirectUrl } from "@/lib/auth-email-redirect";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 const COOLDOWN_SEC = 60;
@@ -38,13 +39,17 @@ export function ResendConfirmationEmail({ email, callbackPath }: Props) {
     setFeedback(null);
 
     const supabase = createSupabaseBrowserClient();
-    const emailRedirectTo = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(callbackPath)}`;
+    const emailRedirectTo = getEmailConfirmationRedirectUrl(callbackPath);
 
-    const { error } = await supabase.auth.resend({
+    const { data, error } = await supabase.auth.resend({
       type: "signup",
       email: trimmed,
       options: { emailRedirectTo },
     });
+
+    if (process.env.NODE_ENV === "development") {
+      console.log("[auth resend signup]", { data, error, emailRedirectTo });
+    }
 
     setLoading(false);
 

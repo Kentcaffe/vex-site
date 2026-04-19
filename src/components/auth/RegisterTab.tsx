@@ -12,6 +12,7 @@ import type { OauthAvailability } from "@/components/auth/types";
 import { routing } from "@/i18n/routing";
 import { evaluatePasswordRules, passwordMeetsAllRules } from "@/lib/auth-password-rules";
 import { ResendConfirmationEmail } from "@/components/auth/ResendConfirmationEmail";
+import { getEmailConfirmationRedirectUrl } from "@/lib/auth-email-redirect";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import { clearRegisterFields, loadRegisterFields, saveRegisterFields } from "@/lib/auth-form-persist";
 
@@ -106,12 +107,14 @@ export function RegisterTab({ oauth }: Props) {
     const name = String(fd.get("name") ?? "").trim();
 
     setRegPending(true);
+    const emailRedirectTo = getEmailConfirmationRedirectUrl(callbackUrl);
+
     void supabase.auth
       .signUp({
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
+          emailRedirectTo,
           data: {
             full_name: name || null,
             phone: phone || null,
@@ -119,19 +122,40 @@ export function RegisterTab({ oauth }: Props) {
         },
       })
       .then(async ({ data, error }) => {
+        if (process.env.NODE_ENV === "development") {
+          console.log("[auth signUp]", { data, error, emailRedirectTo });
+        }
+
         if (error) {
-          setRegisterError(t("validationError"));
+          const msg = (error.message ?? "").toLowerCase();
+          const code = String((error as { code?: string }).code ?? "");
+          const duplicate =
+            code === "user_already_exists" ||
+            msg.includes("already registered") ||
+            msg.includes("already been registered") ||
+            msg.includes("user already");
+          setRegisterError(duplicate ? t("emailTaken") : t("validationError"));
           return;
         }
-        clearRegisterFields();
+
         if (data.session) {
+          clearRegisterFields();
           setPendingConfirmEmail(null);
           await fetch("/api/auth/sync-user", { method: "POST", credentials: "include" });
           setRegisterOutcome("session");
-        } else {
+          return;
+        }
+
+        /** Confirmare email obligatorie: există `user`, dar nu e sesiune până deschizi linkul. */
+        if (data.user) {
+          clearRegisterFields();
           setPendingConfirmEmail(email);
           setRegisterOutcome("confirmEmail");
+          return;
         }
+
+        /** Fără user și fără sesiune — de obicei adresă deja înregistrată (protecție enumerare). */
+        setRegisterError(t("emailTaken"));
       })
       .finally(() => {
         setRegPending(false);
