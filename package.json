@@ -10,7 +10,7 @@
     "dev:api": "node backend/server.js",
     "dev:next": "next dev --webpack",
     "prebuild": "prisma generate",
-    "build": "npm run migrate:deploy && next build",
+    "build": "next build",
     "build:with-db": "npm run build",
     "build:render": "npm run build",
     "start": "next start -H 0.0.0.0 -p $PORT",
