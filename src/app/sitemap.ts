@@ -8,6 +8,9 @@ import { listingSeoPath } from "@/lib/seo";
 
 const baseUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "https://vex.md").replace(/\/$/, "");
 
+/** Nu prerender la build (evită P2022 dacă DB-ul nu are încă migrările soft-delete); generează la request. */
+export const dynamic = "force-dynamic";
+
 /** Pagini statice publice pentru indexare. */
 const staticPages: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
