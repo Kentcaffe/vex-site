@@ -36,7 +36,7 @@ export const HomeListingCard = memo(function HomeListingCard({
 }: HomeListingCardProps) {
   return (
     <li className="group">
-      <article className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] shadow-[var(--mp-shadow-md)] transition hover:-translate-y-0.5 hover:shadow-[var(--mp-shadow-lg)]">
+      <article className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] shadow-[var(--mp-shadow-md)] transition-shadow hover:shadow-[var(--mp-shadow-lg)]">
         <div className="relative mp-card-image">
           <Link href={listingHref} className="absolute inset-0 z-0 block" aria-label={title}>
             {coverSrc ? (

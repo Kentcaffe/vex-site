@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Headphones, MessageCircle } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 import { SupportChatModal } from "@/components/support/SupportChatModal";
+import { prefetchSupportTicket } from "@/lib/support-ticket-cache";
 
 const ctaClasses =
   "inline-flex min-h-[48px] w-full min-w-0 items-center justify-center gap-2 rounded-xl px-5 text-base font-semibold shadow-md transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 active:scale-[0.99] sm:min-h-[52px] md:w-auto md:min-w-[240px]";
@@ -55,6 +56,12 @@ export function SupportContactLauncher({
   const t = useTranslations("Support");
   const { status } = useAuthSession();
   const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      void prefetchSupportTicket();
+    }
+  }, [status]);
 
   const gridClass = unified
     ? "grid grid-cols-1 gap-5 text-center"
@@ -125,6 +132,7 @@ export function SupportContactLauncher({
                 <div className="h-12 w-full animate-pulse rounded-xl bg-zinc-200/75 md:h-[52px]" />
               ) : status === "authenticated" ? (
                 <LiveChatCta
+                  onPointerEnter={() => void prefetchSupportTicket()}
                   onClick={() => setOpen(true)}
                   className={`bg-orange-500 text-white shadow-orange-500/30 hover:bg-orange-600 hover:shadow-lg ${ctaWidthEmbed}`}
                 >

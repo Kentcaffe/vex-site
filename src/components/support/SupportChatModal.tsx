@@ -1,10 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Star, X } from "lucide-react";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 import { SupportLiveChat } from "@/components/support/SupportLiveChat";
+import { getCachedSupportTicket, setSupportTicketCache } from "@/lib/support-ticket-cache";
 
 type Props = {
   open: boolean;
@@ -16,7 +17,7 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
   const t = useTranslations("Support");
   const { status } = useAuthSession();
   const [ticketId, setTicketId] = useState<string | null>(null);
-  const [loadingTicket, setLoadingTicket] = useState(false);
+  const [loadingTicket, setLoadingTicket] = useState(true);
   const [ticketError, setTicketError] = useState(false);
   const [ticketErrorDetail, setTicketErrorDetail] = useState<string | null>(null);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -29,6 +30,16 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
   const [feedbackThanks, setFeedbackThanks] = useState(false);
 
   const ensureTicket = useCallback(async () => {
+    const cached = getCachedSupportTicket();
+    if (cached) {
+      setTicketId(cached.id);
+      setFeedbackSubmitted(Boolean(cached.feedbackAt));
+      setTicketError(false);
+      setTicketErrorDetail(null);
+      setLoadingTicket(false);
+      return;
+    }
+
     setLoadingTicket(true);
     setTicketError(false);
     setTicketErrorDetail(null);
@@ -50,6 +61,10 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
         throw new Error("ticket");
       }
       if (!data.ticket?.id) throw new Error("ticket");
+      setSupportTicketCache({
+        id: data.ticket.id,
+        feedbackAt: data.ticket.feedbackAt ?? null,
+      });
       setTicketId(data.ticket.id);
       setFeedbackSubmitted(Boolean(data.ticket.feedbackAt));
     } catch {
@@ -73,6 +88,7 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
       setFeedbackSending(false);
       setFeedbackError(null);
       setFeedbackThanks(false);
+      setLoadingTicket(true);
     }
   }, [open]);
 
@@ -116,12 +132,28 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
     onDismissAction();
   }
 
+  useLayoutEffect(() => {
+    if (!open || status !== "authenticated") {
+      return;
+    }
+    const cached = getCachedSupportTicket();
+    if (cached) {
+      setTicketId(cached.id);
+      setFeedbackSubmitted(Boolean(cached.feedbackAt));
+      setTicketError(false);
+      setTicketErrorDetail(null);
+      setLoadingTicket(false);
+      return;
+    }
+    setLoadingTicket(true);
+  }, [open, status]);
+
   useEffect(() => {
     if (!open || status !== "authenticated") return;
-    if (ticketId) return;
     if (ticketError) return;
+    if (getCachedSupportTicket()) return;
     void ensureTicket();
-  }, [open, status, ticketId, ticketError, ensureTicket]);
+  }, [open, status, ticketError, ensureTicket]);
 
   if (!open || status !== "authenticated") {
     return null;
@@ -150,8 +182,11 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
         </div>
         <div className="min-h-0 flex-1 overflow-hidden bg-zinc-100/80 p-2 sm:p-3">
           {loadingTicket ? (
-            <div className="flex h-full min-h-[280px] items-center justify-center rounded-xl bg-white">
-              <div className="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" aria-hidden />
+            <div className="flex h-full min-h-[280px] flex-col justify-center gap-4 rounded-xl bg-white px-4 py-6">
+              <div className="h-4 w-40 animate-pulse rounded-md bg-zinc-200" />
+              <div className="h-12 w-full animate-pulse rounded-xl bg-zinc-100" />
+              <div className="h-12 max-w-[75%] animate-pulse rounded-xl bg-orange-100/80" />
+              <div className="h-12 w-full animate-pulse rounded-xl bg-zinc-100" />
             </div>
           ) : ticketError ? (
             <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-4 rounded-xl bg-white px-4 text-center">
@@ -241,8 +276,10 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
           ) : ticketId ? (
             <SupportLiveChat variant="user" ticketId={ticketId} onThreadHasMessagesAction={setThreadHasMessages} />
           ) : (
-            <div className="flex h-full min-h-[280px] items-center justify-center rounded-xl bg-white">
-              <div className="h-10 w-10 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" aria-hidden />
+            <div className="flex h-full min-h-[280px] flex-col justify-center gap-4 rounded-xl bg-white px-4 py-6">
+              <div className="h-4 w-36 animate-pulse rounded-md bg-zinc-200" />
+              <div className="h-12 w-full animate-pulse rounded-xl bg-zinc-100" />
+              <div className="h-12 max-w-[70%] animate-pulse rounded-xl bg-zinc-100" />
             </div>
           )}
         </div>

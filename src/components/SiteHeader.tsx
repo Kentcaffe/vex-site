@@ -27,7 +27,7 @@ export async function SiteHeader() {
 
   return (
     <header className="static w-full max-w-[100vw] border-b border-[var(--mp-border)] bg-[var(--mp-page)] md:bg-[var(--mp-surface)]">
-      <div className="hidden bg-gradient-to-r from-orange-100/90 to-amber-50 px-4 py-2 text-center text-[12px] font-medium text-zinc-700 sm:text-[13px] md:block">
+      <div className="hidden min-h-[2.75rem] items-center justify-center bg-gradient-to-r from-orange-100/90 to-amber-50 px-4 py-2 text-center text-[12px] font-medium leading-snug text-zinc-700 sm:text-[13px] md:flex">
         {tm("banner")}
       </div>
       <div className="app-shell py-3 sm:py-4">

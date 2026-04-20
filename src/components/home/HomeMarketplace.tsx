@@ -73,10 +73,10 @@ export async function HomeMarketplace({
                   <Sparkles className="h-3.5 w-3.5 shrink-0 text-orange-500" aria-hidden />
                   {t("heroBadge")}
                 </p>
-                <h1 className="text-balance text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:text-3xl lg:text-[2rem] lg:leading-snug">
+                <h1 className="min-h-[3.25rem] text-balance text-2xl font-semibold leading-tight tracking-tight text-zinc-900 sm:min-h-[3.75rem] sm:text-3xl lg:min-h-[4rem] lg:text-[2rem] lg:leading-snug">
                   {t("promoTile1Title")}
                 </h1>
-                <p className="max-w-xl text-base leading-relaxed text-zinc-600 sm:text-[1.05rem]">
+                <p className="min-h-[3rem] max-w-xl text-base leading-relaxed text-zinc-600 sm:min-h-[3.25rem] sm:text-[1.05rem]">
                   {t("promoTile1Body")}
                 </p>
               </div>
