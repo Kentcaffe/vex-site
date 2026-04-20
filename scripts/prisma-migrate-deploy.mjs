@@ -48,17 +48,23 @@ function isSupabasePoolerUrl(url) {
 }
 
 /**
- * Implicit: pooler (DATABASE_URL) înainte de DIRECT_URL — multe rețele (inclusiv unele către Render↔Supabase)
- * nu ajung la `db.*:5432` (P1001). Direct doar dacă setezi PRISMA_MIGRATE_TRY_DIRECT_FIRST=true.
- * Poolerul poate sta blocat la migrate; atunci oprești și rulezi migrate din alt mediu sau activezi direct.
+ * PC/local: pooler înainte de direct (unele rețele nu ajung la db.*:5432 → P1001).
+ * Render: implicit DIRECT înainte de pooler — poolerul (6543) poate agăța `migrate deploy` minute întregi.
+ * Suprascrie cu PRISMA_MIGRATE_TRY_DIRECT_FIRST=true|false.
  */
+function shouldTryDirectFirst() {
+  const v = process.env.PRISMA_MIGRATE_TRY_DIRECT_FIRST;
+  if (v === "false") return false;
+  if (v === "true") return true;
+  return process.env.RENDER === "true";
+}
+
 function buildMigrateUrlOrder() {
   const override = process.env.MIGRATE_DATABASE_URL;
   const pool = process.env.DATABASE_URL;
   const direct = process.env.DIRECT_URL;
 
-  const tryDirectFirst =
-    process.env.PRISMA_MIGRATE_TRY_DIRECT_FIRST === "true";
+  const tryDirectFirst = shouldTryDirectFirst();
 
   const ordered = tryDirectFirst
     ? [override, direct, pool]
@@ -72,8 +78,7 @@ const unique = buildMigrateUrlOrder();
 console.log(
   `[migrate] Env: DATABASE_URL=${process.env.DATABASE_URL ? "da" : "nu"}, DIRECT_URL=${process.env.DIRECT_URL ? "da" : "nu"}, MIGRATE_DATABASE_URL=${process.env.MIGRATE_DATABASE_URL ? "da" : "nu"}, RENDER=${process.env.RENDER === "true" ? "da" : "nu"}`,
 );
-const tryDirectFirst =
-  process.env.PRISMA_MIGRATE_TRY_DIRECT_FIRST === "true";
+const tryDirectFirst = shouldTryDirectFirst();
 console.log(
   `[migrate] Ordine: ${tryDirectFirst ? "override → DIRECT → DATABASE (pooler)" : "override → DATABASE (pooler) → DIRECT"}`,
 );
