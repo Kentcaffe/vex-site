@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { setRequestLocale } from "next-intl/server";
 import { CategoryExplorer } from "@/components/categories/CategoryExplorer";
+import { CategoryPageSkeleton } from "@/components/categories/CategoryPageSkeleton";
 import { getRootCategories } from "@/lib/category-queries";
 
 type Props = {
@@ -32,7 +34,7 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   };
 }
 
-export default async function CategoriiPage({ params, searchParams }: Props) {
+async function CategoriiPageContent({ params, searchParams }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
   const sp = await searchParams;
@@ -51,4 +53,12 @@ export default async function CategoriiPage({ params, searchParams }: Props) {
   const rootSlug = requested && roots.some((r) => r.slug === requested) ? requested : roots[0]!.slug;
 
   return <CategoryExplorer locale={locale} rootSlug={rootSlug} />;
+}
+
+export default function CategoriiPage(props: Props) {
+  return (
+    <Suspense fallback={<CategoryPageSkeleton />}>
+      <CategoriiPageContent params={props.params} searchParams={props.searchParams} />
+    </Suspense>
+  );
 }

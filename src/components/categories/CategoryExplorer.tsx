@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
-import { CATEGORY_ROOT_EMOJI } from "@/lib/category-icons";
+import { getRootCategoryLucideIcon } from "@/lib/category-root-icons";
 import { getSubcategoryLucideIcon } from "@/lib/category-subcategory-icons";
 import { getAllCategories } from "@/lib/category-queries";
 
@@ -83,7 +83,7 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
           >
             {roots.map((r) => {
               const active = r.slug === root.slug;
-              const icon = CATEGORY_ROOT_EMOJI[r.slug] ?? "•";
+              const RootIcon = getRootCategoryLucideIcon(r.slug);
               return (
                 <Link
                   key={r.id}
@@ -94,8 +94,8 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
                       : "border-zinc-200 bg-white text-zinc-900 active:bg-zinc-100 lg:border-0 lg:bg-transparent lg:hover:bg-zinc-50"
                   }`}
                 >
-                  <span className="text-xl lg:w-6 lg:text-center" aria-hidden>
-                    {icon}
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center text-emerald-700 lg:w-9" aria-hidden>
+                    <RootIcon className="h-5 w-5" strokeWidth={1.75} />
                   </span>
                   <span className="line-clamp-2 leading-tight">{labelFromJson(r.labels, locale)}</span>
                 </Link>
@@ -115,7 +115,7 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
                     <h2 id={`cat-section-${section.id}`} className="mb-4 text-lg font-bold tracking-tight text-zinc-950 sm:text-xl">
                       {sectionTitle}
                     </h2>
-                    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                       {section.children.map((leaf) => {
                         const Icon = getSubcategoryLucideIcon(leaf.slug);
                         const leafTitle = labelFromJson(leaf.labels, locale);
@@ -123,7 +123,7 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
                           <li key={leaf.id}>
                             <Link
                               href={`/anunturi?category=${encodeURIComponent(leaf.slug)}`}
-                              className="group flex min-h-[44px] items-center gap-3 rounded-xl border border-zinc-200/90 bg-zinc-50/40 px-4 py-3 shadow-sm transition-[background-color,box-shadow,border-color] hover:border-zinc-300 hover:bg-white hover:shadow-md active:bg-zinc-100"
+                              className="group flex min-h-[4.5rem] items-center gap-3 rounded-xl border border-zinc-200/90 bg-zinc-50/40 px-4 py-3 shadow-sm transition-[background-color,box-shadow,border-color] hover:border-zinc-300 hover:bg-white hover:shadow-md active:bg-zinc-100"
                             >
                               <span
                                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100/80"

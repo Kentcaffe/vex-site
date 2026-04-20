@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
+import { Search } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { emojiForCategorySlug, emojiForRootSlug } from "@/lib/category-icons";
+import { getRootCategoryLucideIcon } from "@/lib/category-root-icons";
+import { getSubcategoryLucideIcon } from "@/lib/category-subcategory-icons";
 import type { CategoryRow } from "@/lib/category-queries";
 
 type Props = {
@@ -88,7 +90,7 @@ function SubTree({
       {kids.map((node) => {
         const active = isActiveSlug(currentCategory, node.slug);
         const hasKids = (byParent.get(node.id)?.length ?? 0) > 0;
-        const icon = depth <= 2 ? emojiForCategorySlug(node.slug) : "·";
+        const IconGlyph = depth <= 2 ? getSubcategoryLucideIcon(node.slug) : null;
         const childTree = (
           <SubTree
             locale={locale}
@@ -102,11 +104,8 @@ function SubTree({
         return (
           <li key={node.id}>
             <div className="flex items-start gap-1.5">
-              <span
-                className={`mt-0.5 shrink-0 text-center ${depth === 0 ? "text-[15px]" : depth === 1 ? "text-[13px]" : "text-[11px] text-zinc-400"}`}
-                aria-hidden
-              >
-                {icon}
+              <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center text-zinc-500" aria-hidden>
+                {IconGlyph ? <IconGlyph className="h-3.5 w-3.5" strokeWidth={1.75} /> : <span className="text-[10px] text-zinc-400">·</span>}
               </span>
               <Link
                 href={`/anunturi?category=${encodeURIComponent(node.slug)}`}
@@ -154,9 +153,7 @@ export async function CategorySidebar({ locale, all, currentCategory }: Props) {
           href="/anunturi"
           className={`mt-3 flex items-center gap-2 rounded-xl px-3 py-2 text-sm transition ${linkClass(!currentCategory)}`}
         >
-          <span className="text-base" aria-hidden>
-            🔍
-          </span>
+          <Search className="h-4 w-4 shrink-0 opacity-80" aria-hidden strokeWidth={1.75} />
           {t("allCategories")}
         </Link>
       </div>
@@ -164,7 +161,7 @@ export async function CategorySidebar({ locale, all, currentCategory }: Props) {
         <ul className="space-y-3">
           {roots.map((root) => {
             const parentActive = isActiveUnder(all, currentCategory, root);
-            const rootEmoji = emojiForRootSlug(root.slug);
+            const RootIcon = getRootCategoryLucideIcon(root.slug);
             return (
               <li
                 key={root.id}
@@ -172,8 +169,11 @@ export async function CategorySidebar({ locale, all, currentCategory }: Props) {
               >
                 <details open={parentActive} className="group">
                   <summary className="flex cursor-pointer list-none items-start gap-2 border-b border-zinc-100/90 pb-2 dark:border-zinc-800">
-                    <span className="text-2xl leading-none" aria-hidden>
-                      {rootEmoji}
+                    <span
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-emerald-700 ring-1 ring-zinc-200/90 dark:bg-zinc-900 dark:text-emerald-400 dark:ring-zinc-700"
+                      aria-hidden
+                    >
+                      <RootIcon className="h-5 w-5" strokeWidth={1.75} />
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-1">
