@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { HomeListingCard } from "@/components/home/HomeListingCard";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import type { CategoryRow } from "@/lib/category-queries";
-import { getRootCategoryLucideIcon } from "@/lib/category-root-icons";
+import { emojiForRootSlug } from "@/lib/category-icons";
 import { formatPrice } from "@/lib/formatPrice";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import type { PriceCurrencyCode } from "@/lib/currency";
@@ -114,7 +114,7 @@ export async function HomeMarketplace({
           </div>
           <div className="-mx-1 flex gap-3 overflow-x-auto pb-3 pt-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {rootCategories.map((cat) => {
-              const CatIcon = getRootCategoryLucideIcon(cat.slug);
+              const rootEmoji = emojiForRootSlug(cat.slug);
               return (
                 <Link
                   key={cat.id}
@@ -122,10 +122,10 @@ export async function HomeMarketplace({
                   className="flex min-h-[52px] min-w-[max-content] shrink-0 items-center gap-2.5 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] px-4 py-3.5 text-base font-semibold text-zinc-800 shadow-[var(--mp-shadow-md)] transition hover:border-orange-200 hover:bg-[var(--mp-primary-soft)] active:scale-[0.98]"
                 >
                   <span
-                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--mp-surface-muted)] text-orange-700"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--mp-surface-muted)] text-[1.5rem] leading-none"
                     aria-hidden
                   >
-                    <CatIcon className="h-5 w-5" strokeWidth={1.75} />
+                    {rootEmoji}
                   </span>
                   {labelFor(cat, locale)}
                 </Link>

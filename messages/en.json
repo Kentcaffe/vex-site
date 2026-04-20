@@ -82,7 +82,8 @@
       "success": "Feedback sent successfully",
       "errorEmpty": "Message is too short (minimum 5 characters).",
       "errorTooLong": "Message is too long.",
-      "errorEmail": "Invalid email address."
+      "errorEmail": "Invalid email address.",
+      "accountLead": "Tell us what we can improve — we read every message and reply in your notifications."
     }
   },
   "Support": {
@@ -782,6 +783,7 @@
     "myListings": "My listings",
     "saved": "Saved",
     "support": "Live support",
+    "feedback": "Feedback & suggestions",
     "settings": "Settings",
     "logout": "Log out",
     "backToAccount": "Back to account",

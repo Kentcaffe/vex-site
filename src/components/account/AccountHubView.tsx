@@ -8,6 +8,7 @@ import {
   Heart,
   LayoutGrid,
   LogOut,
+  MessageSquareText,
   Settings,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
@@ -95,6 +96,7 @@ export function AccountHubView({ user }: Props) {
         <HubRow href="/cont/anunturi" icon={LayoutGrid} label={t("myListings")} />
         <HubRow href="/cont/favorite" icon={Heart} label={t("saved")} />
         <HubRow icon={Headphones} label={t("support")} onClick={() => setSupportOpen(true)} />
+        <HubRow href="/cont/feedback" icon={MessageSquareText} label={t("feedback")} />
         <HubRow href="/cont/setari" icon={Settings} label={t("settings")} />
       </nav>
 

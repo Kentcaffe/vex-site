@@ -16,7 +16,8 @@ export const CATEGORY_ROOT_EMOJI: Record<string, string> = {
 };
 
 const SUB_HINTS: { test: RegExp; emoji: string }[] = [
-  { test: /autoturisme|microbuze|camioane|autobuze|epoca|electrice/i, emoji: "🚙" },
+  { test: /camioane|camion/i, emoji: "🚛" },
+  { test: /autoturisme|microbuze|autobuze|epoca|electrice/i, emoji: "🚙" },
   { test: /moto|scuter|atv/i, emoji: "🏍️" },
   { test: /barca|ambarcatiuni/i, emoji: "⛵" },
   { test: /remorc|rulot/i, emoji: "🚚" },

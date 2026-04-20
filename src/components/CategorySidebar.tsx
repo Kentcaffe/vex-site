@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Search } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { getRootCategoryLucideIcon } from "@/lib/category-root-icons";
+import { emojiForRootSlug } from "@/lib/category-icons";
 import { getSubcategoryLucideIcon } from "@/lib/category-subcategory-icons";
 import type { CategoryRow } from "@/lib/category-queries";
 
@@ -161,7 +161,7 @@ export async function CategorySidebar({ locale, all, currentCategory }: Props) {
         <ul className="space-y-3">
           {roots.map((root) => {
             const parentActive = isActiveUnder(all, currentCategory, root);
-            const RootIcon = getRootCategoryLucideIcon(root.slug);
+            const rootEmoji = emojiForRootSlug(root.slug);
             return (
               <li
                 key={root.id}
@@ -170,10 +170,10 @@ export async function CategorySidebar({ locale, all, currentCategory }: Props) {
                 <details open={parentActive} className="group">
                   <summary className="flex cursor-pointer list-none items-start gap-2 border-b border-zinc-100/90 pb-2 dark:border-zinc-800">
                     <span
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-emerald-700 ring-1 ring-zinc-200/90 dark:bg-zinc-900 dark:text-emerald-400 dark:ring-zinc-700"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-[1.25rem] leading-none ring-1 ring-zinc-200/90 dark:bg-zinc-900 dark:ring-zinc-700"
                       aria-hidden
                     >
-                      <RootIcon className="h-5 w-5" strokeWidth={1.75} />
+                      {rootEmoji}
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-1">

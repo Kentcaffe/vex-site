@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
-import { getRootCategoryLucideIcon } from "@/lib/category-root-icons";
+import { emojiForRootSlug } from "@/lib/category-icons";
 import { getSubcategoryLucideIcon } from "@/lib/category-subcategory-icons";
 import { getAllCategories } from "@/lib/category-queries";
 
@@ -83,7 +83,7 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
           >
             {roots.map((r) => {
               const active = r.slug === root.slug;
-              const RootIcon = getRootCategoryLucideIcon(r.slug);
+              const rootEmoji = emojiForRootSlug(r.slug);
               return (
                 <Link
                   key={r.id}
@@ -94,8 +94,11 @@ export async function CategoryExplorer({ locale, rootSlug }: Props) {
                       : "border-zinc-200 bg-white text-zinc-900 active:bg-zinc-100 lg:border-0 lg:bg-transparent lg:hover:bg-zinc-50"
                   }`}
                 >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center text-emerald-700 lg:w-9" aria-hidden>
-                    <RootIcon className="h-5 w-5" strokeWidth={1.75} />
+                  <span
+                    className="flex h-8 w-8 shrink-0 items-center justify-center text-[1.35rem] leading-none lg:w-9"
+                    aria-hidden
+                  >
+                    {rootEmoji}
                   </span>
                   <span className="line-clamp-2 leading-tight">{labelFromJson(r.labels, locale)}</span>
                 </Link>

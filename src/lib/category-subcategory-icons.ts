@@ -171,7 +171,8 @@ const RULES: Rule[] = [
   { match: (s) => s.includes("rafturi-magazin"), Icon: Store },
   { match: (s) => s.includes("autoturism") || s.includes("epoca"), Icon: Car },
   { match: (s) => s.includes("microbuz") || s.includes("furgon"), Icon: Van },
-  { match: (s) => s.includes("camion"), Icon: Truck },
+  /** RO: „camioane” nu conține substringul „camion” */
+  { match: (s) => s.includes("camioane") || s.includes("camion"), Icon: Truck },
   { match: (s) => s.includes("autobuz"), Icon: Bus },
   { match: (s) => s.includes("motocic") || s.includes("scuter") || s.includes("biciclete") || s.includes("trotinet"), Icon: Bike },
   { match: (s) => s.includes("atv"), Icon: CarFront },

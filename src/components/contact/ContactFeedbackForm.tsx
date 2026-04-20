@@ -5,7 +5,14 @@ import { useTranslations } from "next-intl";
 import { submitFeedback, type SubmitFeedbackResult } from "@/app/actions/feedback";
 import { useToast } from "@/components/ui/SimpleToast";
 
-export function ContactFeedbackForm() {
+type Props = {
+  /** Pe pagina Cont titlul e în header; ascunde H2-ul secțiunii. */
+  showHeading?: boolean;
+  /** Sufix pentru id-uri când există două formulare pe aceeași pagină. */
+  idSuffix?: string;
+};
+
+export function ContactFeedbackForm({ showHeading = true, idSuffix = "" }: Props) {
   const t = useTranslations("Contact.feedback");
   const { toast } = useToast();
   const [pending, startTransition] = useTransition();
@@ -36,18 +43,26 @@ export function ContactFeedbackForm() {
     });
   }
 
+  const mid = `contact-feedback-message${idSuffix}`;
+  const eid = `contact-feedback-email${idSuffix}`;
+
   return (
-    <section className="border-t border-zinc-100 pt-8" aria-labelledby="contact-feedback-heading">
-      <h2 id="contact-feedback-heading" className="text-center text-sm font-bold uppercase tracking-[0.12em] text-zinc-500 sm:text-left">
-        {t("title")}
-      </h2>
-      <form onSubmit={onSubmit} className="mt-5 space-y-4">
+    <section
+      className={showHeading ? "border-t border-zinc-100 pt-8" : ""}
+      aria-labelledby={showHeading ? "contact-feedback-heading" : undefined}
+    >
+      {showHeading ? (
+        <h2 id="contact-feedback-heading" className="text-center text-sm font-bold uppercase tracking-[0.12em] text-zinc-500 sm:text-left">
+          {t("title")}
+        </h2>
+      ) : null}
+      <form onSubmit={onSubmit} className={`space-y-4 ${showHeading ? "mt-5" : ""}`}>
         <div>
-          <label htmlFor="contact-feedback-message" className="sr-only">
+          <label htmlFor={mid} className="sr-only">
             {t("placeholder")}
           </label>
           <textarea
-            id="contact-feedback-message"
+            id={mid}
             name="message"
             rows={4}
             value={message}
@@ -60,11 +75,11 @@ export function ContactFeedbackForm() {
           />
         </div>
         <div>
-          <label htmlFor="contact-feedback-email" className="mb-1.5 block text-xs font-medium text-zinc-500">
+          <label htmlFor={eid} className="mb-1.5 block text-xs font-medium text-zinc-500">
             {t("emailLabel")}
           </label>
           <input
-            id="contact-feedback-email"
+            id={eid}
             name="email"
             type="email"
             inputMode="email"

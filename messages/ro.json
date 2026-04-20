@@ -82,7 +82,8 @@
       "success": "Feedback trimis cu succes",
       "errorEmpty": "Mesajul este prea scurt (minim 5 caractere).",
       "errorTooLong": "Mesajul este prea lung.",
-      "errorEmail": "Adresa de email nu este validă."
+      "errorEmail": "Adresa de email nu este validă.",
+      "accountLead": "Spune-ne ce putem îmbunătăți pe platformă — citim mesajele și îți răspundem în cont la notificări."
     }
   },
   "Support": {
@@ -782,6 +783,7 @@
     "myListings": "Anunțurile mele",
     "saved": "Salvate",
     "support": "Suport live",
+    "feedback": "Feedback & sugestii",
     "settings": "Setări",
     "logout": "Ieșire",
     "backToAccount": "Înapoi la cont",
