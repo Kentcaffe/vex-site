@@ -26,6 +26,3 @@ services:
         sync: false
       - key: NEXT_PUBLIC_PRICE_CURRENCY
         value: MDL
-      # Evită agățarea la migrate pe pooler; pe Render direct merge adesea (vezi scripts/prisma-migrate-deploy.mjs)
-      - key: PRISMA_MIGRATE_TRY_DIRECT_FIRST
-        value: "true"

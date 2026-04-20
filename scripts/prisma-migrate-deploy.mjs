@@ -84,15 +84,16 @@ function buildMigrateUrlOrder() {
   const sessionPool = deriveSupabaseSessionPoolerUrl(pool);
   const tryDirectFirst = shouldTryDirectFirst();
   const onRender = process.env.RENDER === "true";
+  /** Pe Render, `db.*.supabase.co:5432` (DIRECT_URL) dă aproape mereu P1001 — nu îl mai încercăm la migrate. */
+  const useDirectInMigrate = Boolean(direct && !onRender);
 
-  /** Ordinea contează: session pooler (:5432) înainte de transaction (:6543). Pe Render, db.* direct dă adesea P1001 — încercăm session înainte. */
+  /** Ordinea: session pooler (:5432) înainte de transaction (:6543). */
   const parts = [];
   if (override) parts.push(override);
 
   if (tryDirectFirst) {
     if (onRender) {
       if (sessionPool) parts.push(sessionPool);
-      if (direct) parts.push(direct);
       if (pool) parts.push(pool);
     } else {
       if (direct) parts.push(direct);
@@ -102,7 +103,7 @@ function buildMigrateUrlOrder() {
   } else {
     if (sessionPool) parts.push(sessionPool);
     if (pool) parts.push(pool);
-    if (direct) parts.push(direct);
+    if (useDirectInMigrate) parts.push(direct);
   }
 
   return [...new Set(parts.filter(Boolean))];
@@ -114,8 +115,14 @@ console.log(
   `[migrate] Env: DATABASE_URL=${process.env.DATABASE_URL ? "da" : "nu"}, DIRECT_URL=${process.env.DIRECT_URL ? "da" : "nu"}, MIGRATE_DATABASE_URL=${process.env.MIGRATE_DATABASE_URL ? "da" : "nu"}, RENDER=${process.env.RENDER === "true" ? "da" : "nu"}`,
 );
 const tryDirectFirst = shouldTryDirectFirst();
+const onRender = process.env.RENDER === "true";
+if (onRender && process.env.DIRECT_URL) {
+  console.log(
+    "[migrate] Pe Render nu folosim DIRECT_URL la migrate (db.*.supabase.co → P1001 din rețeaua Render); folosim pooler session :5432 apoi :6543.",
+  );
+}
 console.log(
-  `[migrate] Ordine: ${tryDirectFirst ? (process.env.RENDER === "true" ? "override → pooler session :5432 → DIRECT → pooler txn :6543" : "override → DIRECT → pooler session :5432 → pooler txn :6543") : "override → pooler session :5432 → pooler txn → DIRECT"}`,
+  `[migrate] Ordine: ${tryDirectFirst ? (onRender ? "override → pooler session :5432 → pooler txn :6543" : "override → DIRECT → pooler session :5432 → pooler txn :6543") : "override → pooler session :5432 → pooler txn → DIRECT"}`,
 );
 console.log(`[migrate] URL-uri unice de încercat: ${unique.length}`);
 unique.forEach((u, i) => console.log(`  ${i + 1}. ${maskConnectionHint(u)}`));
