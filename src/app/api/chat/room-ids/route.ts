@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { logRouteError } from "@/lib/server-log";
 
 /**
  * Lista de roomId-uri pentru utilizatorul curent — folosită la filtrare Supabase Realtime pe ChatMessage.
@@ -19,7 +20,7 @@ export async function GET() {
     });
     return NextResponse.json({ roomIds: rooms.map((r) => r.id) }, { status: 200 });
   } catch (e) {
-    console.error("[GET /api/chat/room-ids]", e);
+    logRouteError("GET /api/chat/room-ids", e);
     return NextResponse.json({ roomIds: [] as string[] }, { status: 200 });
   }
 }

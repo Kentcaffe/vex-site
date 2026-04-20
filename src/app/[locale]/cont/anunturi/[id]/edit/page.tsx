@@ -1,15 +1,27 @@
 import type { Metadata } from "next";
+import dynamic from "next/dynamic";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
-import { ListingForm } from "@/components/ListingForm";
 import { buildPublishValuesForEdit } from "@/lib/listing-edit-hydration";
 import { getCategoryTreeForPicker } from "@/lib/category-queries";
 import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
+
+const ListingForm = dynamic(
+  () => import("@/components/ListingForm").then((m) => m.ListingForm),
+  {
+    loading: () => (
+      <div
+        className="animate-pulse rounded-2xl border border-zinc-200 bg-zinc-50/90 p-12 min-h-[min(70vh,480px)]"
+        aria-hidden
+      />
+    ),
+  },
+);
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;

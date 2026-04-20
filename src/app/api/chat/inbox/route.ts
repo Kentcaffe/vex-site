@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getLastRoomMessage } from "@/lib/chat-realtime-store";
 import { prisma } from "@/lib/prisma";
+import { logRouteError } from "@/lib/server-log";
 
 export async function GET() {
   try {
@@ -60,7 +61,7 @@ export async function GET() {
 
     return NextResponse.json({ rooms: out });
   } catch (err) {
-    console.error("[GET /api/chat/inbox]", err);
+    logRouteError("GET /api/chat/inbox", err);
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }

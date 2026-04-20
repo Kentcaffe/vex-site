@@ -22,19 +22,30 @@ export function SupabaseResetPasswordForm() {
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
     let cancelled = false;
-    void (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (cancelled) {
-        return;
-      }
-      if (data.session) {
+
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled || !session) return;
+      setPhase("ready");
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (cancelled || !session) return;
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
         setPhase("ready");
-      } else {
-        setPhase("noSession");
       }
-    })();
+    });
+
+    const timer = window.setTimeout(() => {
+      if (cancelled) return;
+      setPhase((p) => (p === "loading" ? "noSession" : p));
+    }, 1200);
+
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -56,7 +67,9 @@ export function SupabaseResetPasswordForm() {
     const { error } = await supabase.auth.updateUser({ password: p });
     setPending(false);
     if (error) {
-      console.error("[SupabaseResetPasswordForm] updateUser:", error.message, error);
+      if (process.env.NODE_ENV === "development") {
+        console.error("[SupabaseResetPasswordForm] updateUser:", error.message);
+      }
       setSubmitError(t("resetUpdateFailed"));
       return;
     }

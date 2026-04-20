@@ -1,0 +1,23 @@
+-- Recomandări RLS pentru VEX (aplicați în Supabase SQL Editor după audit).
+-- Tabele: public.messages, public."ChatMessage" (dacă folosiți ambele), public."ChatRoom".
+--
+-- Principii:
+-- 1) SELECT/INSERT doar pentru participanții la cameră (buyer/seller din ChatRoom + sender/receiver).
+-- 2) Fără acces anonim la conținut mesajelor — folosiți service role doar pe server (API Next).
+-- 3) Realtime: policy-urile trebuie să permită replicațiilor să vadă rândurile permise utilizatorului autentificat.
+--
+-- Tabele tipice: public.messages (room_id, sender_id, receiver_id), public."ChatMessage" (roomId, senderId).
+-- Realtime Postgres Changes necesită SELECT permis de RLS pentru rândurile vizibile userului.
+
+-- Exemplu orientativ (adaptați la schema exactă și la cum mapați auth.uid() la userId din app):
+
+-- ALTER TABLE public.messages ENABLE ROW LEVEL SECURITY;
+--
+-- CREATE POLICY "messages_select_participant"
+--   ON public.messages FOR SELECT
+--   USING (
+--     auth.uid()::text = sender_id OR auth.uid()::text = receiver_id
+--   );
+--
+-- Notă: Dacă userId din Postgres ≠ Supabase auth.uid(), folosiți un mapping în tabel users sau
+-- setați JWT custom claims. Politicile de mai sus sunt șabloane — verificați coloanele reale.

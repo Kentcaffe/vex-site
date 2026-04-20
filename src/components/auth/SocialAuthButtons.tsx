@@ -48,7 +48,7 @@ export function SocialAuthButtons({ oauth, callbackUrl, variant }: Props) {
       provider,
       options: { redirectTo },
     });
-    if (error) {
+    if (error && process.env.NODE_ENV === "development") {
       console.error(`[auth] ${provider} sign-in failed:`, error.message);
     }
   }

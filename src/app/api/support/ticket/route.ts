@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getOrCreateActiveSupportTicket } from "@/lib/support-chat";
+import { logRouteError } from "@/lib/server-log";
 
 export async function GET() {
   const session = await auth();
@@ -19,7 +20,7 @@ export async function GET() {
       },
     });
   } catch (err) {
-    console.error("[GET /api/support/ticket]", err);
+    logRouteError("GET /api/support/ticket", err);
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }

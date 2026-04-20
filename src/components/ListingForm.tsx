@@ -4,6 +4,7 @@ import { startTransition, useActionState, useCallback, useEffect, useMemo, useRe
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { saveListing, type CreateListingState } from "@/app/actions/listings";
+import { devLog, devWarn } from "@/lib/dev-log";
 import { CategorySelector } from "@/components/publish/CategorySelector";
 import { useToast } from "@/components/ui/SimpleToast";
 import { localizedHref } from "@/lib/paths";
@@ -445,18 +446,18 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
   }
 
   function handleSubmit() {
-    console.warn("handleSubmit() START");
+    devWarn("handleSubmit() START");
     setLiveValidateEnabled(true);
     const cid = categoryId.trim();
     const selectedPath = cid ? getPathLabelsForLeaf(categoryTree, cid) : "";
-    console.warn("[publish] categoryId payload", {
+    devWarn("[publish] categoryId payload", {
       categoryId: cid,
       selectedPath,
       isLeaf: cid ? isLeafCategoryNode(categoryTree, cid) : false,
     });
 
     if (!cid) {
-      console.warn("[publish] blocked: missing subcategory_id");
+      devWarn("[publish] blocked: missing subcategory_id");
       setClientErrors({ categoryId: msg.errCategory });
       toast("error", msg.errCategory);
       queueMicrotask(() => {
@@ -465,7 +466,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       return;
     }
     if (!isLeafCategoryNode(categoryTree, cid)) {
-      console.warn("[publish] blocked: selected category is not a leaf", { subcategory_id: cid });
+      devWarn("[publish] blocked: selected category is not a leaf", { subcategory_id: cid });
       setClientErrors({ categoryId: tVal("errCategoryLeaf") });
       toast("error", tVal("errCategoryLeaf"));
       queueMicrotask(() => {
@@ -479,7 +480,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       category_id: cid,
       categorySlug: selectedSlug,
     };
-    console.warn("Submitting payload:", payload);
+    devWarn("Submitting payload:", payload);
     const fd = buildFormDataFromPublishValues(
       locale,
       cid,
@@ -489,18 +490,18 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       detailFields,
       editListingId,
     );
-    console.warn("Form data:", debugFormData(fd));
-    console.warn("[publish] request body check", {
+    devWarn("Form data:", debugFormData(fd));
+    devWarn("[publish] request body check", {
       title: fd.get("title"),
       price: fd.get("price"),
       category_id: fd.get("category_id"),
       images: fd.get("images"),
     });
-    console.warn("[publish] formData.categoryId", fd.get("categoryId"));
-    console.warn("[publish] formData.subcategory_id", fd.get("subcategory_id"));
+    devWarn("[publish] formData.categoryId", fd.get("categoryId"));
+    devWarn("[publish] formData.subcategory_id", fd.get("subcategory_id"));
     const v = validateListingFormClient(fd, msg);
     if (!v.ok) {
-      console.warn("[publish] validation errors:", v.errors, "firstField:", v.firstField);
+      devWarn("[publish] validation errors:", v.errors, "firstField:", v.firstField);
       const firstErrorText =
         v.errors[v.firstField] ??
         Object.values(v.errors).find((e): e is string => typeof e === "string") ??
@@ -512,12 +513,12 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       });
       return;
     }
-    console.warn("[publish] validation passed");
+    devWarn("[publish] validation passed");
     setClientErrors({});
-    console.warn("[publish] request transport: serverAction:saveListing");
+    devWarn("[publish] request transport: serverAction:saveListing");
     startTransition(() => {
       formAction(fd);
-      console.warn("[publish] request dispatched");
+      devWarn("[publish] request dispatched");
     });
   }
 
@@ -598,8 +599,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
               const nextId = id.trim();
               const prevId = categoryId.trim();
               const nextSelected = nextId ? findCategoryNodeById(categoryTree, nextId) : null;
-              console.log("Selected:", nextSelected);
-              console.log("Subcategory ID:", nextId);
+              devLog("Category selected:", nextSelected, "id:", nextId);
               setCategoryId(nextId);
               if (nextId !== prevId) {
                 setPublishValues((p) => ({

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getRoomAccess } from "@/lib/chat-actions";
 import { prisma } from "@/lib/prisma";
+import { logRouteError } from "@/lib/server-log";
 
 type Props = { params: Promise<{ roomId: string }> };
 
@@ -28,7 +29,7 @@ export async function POST(_req: Request, { params }: Props) {
 
     return NextResponse.json({ ok: true, lastReadAt: now.toISOString() });
   } catch (err) {
-    console.error("[POST /api/chat/room/[roomId]/read]", err);
+    logRouteError("POST /api/chat/room/[roomId]/read", err);
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }

@@ -91,7 +91,7 @@ export default async function ChatRoomPage({ params }: Props) {
 
     return (
       <div className="flex min-h-[calc(100dvh-5.5rem)] flex-1 flex-col px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))] pt-2 sm:mx-auto sm:min-h-0 sm:max-w-3xl sm:px-6 sm:py-8">
-        <ChatRoomView bootstrap={bootstrap} currentUserId={userId} />
+        <ChatRoomView key={room.id} bootstrap={bootstrap} currentUserId={userId} />
       </div>
     );
   } catch (e) {

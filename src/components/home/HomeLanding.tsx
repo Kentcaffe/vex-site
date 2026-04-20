@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { devLog } from "@/lib/dev-log";
 import { getRootCategories } from "@/lib/category-queries";
 import { asListingSelect } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
@@ -33,11 +34,11 @@ export async function HomeLanding({ locale }: Props) {
       getRootCategories(),
     ]);
 
-    console.log("[home] listings query response", {
+    devLog("[home] listings query response", {
       isArray: Array.isArray(listingsResult),
       count: Array.isArray(listingsResult) ? listingsResult.length : 0,
     });
-    console.log("[home] categories query response", {
+    devLog("[home] categories query response", {
       isArray: Array.isArray(categoriesResult),
       count: Array.isArray(categoriesResult) ? categoriesResult.length : 0,
     });

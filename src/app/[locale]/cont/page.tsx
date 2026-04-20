@@ -8,10 +8,13 @@ import { prisma } from "@/lib/prisma";
 
 type Props = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ error?: string }>;
 };
 
-export default async function ContPage({ params }: Props) {
+export default async function ContPage({ params, searchParams }: Props) {
   const { locale } = await params;
+  const sp = await searchParams;
+  const callbackError = typeof sp.error === "string" && sp.error.length > 0 ? sp.error : undefined;
   setRequestLocale(locale);
   const session = await auth();
 
@@ -38,7 +41,7 @@ export default async function ContPage({ params }: Props) {
 
   return (
     <div className="app-shell flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center px-4 py-12 sm:px-6">
-      <AuthForms oauth={oauth} />
+      <AuthForms oauth={oauth} callbackError={callbackError} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { supportTicket } from "@/lib/prisma-delegates";
+import { logRouteError } from "@/lib/server-log";
 
 export async function POST(req: Request) {
   const session = await auth();
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("[POST /api/support/feedback]", err);
+    logRouteError("POST /api/support/feedback", err);
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }

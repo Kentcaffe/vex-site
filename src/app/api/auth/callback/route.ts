@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { syncAuthenticatedUserToPrisma } from "@/auth";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { logRouteError } from "@/lib/server-log";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -16,12 +17,12 @@ export async function GET(request: Request) {
   try {
     supabase = await createSupabaseServerClient();
   } catch (error) {
-    console.error("[auth] Supabase callback misconfigured:", error);
+    logRouteError("GET /api/auth/callback createSupabaseServerClient", error);
     return NextResponse.redirect(new URL("/cont?error=supabase_env_missing", baseUrl));
   }
   const { error } = await supabase.auth.exchangeCodeForSession(code);
   if (error) {
-    console.error("[auth] OAuth callback exchange failed:", error.message);
+    logRouteError("GET /api/auth/callback exchangeCodeForSession", error);
     return NextResponse.redirect(new URL("/cont?error=oauth_callback", baseUrl));
   }
 

@@ -1,13 +1,25 @@
+import dynamic from "next/dynamic";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { ListingForm } from "@/components/ListingForm";
 import { getCategoryTreeForPicker } from "@/lib/category-queries";
 import { localizedHref } from "@/lib/paths";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
+
+const ListingForm = dynamic(
+  () => import("@/components/ListingForm").then((m) => m.ListingForm),
+  {
+    loading: () => (
+      <div
+        className="animate-pulse rounded-2xl border border-zinc-200 bg-zinc-50/90 p-12 min-h-[min(70vh,480px)]"
+        aria-hidden
+      />
+    ),
+  },
+);
 
 export default async function PublicaPage({ params }: Props) {
   const { locale } = await params;

@@ -16,6 +16,7 @@ import {
   parseListingImageUrlsStrict,
   rawFromFormData,
 } from "@/lib/listing-form-schema";
+import { devLog, devWarn } from "@/lib/dev-log";
 import { asListingCreateInput } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
 
@@ -65,7 +66,7 @@ async function ensureCategoryTreeInDbIfMissing(): Promise<boolean> {
   if (count > 0) {
     return false;
   }
-  console.warn("[createListing] category table is empty; seeding default category tree");
+  devWarn("[createListing] category table is empty; seeding default category tree");
   await upsertCategoryTree(CATEGORY_ROOTS, null);
   return true;
 }
@@ -74,13 +75,10 @@ export async function createListing(
   _prev: CreateListingState | undefined,
   formData: FormData,
 ): Promise<CreateListingState> {
-  console.log("[createListing] START");
-  console.log(
-    "[createListing] formData keys",
-    Array.from(formData.keys()),
-  );
+  devLog("[createListing] START");
+  devLog("[createListing] formData keys", Array.from(formData.keys()));
 
-  console.warn("[createListing] request body", {
+  devWarn("[createListing] request body", {
     title: String(formData.get("title") ?? ""),
     price: String(formData.get("price") ?? ""),
     category_id: String(formData.get("category_id") ?? formData.get("categoryId") ?? ""),
@@ -89,7 +87,7 @@ export async function createListing(
 
   const session = await auth();
   if (!session?.user?.id) {
-    console.log("[createListing] ERROR unauthorized: missing session.user.id");
+    devLog("[createListing] ERROR unauthorized: missing session.user.id");
     return { ok: false, error: "unauthorized", details: "Trebuie să fii autentificat pentru a publica." };
   }
 
@@ -97,12 +95,12 @@ export async function createListing(
   const rawSubcategoryId = String(formData.get("subcategory_id") ?? "").trim();
   const categorySlugRaw = String(formData.get("categorySlug") ?? "").trim();
   if (!rawCategoryId && !rawSubcategoryId) {
-    console.log("[createListing] ERROR category: missing categoryId and subcategory_id");
+    devLog("[createListing] ERROR category: missing categoryId and subcategory_id");
     return { ok: false, error: "category", details: "Lipsește category_id / subcategory_id." };
   }
 
   const raw = rawFromFormData(formData);
-  console.log("[createListing] parsed raw payload preview", {
+  devLog("[createListing] parsed raw payload preview", {
     categoryId: raw.categoryId,
     titleLen: String(raw.title ?? "").length,
     descriptionLen: String(raw.description ?? "").length,
@@ -112,7 +110,7 @@ export async function createListing(
   });
   const parsed = listingFormSchema.safeParse(raw);
   if (!parsed.success) {
-    console.log("[createListing] ERROR validation: schema parse failed", parsed.error.issues);
+    devLog("[createListing] ERROR validation: schema parse failed", parsed.error.issues);
     const first = parsed.error.issues[0];
     return {
       ok: false,
@@ -126,14 +124,14 @@ export async function createListing(
     select: { id: true },
   });
   if (!dbUser) {
-    console.log("[createListing] ERROR session: user not found in DB", session.user.id);
+    devLog("[createListing] ERROR session: user not found in DB", session.user.id);
     return { ok: false, error: "session", details: "Sesiune invalidă. Reautentifică-te." };
   }
 
   const rawImages = parsed.data.imagesRaw ?? null;
   const urls = parseListingImageUrlsStrict(rawImages);
   if (!urls) {
-    console.log("[createListing] ERROR validation: images invalid", {
+    devLog("[createListing] ERROR validation: images invalid", {
       imagesRawLen: String(rawImages ?? "").length,
     });
     return {
@@ -145,7 +143,7 @@ export async function createListing(
 
   const submittedCategoryId = parsed.data.categoryId.trim();
   const submittedSubcategoryId = rawSubcategoryId || submittedCategoryId;
-  console.log("[createListing] received payload", {
+  devLog("[createListing] received payload", {
     categoryId: submittedCategoryId,
     subcategory_id: submittedSubcategoryId,
     categorySlug: categorySlugRaw || parsed.data.categorySlug || "",
@@ -176,7 +174,7 @@ export async function createListing(
           select: { id: true, slug: true },
         });
         if (categoryRow) {
-          console.warn("[createListing] category resolved via slug fallback", {
+          devWarn("[createListing] category resolved via slug fallback", {
             submittedCategoryId,
             slug,
             resolvedId: categoryRow.id,
@@ -196,7 +194,7 @@ export async function createListing(
     }
   }
   if (!categoryRow) {
-    console.log("[createListing] ERROR category: category not found", {
+    devLog("[createListing] ERROR category: category not found", {
       submittedCategoryId,
       submittedSubcategoryId,
       categorySlugRaw,
@@ -208,7 +206,7 @@ export async function createListing(
     where: { parentId: categoryRow.id },
   });
   if (childCount > 0) {
-    console.log("[createListing] ERROR category: selected category is not leaf", {
+    devLog("[createListing] ERROR category: selected category is not leaf", {
       categoryId: categoryRow.id,
       childCount,
     });
@@ -257,7 +255,7 @@ export async function createListing(
     listingId = created.id;
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2003") {
-      console.log("[createListing] ERROR validation: prisma FK P2003");
+      devLog("[createListing] ERROR validation: prisma FK P2003");
       return { ok: false, error: "validation", details: "Relație invalidă în baza de date (P2003)." };
     }
     console.error("[createListing]", e);
@@ -273,7 +271,7 @@ export async function createListing(
   revalidatePath(localizedHref(parsed.data.locale, "/cont/anunturi"));
   revalidatePath(localizedHref(parsed.data.locale, `/anunturi/${listingId}`));
 
-  console.log("[createListing] SUCCESS", { listingId });
+  devLog("[createListing] SUCCESS", { listingId });
   return { ok: true, listingId, details: "Anunț publicat cu succes." };
 }
 

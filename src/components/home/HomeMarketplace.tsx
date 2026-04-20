@@ -1,13 +1,11 @@
 import { getTranslations } from "next-intl/server";
-import { ChevronRight, MapPin, Sparkles } from "lucide-react";
+import { ChevronRight, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-import { FavoriteButton } from "@/components/FavoriteButton";
+import { HomeListingCard } from "@/components/home/HomeListingCard";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import type { CategoryRow } from "@/lib/category-queries";
 import { emojiForRootSlug } from "@/lib/category-icons";
 import { formatPrice } from "@/lib/formatPrice";
-import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
-import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import type { PriceCurrencyCode } from "@/lib/currency";
 import { listingSeoPath } from "@/lib/seo";
@@ -158,53 +156,24 @@ export async function HomeMarketplace({
           ) : (
             <ul className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
               {listings.map((item, index) => {
-                const cover = parseStoredListingImages(item.images)[0];
+                const cover = parseStoredListingImages(item.images)[0] ?? null;
                 const place = item.city + (item.district ? ` · ${item.district}` : "");
                 const listingHref = listingSeoPath({ id: item.id, title: item.title, city: item.city });
                 return (
-                  <li key={item.id} className="group">
-                    <article className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] shadow-[var(--mp-shadow-md)] transition hover:-translate-y-0.5 hover:shadow-[var(--mp-shadow-lg)]">
-                      <div className="relative mp-card-image">
-                        <Link href={listingHref} className="absolute inset-0 z-0 block" aria-label={item.title}>
-                          {cover ? (
-                            <ListingCoverImg
-                              src={cover}
-                              alt={`${item.title} de vânzare în ${item.city}`}
-                              priority={index < 4}
-                              className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
-                            />
-                          ) : (
-                            <ListingImagePlaceholder
-                              title={tList("cardNoImageTitle")}
-                              hint={tList("cardNoImageHint")}
-                              className="bg-zinc-200"
-                            />
-                          )}
-                        </Link>
-                        <div className="absolute right-2 top-2 z-10">
-                          <FavoriteButton
-                            listingId={item.id}
-                            initialFavorited={favoritedIds.has(item.id)}
-                            variant="icon"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex flex-1 flex-col p-3.5 sm:p-4">
-                        <Link href={listingHref} className="block min-h-0 flex-1">
-                          <span className="line-clamp-2 text-base font-bold leading-snug text-zinc-900 group-hover:text-[#c2410c]">
-                            {item.title}
-                          </span>
-                        </Link>
-                        <p className="mt-2 text-base font-extrabold text-[#c2410c] tabular-nums">
-                          {formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
-                        </p>
-                        <p className="mt-1.5 flex items-center gap-1 text-sm text-zinc-700">
-                          <MapPin className="h-4 w-4 shrink-0 text-zinc-600" aria-hidden />
-                          <span className="line-clamp-1">{place}</span>
-                        </p>
-                      </div>
-                    </article>
-                  </li>
+                  <HomeListingCard
+                    key={item.id}
+                    listingId={item.id}
+                    listingHref={listingHref}
+                    title={item.title}
+                    formattedPrice={formatPrice(item.price, locale, item.priceCurrency as PriceCurrencyCode)}
+                    place={place}
+                    coverSrc={cover}
+                    coverAlt={`${item.title} de vânzare în ${item.city}`}
+                    priority={index < 4}
+                    initialFavorited={favoritedIds.has(item.id)}
+                    noImageTitle={tList("cardNoImageTitle")}
+                    noImageHint={tList("cardNoImageHint")}
+                  />
                 );
               })}
             </ul>

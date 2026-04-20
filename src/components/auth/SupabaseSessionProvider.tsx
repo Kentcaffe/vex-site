@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { AppSession } from "@/auth";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
@@ -28,12 +28,12 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<AppSession | null>(null);
   const [status, setStatus] = useState<SessionStatus>("loading");
 
-  async function refresh() {
+  const refresh = useCallback(async () => {
     setStatus((prev) => (prev === "loading" ? prev : "loading"));
     const session = await readServerSession();
     setData(session);
     setStatus(session?.user?.id ? "authenticated" : "unauthenticated");
-  }
+  }, []);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -47,7 +47,7 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(timer);
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [refresh]);
 
   const value = useMemo(
     () => ({
@@ -55,7 +55,7 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
       status,
       refresh,
     }),
-    [data, status],
+    [data, status, refresh],
   );
 
   return <SupabaseSessionContext.Provider value={value}>{children}</SupabaseSessionContext.Provider>;

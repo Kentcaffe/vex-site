@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { isStaff } from "@/lib/auth-roles";
 import { supportTicket } from "@/lib/prisma-delegates";
+import { logRouteError } from "@/lib/server-log";
 
 export async function GET() {
   const session = await auth();
@@ -26,7 +27,7 @@ export async function GET() {
       },
     });
   } catch (e) {
-    console.error("[GET /api/admin/support/tickets]", e);
+    logRouteError("GET /api/admin/support/tickets", e);
     return NextResponse.json({ error: "service_unavailable", tickets: [] }, { status: 503 });
   }
   type TicketApiRow = (typeof tickets)[number];

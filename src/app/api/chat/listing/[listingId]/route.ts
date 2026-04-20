@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
 import { prisma } from "@/lib/prisma";
+import { logRouteError } from "@/lib/server-log";
 
 type Props = { params: Promise<{ listingId: string }> };
 
@@ -57,7 +58,7 @@ export async function GET(_req: Request, { params }: Props) {
       maxBodyLength: CHAT_MESSAGE_MAX,
     });
   } catch (err) {
-    console.error("[GET /api/chat/listing/[listingId]]", err);
+    logRouteError("GET /api/chat/listing/[listingId]", err);
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }

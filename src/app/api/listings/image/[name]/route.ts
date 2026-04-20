@@ -2,6 +2,7 @@ import { access, readFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 import { getSupabaseServiceClient, listingsObjectKey, listingsStorageBucket } from "@/lib/supabase-service-role";
+import { logRouteError } from "@/lib/server-log";
 
 const MIME_BY_EXT: Record<string, string> = {
   jpg: "image/jpeg",
@@ -71,7 +72,7 @@ export async function GET(
       });
     }
     if (error) {
-      console.error("[api/listings/image] Supabase download:", error.message);
+      logRouteError("GET /api/listings/image/[name] Supabase download", error);
     }
   }
 

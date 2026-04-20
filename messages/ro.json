@@ -742,7 +742,11 @@
     "resetPasswordSubmit": "Salvează parola",
     "resetSessionLoading": "Verificăm sesiunea…",
     "resetNoRecoverySession": "Deschide linkul din email pe acest dispozitiv sau cere un link nou mai jos.",
-    "resetUpdateFailed": "Nu s-a putut actualiza parola. Încearcă din nou sau cere un link nou de resetare."
+    "resetUpdateFailed": "Nu s-a putut actualiza parola. Încearcă din nou sau cere un link nou de resetare.",
+    "callbackError_missing_code": "Linkul de autentificare nu este valid sau a expirat. Încearcă din nou.",
+    "callbackError_oauth": "Autentificarea cu Google/Facebook a eșuat. Încearcă din nou sau folosește emailul și parola.",
+    "callbackError_supabase_env": "Autentificarea nu este configurată corect. Încearcă mai târziu sau contactează suportul.",
+    "callbackError_generic": "Autentificarea nu s-a putut finaliza. Încearcă din nou."
   },
   "Account": {
     "title": "Cont",

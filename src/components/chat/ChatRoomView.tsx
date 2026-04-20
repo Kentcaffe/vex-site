@@ -11,6 +11,7 @@ import {
   showNewChatMessageNotification,
 } from "@/lib/chat-notifications-client";
 import { sameCalendarDay } from "@/lib/chat-ui";
+import { sortChatMessages, upsertChatMessagesSorted, type ChatMessageRow } from "@/lib/chat-merge-messages";
 import { listingSeoPath } from "@/lib/seo";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
@@ -48,7 +49,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   const locale = useLocale();
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState(() =>
-    Array.isArray(bootstrap.messages) ? bootstrap.messages : [],
+    sortChatMessages(Array.isArray(bootstrap.messages) ? bootstrap.messages : []),
   );
   const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(bootstrap.otherLastReadAt);
   const [draft, setDraft] = useState("");
@@ -94,20 +95,13 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
       const wasNearBottom = nearBottomRef.current;
       const fromOther = normalized.senderId !== currentUserId;
 
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === normalized.id)) {
-          return prev;
-        }
-        return [
-          ...prev,
-          {
-            id: normalized.id,
-            senderId: normalized.senderId,
-            body: normalized.body,
-            createdAt: normalized.createdAt,
-          },
-        ];
-      });
+      const row: ChatMessageRow = {
+        id: normalized.id,
+        senderId: normalized.senderId,
+        body: normalized.body,
+        createdAt: normalized.createdAt,
+      };
+      setMessages((prev) => upsertChatMessagesSorted(prev, row));
 
       if (fromOther) {
         void fetch(`/api/chat/room/${roomId}/read`, { method: "POST", credentials: "include" });
@@ -138,6 +132,9 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
     [currentUserId, roomId, scrollToBottom, t],
   );
 
+  const appendRef = useRef(appendIncomingMessage);
+  appendRef.current = appendIncomingMessage;
+
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
     const channel = supabase
@@ -151,7 +148,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
           filter: `roomId=eq.${roomId}`,
         },
         (payload) => {
-          appendIncomingMessage("ChatMessage", payload.new);
+          appendRef.current("ChatMessage", payload.new);
         },
       )
       .on(
@@ -163,7 +160,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
           filter: `room_id=eq.${roomId}`,
         },
         (payload) => {
-          appendIncomingMessage("messages", payload.new);
+          appendRef.current("messages", payload.new);
         },
       )
       .subscribe((status) => {
@@ -175,7 +172,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
       void supabase.removeChannel(channel);
       setConnected(false);
     };
-  }, [appendIncomingMessage, roomId]);
+  }, [roomId]);
 
   const send = useCallback(async () => {
     const text = draft.trim();
@@ -197,12 +194,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
     if (data.message) {
       nearBottomRef.current = true;
       setShowNewMessagesBanner(false);
-      setMessages((prev) => {
-        if (prev.some((m) => m.id === data.message!.id)) {
-          return prev;
-        }
-        return [...prev, data.message!];
-      });
+      setMessages((prev) => upsertChatMessagesSorted(prev, data.message!));
       queueMicrotask(() => {
         requestAnimationFrame(() => scrollToBottom("smooth"));
       });

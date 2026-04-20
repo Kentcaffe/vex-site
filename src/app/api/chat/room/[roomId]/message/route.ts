@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { CHAT_MESSAGE_MAX, getRoomAccess } from "@/lib/chat-actions";
 import { insertRoomMessage } from "@/lib/chat-realtime-store";
 import { prisma } from "@/lib/prisma";
+import { logRouteError } from "@/lib/server-log";
 
 type Props = { params: Promise<{ roomId: string }> };
 
@@ -47,7 +48,7 @@ export async function POST(req: Request, { params }: Props) {
     try {
       await prisma.chatRoom.update({ where: { id: roomId }, data: { updatedAt: new Date() } });
     } catch (e) {
-      console.error("[POST /api/chat/room/.../message] chatRoom.updatedAt", e);
+      logRouteError("POST /api/chat/room/[roomId]/message chatRoom.updatedAt", e);
     }
 
     return NextResponse.json({
@@ -60,7 +61,7 @@ export async function POST(req: Request, { params }: Props) {
       },
     });
   } catch (err) {
-    console.error("[POST /api/chat/room/[roomId]/message]", err);
+    logRouteError("POST /api/chat/room/[roomId]/message", err);
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }

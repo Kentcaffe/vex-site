@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { chatAvatarHue, chatInitials } from "@/lib/chat-ui";
 
@@ -12,7 +12,7 @@ type Props = {
 };
 
 /** Avatar cu URL rezolvat (Supabase / API) și fallback la inițiale dacă imaginea lipsește sau dă eroare. */
-export function ChatAvatar({ url, name, size = 44, className }: Props) {
+export const ChatAvatar = memo(function ChatAvatar({ url, name, size = 44, className }: Props) {
   const [failed, setFailed] = useState(false);
   const resolved = resolvePublicMediaUrl(url);
   const hue = chatAvatarHue(name || "u");
@@ -51,4 +51,4 @@ export function ChatAvatar({ url, name, size = 44, className }: Props) {
       />
     </div>
   );
-}
+});

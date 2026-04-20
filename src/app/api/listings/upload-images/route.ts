@@ -3,6 +3,7 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { getSupabaseServiceClient, listingsObjectKey, listingsStorageBucket } from "@/lib/supabase-service-role";
+import { logRouteError } from "@/lib/server-log";
 
 const MAX_FILES = 8;
 const MAX_SIZE = 5 * 1024 * 1024;
@@ -63,7 +64,7 @@ export async function POST(request: Request) {
         upsert: true,
       });
       if (error) {
-        console.error("[upload-images] Supabase Storage:", error.message);
+        logRouteError("POST /api/listings/upload-images Supabase Storage", error);
       } else {
         stored = true;
       }

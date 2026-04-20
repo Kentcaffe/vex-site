@@ -203,7 +203,9 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
 
     channel.subscribe((status, err) => {
       if (err) {
-        console.error("[SupportLiveChat] Supabase Realtime subscribe error:", err.message, err);
+        if (process.env.NODE_ENV === "development") {
+          console.error("[SupportLiveChat] Supabase Realtime subscribe error:", err.message, err);
+        }
       }
       const ok = status === "SUBSCRIBED";
       setLive(ok);

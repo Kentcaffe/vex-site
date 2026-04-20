@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { isStaff } from "@/lib/auth-roles";
 import { supportTicket } from "@/lib/prisma-delegates";
+import { logRouteError } from "@/lib/server-log";
 import {
   appendSupportMessage,
   assertTicketAccess,
@@ -28,7 +29,7 @@ export async function GET(req: Request) {
     const messages = await listSupportMessages(ticketId);
     return NextResponse.json({ messages });
   } catch (e) {
-    console.error("[GET /api/support/messages]", e);
+    logRouteError("GET /api/support/messages", e);
     const message = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
     const messages = await listSupportMessages(ticketId);
     return NextResponse.json({ ok: true, messages });
   } catch (e) {
-    console.error("[POST /api/support/messages]", e);
+    logRouteError("POST /api/support/messages", e);
     const message = e instanceof Error ? e.message : String(e);
     return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
   }

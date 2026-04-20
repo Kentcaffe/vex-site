@@ -29,7 +29,9 @@ export async function requestPasswordReset(
   formData: FormData,
 ): Promise<RequestResetState> {
   if (!isSupabaseAuthConfigured()) {
-    console.error("[password-reset] Lipsesc NEXT_PUBLIC_SUPABASE_URL sau NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    if (process.env.NODE_ENV === "development") {
+      console.error("[password-reset] Lipsesc NEXT_PUBLIC_SUPABASE_URL sau NEXT_PUBLIC_SUPABASE_ANON_KEY");
+    }
     return { ok: false, error: "mailNotConfigured" };
   }
 
@@ -59,25 +61,12 @@ export async function requestPasswordReset(
   const nextPath = localizedHref(locale, "/cont/reset-password");
   const redirectTo = `${base}/api/auth/callback?next=${encodeURIComponent(nextPath)}`;
 
-  const { data, error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
+  const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
     redirectTo,
   });
 
-  console.log("[password-reset] resetPasswordForEmail", {
-    email: normalizedEmail,
-    redirectTo,
-    data,
-    error: error
-      ? {
-          message: error.message,
-          status: error.status,
-          code: (error as { code?: string }).code,
-        }
-      : null,
-  });
-
-  if (error) {
-    console.error("[password-reset] resetPasswordForEmail error:", error);
+  if (error && process.env.NODE_ENV === "development") {
+    console.error("[password-reset] resetPasswordForEmail error:", error.message);
   }
 
   // Anti-enumerare: același răspuns pentru „email inexistent”, rate limit etc.
