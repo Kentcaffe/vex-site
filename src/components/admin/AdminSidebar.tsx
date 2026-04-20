@@ -1,7 +1,9 @@
 "use client";
 
+import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 
 const links = [
   {
@@ -54,11 +56,31 @@ const links = [
       </svg>
     ),
   },
+  {
+    href: "/admin/feedback",
+    labelKey: "navFeedback" as const,
+    icon: (
+      <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.75}
+          d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+        />
+      </svg>
+    ),
+  },
 ] as const;
 
 export function AdminSidebar() {
   const t = useTranslations("Admin");
   const pathname = usePathname();
+  const { data } = useAuthSession();
+  const role = data?.user?.role;
+
+  const visibleLinks = useMemo(() => {
+    return links.filter((item) => item.href !== "/admin/feedback" || role === "ADMIN");
+  }, [role]);
 
   return (
     <aside className="w-full shrink-0 border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/80 lg:w-60 lg:border-b-0 lg:border-r">
@@ -67,7 +89,7 @@ export function AdminSidebar() {
         <p className="mt-1 text-sm font-semibold text-zinc-900 dark:text-zinc-50">{t("shellTagline")}</p>
       </div>
       <nav className="flex flex-wrap gap-0.5 p-2 lg:flex-col lg:gap-0">
-        {links.map((item) => {
+        {visibleLinks.map((item) => {
           const active =
             pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
           return (

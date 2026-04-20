@@ -52,7 +52,10 @@ export function NotificationsList({ items }: Props) {
             key={n.id}
             className={`rounded-[14px] border p-4 shadow-[0_18px_40px_-30px_rgba(15,23,42,0.35)] ${
               n.read ? "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900" : "border-emerald-300/80 bg-emerald-50/50 dark:border-emerald-900 dark:bg-emerald-950/20"
-            }`}
+            } ${!n.read ? "cursor-pointer" : ""}`}
+            onClick={() => {
+              if (!n.read) startTransition(() => void onMarkRead(n.id));
+            }}
           >
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
@@ -64,7 +67,10 @@ export function NotificationsList({ items }: Props) {
                 <button
                   type="button"
                   disabled={pending}
-                  onClick={() => startTransition(() => void onMarkRead(n.id))}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    startTransition(() => void onMarkRead(n.id));
+                  }}
                   className="btn-secondary min-h-[36px] shrink-0 rounded-lg px-3 py-1 text-xs"
                 >
                   {t("markRead")}

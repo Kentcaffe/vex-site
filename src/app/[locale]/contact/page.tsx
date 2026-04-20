@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Mail, MapPin } from "lucide-react";
+import { ContactFeedbackForm } from "@/components/contact/ContactFeedbackForm";
 import { SupportContactLauncher } from "@/components/support/SupportContactLauncher";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -65,6 +66,8 @@ export default async function ContactPage({ params }: Props) {
                 </div>
               </div>
             </section>
+
+            <ContactFeedbackForm />
 
             <div className="flex flex-col items-center gap-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/90 px-4 py-5 text-center text-sm leading-relaxed text-zinc-600 sm:flex-row sm:items-start sm:text-left">
               <MapPin className="mx-auto h-5 w-5 shrink-0 text-zinc-400 sm:mx-0 sm:mt-0.5" aria-hidden />

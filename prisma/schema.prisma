@@ -55,6 +55,8 @@ model User {
   receivedMessages Message[]   @relation("MessageReceiver")
   supportTickets SupportTicket[]
   supportMessagesSent SupportMessage[] @relation("SupportMessages")
+  feedbacks     Feedback[]
+  feedbackRepliesAsAdmin FeedbackReply[] @relation("FeedbackReplyAdmin")
   /** JSON: theme, notifications, privacy toggles, activity log snippets, etc. */
   preferences   Json?
   createdAt     DateTime       @default(now())
@@ -186,6 +188,34 @@ model UserNotification {
 
   @@index([userId, read])
   @@index([userId, createdAt])
+}
+
+/** Sugestii de pe pagina Contact (separat de suport live). */
+model Feedback {
+  id        String          @id @default(cuid())
+  userId    String?         @map("user_id")
+  user      User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  email     String?
+  message   String
+  createdAt DateTime        @default(now()) @map("created_at")
+  replies   FeedbackReply[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("feedback")
+}
+
+model FeedbackReply {
+  id         String   @id @default(cuid())
+  feedbackId String   @map("feedback_id")
+  feedback   Feedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  adminId    String   @map("admin_id")
+  admin      User     @relation("FeedbackReplyAdmin", fields: [adminId], references: [id], onDelete: Cascade)
+  reply      String
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([feedbackId])
+  @@map("feedback_replies")
 }
 
 model ListingFavorite {
