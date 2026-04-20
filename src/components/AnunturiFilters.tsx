@@ -1,7 +1,10 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { AUTOTURISME_CATEGORY_SLUG } from "@/lib/category-slugs";
+import { getModelsForBrand } from "@/lib/vehicle-models-by-brand";
 import {
   ELECTRONICS_CONDITION,
   ELECTRONICS_PRODUCT_ALL,
@@ -94,6 +97,9 @@ export function AnunturiFilters({
   const tForm = useTranslations("ListingForm");
   const cur = defaultCurrency === "EUR" || defaultCurrency === "MDL" ? defaultCurrency : null;
   const isVehicleCategory = (category ?? "").startsWith("transport");
+  const isAutoturismeCategory = category === AUTOTURISME_CATEGORY_SLUG;
+  const [brand, setBrand] = useState(defaultBrand);
+  const modelOptions = useMemo(() => getModelsForBrand(brand), [brand]);
   const isReCategory = (category ?? "").startsWith("imobiliare");
   const isElectronicsCategory = (category ?? "").startsWith("electronice");
 
@@ -210,44 +216,66 @@ export function AnunturiFilters({
           </select>
         </div>
       </div>
+      {isAutoturismeCategory ? (
+        <details open className="rounded-xl border border-zinc-200/90 bg-zinc-50/60 p-3">
+          <summary className="cursor-pointer list-none text-sm font-semibold text-zinc-900">{t("vehicleBrandSection")}</summary>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-brand">
+                {t("brand")}
+              </label>
+              <input
+                id="flt-brand"
+                name="brand"
+                list="flt-brand-list"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                className="field-input mt-1"
+                placeholder={t("brandPlaceholder")}
+              />
+              <datalist id="flt-brand-list">
+                {VEHICLE_BRANDS.map((b) => (
+                  <option key={b} value={b} />
+                ))}
+              </datalist>
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-model">
+                {t("model")}
+              </label>
+              <input
+                id="flt-model"
+                name="model"
+                list="flt-model-list"
+                defaultValue={defaultModel}
+                className="field-input mt-1"
+                placeholder={t("modelPlaceholder")}
+              />
+              <datalist id="flt-model-list">
+                {modelOptions.map((m) => (
+                  <option key={m} value={m} />
+                ))}
+              </datalist>
+            </div>
+            <div className="sm:col-span-2 lg:col-span-1">
+              <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-fuel">
+                {t("fuel")}
+              </label>
+              <select id="flt-fuel" name="fuel" defaultValue={defaultFuel} className="field-input mt-1">
+                <option value="">{t("all")}</option>
+                {VEHICLE_FUEL_VALUES.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </details>
+      ) : null}
+
       {isVehicleCategory ? (
         <>
-          <details open className="rounded-xl border border-zinc-200/90 bg-zinc-50/60 p-3">
-            <summary className="cursor-pointer list-none text-sm font-semibold text-zinc-900">{t("vehicleBrandSection")}</summary>
-            <div className="mt-3 grid gap-3 md:grid-cols-2">
-              <div>
-                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-brand">
-                  {t("brand")}
-                </label>
-                <input
-                  id="flt-brand"
-                  name="brand"
-                  list="flt-brand-list"
-                  defaultValue={defaultBrand}
-                  className="field-input mt-1"
-                  placeholder={t("brandPlaceholder")}
-                />
-                <datalist id="flt-brand-list">
-                  {VEHICLE_BRANDS.map((b) => (
-                    <option key={b} value={b} />
-                  ))}
-                </datalist>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-model">
-                  {t("model")}
-                </label>
-                <input
-                  id="flt-model"
-                  name="model"
-                  defaultValue={defaultModel}
-                  className="field-input mt-1"
-                  placeholder={t("modelPlaceholder")}
-                />
-              </div>
-            </div>
-          </details>
-
           <details open className="rounded-xl border border-zinc-200/90 bg-zinc-50/60 p-3">
             <summary className="cursor-pointer list-none text-sm font-semibold text-zinc-900">{t("vehicleSpecsSection")}</summary>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
@@ -292,19 +320,6 @@ export function AnunturiFilters({
                   defaultValue={defaultMileageMax}
                   className="field-input mt-1"
                 />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-fuel">
-                  {t("fuel")}
-                </label>
-                <select id="flt-fuel" name="fuel" defaultValue={defaultFuel} className="field-input mt-1">
-                  <option value="">{t("all")}</option>
-                  {VEHICLE_FUEL_VALUES.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
               </div>
               <div>
                 <label className="block text-xs font-medium text-zinc-500" htmlFor="flt-transmission">

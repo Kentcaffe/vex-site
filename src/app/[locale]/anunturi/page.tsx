@@ -13,6 +13,7 @@ import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceh
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
 import { prisma } from "@/lib/prisma";
+import { AUTOTURISME_CATEGORY_SLUG } from "@/lib/category-slugs";
 import { listingSeoPath } from "@/lib/seo";
 import {
   ELECTRONICS_CONDITION,
@@ -116,8 +117,10 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const areaMin = areaMinRaw ? Number(areaMinRaw) : NaN;
   const areaMax = areaMaxRaw ? Number(areaMaxRaw) : NaN;
 
-  /** Filtre marcă/model/an/combustibil etc. doar în categorii transport (evită rezultate goale fără categorie). */
+  /** Filtre tehnice vehicul pentru orice subcategorie Transport. */
   const applyTransportVehicleFilters = Boolean(categorySlug?.startsWith("transport"));
+  /** Marcă, model, combustibil doar pentru Autoturisme. */
+  const applyAutoturismeCarFilters = categorySlug === AUTOTURISME_CATEGORY_SLUG;
   const applyImobiliareFilters = Boolean(categorySlug?.startsWith("imobiliare"));
   const applyElectronicsFilters = Boolean(categorySlug?.startsWith("electronice"));
 
@@ -148,12 +151,14 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   }
 
   if (applyTransportVehicleFilters) {
-    if (brand) {
-      where.brand = { contains: brand, mode: "insensitive" };
-    }
+    if (applyAutoturismeCarFilters) {
+      if (brand) {
+        where.brand = { contains: brand, mode: "insensitive" };
+      }
 
-    if (model) {
-      where.modelName = { contains: model, mode: "insensitive" };
+      if (model) {
+        where.modelName = { contains: model, mode: "insensitive" };
+      }
     }
 
     if (Number.isFinite(yearMin) || Number.isFinite(yearMax)) {
@@ -166,7 +171,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
       where.mileageKm = { lte: mileageMax };
     }
 
-    if (allows(fuel, VEHICLE_FUEL_KEYS)) {
+    if (applyAutoturismeCarFilters && allows(fuel, VEHICLE_FUEL_KEYS)) {
       andFilters.push({ detailsJson: { contains: `"fuel":"${fuel}"` } });
     }
 
@@ -295,6 +300,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
       sidebar={<CategorySidebar locale={locale} all={allCats} currentCategory={categorySlug} />}
       filters={
         <AnunturiFilters
+          key={categorySlug ?? "all"}
           defaultCity={city ?? ""}
           defaultDistrict={district ?? ""}
           defaultMin={Number.isFinite(minN) ? String(minN) : ""}

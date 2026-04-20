@@ -62,9 +62,9 @@ export async function HomeMarketplace({
           className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white/60 to-transparent"
           aria-hidden
         />
-        <div className="relative mx-auto w-full max-w-6xl px-4 pb-10 pt-7 sm:px-6 sm:pb-12 sm:pt-9 lg:px-8 lg:pb-14 lg:pt-10">
-          <div className="mx-auto max-w-4xl">
-            <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        <div className="relative mx-auto w-full max-w-6xl px-4 pb-8 pt-7 sm:px-6 sm:pb-10 sm:pt-9 lg:px-8 lg:pb-12 lg:pt-10">
+          <div className="mx-auto mb-6 max-w-4xl sm:mb-7">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
               <div className="min-w-0 flex-1 space-y-3">
                 <p
                   className="inline-flex w-fit items-center gap-2 rounded-full border border-orange-200/80 bg-white/90 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-orange-800/90 shadow-sm backdrop-blur-sm sm:text-xs"
@@ -88,9 +88,13 @@ export async function HomeMarketplace({
                 <span aria-hidden>👤</span>
               </Link>
             </div>
+          </div>
 
-            <div className="rounded-[1.25rem] border border-orange-100/80 bg-white/70 p-1 shadow-[0_8px_40px_-12px_rgba(124,45,18,0.12)] backdrop-blur-sm sm:rounded-3xl sm:p-2">
-              <HomeHeroSearchForm action={anunturiAction} />
+          <div className="mx-auto max-w-2xl">
+            <div className="rounded-[1.25rem] border border-orange-100/80 bg-white/70 p-1 shadow-[0_8px_40px_-12px_rgba(124,45,18,0.12)] backdrop-blur-sm sm:rounded-3xl sm:p-1.5">
+              <div className="px-2 py-3 sm:px-4 sm:py-4">
+                <HomeHeroSearchForm action={anunturiAction} />
+              </div>
             </div>
           </div>
         </div>
