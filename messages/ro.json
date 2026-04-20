@@ -71,10 +71,12 @@
     "regionNote": "Echipa noastră operează din Republica Moldova, iar timpul de răspuns poate varia în weekend și în zilele de sărbătoare."
   },
   "Support": {
-    "liveBadge": "Live",
+    "contactSectionEyebrow": "Live Chat & Asistență",
+    "liveBadge": "LIVE",
     "contactSectionTitle": "Live chat cu echipa",
-    "contactSectionLead": "Primești răspuns rapid direct în chat, fără să părăsești site-ul. Ideal pentru întrebări despre cont, anunțuri sau situații urgente.",
-    "contactSectionHint": "Conversațiile sunt confidențiale și gestionate de echipa noastră de suport. Pentru a utiliza chat-ul, este necesar să fii autentificat.",
+    "contactSectionLead": "Răspuns rapid în chat, direct pe site. Pentru cont, anunțuri sau situații care nu suportă amânare.",
+    "contactSectionHintPrivacy": "Conversațiile sunt confidențiale — gestionate de suportul VEX.",
+    "contactSectionHintAuth": "Pentru chat este necesară autentificarea în cont.",
     "openChat": "Deschide chat",
     "loginToChat": "Autentifică-te pentru chat",
     "dialogTitle": "Suport live",
@@ -218,6 +220,7 @@
     "linkReportListing": "Raportează un anunț suspect",
     "linkCookiePolicy": "Politica cookie",
     "linkCategories": "Categorii",
+    "accordionNavAria": "Secțiuni footer",
     "quickNavAria": "Navigare rapidă",
     "terms": "Termeni și condiții",
     "privacy": "Confidențialitate",

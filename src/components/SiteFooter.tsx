@@ -1,23 +1,19 @@
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { FooterNav } from "@/components/FooterNav";
 
 const linkClass =
-  "inline-block min-h-[44px] py-1 text-base font-medium leading-snug text-zinc-800 sm:min-h-0 sm:text-sm hover:text-orange-700";
-const mailClass =
-  "inline-block min-h-[44px] py-1 text-base font-medium text-zinc-800 sm:min-h-0 sm:text-sm hover:text-orange-700";
-const headingClass =
-  "text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-700";
+  "inline-block min-h-[44px] py-1 text-xs font-medium leading-snug text-zinc-700 sm:min-h-0 hover:text-orange-700";
 
 export async function SiteFooter() {
   const t = await getTranslations("Footer");
   const year = new Date().getFullYear();
 
   return (
-    <footer className="mt-12 w-full max-w-full overflow-x-clip border-t border-[var(--mp-border)] bg-[var(--mp-surface)]">
-      <div className="app-shell py-8 sm:py-12 lg:py-16">
-        {/* Brand — același namespace Footer ca în header (siteName, tagline) */}
-        <div className="border-b border-zinc-200/80 pb-10">
+    <footer className="mt-12 w-full max-w-full overflow-x-clip border-t border-[var(--mp-border)] bg-zinc-50/80">
+      <div className="app-shell py-8 sm:py-10 lg:py-14">
+        <div className="border-b border-zinc-200/90 pb-8 sm:pb-10">
           <Link href="/" className="inline-flex items-center">
             <Image
               src="/logo.png"
@@ -27,157 +23,47 @@ export async function SiteFooter() {
               className="h-10 w-auto transition-opacity hover:opacity-90"
             />
           </Link>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-zinc-700">{t("tagline")}</p>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-zinc-600 sm:text-base">{t("tagline")}</p>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-12 sm:grid-cols-2 sm:gap-14 lg:grid-cols-4 lg:gap-16">
-          {/* Contact */}
-          <div className="space-y-5">
-            <p className={headingClass}>{t("colContact")}</p>
-            <p className="text-xs leading-relaxed text-zinc-600">{t("colContactIntro")}</p>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/contact" className={`${linkClass} font-semibold text-orange-800`}>
-                  {t("linkContactPage")}
-                </Link>
-              </li>
-              <li>
-                <a href="mailto:asistenta@vex.md" className={mailClass}>
-                  asistenta@vex.md
-                </a>
-                <span className="mt-0.5 block text-[11px] text-zinc-500">{t("emailSupportHint")}</span>
-              </li>
-              <li>
-                <a href="mailto:contact@vex.md" className={mailClass}>
-                  contact@vex.md
-                </a>
-                <span className="mt-0.5 block text-[11px] text-zinc-500">{t("emailContactHint")}</span>
-              </li>
-            </ul>
-          </div>
+        <FooterNav />
 
-          {/* Ajutor */}
-          <div className="space-y-5">
-            <Link href="/ajutor" className={`${headingClass} inline-block hover:text-emerald-700`}>
-              {t("colHelp")}
-            </Link>
-            <p className="text-xs leading-relaxed text-zinc-600">{t("colHelpIntro")}</p>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/cum-functioneaza" className={linkClass}>
-                  {t("linkHowItWorks")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/cum-publici-anunt" className={linkClass}>
-                  {t("linkPostingGuide")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/cum-contactezi-vanzatorul" className={linkClass}>
-                  {t("linkContactSeller")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/gestioneaza-contul" className={linkClass}>
-                  {t("linkManageAccount")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/intrebari-frecvente" className={linkClass}>
-                  {t("linkFaq")}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Siguranță */}
-          <div className="space-y-5">
-            <Link href="/siguranta" className={`${headingClass} inline-block hover:text-emerald-700`}>
-              {t("colSafety")}
-            </Link>
-            <p className="text-xs leading-relaxed text-zinc-600">{t("colSafetyIntro")}</p>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/sfaturi-anti-frauda" className={linkClass}>
-                  {t("linkAntiFraud")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/cum-recunosti-un-scam" className={linkClass}>
-                  {t("linkRecognizeScam")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/reguli-siguranta-cumparare" className={linkClass}>
-                  {t("linkSafetyBuy")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/reguli-siguranta-vanzare" className={linkClass}>
-                  {t("linkSafetySell")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/raporteaza-anunt" className={linkClass}>
-                  {t("linkReportListing")}
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div className="space-y-5">
-            <p className={headingClass}>{t("colLegal")}</p>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/termeni" className={linkClass}>
-                  {t("terms")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/confidentialitate" className={linkClass}>
-                  {t("privacy")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/stergere-date" className={linkClass}>
-                  {t("linkDataDeletion")}
-                </Link>
-              </li>
-              <li>
-                <Link href="/politica-cookie" className={linkClass}>
-                  {t("linkCookiePolicy")}
-                </Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Nav rapid minimalist */}
         <nav
-          className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 border-t border-zinc-200/80 pt-12 text-xs text-zinc-600"
+          className="mt-10 flex flex-col gap-3 border-t border-zinc-200/90 pt-8 sm:mt-12 sm:flex-row sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-6 sm:gap-y-2 sm:pt-10"
           aria-label={t("quickNavAria")}
         >
-          <Link href="/anunturi" className={`${linkClass} text-xs`}>
+          <Link href="/anunturi" className={linkClass}>
             {t("linkListings")}
           </Link>
-          <Link href="/publica" className={`${linkClass} text-xs`}>
+          <span className="hidden text-zinc-300 sm:inline" aria-hidden>
+            ·
+          </span>
+          <Link href="/publica" className={linkClass}>
             {t("linkPublish")}
           </Link>
-          <Link href="/categorii" className={`${linkClass} text-xs`}>
+          <span className="hidden text-zinc-300 sm:inline" aria-hidden>
+            ·
+          </span>
+          <Link href="/categorii" className={linkClass}>
             {t("linkCategories")}
           </Link>
-          <Link href="/cont" className={`${linkClass} text-xs`}>
+          <span className="hidden text-zinc-300 sm:inline" aria-hidden>
+            ·
+          </span>
+          <Link href="/cont" className={linkClass}>
             {t("linkAccount")}
           </Link>
         </nav>
 
-        <div className="mt-12 flex flex-col gap-6 border-t border-zinc-200/80 pt-10 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-zinc-600">{t("rights", { year })}</p>
-          <p className="text-sm font-medium tracking-wide text-zinc-800">{t("madeInMoldova")}</p>
+        <div className="mt-8 flex flex-col gap-4 border-t border-zinc-200/90 pt-8 sm:mt-10 sm:flex-row sm:items-center sm:justify-between sm:pt-10">
+          <p className="text-center text-xs text-zinc-500 sm:text-left">{t("rights", { year })}</p>
+          <p className="text-center text-sm font-medium tracking-wide text-zinc-800 sm:text-right">
+            {t("madeInMoldova")}
+          </p>
         </div>
-        <p className="mt-6 max-w-2xl text-xs leading-relaxed text-zinc-600">{t("disclaimer")}</p>
+        <p className="mt-6 max-w-2xl text-center text-xs leading-relaxed text-zinc-500 sm:mt-8 sm:text-left">
+          {t("disclaimer")}
+        </p>
       </div>
     </footer>
   );

@@ -71,10 +71,12 @@
     "regionNote": "Our team is based in Moldova; response times may vary on weekends and holidays."
   },
   "Support": {
-    "liveBadge": "Live",
+    "contactSectionEyebrow": "Live chat & support",
+    "liveBadge": "LIVE",
     "contactSectionTitle": "Live chat with the team",
-    "contactSectionLead": "Get answers directly in chat without leaving the site. Best for quick questions about your account, payments, or moderation.",
-    "contactSectionHint": "You need to be signed in. This conversation is private and separate from listing messages.",
+    "contactSectionLead": "Fast answers in chat, without leaving the site. For account, payments, or urgent issues.",
+    "contactSectionHintPrivacy": "Conversations are confidential — handled by VEX support.",
+    "contactSectionHintAuth": "You need to be signed in to use chat.",
     "openChat": "Open chat",
     "loginToChat": "Sign in to chat",
     "dialogTitle": "Live support",
@@ -218,6 +220,7 @@
     "linkReportListing": "Report a suspicious listing",
     "linkCookiePolicy": "Cookie policy",
     "linkCategories": "Categories",
+    "accordionNavAria": "Footer sections",
     "quickNavAria": "Quick navigation",
     "terms": "Terms of service",
     "privacy": "Privacy policy",

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Mail, MapPin } from "lucide-react";
-import { SupportContactLauncher } from "@/components/support/SupportContactLauncher";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -48,10 +47,6 @@ export default async function ContactPage({ params }: Props) {
             contact@vex.md
           </a>
         </div>
-      </div>
-
-      <div className="mx-auto mt-10 max-w-3xl">
-        <SupportContactLauncher />
       </div>
 
       <div className="mx-auto mt-10 flex max-w-3xl items-start gap-3 rounded-2xl border border-zinc-200/80 bg-zinc-50/80 px-4 py-4 text-sm text-zinc-600">
