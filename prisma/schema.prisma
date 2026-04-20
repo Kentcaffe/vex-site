@@ -33,7 +33,7 @@ enum SupportMessageSenderRole {
 
 model User {
   id            String         @id @default(cuid())
-  supabaseAuthId String?       @unique
+  supabaseAuthId String?
   email         String         @unique
   name          String?
   avatarUrl     String?
