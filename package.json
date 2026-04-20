@@ -12,7 +12,7 @@
     "prebuild": "prisma generate",
     "build": "next build",
     "build:with-db": "prisma generate && prisma migrate deploy && next build",
-    "build:render": "prisma generate && npm run build",
+    "build:render": "prisma generate && npm run migrate:deploy && npm run build",
     "start": "next start -H 0.0.0.0 -p $PORT",
     "start:api": "node backend/server.js",
     "migrate:deploy": "node scripts/prisma-migrate-deploy.mjs",

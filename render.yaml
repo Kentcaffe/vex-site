@@ -4,8 +4,8 @@ services:
   - type: web
     name: anunturi-web
     runtime: node
-    # `npm ci` rulează postinstall (prisma generate), apoi `next build` (vezi scriptul `build`).
-    buildCommand: npm ci && npm run build
+    # `npm ci` → postinstall (prisma generate) → migrate pe DB (altfel build-ul pică la /sitemap.xml etc.)
+    buildCommand: npm ci && npm run migrate:deploy && npm run build
     startCommand: npm run start:render
     envVars:
       - key: NODE_VERSION
