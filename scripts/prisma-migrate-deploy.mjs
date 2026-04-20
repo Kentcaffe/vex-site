@@ -48,8 +48,26 @@ function isSupabasePoolerUrl(url) {
 }
 
 /**
+ * Pooler 6543 = mod tranzacție (PgBouncer) → Prisma migrate poate da P1002 la advisory lock.
+ * Același host, port 5432 = mod sesiune — potrivit pentru `migrate deploy` (vezi Supabase Dashboard → Session mode).
+ */
+function deriveSupabaseSessionPoolerUrl(databaseUrl) {
+  if (!databaseUrl) return null;
+  try {
+    const u = new URL(databaseUrl);
+    if (u.port !== "6543") return null;
+    if (!u.hostname.includes("pooler.supabase.com")) return null;
+    const next = new URL(databaseUrl);
+    next.port = "5432";
+    return next.toString();
+  } catch {
+    return null;
+  }
+}
+
+/**
  * PC/local: pooler înainte de direct (unele rețele nu ajung la db.*:5432 → P1001).
- * Render: implicit DIRECT înainte de pooler — poolerul (6543) poate agăța `migrate deploy` minute întregi.
+ * Render: implicit DIRECT înainte de pooler — uneori P1001; apoi session pooler :5432 înainte de :6543.
  * Suprascrie cu PRISMA_MIGRATE_TRY_DIRECT_FIRST=true|false.
  */
 function shouldTryDirectFirst() {
@@ -63,14 +81,31 @@ function buildMigrateUrlOrder() {
   const override = process.env.MIGRATE_DATABASE_URL;
   const pool = process.env.DATABASE_URL;
   const direct = process.env.DIRECT_URL;
-
+  const sessionPool = deriveSupabaseSessionPoolerUrl(pool);
   const tryDirectFirst = shouldTryDirectFirst();
+  const onRender = process.env.RENDER === "true";
 
-  const ordered = tryDirectFirst
-    ? [override, direct, pool]
-    : [override, pool, direct];
+  /** Ordinea contează: session pooler (:5432) înainte de transaction (:6543). Pe Render, db.* direct dă adesea P1001 — încercăm session înainte. */
+  const parts = [];
+  if (override) parts.push(override);
 
-  return [...new Set(ordered.filter(Boolean))];
+  if (tryDirectFirst) {
+    if (onRender) {
+      if (sessionPool) parts.push(sessionPool);
+      if (direct) parts.push(direct);
+      if (pool) parts.push(pool);
+    } else {
+      if (direct) parts.push(direct);
+      if (sessionPool) parts.push(sessionPool);
+      if (pool) parts.push(pool);
+    }
+  } else {
+    if (sessionPool) parts.push(sessionPool);
+    if (pool) parts.push(pool);
+    if (direct) parts.push(direct);
+  }
+
+  return [...new Set(parts.filter(Boolean))];
 }
 
 const unique = buildMigrateUrlOrder();
@@ -80,7 +115,7 @@ console.log(
 );
 const tryDirectFirst = shouldTryDirectFirst();
 console.log(
-  `[migrate] Ordine: ${tryDirectFirst ? "override → DIRECT → DATABASE (pooler)" : "override → DATABASE (pooler) → DIRECT"}`,
+  `[migrate] Ordine: ${tryDirectFirst ? (process.env.RENDER === "true" ? "override → pooler session :5432 → DIRECT → pooler txn :6543" : "override → DIRECT → pooler session :5432 → pooler txn :6543") : "override → pooler session :5432 → pooler txn → DIRECT"}`,
 );
 console.log(`[migrate] URL-uri unice de încercat: ${unique.length}`);
 unique.forEach((u, i) => console.log(`  ${i + 1}. ${maskConnectionHint(u)}`));
@@ -171,7 +206,7 @@ if (lastStatus !== 0) {
     "[migrate] (2) rulează migrarea din Render → Shell: npm run db:migrate:render;",
   );
   console.error(
-    "[migrate] (3) Pooler Transaction (6543) poate eșua sau agăța la migrate; încearcă în Supabase «Session mode» pentru pooler sau aplică SQL-ul din `prisma/migrations` manual.",
+    "[migrate] (3) P1002 pe port 6543: folosește pooler «Session» (același host, port 5432) — scriptul îl derivă din DATABASE_URL cu :6543.",
   );
   if (onlyDirect) {
     console.error(
