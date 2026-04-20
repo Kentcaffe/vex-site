@@ -1,5 +1,6 @@
-import { getTranslations } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { getListingSpecEntries, type ListingSpecsSource } from "@/lib/listing-detail-config";
+import { resolveListingSpecValueDisplay } from "@/lib/listing-spec-value-display";
 
 type Props = {
   categorySlug: string;
@@ -8,6 +9,7 @@ type Props = {
 
 export async function ListingSpecs({ categorySlug, listing }: Props) {
   const t = await getTranslations("ListingDetail");
+  const messages = await getMessages();
 
   const rows = getListingSpecEntries(categorySlug, listing, (key) => t(key as never));
 
@@ -22,7 +24,7 @@ export async function ListingSpecs({ categorySlug, listing }: Props) {
         {rows.map((row) => {
           const display =
             row.detailKey != null && row.detailKey !== ""
-              ? t(`specValue.${row.detailKey}.${row.value}` as never)
+              ? resolveListingSpecValueDisplay(messages, row.detailKey, row.value)
               : row.value;
           return (
             <div key={(row.detailKey ?? "") + row.label + row.value} className="surface-muted flex justify-between gap-4 px-4 py-3">

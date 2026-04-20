@@ -383,7 +383,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
           />
           <button
             type="submit"
-            disabled={!draft.trim() || !connected}
+            disabled={!draft.trim()}
             className="flex h-11 w-11 shrink-0 items-center justify-center self-end rounded-xl bg-[var(--mp-accent-chat)] text-white shadow-sm transition hover:bg-[var(--mp-accent-chat-hover)] disabled:cursor-not-allowed disabled:opacity-40"
             title={t("send")}
             aria-label={t("send")}

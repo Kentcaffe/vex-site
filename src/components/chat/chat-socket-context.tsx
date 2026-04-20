@@ -169,25 +169,27 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
       void refreshUnreadRef.current();
     }, 0);
 
-    const reconnectInterval = setInterval(() => {
-      void connect();
-    }, 120000);
-
     const pollUnread = setInterval(() => {
       void refreshUnreadRef.current();
-    }, 60000);
+    }, 90000);
 
     const onFocus = () => {
       void connect();
     };
+    const onVisibility = () => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        void connect();
+      }
+    };
     window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
       cancelled = true;
       clearTimeout(bootTimer);
-      clearInterval(reconnectInterval);
       clearInterval(pollUnread);
       window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
       if (activeChannel) {
         void supabase.removeChannel(activeChannel);
       }
