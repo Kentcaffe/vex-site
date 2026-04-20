@@ -8,6 +8,7 @@ import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 const links = [
   {
     href: "/admin",
+    adminOnly: false,
     labelKey: "navDashboard" as const,
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -17,6 +18,7 @@ const links = [
   },
   {
     href: "/admin/listings",
+    adminOnly: false,
     labelKey: "navListings" as const,
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -25,7 +27,38 @@ const links = [
     ),
   },
   {
+    href: "/admin/trash",
+    adminOnly: true,
+    labelKey: "navTrash" as const,
+    icon: (
+      <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.75}
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        />
+      </svg>
+    ),
+  },
+  {
+    href: "/admin/logs",
+    adminOnly: true,
+    labelKey: "navAdminLogs" as const,
+    icon: (
+      <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.75}
+          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+        />
+      </svg>
+    ),
+  },
+  {
     href: "/admin/reclamatii",
+    adminOnly: false,
     labelKey: "navComplaints" as const,
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -35,6 +68,7 @@ const links = [
   },
   {
     href: "/admin/users",
+    adminOnly: false,
     labelKey: "navUsers" as const,
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -44,6 +78,7 @@ const links = [
   },
   {
     href: "/admin/support",
+    adminOnly: false,
     labelKey: "navSupport" as const,
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -58,6 +93,7 @@ const links = [
   },
   {
     href: "/admin/feedback",
+    adminOnly: false,
     labelKey: "navFeedback" as const,
     icon: (
       <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -79,7 +115,12 @@ export function AdminSidebar() {
   const role = data?.user?.role;
 
   const visibleLinks = useMemo(() => {
-    return links.filter((item) => item.href !== "/admin/feedback" || role === "ADMIN");
+    return links.filter((item) => {
+      if ("adminOnly" in item && item.adminOnly && role !== "ADMIN") {
+        return false;
+      }
+      return item.href !== "/admin/feedback" || role === "ADMIN";
+    });
   }, [role]);
 
   return (

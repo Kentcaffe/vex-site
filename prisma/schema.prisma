@@ -57,6 +57,7 @@ model User {
   supportMessagesSent SupportMessage[] @relation("SupportMessages")
   feedbacks     Feedback[]
   feedbackRepliesAsAdmin FeedbackReply[] @relation("FeedbackReplyAdmin")
+  adminLogs     AdminLog[]
   /** JSON: theme, notifications, privacy toggles, activity log snippets, etc. */
   preferences   Json?
   createdAt     DateTime       @default(now())
@@ -129,11 +130,29 @@ model Listing {
 
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isDeleted Boolean  @default(false)
+  deletedAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   chatRooms ChatRoom[]
   reports   ListingReport[]
   favoritedBy ListingFavorite[]
+
+  @@index([isDeleted])
+}
+
+model AdminLog {
+  id        String   @id @default(cuid())
+  adminId   String   @map("admin_id")
+  admin     User     @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  action    String
+  targetId  String   @map("target_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([adminId])
+  @@index([targetId])
+  @@index([createdAt])
+  @@map("admin_logs")
 }
 
 model ListingReport {

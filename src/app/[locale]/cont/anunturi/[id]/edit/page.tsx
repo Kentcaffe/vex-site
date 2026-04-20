@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { buildPublishValuesForEdit } from "@/lib/listing-edit-hydration";
 import { getCategoryTreeForPicker } from "@/lib/category-queries";
 import { localizedHref } from "@/lib/paths";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
 type Props = { params: Promise<{ locale: string; id: string }> };
@@ -41,7 +42,7 @@ export default async function EditMyListingPage({ params }: Props) {
   const tHub = await getTranslations("AccountHub");
 
   const listing = await prisma.listing.findFirst({
-    where: { id, userId: session.user.id },
+    where: { id, userId: session.user.id, ...listingWhereActive() },
     select: {
       categoryId: true,
       title: true,

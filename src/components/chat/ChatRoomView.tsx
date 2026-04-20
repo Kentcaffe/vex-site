@@ -142,7 +142,9 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   );
 
   const appendRef = useRef(appendIncomingMessage);
-  appendRef.current = appendIncomingMessage;
+  useEffect(() => {
+    appendRef.current = appendIncomingMessage;
+  }, [appendIncomingMessage]);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();

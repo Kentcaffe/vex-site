@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { localizedHref } from "@/lib/paths";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { routing } from "@/i18n/routing";
 
@@ -16,8 +17,8 @@ export async function toggleListingFavorite(listingId: string): Promise<ToggleFa
     return { ok: false, error: "unauthorized" };
   }
 
-  const listing = await prisma.listing.findUnique({
-    where: { id: listingId },
+  const listing = await prisma.listing.findFirst({
+    where: { id: listingId, ...listingWhereActive() },
     select: { id: true },
   });
   if (!listing) {

@@ -13,6 +13,13 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-require-imports": "off",
     },
   },
+  {
+    files: ["src/components/ListingForm.tsx"],
+    rules: {
+      // Form mare: hidratare din snapshot server / ciornă / validare live în efecte.
+      "react-hooks/set-state-in-effect": "off",
+    },
+  },
 ]);
 
 export default eslintConfig;

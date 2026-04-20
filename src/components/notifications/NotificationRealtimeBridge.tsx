@@ -11,7 +11,9 @@ export function NotificationRealtimeBridge() {
   const { data, status } = useAuthSession();
   const userId = data?.user?.id;
   const refreshRef = useRef(router.refresh);
-  refreshRef.current = router.refresh;
+  useEffect(() => {
+    refreshRef.current = router.refresh;
+  }, [router.refresh]);
 
   useEffect(() => {
     if (status !== "authenticated" || !userId) return;

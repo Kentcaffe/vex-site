@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { localizedHref } from "@/lib/paths";
 import { routing } from "@/i18n/routing";
 import { getRootCategories } from "@/lib/category-queries";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { listingSeoPath } from "@/lib/seo";
 
@@ -29,6 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [roots, latestListings] = await Promise.all([
     getRootCategories(),
     prisma.listing.findMany({
+      where: listingWhereActive(),
       orderBy: { createdAt: "desc" },
       take: 500,
       select: { id: true, title: true, city: true, updatedAt: true },

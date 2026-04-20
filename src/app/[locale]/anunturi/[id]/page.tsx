@@ -9,12 +9,13 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import { ReportListingButton } from "@/components/ReportListingButton";
 import { ListingGallery } from "@/components/listing-detail/ListingGallery";
 import { ListingSpecs } from "@/components/listing-detail/ListingSpecs";
-import { isStaff } from "@/lib/auth-roles";
+import { isAdmin, isStaff } from "@/lib/auth-roles";
 import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PriceCurrencyCode } from "@/lib/currency";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import type { ListingPayloadWithCategory } from "@/lib/prisma-listing-casts";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { listingSeoPath } from "@/lib/seo";
@@ -28,8 +29,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const listing = await prisma.listing.findUnique({
-    where: { id },
+  const listing = await prisma.listing.findFirst({
+    where: { id, ...listingWhereActive() },
     select: {
       id: true,
       title: true,
@@ -87,8 +88,8 @@ export default async function ListingDetailPage({ params }: Props) {
   setRequestLocale(locale);
 
   const [listing, allCats, session, t] = await Promise.all([
-    prisma.listing.findUnique({
-      where: { id },
+    prisma.listing.findFirst({
+      where: { id, ...listingWhereActive() },
       include: { category: true },
     }) as Promise<ListingPayloadWithCategory | null>,
     getAllCategories(),
@@ -113,6 +114,7 @@ export default async function ListingDetailPage({ params }: Props) {
   const images = parseStoredListingImages(listing.images);
   const path = categoryPathLabels(allCats, listing.categoryId, locale);
   const canModerate = session?.user && isStaff(session.user.role);
+  const canAdminDeleteListing = session?.user && isAdmin(session.user.role);
   const isOwner = !!userId && listing.userId === userId;
   const canReport = !!userId && !isOwner;
 
@@ -210,7 +212,7 @@ export default async function ListingDetailPage({ params }: Props) {
               </div>
             ) : null}
           </div>
-          {canModerate ? (
+          {canModerate && canAdminDeleteListing ? (
             <div className="surface-muted p-4">
               <p className="text-xs font-medium text-amber-900 dark:text-amber-200">{t("moderation")}</p>
               <div className="mt-2">

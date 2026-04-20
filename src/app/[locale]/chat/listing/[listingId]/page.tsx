@@ -7,6 +7,7 @@ import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { localizedHref } from "@/lib/paths";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
 type Props = { params: Promise<{ locale: string; listingId: string }> };
@@ -28,8 +29,8 @@ export default async function ChatFromListingPage({ params }: Props) {
       redirect(localizedHref(locale, "/cont"));
     }
 
-    const listing = await prisma.listing.findUnique({
-      where: { id: listingId },
+    const listing = await prisma.listing.findFirst({
+      where: { id: listingId, ...listingWhereActive() },
       include: { user: { select: { id: true, name: true, email: true, avatarUrl: true } } },
     });
     if (!listing) {

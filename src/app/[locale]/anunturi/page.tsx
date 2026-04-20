@@ -12,6 +12,7 @@ import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { AUTOTURISME_CATEGORY_SLUG } from "@/lib/category-slugs";
 import { listingSeoPath } from "@/lib/seo";
@@ -124,7 +125,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   const applyImobiliareFilters = Boolean(categorySlug?.startsWith("imobiliare"));
   const applyElectronicsFilters = Boolean(categorySlug?.startsWith("electronice"));
 
-  const where: Prisma.ListingWhereInput = {};
+  const where: Prisma.ListingWhereInput = { ...listingWhereActive() };
   const andFilters: Prisma.ListingWhereInput[] = [];
 
   if (currencyFilter === "MDL" || currencyFilter === "EUR") {

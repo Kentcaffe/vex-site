@@ -23,7 +23,6 @@ export function DeleteListingButton({ listingId }: Props) {
     startTransition(async () => {
       const r = await deleteListingAsStaff(listingId);
       if (r.ok) {
-        router.push("/anunturi");
         router.refresh();
         return;
       }

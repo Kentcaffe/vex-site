@@ -15,6 +15,7 @@ import {
   userUpdatePreferences,
 } from "@/lib/prisma-account-settings";
 import { asListingSelect } from "@/lib/prisma-listing-casts";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import {
   mergePreferences,
@@ -202,6 +203,7 @@ export async function exportUserDataAction(): Promise<{ ok: true; json: string }
     where: { id: session.user.id },
     include: {
       listings: {
+        where: listingWhereActive(),
         select: asListingSelect({
           id: true,
           title: true,

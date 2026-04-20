@@ -1,0 +1,1 @@
+export type AdminListingLogAction = "DELETE_LISTING" | "RESTORE_LISTING" | "PERMANENT_DELETE_LISTING";

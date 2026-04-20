@@ -1,6 +1,6 @@
 "use server";
 
-import { createHash, randomBytes } from "node:crypto";
+import { createHash } from "node:crypto";
 import { hash } from "bcryptjs";
 import { z } from "zod";
 import { localizedHref } from "@/lib/paths";

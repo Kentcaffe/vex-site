@@ -1,3 +1,4 @@
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { countUnreadRoomMessages } from "@/lib/chat-realtime-store";
 
@@ -14,7 +15,10 @@ export async function getRoomAccess(roomId: string, userId: string): Promise<Cha
   const room = await prisma.chatRoom.findFirst({
     where: {
       id: roomId,
-      OR: [{ buyerId: userId }, { listing: { userId } }],
+      AND: [
+        { OR: [{ buyerId: userId }, { listing: { userId } }] },
+        { listing: listingWhereActive() },
+      ],
     },
     include: { listing: { select: { userId: true } } },
   });
@@ -32,7 +36,9 @@ export async function getRoomAccess(roomId: string, userId: string): Promise<Cha
 export async function unreadTotalForUser(userId: string): Promise<number> {
   try {
     const rooms = await prisma.chatRoom.findMany({
-      where: { OR: [{ buyerId: userId }, { listing: { userId } }] },
+      where: {
+        AND: [{ OR: [{ buyerId: userId }, { listing: { userId } }] }, { listing: listingWhereActive() }],
+      },
       select: { id: true },
     });
     let total = 0;

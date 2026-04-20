@@ -10,6 +10,7 @@ import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceh
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { localizedHref } from "@/lib/paths";
 import { asListingSelect, type FavoriteRowWithListing } from "@/lib/prisma-listing-casts";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { listingSeoPath } from "@/lib/seo";
 
@@ -30,7 +31,7 @@ export default async function FavoriteListPage({ params }: Props) {
   const tList = await getTranslations("Listings");
   const [rows, allCats] = await Promise.all([
     prisma.listingFavorite.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, listing: listingWhereActive() },
       orderBy: { createdAt: "desc" },
       take: 100,
       include: {

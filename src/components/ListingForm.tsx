@@ -260,8 +260,6 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       /* ignore */
     }
     setDraftHydrated(true);
-    // categoryTree vine din server o dată; nu reîncărca ciorna la fiecare rerandare.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- doar la mount / chei storage
   }, [storageKey, legacyDraftSessionKey, draftAdKey, isEditMode, initialEditSnapshot, categoryTree]);
 
   const scheduleDraftPersist = useCallback(() => {
@@ -316,7 +314,19 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     const city = typeof publishValues.city === "string" ? publishValues.city : "";
     const title = typeof publishValues.title === "string" ? publishValues.title : "";
     router.push(localizedHref(locale, listingSeoPath({ id: state.listingId, title, city })));
-  }, [state, storageKey, legacyDraftSessionKey, draftAdKey, router, toast, t, locale, isEditMode]);
+  }, [
+    state,
+    storageKey,
+    legacyDraftSessionKey,
+    draftAdKey,
+    router,
+    toast,
+    t,
+    locale,
+    isEditMode,
+    publishValues.city,
+    publishValues.title,
+  ]);
 
   useEffect(() => {
     if (state?.ok === false && state.error === "server") {
@@ -737,7 +747,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
             <SearchableSelect
               id="city"
               value={publishValues.city}
-              onChange={(v) => {
+              onValueChangeAction={(v) => {
                 setPublishValues((p) => ({ ...p, city: v }));
                 clearFieldError("city");
               }}
@@ -826,7 +836,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
                 <SearchableSelect
                   id="brand"
                   value={publishValues.brand}
-                  onChange={(v) => setPublishValues((p) => ({ ...p, brand: v, modelName: "" }))}
+                  onValueChangeAction={(v) => setPublishValues((p) => ({ ...p, brand: v, modelName: "" }))}
                   options={VEHICLE_BRANDS.map((b) => ({ value: b, label: b }))}
                   placeholder={t("pickBrand")}
                   emptyLabel={t("detailOptional")}
@@ -841,7 +851,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
                 <SearchableSelect
                   id="modelName"
                   value={publishValues.modelName}
-                  onChange={(v) => setPublishValues((p) => ({ ...p, modelName: v }))}
+                  onValueChangeAction={(v) => setPublishValues((p) => ({ ...p, modelName: v }))}
                   options={vehicleModelSuggestions.map((m) => ({ value: m, label: m }))}
                   placeholder={t("pickModel")}
                   emptyLabel={t("detailOptional")}
@@ -895,7 +905,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
                 <SearchableSelect
                   id="brand-el"
                   value={publishValues.brand}
-                  onChange={(v) => setPublishValues((p) => ({ ...p, brand: v, modelName: "" }))}
+                  onValueChangeAction={(v) => setPublishValues((p) => ({ ...p, brand: v, modelName: "" }))}
                   options={ELECTRONICS_BRANDS.map((b) => ({ value: b, label: b }))}
                   placeholder={t("pickBrand")}
                   emptyLabel={t("detailOptional")}
@@ -910,7 +920,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
                 <SearchableSelect
                   id="modelName-el"
                   value={publishValues.modelName}
-                  onChange={(v) => setPublishValues((p) => ({ ...p, modelName: v }))}
+                  onValueChangeAction={(v) => setPublishValues((p) => ({ ...p, modelName: v }))}
                   options={electronicsModelSuggestions.map((m) => ({ value: m, label: m }))}
                   placeholder={t("pickModel")}
                   emptyLabel={t("detailOptional")}
@@ -1010,7 +1020,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
                     <SearchableSelect
                       id={fname}
                       value={val}
-                      onChange={(v) => setExtra(fname, v)}
+                      onValueChangeAction={(v) => setExtra(fname, v)}
                       options={searchOpts}
                       placeholder={t("detailOptional")}
                       emptyLabel={t("detailOptional")}

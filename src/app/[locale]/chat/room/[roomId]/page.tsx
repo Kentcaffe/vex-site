@@ -7,6 +7,7 @@ import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { localizedHref } from "@/lib/paths";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
 type Props = { params: Promise<{ locale: string; roomId: string }> };
@@ -30,7 +31,10 @@ export default async function ChatRoomPage({ params }: Props) {
     const room = await prisma.chatRoom.findFirst({
       where: {
         id: roomId,
-        OR: [{ buyerId: userId }, { listing: { userId } }],
+        AND: [
+          { OR: [{ buyerId: userId }, { listing: { userId } }] },
+          { listing: listingWhereActive() },
+        ],
       },
       include: {
         listing: {

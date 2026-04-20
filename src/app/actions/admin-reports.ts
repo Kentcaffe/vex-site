@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
-import { isStaff } from "@/lib/auth-roles";
+import { isAdmin, isStaff } from "@/lib/auth-roles";
+import { softDeleteListingWithAdminLog } from "@/lib/admin-listing-soft-delete";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { localizedHref } from "@/lib/paths";
 import { notifyListingReportResolved } from "@/lib/report-notifications";
 import { prisma } from "@/lib/prisma";
@@ -83,7 +85,7 @@ export async function deleteListingFromReport(reportId: string): Promise<AdminRe
   if (!session?.user?.id) {
     return { ok: false, error: "unauthorized" };
   }
-  if (!isStaff(session.user.role)) {
+  if (!isAdmin(session.user.role)) {
     return { ok: false, error: "forbidden" };
   }
 
@@ -95,7 +97,15 @@ export async function deleteListingFromReport(reportId: string): Promise<AdminRe
     return { ok: false, error: "not_found" };
   }
 
-  await prisma.listing.delete({ where: { id: row.listingId } });
+  const listing = await prisma.listing.findFirst({
+    where: { id: row.listingId, ...listingWhereActive() },
+    select: { id: true },
+  });
+  if (!listing) {
+    return { ok: false, error: "not_found" };
+  }
+
+  await softDeleteListingWithAdminLog(row.listingId, session.user.id);
 
   for (const locale of routing.locales) {
     revalidatePath(localizedHref(locale, "/"));
@@ -104,6 +114,8 @@ export async function deleteListingFromReport(reportId: string): Promise<AdminRe
     revalidatePath(localizedHref(locale, "/admin/listings"));
     revalidatePath(localizedHref(locale, "/admin/reclamatii"));
     revalidatePath(localizedHref(locale, "/admin/reports"));
+    revalidatePath(localizedHref(locale, "/admin/trash"));
+    revalidatePath(localizedHref(locale, "/admin/logs"));
     revalidatePath(localizedHref(locale, `/anunturi/${row.listingId}`));
   }
 

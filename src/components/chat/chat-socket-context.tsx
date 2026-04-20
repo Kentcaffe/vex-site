@@ -53,7 +53,9 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  refreshUnreadRef.current = refreshUnread;
+  useEffect(() => {
+    refreshUnreadRef.current = refreshUnread;
+  }, [refreshUnread]);
 
   /** Badge: endpoint + Realtime (messages + ChatMessage) + polling de siguranță. */
   useEffect(() => {

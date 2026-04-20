@@ -17,7 +17,12 @@ export function asListingCreateInput(data: Record<string, unknown>): Prisma.List
 /** `findMany` / `findUnique` cu `include: { category: true }` — acces sigur la `priceCurrency`. */
 export type ListingPayloadWithCategory = Prisma.ListingGetPayload<{
   include: { category: true };
-}> & { priceCurrency: string };
+}> & {
+  priceCurrency: string;
+  /** Soft-delete (schema + `prisma generate`); opțional pentru compat IDE. */
+  deletedAt?: Date | null;
+  isDeleted?: boolean;
+};
 
 /** Rând listă `/anunturi` (select cu categoryId). */
 export type ListingBrowseRow = {

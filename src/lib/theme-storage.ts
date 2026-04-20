@@ -39,7 +39,7 @@ export function applyThemeFromStorage(): void {
   }
 }
 
-export function setThemeAndApply(_mode: StoredTheme | null): void {
+export function setThemeAndApply(): void {
   setStoredTheme("light");
   applyThemeFromStorage();
 }

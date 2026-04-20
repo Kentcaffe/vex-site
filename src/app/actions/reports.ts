@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { auth } from "@/auth";
 import { localizedHref } from "@/lib/paths";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { otherContentReport } from "@/lib/prisma-delegates";
 import { REPORT_REASONS, type ReportReasonId } from "@/lib/report-reasons";
@@ -39,8 +40,8 @@ export async function submitListingReport(
     return { ok: false, error: "unauthorized" };
   }
 
-  const listing = await prisma.listing.findUnique({
-    where: { id: listingId },
+  const listing = await prisma.listing.findFirst({
+    where: { id: listingId, ...listingWhereActive() },
     select: { id: true, userId: true },
   });
   if (!listing) {

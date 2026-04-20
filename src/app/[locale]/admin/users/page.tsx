@@ -1,9 +1,11 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
+
 
 /** Lista trebuie să reflecte mereu DB-ul (fără cache la build). */
 export const dynamic = "force-dynamic";
@@ -22,7 +24,7 @@ export default async function AdminUsersPage({ params }: Props) {
       name: true,
       role: true,
       createdAt: true,
-      _count: { select: { listings: true } },
+      _count: { select: { listings: { where: listingWhereActive() } } },
     },
   });
 

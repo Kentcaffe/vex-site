@@ -6,6 +6,7 @@ import { ChatServerError } from "@/components/chat/ChatServerError";
 import { getLastRoomMessage } from "@/lib/chat-realtime-store";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { localizedHref } from "@/lib/paths";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -32,7 +33,9 @@ export default async function ChatInboxPage({ params }: Props) {
 
   try {
     const rooms = await prisma.chatRoom.findMany({
-      where: { OR: [{ buyerId: userId }, { listing: { userId } }] },
+      where: {
+        AND: [{ OR: [{ buyerId: userId }, { listing: { userId } }] }, { listing: listingWhereActive() }],
+      },
       include: {
         listing: {
           select: {

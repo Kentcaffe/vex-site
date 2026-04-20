@@ -1,5 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { otherContentReport } from "@/lib/prisma-delegates";
 import { countOpenSupportTicketsSafe } from "@/lib/support-db-safe";
@@ -14,7 +15,7 @@ export default async function AdminDashboardPage({ params }: Props) {
   const t = await getTranslations("Admin");
 
   const [listingCount, userCount, supportOpen, lp, lr, ld, op, or, od] = await Promise.all([
-    prisma.listing.count(),
+    prisma.listing.count({ where: listingWhereActive() }),
     prisma.user.count(),
     countOpenSupportTicketsSafe(),
     prisma.listingReport.count({ where: { status: "PENDING" } }),

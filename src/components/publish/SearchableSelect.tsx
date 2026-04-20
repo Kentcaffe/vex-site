@@ -8,7 +8,8 @@ export type SearchableSelectOption = { value: string; label: string };
 type Props = {
   id: string;
   value: string;
-  onChange: (value: string) => void;
+  /** Sufixul `Action` — convenția Next pentru props cu funcții în entry-uri client. */
+  onValueChangeAction: (value: string) => void;
   options: readonly SearchableSelectOption[];
   placeholder?: string;
   emptyLabel?: string;
@@ -24,7 +25,7 @@ type Props = {
 export function SearchableSelect({
   id,
   value,
-  onChange,
+  onValueChangeAction,
   options,
   placeholder = "Alege…",
   emptyLabel = "—",
@@ -71,11 +72,11 @@ export function SearchableSelect({
 
   const pick = useCallback(
     (v: string) => {
-      onChange(v);
+      onValueChangeAction(v);
       setOpen(false);
       setQ("");
     },
-    [onChange],
+    [onValueChangeAction],
   );
 
   return (
@@ -83,6 +84,7 @@ export function SearchableSelect({
       <button
         id={id}
         type="button"
+        role="combobox"
         disabled={disabled}
         aria-invalid={invalid}
         aria-haspopup="listbox"

@@ -95,7 +95,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ThemeScript />
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger -- JSON-LD SEO metadata
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         {preconnect ? (

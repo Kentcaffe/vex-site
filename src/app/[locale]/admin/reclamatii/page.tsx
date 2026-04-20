@@ -1,4 +1,6 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { auth } from "@/auth";
+import { isAdmin } from "@/lib/auth-roles";
 import { OtherReportRow } from "@/components/admin/OtherReportRow";
 import { ReportQueueRow } from "@/components/admin/ReportQueueRow";
 import { prisma } from "@/lib/prisma";
@@ -53,6 +55,8 @@ export default async function AdminReclamatiiPage({ params, searchParams }: Prop
   const sp = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("Admin");
+  const session = await auth();
+  const canDeleteListing = isAdmin(session?.user?.role);
 
   const st = statusWhere(sp.status);
   const type = sp.type ?? "all";
@@ -211,6 +215,7 @@ export default async function AdminReclamatiiPage({ params, searchParams }: Prop
                 >
                   <ReportQueueRow
                     locale={locale}
+                    canDeleteListing={canDeleteListing}
                     report={{
                       id: r.id,
                       status: r.status,

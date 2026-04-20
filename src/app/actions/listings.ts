@@ -18,6 +18,7 @@ import {
 } from "@/lib/listing-form-schema";
 import { devLog, devWarn } from "@/lib/dev-log";
 import { asListingCreateInput } from "@/lib/prisma-listing-casts";
+import { listingUpdateSoftDelete, listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
 export type CreateListingState =
@@ -301,7 +302,7 @@ export async function updateOwnListing(
   }
 
   const existing = await prisma.listing.findFirst({
-    where: { id: listingId, userId: session.user.id },
+    where: { id: listingId, userId: session.user.id, ...listingWhereActive() },
     select: { id: true, title: true, city: true },
   });
   if (!existing) {
@@ -345,7 +346,6 @@ export async function updateOwnListing(
   }
 
   const submittedCategoryId = parsed.data.categoryId.trim();
-  const submittedSubcategoryId = rawSubcategoryId || submittedCategoryId;
 
   let categoryRow = await prisma.category.findUnique({
     where: { id: submittedCategoryId },
@@ -485,7 +485,7 @@ export async function deleteOwnListing(listingId: string): Promise<DeleteOwnList
   }
 
   const row = await prisma.listing.findFirst({
-    where: { id, userId: session.user.id },
+    where: { id, userId: session.user.id, ...listingWhereActive() },
     select: { id: true, title: true, city: true },
   });
   if (!row) {
@@ -493,7 +493,10 @@ export async function deleteOwnListing(listingId: string): Promise<DeleteOwnList
   }
 
   try {
-    await prisma.listing.delete({ where: { id } });
+    await prisma.listing.update({
+      where: { id },
+      data: listingUpdateSoftDelete(),
+    });
   } catch (e) {
     console.error("[deleteOwnListing]", e);
     return { ok: false, error: "server" };

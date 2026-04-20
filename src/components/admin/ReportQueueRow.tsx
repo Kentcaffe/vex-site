@@ -21,6 +21,7 @@ function reasonLabel(t: (key: string) => string, code: string): string {
 
 type RowProps = {
   locale: string;
+  canDeleteListing: boolean;
   report: {
     id: string;
     status: ReportStatus;
@@ -33,7 +34,7 @@ type RowProps = {
   };
 };
 
-export function ReportQueueRow({ report: initial, locale }: RowProps) {
+export function ReportQueueRow({ report: initial, locale, canDeleteListing }: RowProps) {
   const t = useTranslations("Admin");
   const router = useRouter();
   const [err, setErr] = useState<string | null>(null);
@@ -138,19 +139,21 @@ export function ReportQueueRow({ report: initial, locale }: RowProps) {
             </div>
           </>
         ) : null}
-        <button
-          type="button"
-          disabled={pending}
-          onClick={() => {
-            if (!window.confirm(t("confirmDeleteListingFromReport"))) {
-              return;
-            }
-            run(() => deleteListingFromReport(initial.id));
-          }}
-          className="rounded-lg border border-red-300 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-800 hover:bg-red-100 disabled:opacity-60 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200"
-        >
-          {t("deleteListing")}
-        </button>
+        {canDeleteListing ? (
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => {
+              if (!window.confirm(t("confirmDeleteListingFromReport"))) {
+                return;
+              }
+              run(() => deleteListingFromReport(initial.id));
+            }}
+            className="rounded-lg border border-red-300 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-800 hover:bg-red-100 disabled:opacity-60 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200"
+          >
+            {t("deleteListing")}
+          </button>
+        ) : null}
       </div>
       {err ? <p className="w-full text-xs text-red-600">{err}</p> : null}
     </div>

@@ -9,6 +9,7 @@ import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { localizedHref } from "@/lib/paths";
 import { MyListingCard } from "@/components/account/MyListingCard";
 import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { listingSeoPath } from "@/lib/seo";
 
@@ -27,7 +28,7 @@ export default async function ContMyListingsPage({ params }: Props) {
 
   const [rowsRaw, allCats] = await Promise.all([
     prisma.listing.findMany({
-      where: { userId: session.user.id },
+      where: { userId: session.user.id, ...listingWhereActive() },
       orderBy: { createdAt: "desc" },
       take: 120,
       select: asListingSelect({

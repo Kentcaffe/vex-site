@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
+import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { logRouteError } from "@/lib/server-log";
 
@@ -16,15 +17,23 @@ export async function GET(_req: Request, { params }: Props) {
     const { listingId } = await params;
     const userId = session.user.id;
 
-    const listing = await prisma.listing.findUnique({
-      where: { id: listingId },
-      include: { user: { select: { id: true, name: true, email: true } } },
+    const listing = await prisma.listing.findFirst({
+      where: { id: listingId, ...listingWhereActive() },
+      select: { id: true, title: true, userId: true },
     });
     if (!listing) {
       return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
     if (listing.userId === userId) {
       return NextResponse.json({ error: "own_listing" }, { status: 403 });
+    }
+
+    const seller = await prisma.user.findUnique({
+      where: { id: listing.userId },
+      select: { id: true, name: true, email: true },
+    });
+    if (!seller) {
+      return NextResponse.json({ error: "not_found" }, { status: 404 });
     }
 
     const room = await prisma.chatRoom.upsert({
@@ -38,7 +47,6 @@ export async function GET(_req: Request, { params }: Props) {
 
     const messages = await listRoomMessages(room.id, 200);
 
-    const seller = listing.user;
     const readByOther = room.readStates.find((s) => s.userId !== userId);
     const myRead = room.readStates.find((s) => s.userId === userId);
 
