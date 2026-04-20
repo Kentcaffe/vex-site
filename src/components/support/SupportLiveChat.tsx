@@ -150,8 +150,13 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
   }, [messages.length, onThreadHasMessagesAction]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length, staffTyping, staffOnline]);
+    const el = scrollRef.current;
+    if (!el) {
+      return;
+    }
+    const top = el.scrollHeight - el.clientHeight;
+    el.scrollTo({ top, behavior: "smooth" });
+  }, [messages.length]);
 
   /** Realtime: postgres + broadcast (prezență moderator, typing) + polling de rezervă. */
   useEffect(() => {
@@ -220,7 +225,7 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
 
     pollRef.current = setInterval(() => {
       void loadMessages();
-    }, 12000);
+    }, 25000);
 
     return () => {
       if (typingTimerRef.current) {
@@ -321,8 +326,8 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
             <Headphones className="h-5 w-5" aria-hidden />
           </span>
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-zinc-900">{t("panelTitle")}</p>
-            <p className="truncate text-xs text-zinc-500">
+            <p className="break-words text-sm font-bold text-zinc-900">{t("panelTitle")}</p>
+            <p className="break-all text-xs text-zinc-500 sm:break-words">
               {variant === "staff" && userEmail ? userEmail : t("panelSubtitle")}
             </p>
           </div>
@@ -344,9 +349,17 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
         </div>
       </div>
 
-      {variant === "user" && staffOnline ? (
-        <div className="shrink-0 border-b border-emerald-100/80 bg-emerald-50/90 px-4 py-2.5 text-center text-xs font-medium text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/35 dark:text-emerald-100">
-          {t("moderatorJoinedBanner")}
+      {variant === "user" ? (
+        <div
+          className={`flex min-h-[2.75rem] shrink-0 items-center justify-center border-b px-4 py-2 text-center text-xs font-medium ${
+            staffOnline
+              ? "border-emerald-100/80 bg-emerald-50/90 text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/35 dark:text-emerald-100"
+              : "border-transparent text-transparent"
+          }`}
+          aria-live="polite"
+          aria-hidden={!staffOnline}
+        >
+          <span className={staffOnline ? "" : "invisible select-none"}>{t("moderatorJoinedBanner")}</span>
         </div>
       ) : null}
 
@@ -355,8 +368,16 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
         className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain bg-zinc-50/50 px-3 py-4 sm:px-4 [-webkit-overflow-scrolling:touch]"
       >
         {loading ? (
-          <div className="flex justify-center py-12 text-zinc-500">
-            <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
+          <div className="flex min-h-[240px] flex-col justify-center gap-4 px-2 py-6" aria-busy="true">
+            <div className="flex justify-start">
+              <div className="h-14 w-[min(85%,14rem)] animate-pulse rounded-2xl bg-zinc-200/90" />
+            </div>
+            <div className="flex justify-end">
+              <div className="h-11 w-[min(70%,12rem)] animate-pulse rounded-2xl bg-orange-100/90" />
+            </div>
+            <div className="flex justify-start">
+              <div className="h-12 w-[min(75%,13rem)] animate-pulse rounded-2xl bg-zinc-200/90" />
+            </div>
           </div>
         ) : (
           <>

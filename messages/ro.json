@@ -59,9 +59,12 @@
     "newMessagesBanner": "Mesaje noi"
   },
   "Contact": {
-    "metaTitle": "Contact & suport | VEX",
+    "metaTitle": "Contact & Live Chat | VEX",
     "metaDescription": "Contactează echipa VEX prin email sau live chat pentru ajutor legat de cont și platformă.",
     "kicker": "Contact & suport",
+    "pageTitle": "Contact & Live Chat",
+    "pageSubtitle": "Live chat și email într-un singur loc — alege ce ți se potrivește, iar noi îți răspundem cât mai curând.",
+    "emailSectionTitle": "Email",
     "title": "Contact",
     "subtitle": "Alege canalul potrivit, iar noi îți răspundem cât mai rapid în timpul programului.",
     "emailSupportTitle": "Suport tehnic",

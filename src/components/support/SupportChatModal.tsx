@@ -99,7 +99,7 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
       window.setTimeout(() => {
         setShowFeedback(false);
         onDismissAction();
-      }, 900);
+      }, 400);
     } catch (err) {
       const msg = err instanceof Error && err.message !== "feedback_failed" ? err.message : t("feedbackError");
       setFeedbackError(msg);

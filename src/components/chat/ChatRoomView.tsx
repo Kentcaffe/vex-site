@@ -61,7 +61,16 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   const roomId = bootstrap.roomId;
 
   const scrollToBottom = useCallback((behavior: ScrollBehavior = "smooth") => {
-    bottomRef.current?.scrollIntoView({ behavior });
+    const el = scrollRef.current;
+    if (!el) {
+      return;
+    }
+    const target = el.scrollHeight - el.clientHeight;
+    if (behavior === "smooth" && typeof el.scrollTo === "function") {
+      el.scrollTo({ top: target, behavior: "smooth" });
+    } else {
+      el.scrollTop = el.scrollHeight;
+    }
   }, []);
 
   useEffect(() => {
@@ -219,7 +228,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   const remaining = bootstrap.maxBodyLength - draft.length;
 
   return (
-    <div className="surface-card flex min-h-0 w-full flex-1 flex-col overflow-hidden ring-1 ring-zinc-900/5 dark:ring-white/5 md:min-h-[560px] md:flex-none">
+    <div className="surface-card flex min-h-0 w-full flex-1 flex-col overflow-hidden ring-1 ring-zinc-900/5 dark:ring-white/5 max-md:min-h-[min(100dvh,720px)] md:min-h-[560px] md:flex-none">
       {/* Header */}
       <div className="flex shrink-0 items-start gap-3 border-b border-[var(--mp-border)] bg-[var(--mp-surface-muted)] px-4 py-3.5">
         <Link
@@ -270,7 +279,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
         role="log"
         aria-live="polite"
         aria-relevant="additions"
-        className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain bg-[var(--mp-page)] px-3 py-4 [-webkit-overflow-scrolling:touch]"
+        className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-y-contain bg-[var(--mp-page)] px-3 py-4 pb-[max(1rem,var(--chat-composer-stack))] [-webkit-overflow-scrolling:touch] md:pb-4"
       >
         {(Array.isArray(messages) ? messages : []).length === 0 ? (
           <p className="mx-auto max-w-sm py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">{t("emptyThread")}</p>
@@ -349,8 +358,8 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
         </p>
       ) : null}
 
-      {/* Composer */}
-      <div className="shrink-0 border-t border-[var(--mp-border)] bg-[var(--mp-surface)] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      {/* Composer — fix deasupra barei de jos pe mobil; în flux pe desktop */}
+      <div className="shrink-0 border-t border-[var(--mp-border)] bg-[var(--mp-surface)] p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] max-md:fixed max-md:inset-x-0 max-md:bottom-[var(--mobile-nav-reserve)] max-md:z-40 max-md:shadow-[0_-8px_24px_rgb(0_0_0_/_0.08)] md:static md:shadow-none">
         <form
           className="flex gap-2 rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface-muted)] p-1.5 shadow-inner"
           onSubmit={(e) => {
@@ -391,6 +400,8 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
           </span>
         </div>
       </div>
+      {/* Spațiu pentru composer-ul fixed (nu ocupă loc în flux) */}
+      <div className="shrink-0 md:hidden" style={{ minHeight: "calc(var(--chat-composer-stack) + 2.25rem)" }} aria-hidden />
     </div>
   );
 }

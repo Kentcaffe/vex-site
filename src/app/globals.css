@@ -8,7 +8,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   background-color: var(--mp-page);
 }
 
@@ -38,6 +38,8 @@ html {
     --mp-nav-solid: #ffffff;
     /* Bară fixă (~72px rând + padding) + safe-area — evită „crop” peste ultimul conținut */
     --mobile-nav-reserve: calc(92px + max(16px, env(safe-area-inset-bottom, 0px)));
+    /* Composer chat deasupra barei de jos (textarea + padding) */
+    --chat-composer-stack: 5.75rem;
   }
 
   .dark {
@@ -61,6 +63,7 @@ html {
     --mp-shadow-md: 0 14px 36px -10px rgb(0 0 0 / 0.45);
     --mp-shadow-lg: 0 26px 56px -16px rgb(0 0 0 / 0.55);
     --mp-nav-solid: #111827;
+    --chat-composer-stack: 5.75rem;
   }
 
   body {

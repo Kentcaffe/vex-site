@@ -59,9 +59,12 @@
     "newMessagesBanner": "Новые сообщения"
   },
   "Contact": {
-    "metaTitle": "Контакты и поддержка | VEX",
+    "metaTitle": "Контакты и Live Chat | VEX",
     "metaDescription": "Напишите на email или откройте живой чат с командой для помощи по аккаунту и вопросам о платформе.",
     "kicker": "Мы на связи",
+    "pageTitle": "Контакты и Live Chat",
+    "pageSubtitle": "Живой чат и email в одном месте — выберите удобный способ; отвечаем как можно скорее.",
+    "emailSectionTitle": "Email",
     "title": "Контакты",
     "subtitle": "Выберите удобный канал — отвечаем как можно быстрее в рабочее время.",
     "emailSupportTitle": "Техподдержка",

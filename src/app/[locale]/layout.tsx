@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Providers } from "@/components/Providers";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { FooterVisibility } from "@/components/FooterVisibility";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 
@@ -35,7 +36,9 @@ export default async function LocaleLayout({ children, params }: Props) {
           <SiteHeader />
           <div className="flex min-h-0 w-full min-w-0 flex-1 flex-col pb-[var(--mobile-nav-reserve)] md:pb-0">
             <main className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</main>
-            <SiteFooter />
+            <FooterVisibility>
+              <SiteFooter />
+            </FooterVisibility>
           </div>
           <MobileBottomNav />
         </div>

@@ -41,41 +41,50 @@ function LiveChatCtaLink({
 type SupportContactLauncherProps = {
   /** Coloană îngustă (ex. footer): fără eyebrow, layout mereu stacked */
   embed?: boolean;
+  /** Pagina Contact — totul centrat, fără eyebrow separat */
+  unified?: boolean;
   /** Evită duplicate id când există mai multe instanțe pe pagină */
   headingId?: string;
 };
 
 export function SupportContactLauncher({
   embed = false,
+  unified = false,
   headingId = "support-live-heading",
 }: SupportContactLauncherProps) {
   const t = useTranslations("Support");
   const { status } = useAuthSession();
   const [open, setOpen] = useState(false);
 
-  const gridClass = embed
-    ? "grid grid-cols-1 gap-3"
-    : "grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6 lg:gap-8";
-  const ctaWrapClass = embed
-    ? "flex w-full flex-col gap-1.5"
-    : "flex w-full flex-col gap-1.5 md:max-w-[min(100%,280px)] md:items-end md:justify-center md:justify-self-end";
-  const titleClass = embed
-    ? "mt-1.5 text-lg font-bold leading-snug tracking-tight text-zinc-900"
-    : "mt-1.5 text-xl font-bold leading-snug tracking-tight text-zinc-900 md:text-2xl md:leading-tight";
-  const cardPad = embed ? "p-3.5 sm:p-4" : "p-4 sm:p-5 md:p-4";
+  const gridClass = unified
+    ? "grid grid-cols-1 gap-5 text-center"
+    : embed
+      ? "grid grid-cols-1 gap-3"
+      : "grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-center md:gap-6 lg:gap-8";
+  const ctaWrapClass = unified
+    ? "flex w-full flex-col items-center gap-2"
+    : embed
+      ? "flex w-full flex-col gap-1.5"
+      : "flex w-full flex-col gap-1.5 md:max-w-[min(100%,280px)] md:items-end md:justify-center md:justify-self-end";
+  const titleClass = unified
+    ? "mt-2 text-xl font-bold leading-snug tracking-tight text-zinc-900 sm:text-2xl"
+    : embed
+      ? "mt-1.5 text-lg font-bold leading-snug tracking-tight text-zinc-900"
+      : "mt-1.5 text-xl font-bold leading-snug tracking-tight text-zinc-900 md:text-2xl md:leading-tight";
+  const cardPad = unified ? "p-5 sm:p-6" : embed ? "p-3.5 sm:p-4" : "p-4 sm:p-5 md:p-4";
 
-  const ctaWidthEmbed = embed ? "!w-full md:!w-full md:min-w-0" : "";
+  const ctaWidthEmbed = embed || unified ? "!w-full md:!w-full md:min-w-0" : "";
 
   return (
     <>
-      {!embed ? (
+      {!embed && !unified ? (
         <p className="mb-3 text-center text-[11px] font-semibold uppercase tracking-[0.2em] text-orange-800/90 md:text-left">
           {t("contactSectionEyebrow")}
         </p>
       ) : null}
 
       <section
-          className={`group relative overflow-hidden rounded-3xl border border-orange-200/55 bg-gradient-to-br from-orange-50 via-orange-50/70 to-amber-50/80 shadow-[0_8px_30px_-12px_rgba(234,88,12,0.22)] transition-all duration-300 ease-out hover:-translate-y-1 hover:border-orange-300/60 hover:shadow-[0_16px_40px_-12px_rgba(234,88,12,0.28)] hover:ring-2 hover:ring-orange-200/50 ${cardPad}`}
+          className={`group relative overflow-hidden rounded-3xl border border-orange-200/55 bg-gradient-to-br from-orange-50 via-orange-50/70 to-amber-50/80 shadow-[0_8px_30px_-12px_rgba(234,88,12,0.22)] transition-shadow duration-200 ease-out hover:border-orange-300/60 hover:shadow-[0_16px_40px_-12px_rgba(234,88,12,0.26)] hover:ring-2 hover:ring-orange-200/50 ${cardPad}`}
           aria-labelledby={headingId}
         >
           <div
@@ -88,24 +97,24 @@ export function SupportContactLauncher({
           />
 
           <div className={`relative ${gridClass}`}>
-            <div className="flex min-w-0 gap-3 sm:gap-3.5">
+            <div className={`flex min-w-0 gap-3 sm:gap-3.5 ${unified ? "flex-col items-center sm:flex-row sm:items-start sm:text-left" : ""}`}>
               <div
-                className={`flex shrink-0 items-center justify-center rounded-2xl bg-white text-orange-600 shadow-sm ring-1 ring-orange-100/90 ${embed ? "h-11 w-11" : "h-12 w-12 sm:h-[52px] sm:w-[52px]"}`}
+                className={`flex shrink-0 items-center justify-center rounded-2xl bg-white text-orange-600 shadow-sm ring-1 ring-orange-100/90 ${embed ? "h-11 w-11" : unified ? "mx-auto h-14 w-14 sm:mx-0 sm:h-[52px] sm:w-[52px]" : "h-12 w-12 sm:h-[52px] sm:w-[52px]"}`}
               >
                 <Headphones
-                  className={embed ? "h-5 w-5" : "h-6 w-6 sm:h-7 sm:w-7"}
+                  className={embed ? "h-5 w-5" : unified ? "h-7 w-7 sm:h-7 sm:w-7" : "h-6 w-6 sm:h-7 sm:w-7"}
                   strokeWidth={2}
                   aria-hidden
                 />
               </div>
-              <div className="min-w-0 flex-1">
+              <div className={`min-w-0 flex-1 ${unified ? "text-center sm:text-left" : ""}`}>
                 <span className="inline-flex items-center rounded-md bg-white/95 px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-orange-700 shadow-sm ring-1 ring-orange-200/90">
                   {t("liveBadge")}
                 </span>
                 <h2 id={headingId} className={titleClass}>
                   {t("contactSectionTitle")}
                 </h2>
-                <p className="mt-1 line-clamp-2 text-sm leading-snug text-zinc-600">
+                <p className="mt-2 text-sm leading-relaxed text-zinc-600">
                   {t("contactSectionLead")}
                 </p>
               </div>
@@ -131,12 +140,12 @@ export function SupportContactLauncher({
                 </LiveChatCtaLink>
               )}
               <p
-                className={`text-[11px] leading-relaxed text-zinc-400 ${embed ? "text-left" : "text-center md:text-right"}`}
+                className={`text-[11px] leading-relaxed text-zinc-400 ${embed ? "text-left" : unified ? "text-center sm:text-center" : "text-center md:text-right"}`}
               >
                 {t("contactSectionHintPrivacy")}
               </p>
               <p
-                className={`text-[11px] leading-relaxed text-zinc-400/95 ${embed ? "text-left" : "text-center md:text-right"}`}
+                className={`text-[11px] leading-relaxed text-zinc-400/95 ${embed ? "text-left" : unified ? "text-center sm:text-center" : "text-center md:text-right"}`}
               >
                 {t("contactSectionHintAuth")}
               </p>

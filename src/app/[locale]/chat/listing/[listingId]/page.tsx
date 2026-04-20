@@ -85,7 +85,7 @@ export default async function ChatFromListingPage({ params }: Props) {
     };
 
     return (
-      <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-8">
+      <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-3 pt-2 pb-0 sm:px-6 sm:py-6">
         <ChatRoomView key={room.id} bootstrap={bootstrap} currentUserId={userId} />
       </div>
     );
