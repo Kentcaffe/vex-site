@@ -4,7 +4,22 @@ import { auth } from "@/auth";
 import { AdminFeedbackList, type AdminFeedbackRow } from "@/components/admin/AdminFeedbackList";
 import { isAdmin } from "@/lib/auth-roles";
 import { localizedHref } from "@/lib/paths";
-import { prisma } from "@/lib/prisma";
+import { feedback } from "@/lib/prisma-delegates";
+
+/** Tip explicit pentru rândul din listă (delegates Prisma folosesc `any`). */
+type AdminFeedbackQueryRow = {
+  id: string;
+  message: string;
+  email: string | null;
+  createdAt: Date;
+  user: { email: string; name: string | null } | null;
+  replies: Array<{
+    id: string;
+    reply: string;
+    createdAt: Date;
+    admin: { email: string; name: string | null };
+  }>;
+};
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -18,7 +33,7 @@ export default async function AdminFeedbackPage({ params }: Props) {
 
   const t = await getTranslations("Admin");
 
-  const rows = await prisma.feedback.findMany({
+  const rows = (await feedback.findMany({
     orderBy: { createdAt: "desc" },
     take: 200,
     include: {
@@ -28,9 +43,9 @@ export default async function AdminFeedbackPage({ params }: Props) {
         include: { admin: { select: { email: true, name: true } } },
       },
     },
-  });
+  })) as AdminFeedbackQueryRow[];
 
-  const items: AdminFeedbackRow[] = rows.map((fb) => {
+  const items: AdminFeedbackRow[] = rows.map((fb: AdminFeedbackQueryRow) => {
     const userLabel = fb.user
       ? fb.user.name?.trim() || fb.user.email?.trim() || fb.user.email
       : t("feedbackGuest");
@@ -42,7 +57,7 @@ export default async function AdminFeedbackPage({ params }: Props) {
       createdAt: fb.createdAt.toISOString(),
       email,
       userLabel,
-      replies: fb.replies.map((r) => ({
+      replies: fb.replies.map((r: AdminFeedbackQueryRow["replies"][number]) => ({
         id: r.id,
         reply: r.reply,
         createdAt: r.createdAt.toISOString(),

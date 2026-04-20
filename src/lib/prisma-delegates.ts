@@ -13,3 +13,5 @@ export const userNotification = p.userNotification;
 export const passwordResetToken = p.passwordResetToken;
 export const supportTicket = p.supportTicket;
 export const supportMessage = p.supportMessage;
+export const feedback = p.feedback;
+export const feedbackReply = p.feedbackReply;

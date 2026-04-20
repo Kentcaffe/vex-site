@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { localizedHref } from "@/lib/paths";
-import { prisma } from "@/lib/prisma";
+import { feedback } from "@/lib/prisma-delegates";
 import { routing } from "@/i18n/routing";
 
 export type SubmitFeedbackResult =
@@ -32,7 +32,7 @@ export async function submitFeedback(formData: FormData): Promise<SubmitFeedback
     email = emailRaw.toLowerCase();
   }
 
-  await prisma.feedback.create({
+  await feedback.create({
     data: {
       userId: session?.user?.id ?? null,
       email,
