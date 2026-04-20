@@ -52,6 +52,7 @@ import {
   Leaf,
   Lightbulb,
   MapPin,
+  Megaphone,
   Mic2,
   Monitor,
   Moon,
@@ -85,6 +86,7 @@ import {
   Sun,
   Tablet,
   Tag,
+  Ticket,
   Tent,
   TentTree,
   Trees,
@@ -111,6 +113,7 @@ const RULES: Rule[] = [
   { match: (s) => s.includes("servere") && s.includes("electronice"), Icon: Cpu },
   { match: (s) => s.includes("electronice-nas"), Icon: HardDrive },
   { match: (s) => s.includes("camere-video") && s.includes("electronice"), Icon: Film },
+  { match: (s) => s.includes("binocluri") && s.includes("electronice"), Icon: Focus },
   { match: (s) => s.includes("soundbar") || s.includes("media-players"), Icon: Tv },
   { match: (s) => s.includes("televizoare"), Icon: Tv },
   { match: (s) => s.includes("proiectoare") && s.includes("electronice"), Icon: Lightbulb },
@@ -143,7 +146,7 @@ const RULES: Rule[] = [
   { match: (s) => s.includes("servicii-stomatologie"), Icon: Stethoscope },
   { match: (s) => s.includes("instalatii") && s.includes("servicii"), Icon: Wrench },
   { match: (s) => s.includes("retele-it") && s.includes("servicii"), Icon: Wifi },
-  { match: (s) => s.includes("marketing") && s.includes("joburi"), Icon: Tag },
+  { match: (s) => s.includes("marketing") && s.includes("joburi"), Icon: Megaphone },
   { match: (s) => s.includes("livratori") && s.includes("joburi"), Icon: Package },
   { match: (s) => s.includes("curatenie-job"), Icon: Sparkles },
   { match: (s) => s.includes("dulgheri"), Icon: Hammer },
@@ -162,7 +165,7 @@ const RULES: Rule[] = [
   { match: (s) => s.includes("hrana-bebelusi"), Icon: Baby },
   { match: (s) => s.includes("textile-pat") && s.includes("mama"), Icon: BedDouble },
   { match: (s) => s.includes("diverse-carti"), Icon: BookOpen },
-  { match: (s) => s.includes("diverse-bilete"), Icon: Tag },
+  { match: (s) => s.includes("diverse-bilete"), Icon: Ticket },
   { match: (s) => s.includes("antichitati"), Icon: Gem },
   { match: (s) => s.includes("textile-sport") && s.includes("moda"), Icon: Shirt },
   { match: (s) => s.includes("scolare") && s.includes("moda"), Icon: ShoppingBag },
@@ -189,7 +192,7 @@ const RULES: Rule[] = [
   { match: (s) => s.includes("piese-electrice") || s.includes("instalatie") || (s.includes("electrica") && !s.includes("job")), Icon: Zap },
   { match: (s) => s.includes("piese-caroserie") || s.includes("caroserie-acc"), Icon: DoorOpen },
   { match: (s) => s.includes("filtre") || s.includes("ulei"), Icon: Droplets },
-  { match: (s) => s.includes("acc-salon") || s.includes("covoras"), Icon: Sofa },
+  { match: (s) => s.includes("acc-salon") || s.includes("covoras") || s.includes("covorase"), Icon: Sofa },
   { match: (s) => s.includes("vopsea") && s.includes("transport"), Icon: PaintBucket },
   { match: (s) => s.includes("ajutor-tehnic") || s.includes("tractar"), Icon: Truck },
   { match: (s) => s.includes("chei") || s.includes("cricuri"), Icon: Wrench },
@@ -266,6 +269,8 @@ const RULES: Rule[] = [
   { match: (s) => s.includes("drumetii"), Icon: Mountain },
   { match: (s) => s.includes("numismatica"), Icon: BadgePercent },
   { match: (s) => s.includes("machete"), Icon: Puzzle },
+  { match: (s) => s.includes("accesorii-caine"), Icon: Dog },
+  { match: (s) => s.includes("accesorii-pisica"), Icon: Cat },
   { match: (s) => s.includes("caini"), Icon: Dog },
   { match: (s) => s.includes("pisici"), Icon: Cat },
   { match: (s) => s.includes("pasari") || s.includes("rozatoare"), Icon: Bug },
@@ -302,10 +307,28 @@ const RULES: Rule[] = [
   { match: (s) => s.includes("electrician-job"), Icon: Zap },
 ];
 
+/** Ultimă linie de apărare: icon potrivit secțiunii, nu etichetă generică. */
+function iconBySectionPrefix(s: string): LucideIcon | null {
+  if (s.startsWith("transport-")) return Car;
+  if (s.startsWith("imobiliare-")) return Building2;
+  if (s.startsWith("electronice-")) return Cpu;
+  if (s.startsWith("casa-")) return Sofa;
+  if (s.startsWith("servicii-")) return Wrench;
+  if (s.startsWith("joburi-")) return Briefcase;
+  if (s.startsWith("animale-")) return PawPrint;
+  if (s.startsWith("moda-")) return Shirt;
+  if (s.startsWith("sport-")) return Dumbbell;
+  if (s.startsWith("agricol-")) return Sprout;
+  if (s.startsWith("mama-copil-")) return Baby;
+  if (s.startsWith("diverse-")) return Package;
+  if (s.startsWith("business-")) return Briefcase;
+  return null;
+}
+
 export function getSubcategoryLucideIcon(slug: string): LucideIcon {
   const s = slug.toLowerCase();
   for (const { match, Icon } of RULES) {
     if (match(s)) return Icon;
   }
-  return Tag;
+  return iconBySectionPrefix(s) ?? Tag;
 }
