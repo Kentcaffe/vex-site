@@ -129,12 +129,6 @@ export function FooterNav() {
           <div className="space-y-4">
             <p className="text-xs leading-relaxed text-zinc-600">{t("colContactIntro")}</p>
             <SupportContactLauncher embed headingId="support-footer-chat-mobile" />
-            <MobileFooterLink
-              href="/contact"
-              className="py-2 text-sky-800 underline-offset-2 hover:underline"
-            >
-              {t("linkContactPage")}
-            </MobileFooterLink>
             {emailBlock}
           </div>
         </AccordionRow>
@@ -163,11 +157,6 @@ export function FooterNav() {
           <p className="text-xs leading-relaxed text-zinc-600">{t("colContactIntro")}</p>
           <SupportContactLauncher embed headingId="support-footer-chat-desktop" />
           <ul className="space-y-3">
-            <li>
-              <Link href="/contact" className={`${desktopLink} font-semibold text-orange-800`}>
-                {t("linkContactPage")}
-              </Link>
-            </li>
             <li>
               <a href="mailto:asistenta@vex.md" className={mailClass}>
                 asistenta@vex.md
