@@ -21,21 +21,25 @@ export const metadata: Metadata = {
   title: SEO_TITLE,
   description: SEO_DESCRIPTION,
   keywords: SEO_KEYWORDS,
+  alternates: {
+    canonical: "/",
+  },
   manifest: "/site.webmanifest",
   icons: {
-    icon: [{ url: "/favicon.png", type: "image/png", sizes: "512x512" }, { url: "/favicon.ico" }],
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
+    icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
   openGraph: {
     title: "VEX - Anunțuri gratuite în Moldova",
     description: "Cumpără și vinde rapid pe VEX.",
     type: "website",
-    url: "https://vex.md",
+    url: siteUrl(),
     siteName: "VEX",
+    locale: "ro_MD",
     images: [
       {
-        url: "https://vex.md/logo.png",
+        url: "/logo.png",
         width: 512,
         height: 512,
         alt: "VEX - anunțuri gratuite Moldova",
@@ -46,7 +50,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "VEX - Anunțuri Moldova",
     description: "Platformă de anunțuri gratuite",
-    images: ["https://vex.md/logo.png"],
+    images: ["/logo.png"],
+  },
+  other: {
+    "og:logo": `${siteUrl()}/logo.png`,
   },
   verification: {
     google: "c8RdLZCq_i84jUUQXIatmo8Uoc37kRmu2_fv_t-IQS8",
@@ -81,12 +88,14 @@ function supabaseOrigin(): string | null {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const preconnect = supabaseOrigin();
+  const logoUrl = `${siteUrl()}/logo.png`;
   const orgJsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "VEX",
-    url: "https://vex.md",
-    logo: "https://vex.md/logo.png",
+    url: siteUrl(),
+    logo: logoUrl,
+    image: logoUrl,
   };
 
   return (
