@@ -150,8 +150,7 @@ export async function HomeMarketplace({
 
           {loadError ? (
             <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center">
-              <p className="text-sm font-semibold text-red-800">Eroare la încărcarea anunțurilor.</p>
-              <p className="mt-1 text-base text-red-800">Încearcă refresh sau revino în câteva momente.</p>
+              <p className="text-sm font-semibold text-red-800">{tList("browseLoadError")}</p>
             </div>
           ) : listings.length === 0 ? (
             <div className="rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] p-10 text-center shadow-[var(--mp-shadow-md)]">

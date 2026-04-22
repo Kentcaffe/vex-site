@@ -2,6 +2,7 @@ import { auth } from "@/auth";
 import { devLog } from "@/lib/dev-log";
 import { getRootCategories } from "@/lib/category-queries";
 import { asListingSelect } from "@/lib/prisma-listing-casts";
+import { findManyListingsResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { HomeMarketplace, type ListingCard } from "@/components/home/HomeMarketplace";
@@ -18,7 +19,7 @@ export async function HomeLanding({ locale }: Props) {
 
   try {
     const [listingsResult, categoriesResult] = await Promise.all([
-      prisma.listing.findMany({
+      findManyListingsResilient({
         where: listingWhereActive(),
         orderBy: { createdAt: "desc" },
         take: 15,
@@ -62,7 +63,7 @@ export async function HomeLanding({ locale }: Props) {
         },
         select: { listingId: true },
       });
-      favoritedIds = new Set(favs.map((f) => f.listingId));
+      favoritedIds = new Set(favs.map((f: { listingId: string }) => f.listingId));
     } catch (e) {
       console.error("[home] favorites load error", e);
     }

@@ -1,4 +1,5 @@
 import type { UserRole } from "@prisma/client";
+import { isMissingListingColumnError } from "@/lib/prisma-listing-queries";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
@@ -33,20 +34,42 @@ function hasSupabaseEnv(): boolean {
 
 async function upsertPrismaUserFromSupabase(input: SyncInput) {
   const email = normalizeEmail(input.email);
-  return prisma.user.upsert({
-    where: { email },
-    create: {
-      email,
-      name: input.name ?? null,
-      avatarUrl: input.avatarUrl ?? null,
-      supabaseAuthId: input.supabaseUserId,
-    },
-    update: {
-      name: input.name ?? undefined,
-      avatarUrl: input.avatarUrl ?? undefined,
-      supabaseAuthId: input.supabaseUserId,
-    },
-  });
+  try {
+    return await prisma.user.upsert({
+      where: { email },
+      create: {
+        email,
+        name: input.name ?? null,
+        avatarUrl: input.avatarUrl ?? null,
+        supabaseAuthId: input.supabaseUserId,
+      },
+      update: {
+        name: input.name ?? undefined,
+        avatarUrl: input.avatarUrl ?? undefined,
+        supabaseAuthId: input.supabaseUserId,
+      },
+    });
+  } catch (err) {
+    if (isMissingListingColumnError(err, "supabaseAuthId")) {
+      console.error(
+        "[auth] Coloana User.supabaseAuthId lipsește în DB — sincronizare fără ea (rulează migrările sau ALTER TABLE).",
+        err,
+      );
+      return prisma.user.upsert({
+        where: { email },
+        create: {
+          email,
+          name: input.name ?? null,
+          avatarUrl: input.avatarUrl ?? null,
+        },
+        update: {
+          name: input.name ?? undefined,
+          avatarUrl: input.avatarUrl ?? undefined,
+        },
+      });
+    }
+    throw err;
+  }
 }
 
 function metadataName(metadata: Record<string, unknown> | undefined): string | null {

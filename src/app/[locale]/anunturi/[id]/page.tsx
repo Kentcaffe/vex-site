@@ -14,7 +14,7 @@ import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PriceCurrencyCode } from "@/lib/currency";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
-import type { ListingPayloadWithCategory } from "@/lib/prisma-listing-casts";
+import { findFirstListingResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
@@ -29,7 +29,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const listing = await prisma.listing.findFirst({
+  const listing = await findFirstListingResilient({
     where: { id, ...listingWhereActive() },
     select: {
       id: true,
@@ -88,10 +88,10 @@ export default async function ListingDetailPage({ params }: Props) {
   setRequestLocale(locale);
 
   const [listing, allCats, session, t] = await Promise.all([
-    prisma.listing.findFirst({
+    findFirstListingResilient({
       where: { id, ...listingWhereActive() },
       include: { category: true },
-    }) as Promise<ListingPayloadWithCategory | null>,
+    }),
     getAllCategories(),
     auth(),
     getTranslations("ListingDetail"),

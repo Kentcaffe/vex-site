@@ -12,8 +12,8 @@ import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
+import { findManyListingsResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
-import { prisma } from "@/lib/prisma";
 import { AUTOTURISME_CATEGORY_SLUG } from "@/lib/category-slugs";
 import { listingSeoPath } from "@/lib/seo";
 import {
@@ -270,7 +270,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
   let browseLoadError = false;
   try {
     const [listingsRaw, cats] = await Promise.all([
-      prisma.listing.findMany({
+      findManyListingsResilient({
         where,
         orderBy: { createdAt: "desc" },
         take: 80,

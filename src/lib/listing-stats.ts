@@ -1,9 +1,8 @@
 import { unstable_cache } from "next/cache";
-import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
-import { prisma } from "@/lib/prisma";
+import { countActiveListingsResilient } from "@/lib/prisma-listing-queries";
 
 export const getActiveListingCount = unstable_cache(
-  async () => prisma.listing.count({ where: listingWhereActive() }),
+  async () => countActiveListingsResilient(),
   ["listing-count"],
   { revalidate: 60 },
 );
