@@ -35,18 +35,7 @@ export function SupabaseResetPasswordForm() {
     const type = parsedUrl.searchParams.get("type");
 
     const tryHydrateRecoverySession = async () => {
-      // 1) Try full URL exchange first.
-      try {
-        const { data, error } = await supabase.auth.exchangeCodeForSession(currentHref);
-        console.info("[reset-password] exchangeCodeForSession(fullUrl)", { href: currentHref, data, error });
-        if (!error) {
-          return true;
-        }
-      } catch (error) {
-        console.error("[reset-password] exchangeCodeForSession(fullUrl) threw", error);
-      }
-
-      // 2) Fallback: `code` only.
+      // 1) Preferred path for PKCE links.
       if (code) {
         const { data, error } = await supabase.auth.exchangeCodeForSession(code);
         console.info("[reset-password] exchangeCodeForSession(code)", { code, data, error });
@@ -55,7 +44,7 @@ export function SupabaseResetPasswordForm() {
         }
       }
 
-      // 3) Fallback: token hash + recovery type.
+      // 2) Fallback: token hash + recovery type.
       if (tokenHash && type === "recovery") {
         const { data, error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,

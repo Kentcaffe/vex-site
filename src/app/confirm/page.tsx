@@ -42,22 +42,8 @@ export default function ConfirmPage() {
         let confirmed = false;
         let lastError: unknown = null;
 
-        // 1) Try exactly with full URL first (as requested for your flow).
-        try {
-          const { data, error } = await supabase.auth.exchangeCodeForSession(fullUrl);
-          console.info("[confirm page] exchangeCodeForSession(fullUrl)", { href: fullUrl, data, error });
-          if (!error) {
-            confirmed = true;
-          } else {
-            lastError = error;
-          }
-        } catch (error) {
-          console.error("[confirm page] exchangeCodeForSession(fullUrl) threw", error);
-          lastError = error;
-        }
-
-        // 2) Fallback for SDKs that expect only the `code` value.
-        if (!confirmed && code) {
+        // 1) Preferred path for PKCE links: exchange auth code.
+        if (code) {
           const { data, error } = await supabase.auth.exchangeCodeForSession(code);
           console.info("[confirm page] exchangeCodeForSession(code)", { code, data, error });
           if (!error) {
@@ -67,7 +53,7 @@ export default function ConfirmPage() {
           }
         }
 
-        // 3) Fallback for token-hash links (`token_hash` + `type`).
+        // 2) Fallback for token-hash links (`token_hash` + `type`).
         if (!confirmed && tokenHash && type) {
           const normalizedType = type as "signup" | "invite" | "magiclink" | "recovery" | "email_change";
           const { data, error } = await supabase.auth.verifyOtp({
