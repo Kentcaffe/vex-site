@@ -27,6 +27,30 @@ type Props = {
   params: Promise<{ locale: string; id: string }>;
 };
 
+type ListingDetailRow = {
+  id: string;
+  userId: string;
+  title: string;
+  description: string;
+  price: number;
+  priceCurrency?: string | null;
+  negotiable: boolean;
+  city: string;
+  district: string | null;
+  phone: string | null;
+  condition: string;
+  images: string | null;
+  categoryId: string;
+  brand: string | null;
+  modelName: string | null;
+  year: number | null;
+  mileageKm: number | null;
+  rooms: string | null;
+  areaSqm: number | null;
+  detailsJson: string | null;
+  category?: { slug?: string | null } | null;
+};
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { id } = await params;
@@ -95,7 +119,7 @@ export default async function ListingDetailPage({ params }: Props) {
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  let listing: Awaited<ReturnType<typeof findFirstListingResilient>> = null;
+  let listing: ListingDetailRow | null = null;
   let allCats: Awaited<ReturnType<typeof getAllCategories>> = [];
   let session: Awaited<ReturnType<typeof auth>> = null;
   let t: Awaited<ReturnType<typeof getTranslations>>;
@@ -104,8 +128,30 @@ export default async function ListingDetailPage({ params }: Props) {
     [listing, allCats, session, t] = await Promise.all([
       findFirstListingResilient({
         where: { id, ...listingWhereActive() },
-        include: { category: true },
-      }),
+        select: {
+          id: true,
+          userId: true,
+          title: true,
+          description: true,
+          price: true,
+          priceCurrency: true,
+          negotiable: true,
+          city: true,
+          district: true,
+          phone: true,
+          condition: true,
+          images: true,
+          categoryId: true,
+          brand: true,
+          modelName: true,
+          year: true,
+          mileageKm: true,
+          rooms: true,
+          areaSqm: true,
+          detailsJson: true,
+          category: { select: { slug: true } },
+        },
+      }) as Promise<ListingDetailRow | null>,
       getAllCategories(),
       auth(),
       getTranslations("ListingDetail"),
@@ -142,7 +188,7 @@ export default async function ListingDetailPage({ params }: Props) {
   if (!listing) {
     notFound();
   }
-  const listingCategorySlug = (listing as NonNullable<typeof listing> & { category: { slug: string } }).category.slug;
+  const listingCategorySlug = (listing as { category?: { slug?: string | null } | null }).category?.slug ?? "";
 
   const images = parseStoredListingImages(listing.images);
   const path = categoryPathLabels(allCats, listing.categoryId, locale);
@@ -167,7 +213,7 @@ export default async function ListingDetailPage({ params }: Props) {
           <div className="surface-card p-5 sm:p-6">
             <p className="whitespace-pre-wrap text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{listing.description}</p>
           </div>
-          <ListingSpecs categorySlug={listingCategorySlug} listing={listing} />
+          {listingCategorySlug ? <ListingSpecs categorySlug={listingCategorySlug} listing={listing} /> : null}
         </div>
         <aside className="space-y-4">
           <div className="surface-card sticky top-24 p-5">
