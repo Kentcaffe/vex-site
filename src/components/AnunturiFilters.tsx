@@ -389,7 +389,7 @@ export function AnunturiFilters({
                   <option value="">{t("all")}</option>
                   {ENGINE_LITER_OPTIONS.map((v) => (
                     <option key={v} value={v}>
-                      {tForm(`engine_l.${v}`)}
+                      {tForm(`engine_l.${v.replace(/\./g, "_")}`)}
                     </option>
                   ))}
                 </select>

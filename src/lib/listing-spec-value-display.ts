@@ -15,8 +15,17 @@ export function resolveListingSpecValueDisplay(
   const listing = root.ListingDetail as Record<string, unknown> | undefined;
   const specValue = listing?.specValue as Record<string, Record<string, string>> | undefined;
   const bucket = specValue?.[detailKey];
-  if (bucket && typeof rawValue === "string" && rawValue in bucket) {
-    const tr = bucket[rawValue];
+  const normalizedRawValue = rawValue.replace(/\./g, "_");
+  const bucketValueKey =
+    bucket && typeof rawValue === "string"
+      ? rawValue in bucket
+        ? rawValue
+        : normalizedRawValue in bucket
+          ? normalizedRawValue
+          : null
+      : null;
+  if (bucket && bucketValueKey) {
+    const tr = bucket[bucketValueKey];
     if (typeof tr === "string" && tr.length > 0) {
       return tr;
     }

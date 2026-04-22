@@ -62,6 +62,8 @@ model User {
   preferences   Json?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now()) @updatedAt
+
+  @@map("users")
 }
 
 model Message {
@@ -139,6 +141,7 @@ model Listing {
   favoritedBy ListingFavorite[]
 
   @@index([isDeleted])
+  @@map("listings")
 }
 
 model AdminLog {
@@ -257,6 +260,8 @@ model ChatRoom {
   buyer     User     @relation("BuyerRooms", fields: [buyerId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  members   String[]  @default([])
+  sellerId  String?
   messages  ChatMessage[]
   readStates ChatReadState[]
 

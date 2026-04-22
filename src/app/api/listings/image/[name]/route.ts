@@ -1,5 +1,3 @@
-import { access, readFile } from "fs/promises";
-import path from "path";
 import { NextResponse } from "next/server";
 import { safeApiRoute } from "@/lib/api-error";
 import { getSupabaseServiceClient, listingsObjectKey, listingsStorageBucket } from "@/lib/supabase-service-role";
@@ -28,7 +26,7 @@ function contentTypeFor(filename: string): string {
 
 export const GET = safeApiRoute(
   "GET /api/listings/image/[name]",
-  async (_ctx, ...args) => {
+  async ({ request }, ...args) => {
     const context = args[0] as { params: Promise<{ name: string }> } | undefined;
     if (!context) {
       return NextResponse.json({ ok: false, error: "invalid_context" }, { status: 500 });
@@ -37,27 +35,6 @@ export const GET = safeApiRoute(
     const name = safeName(rawName);
     if (!name) {
       return NextResponse.json({ ok: false, error: "invalid_image_name" }, { status: 400 });
-    }
-
-    const candidatePaths = [
-      path.join(process.cwd(), "public", "uploads", "listings", name),
-      path.join(process.cwd(), "uploads", "listings", name),
-    ];
-
-    for (const filePath of candidatePaths) {
-      try {
-        await access(filePath);
-        const buffer = await readFile(filePath);
-        return new NextResponse(new Uint8Array(buffer), {
-          status: 200,
-          headers: {
-            "Content-Type": contentTypeFor(name),
-            "Cache-Control": "public, max-age=604800, immutable",
-          },
-        });
-      } catch {
-        // try next candidate path
-      }
     }
 
     const supabase = getSupabaseServiceClient();
@@ -80,6 +57,8 @@ export const GET = safeApiRoute(
       }
     }
 
-    return NextResponse.json({ ok: false, error: "image_not_found" }, { status: 404 });
+    // Fallback: if local upload exists in /public/uploads/listings, static serving handles it.
+    const localUrl = new URL(`/uploads/listings/${name}`, request.url);
+    return NextResponse.redirect(localUrl, 307);
   },
 );

@@ -29,11 +29,11 @@ async function attachSupabaseSession(request: NextRequest, response: NextRespons
     });
     await supabase.auth.getUser();
   } catch (err) {
-    console.error("[middleware] Supabase session refresh failed:", err);
+    console.error("[proxy] Supabase session refresh failed:", err);
   }
 }
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   /* Chunk-uri, HMR, internals Vercel/Render — fără intl */
