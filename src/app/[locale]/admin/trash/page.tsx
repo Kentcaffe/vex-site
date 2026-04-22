@@ -4,14 +4,13 @@ import { auth } from "@/auth";
 import { TrashListingActions } from "@/components/admin/TrashListingActions";
 import { Link } from "@/i18n/navigation";
 import { isAdmin } from "@/lib/auth-roles";
-import { categoryPathLabels, getAllCategories } from "@/lib/category-queries";
+import { categoryPathLabels, getAllCategories, type CategoryRow } from "@/lib/category-queries";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PriceCurrencyCode } from "@/lib/currency";
-import type { Prisma } from "@prisma/client";
 import { localizedHref } from "@/lib/paths";
 import type { ListingPayloadWithCategory } from "@/lib/prisma-listing-casts";
+import { findManyTrashListingsResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereDeleted } from "@/lib/prisma-listing-soft-delete-filter";
-import { prisma } from "@/lib/prisma";
 import { listingSeoPath } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -27,24 +26,48 @@ export default async function AdminTrashPage({ params }: Props) {
   }
 
   const t = await getTranslations("Admin");
-  const [listings, allCats] = await Promise.all([
-    prisma.listing.findMany({
+
+  let listings: ListingPayloadWithCategory[] = [];
+  let loadFailed = false;
+  let allCats: CategoryRow[] = [];
+
+  try {
+    const { rows, loadFailed: trashFailed } = await findManyTrashListingsResilient({
       where: listingWhereDeleted(),
-      orderBy: { deletedAt: "desc" } as Prisma.ListingOrderByWithRelationInput,
+      orderBy: { deletedAt: "desc" },
       take: 200,
       include: { category: true },
-    }) as Promise<ListingPayloadWithCategory[]>,
-    getAllCategories(),
-  ]);
+    });
+    loadFailed = trashFailed;
+    listings = rows as unknown as ListingPayloadWithCategory[];
+  } catch (error) {
+    console.error("[admin/trash] Unexpected error loading trash listings.", error);
+    loadFailed = true;
+  }
+
+  try {
+    allCats = await getAllCategories();
+  } catch (error) {
+    console.error("[admin/trash] Failed to load categories for paths.", error);
+    allCats = [];
+  }
 
   return (
     <div>
       <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("trashTitle")}</h1>
       <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">{t("trashSubtitle")}</p>
 
-      {listings.length === 0 ? (
+      {loadFailed ? (
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          {t("trashLoadError")}
+        </p>
+      ) : null}
+
+      {!loadFailed && listings.length === 0 ? (
         <p className="mt-8 text-zinc-600 dark:text-zinc-400">{t("trashEmpty")}</p>
-      ) : (
+      ) : null}
+
+      {!loadFailed && listings.length > 0 ? (
         <div className="mt-8 overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <table className="w-full min-w-[720px] text-left text-sm">
             <thead>
@@ -93,7 +116,7 @@ export default async function AdminTrashPage({ params }: Props) {
             </tbody>
           </table>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

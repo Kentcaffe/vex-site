@@ -164,3 +164,78 @@ export async function countActiveListingsResilient(): Promise<number> {
     throw err;
   }
 }
+
+/** Preview anunțuri pentru jurnalul admin (badge „în coș”). */
+export type ListingLogPreview = {
+  id: string;
+  title: string;
+  city: string;
+  isDeleted: boolean;
+};
+
+export async function findManyListingsByIdsForLogPreview(ids: string[]): Promise<ListingLogPreview[]> {
+  if (ids.length === 0) {
+    return [];
+  }
+  try {
+    const rows = await prisma.listing.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, title: true, city: true, isDeleted: true },
+    });
+    return rows as ListingLogPreview[];
+  } catch (err) {
+    if (isMissingListingColumnError(err, "isDeleted")) {
+      console.error("[admin/logs] Coloana isDeleted lipsește; preview fără flag coș.", err);
+      try {
+        const rows = await prisma.listing.findMany({
+          where: { id: { in: ids } },
+          select: { id: true, title: true, city: true },
+        });
+        return rows.map((r) => ({ ...r, isDeleted: false }));
+      } catch (err2) {
+        console.error("[admin/logs] Fallback listing preview a eșuat.", err2);
+        return [];
+      }
+    }
+    console.error("[admin/logs] findMany listing preview a eșuat.", err);
+    return [];
+  }
+}
+
+/**
+ * Listă coș admin: filtru `isDeleted: true` sau, dacă lipsește coloana, `deletedAt IS NOT NULL`.
+ * Nu aruncă — returnează `loadFailed` pentru UI de eroare.
+ */
+export async function findManyTrashListingsResilient(args: Prisma.ListingFindManyArgs): Promise<{
+  rows: ListingFindManyResult;
+  loadFailed: boolean;
+}> {
+  try {
+    const rows = await prisma.listing.findMany(args);
+    return { rows, loadFailed: false };
+  } catch (err) {
+    if (isMissingListingColumnError(err, "isDeleted")) {
+      console.error(
+        "[admin/trash] Coloana isDeleted lipsește — reîncerc cu deletedAt NOT NULL.",
+        err,
+      );
+      const rest = omitIsDeletedFromWhere(args.where);
+      try {
+        const rows = await prisma.listing.findMany({
+          ...args,
+          where: { deletedAt: { not: null }, ...rest },
+        });
+        return { rows, loadFailed: false };
+      } catch (err2) {
+        console.error("[admin/trash] Reîncercarea pentru coș a eșuat.", err2);
+        return { rows: [], loadFailed: true };
+      }
+    }
+    if (isMissingListingColumnError(err, "deletedAt")) {
+      console.error("[admin/trash] Coloana deletedAt lipsește — coș indisponibil.", err);
+      return { rows: [], loadFailed: true };
+    }
+    console.error("[admin/trash] findMany pentru coș a eșuat.", err);
+    return { rows: [], loadFailed: true };
+  }
+}

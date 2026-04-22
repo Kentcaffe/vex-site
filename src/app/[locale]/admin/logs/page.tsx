@@ -4,9 +4,8 @@ import { auth } from "@/auth";
 import { isAdmin } from "@/lib/auth-roles";
 import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
-import type { Prisma } from "@prisma/client";
 import { adminLog } from "@/lib/prisma-delegates";
-import { prisma } from "@/lib/prisma";
+import { findManyListingsByIdsForLogPreview } from "@/lib/prisma-listing-queries";
 import { listingSeoPath } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
@@ -31,28 +30,26 @@ export default async function AdminLogsPage({ params }: Props) {
     admin: { email: string | null; name: string | null };
   };
 
-  const rows = (await adminLog.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 500,
-    include: {
-      admin: { select: { email: true, name: true } },
-    },
-  })) as unknown as AdminLogRow[];
+  let rows: AdminLogRow[] = [];
+  let logsLoadFailed = false;
+
+  try {
+    rows = (await adminLog.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 500,
+      include: {
+        admin: { select: { email: true, name: true } },
+      },
+    })) as unknown as AdminLogRow[];
+  } catch (error) {
+    console.error("[admin/logs] adminLog.findMany a eșuat (tabel lipsă sau DB indisponibil).", error);
+    logsLoadFailed = true;
+    rows = [];
+  }
 
   const listingIds = [...new Set(rows.map((r) => r.targetId))];
-  const listings =
-    listingIds.length === 0
-      ? []
-      : ((await prisma.listing.findMany({
-          where: { id: { in: listingIds } },
-          select: {
-            id: true,
-            title: true,
-            city: true,
-            isDeleted: true,
-          } as Prisma.ListingSelect,
-        })) as unknown as Array<{ id: string; title: string; city: string; isDeleted: boolean }>);
-  const listingMap = new Map(listings.map((l) => [l.id, l]));
+  const listingPreviews = await findManyListingsByIdsForLogPreview(listingIds);
+  const listingMap = new Map(listingPreviews.map((l) => [l.id, l]));
 
   function actionLabel(action: string): string {
     if (action === "DELETE_LISTING") return t("logActionDelete");
@@ -66,9 +63,17 @@ export default async function AdminLogsPage({ params }: Props) {
       <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("logsTitle")}</h1>
       <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">{t("logsSubtitle")}</p>
 
-      {rows.length === 0 ? (
+      {logsLoadFailed ? (
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          {t("logsLoadError")}
+        </p>
+      ) : null}
+
+      {!logsLoadFailed && rows.length === 0 ? (
         <p className="mt-8 text-zinc-600 dark:text-zinc-400">{t("logsEmpty")}</p>
-      ) : (
+      ) : null}
+
+      {!logsLoadFailed && rows.length > 0 ? (
         <div className="mt-8 overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <table className="w-full min-w-[800px] text-left text-sm">
             <thead>
@@ -115,7 +120,7 @@ export default async function AdminLogsPage({ params }: Props) {
             </tbody>
           </table>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
