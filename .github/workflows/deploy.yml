@@ -13,6 +13,9 @@ jobs:
       group: production-db
       cancel-in-progress: false
 
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,5 +30,3 @@ jobs:
 
       - name: Run Prisma migrate
         run: npx prisma migrate deploy
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
