@@ -188,6 +188,45 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
     };
   }, [roomId]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const syncFromServer = async () => {
+      try {
+        const res = await fetch(`/api/chat/room/${roomId}`, { credentials: "include" });
+        if (!res.ok) {
+          return;
+        }
+        const data = (await res.json()) as {
+          messages?: { id: string; senderId: string; body: string; createdAt: string }[];
+          otherLastReadAt?: string | null;
+        };
+        if (cancelled || !Array.isArray(data.messages)) {
+          return;
+        }
+        setMessages((prev) => {
+          let next = prev;
+          for (const row of data.messages ?? []) {
+            next = upsertChatMessagesSorted(next, row);
+          }
+          return next;
+        });
+        if (typeof data.otherLastReadAt === "string" || data.otherLastReadAt === null) {
+          setOtherLastReadAt(data.otherLastReadAt);
+        }
+      } catch {
+        /* ignore background sync errors */
+      }
+    };
+    void syncFromServer();
+    const timer = window.setInterval(() => {
+      void syncFromServer();
+    }, 4000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [roomId]);
+
   const send = useCallback(async () => {
     const text = draft.trim();
     if (!text) {
@@ -314,7 +353,7 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
                         <ChatAvatar url={bootstrap.otherUserAvatarUrl} name={bootstrap.otherUserName} size={32} />
                       )}
                     </div>
-                    <div className={`max-w-[min(85%,420px)] ${mine ? "items-end" : "items-start"} flex flex-col`}>
+                    <div className={`max-w-[85%] md:max-w-[70%] ${mine ? "items-end" : "items-start"} flex flex-col`}>
                       <div
                         className={`rounded-2xl px-3.5 py-2.5 text-[15px] leading-snug shadow-sm ${
                           mine

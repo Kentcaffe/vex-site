@@ -440,7 +440,8 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       "engine_l",
     ] as const;
     if ((groupKeys as readonly string[]).includes(field.id)) {
-      return t(`${field.id}.${value}` as never);
+      const normalizedValue = field.id === "engine_l" ? value.replace(/\./g, "_") : value;
+      return t(`${field.id}.${normalizedValue}` as never);
     }
     if (field.id === "generation" && value === "n_a") {
       return t("generationNA" as never);
