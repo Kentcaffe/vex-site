@@ -83,6 +83,13 @@ export default async function middleware(request: NextRequest) {
     return response;
   }
 
+  // Keep /confirm outside locale middleware to prevent i18n rewrites/404.
+  if (pathname === "/confirm" || pathname.startsWith("/confirm/")) {
+    const response = NextResponse.next();
+    await attachSupabaseSession(request, response);
+    return response;
+  }
+
   const response = await Promise.resolve(intlMiddleware(request));
   await attachSupabaseSession(request, response);
   return response;
