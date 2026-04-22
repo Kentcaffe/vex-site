@@ -28,11 +28,59 @@ export function SupabaseResetPasswordForm() {
       return () => window.clearTimeout(t);
     }
     let cancelled = false;
+    const currentHref = window.location.href;
+    const parsedUrl = new URL(currentHref);
+    const code = parsedUrl.searchParams.get("code");
+    const tokenHash = parsedUrl.searchParams.get("token_hash");
+    const type = parsedUrl.searchParams.get("type");
 
-    void supabase.auth.getSession().then(({ data: { session } }) => {
-      if (cancelled || !session) return;
-      setPhase("ready");
-    });
+    const tryHydrateRecoverySession = async () => {
+      // 1) Try full URL exchange first.
+      try {
+        const { data, error } = await supabase.auth.exchangeCodeForSession(currentHref);
+        console.info("[reset-password] exchangeCodeForSession(fullUrl)", { href: currentHref, data, error });
+        if (!error) {
+          return true;
+        }
+      } catch (error) {
+        console.error("[reset-password] exchangeCodeForSession(fullUrl) threw", error);
+      }
+
+      // 2) Fallback: `code` only.
+      if (code) {
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+        console.info("[reset-password] exchangeCodeForSession(code)", { code, data, error });
+        if (!error) {
+          return true;
+        }
+      }
+
+      // 3) Fallback: token hash + recovery type.
+      if (tokenHash && type === "recovery") {
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: "recovery",
+        });
+        console.info("[reset-password] verifyOtp(recovery)", { tokenHash, data, error });
+        if (!error) {
+          return true;
+        }
+      }
+
+      return false;
+    };
+
+    void (async () => {
+      const hydrated = await tryHydrateRecoverySession();
+      if (hydrated && !cancelled) {
+        setPhase("ready");
+        return;
+      }
+      const { data } = await supabase.auth.getSession();
+      if (!cancelled && data.session) {
+        setPhase("ready");
+      }
+    })();
 
     const {
       data: { subscription },

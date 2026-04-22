@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
@@ -19,8 +19,6 @@ export default function ConfirmPage() {
   const [state, setState] = useState<ConfirmState>("confirming");
   const [message, setMessage] = useState("Confirming your account...");
 
-  const href = useMemo(() => (typeof window !== "undefined" ? window.location.href : ""), []);
-
   useEffect(() => {
     let cancelled = false;
 
@@ -35,28 +33,57 @@ export default function ConfirmPage() {
       }
 
       try {
-        const url = new URL(href || window.location.href);
+        const fullUrl = window.location.href;
+        const url = new URL(fullUrl);
         const code = url.searchParams.get("code");
         const tokenHash = url.searchParams.get("token_hash");
         const type = url.searchParams.get("type");
 
-        if (code) {
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-          console.info("[confirm page] exchangeCodeForSession response", { href: url.toString(), data, error });
-          if (error) {
-            throw error;
+        let confirmed = false;
+        let lastError: unknown = null;
+
+        // 1) Try exactly with full URL first (as requested for your flow).
+        try {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(fullUrl);
+          console.info("[confirm page] exchangeCodeForSession(fullUrl)", { href: fullUrl, data, error });
+          if (!error) {
+            confirmed = true;
+          } else {
+            lastError = error;
           }
-        } else if (tokenHash && type) {
+        } catch (error) {
+          console.error("[confirm page] exchangeCodeForSession(fullUrl) threw", error);
+          lastError = error;
+        }
+
+        // 2) Fallback for SDKs that expect only the `code` value.
+        if (!confirmed && code) {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          console.info("[confirm page] exchangeCodeForSession(code)", { code, data, error });
+          if (!error) {
+            confirmed = true;
+          } else {
+            lastError = error;
+          }
+        }
+
+        // 3) Fallback for token-hash links (`token_hash` + `type`).
+        if (!confirmed && tokenHash && type) {
+          const normalizedType = type as "signup" | "invite" | "magiclink" | "recovery" | "email_change";
           const { data, error } = await supabase.auth.verifyOtp({
             token_hash: tokenHash,
-            type: type as "signup" | "invite" | "magiclink" | "recovery" | "email_change",
+            type: normalizedType,
           });
-          console.info("[confirm page] verifyOtp response", { href: url.toString(), data, error, type });
-          if (error) {
-            throw error;
+          console.info("[confirm page] verifyOtp(token_hash)", { tokenHash, type: normalizedType, data, error });
+          if (!error) {
+            confirmed = true;
+          } else {
+            lastError = error;
           }
-        } else {
-          throw new Error("Missing confirmation token.");
+        }
+
+        if (!confirmed) {
+          throw (lastError ?? new Error("Missing confirmation token."));
         }
 
         if (!cancelled) {
@@ -77,7 +104,7 @@ export default function ConfirmPage() {
     return () => {
       cancelled = true;
     };
-  }, [href, router]);
+  }, [router]);
 
   return (
     <main className="mx-auto flex min-h-[60vh] w-full max-w-lg items-center justify-center px-4 py-16">
