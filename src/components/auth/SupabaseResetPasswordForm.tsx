@@ -20,6 +20,29 @@ export function SupabaseResetPasswordForm() {
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
+    const parsedUrl = new URL(window.location.href);
+    const code = parsedUrl.searchParams.get("code");
+    const tokenHash = parsedUrl.searchParams.get("token_hash");
+    const type = parsedUrl.searchParams.get("type");
+    const nextPath = window.location.pathname;
+
+    // Prefer server-side exchange/verify to avoid PKCE verifier issues in browser storage.
+    if (code) {
+      const target = new URL("/api/auth/callback", window.location.origin);
+      target.searchParams.set("code", code);
+      target.searchParams.set("next", nextPath);
+      window.location.replace(target.toString());
+      return;
+    }
+    if (tokenHash && type === "recovery") {
+      const target = new URL("/api/auth/confirm", window.location.origin);
+      target.searchParams.set("token_hash", tokenHash);
+      target.searchParams.set("type", "recovery");
+      target.searchParams.set("next", nextPath);
+      window.location.replace(target.toString());
+      return;
+    }
+
     const supabase = tryCreateSupabaseBrowserClient();
     if (!supabase) {
       const t = window.setTimeout(() => {
@@ -28,48 +51,10 @@ export function SupabaseResetPasswordForm() {
       return () => window.clearTimeout(t);
     }
     let cancelled = false;
-    const currentHref = window.location.href;
-    const parsedUrl = new URL(currentHref);
-    const code = parsedUrl.searchParams.get("code");
-    const tokenHash = parsedUrl.searchParams.get("token_hash");
-    const type = parsedUrl.searchParams.get("type");
-
-    const tryHydrateRecoverySession = async () => {
-      // 1) Preferred path for PKCE links.
-      if (code) {
-        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-        console.info("[reset-password] exchangeCodeForSession(code)", { code, data, error });
-        if (!error) {
-          return true;
-        }
-      }
-
-      // 2) Fallback: token hash + recovery type.
-      if (tokenHash && type === "recovery") {
-        const { data, error } = await supabase.auth.verifyOtp({
-          token_hash: tokenHash,
-          type: "recovery",
-        });
-        console.info("[reset-password] verifyOtp(recovery)", { tokenHash, data, error });
-        if (!error) {
-          return true;
-        }
-      }
-
-      return false;
-    };
-
-    void (async () => {
-      const hydrated = await tryHydrateRecoverySession();
-      if (hydrated && !cancelled) {
-        setPhase("ready");
-        return;
-      }
-      const { data } = await supabase.auth.getSession();
-      if (!cancelled && data.session) {
-        setPhase("ready");
-      }
-    })();
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled || !session) return;
+      setPhase("ready");
+    });
 
     const {
       data: { subscription },

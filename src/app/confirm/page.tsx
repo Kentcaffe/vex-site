@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
 type ConfirmState = "confirming" | "success" | "error";
 
@@ -20,76 +19,33 @@ export default function ConfirmPage() {
   const [message, setMessage] = useState("Confirming your account...");
 
   useEffect(() => {
-    let cancelled = false;
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get("code");
+    const tokenHash = url.searchParams.get("token_hash");
+    const type = url.searchParams.get("type");
 
-    const run = async () => {
-      const supabase = tryCreateSupabaseBrowserClient();
-      if (!supabase) {
-        if (!cancelled) {
-          setState("error");
-          setMessage("Supabase is not configured. Check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.");
-        }
-        return;
-      }
+    if (code) {
+      const target = new URL("/api/auth/callback", window.location.origin);
+      target.searchParams.set("code", code);
+      target.searchParams.set("next", "/");
+      window.location.replace(target.toString());
+      return;
+    }
 
-      try {
-        const fullUrl = window.location.href;
-        const url = new URL(fullUrl);
-        const code = url.searchParams.get("code");
-        const tokenHash = url.searchParams.get("token_hash");
-        const type = url.searchParams.get("type");
+    if (tokenHash && type) {
+      const target = new URL("/api/auth/confirm", window.location.origin);
+      target.searchParams.set("token_hash", tokenHash);
+      target.searchParams.set("type", type);
+      target.searchParams.set("next", "/");
+      window.location.replace(target.toString());
+      return;
+    }
 
-        let confirmed = false;
-        let lastError: unknown = null;
-
-        // 1) Preferred path for PKCE links: exchange auth code.
-        if (code) {
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-          console.info("[confirm page] exchangeCodeForSession(code)", { code, data, error });
-          if (!error) {
-            confirmed = true;
-          } else {
-            lastError = error;
-          }
-        }
-
-        // 2) Fallback for token-hash links (`token_hash` + `type`).
-        if (!confirmed && tokenHash && type) {
-          const normalizedType = type as "signup" | "invite" | "magiclink" | "recovery" | "email_change";
-          const { data, error } = await supabase.auth.verifyOtp({
-            token_hash: tokenHash,
-            type: normalizedType,
-          });
-          console.info("[confirm page] verifyOtp(token_hash)", { tokenHash, type: normalizedType, data, error });
-          if (!error) {
-            confirmed = true;
-          } else {
-            lastError = error;
-          }
-        }
-
-        if (!confirmed) {
-          throw (lastError ?? new Error("Missing confirmation token."));
-        }
-
-        if (!cancelled) {
-          setState("success");
-          setMessage("Your account is confirmed. Redirecting...");
-          router.replace("/");
-        }
-      } catch (error) {
-        console.error("[confirm page] account confirmation failed", error);
-        if (!cancelled) {
-          setState("error");
-          setMessage(normalizeErrorMessage(error));
-        }
-      }
-    };
-
-    void run();
-    return () => {
-      cancelled = true;
-    };
+    const timer = window.setTimeout(() => {
+      setState("error");
+      setMessage(normalizeErrorMessage(new Error("Missing confirmation token in URL.")));
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [router]);
 
   return (
