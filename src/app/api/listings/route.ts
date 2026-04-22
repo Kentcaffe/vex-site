@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { asListingSelect } from "@/lib/prisma-listing-casts";
 import { findManyListingsResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
@@ -34,10 +35,7 @@ export async function GET(req: Request) {
   } catch (error) {
     logRouteError("GET /api/listings", error);
     console.error("[api/listings] GET failed", error);
-    return NextResponse.json(
-      { ok: false, listings: [], error: "database_error" as const },
-      { status: 200 },
-    );
+    return jsonServiceUnavailable("Listings service is temporarily unavailable.", ApiErrorCode.DATABASE);
   }
 }
 

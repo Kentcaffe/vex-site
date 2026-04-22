@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { Headphones, Loader2, Send, Shield } from "lucide-react";
 import {
@@ -9,7 +10,7 @@ import {
   showNewChatMessageNotification,
 } from "@/lib/chat-notifications-client";
 import { SUPPORT_SYSTEM_BODY_TICKET_REGISTERED, type SupportMessageDTO } from "@/lib/support-chat-types";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
 type Props = {
   variant: "user" | "staff";
@@ -42,7 +43,7 @@ function resolveMessageBody(m: SupportMessageDTO, translate: (key: string) => st
 
 export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessagesAction }: Props) {
   const t = useTranslations("Support");
-  const [locale, setLocale] = useState("ro");
+  const [locale] = useState(() => (typeof document !== "undefined" ? document.documentElement.lang || "ro" : "ro"));
   const [messages, setMessages] = useState<SupportMessageDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -55,17 +56,11 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const channelRef = useRef<ReturnType<ReturnType<typeof createSupabaseBrowserClient>["channel"]> | null>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
   const channelReadyRef = useRef(false);
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSeenMessageIdRef = useRef<string | null>(null);
   const initialSyncDoneRef = useRef(false);
-
-  useEffect(() => {
-    if (typeof document !== "undefined") {
-      setLocale(document.documentElement.lang || "ro");
-    }
-  }, []);
 
   useEffect(() => {
     if (variant === "user") {
@@ -160,7 +155,10 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
 
   /** Realtime: postgres + broadcast (prezență moderator, typing) + polling de rezervă. */
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient();
+    const supabase = tryCreateSupabaseBrowserClient();
+    if (!supabase) {
+      return;
+    }
     channelReadyRef.current = false;
     const channel = supabase.channel(`support-ticket-${ticketId}`, {
       config: { broadcast: { ack: false } },

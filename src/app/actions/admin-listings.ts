@@ -16,7 +16,7 @@ import { routing } from "@/i18n/routing";
 
 export type AdminListingMutationResult =
   | { ok: true }
-  | { ok: false; error: "unauthorized" | "forbidden" | "not_found" };
+  | { ok: false; error: "unauthorized" | "forbidden" | "not_found" | "invalid" | "service_unavailable" };
 
 function revalidateListingSurfaces(listingId: string) {
   for (const locale of routing.locales) {
@@ -36,6 +36,10 @@ function revalidateListingSurfaces(listingId: string) {
 
 /** Ștergere soft (admin) + jurnal. Înlocuiește ștergerea fizică din panou. */
 export async function deleteListingAsStaff(listingId: string): Promise<AdminListingMutationResult> {
+  const normalizedId = listingId.trim();
+  if (!normalizedId) {
+    return { ok: false, error: "invalid" };
+  }
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, error: "unauthorized" };
@@ -44,21 +48,30 @@ export async function deleteListingAsStaff(listingId: string): Promise<AdminList
     return { ok: false, error: "forbidden" };
   }
 
-  const row = await prisma.listing.findFirst({
-    where: { id: listingId, ...listingWhereActive() },
-    select: { id: true },
-  });
-  if (!row) {
-    return { ok: false, error: "not_found" };
+  try {
+    const row = await prisma.listing.findFirst({
+      where: { id: normalizedId, ...listingWhereActive() },
+      select: { id: true },
+    });
+    if (!row) {
+      return { ok: false, error: "not_found" };
+    }
+
+    await softDeleteListingWithAdminLog(normalizedId, session.user.id);
+    revalidateListingSurfaces(normalizedId);
+
+    return { ok: true };
+  } catch (error) {
+    console.error("[actions/admin-listings] deleteListingAsStaff failed", error);
+    return { ok: false, error: "service_unavailable" };
   }
-
-  await softDeleteListingWithAdminLog(listingId, session.user.id);
-  revalidateListingSurfaces(listingId);
-
-  return { ok: true };
 }
 
 export async function restoreListingAsAdmin(listingId: string): Promise<AdminListingMutationResult> {
+  const normalizedId = listingId.trim();
+  if (!normalizedId) {
+    return { ok: false, error: "invalid" };
+  }
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, error: "unauthorized" };
@@ -67,29 +80,38 @@ export async function restoreListingAsAdmin(listingId: string): Promise<AdminLis
     return { ok: false, error: "forbidden" };
   }
 
-  const row = await prisma.listing.findFirst({
-    where: { id: listingId, ...listingWhereDeleted() },
-    select: { id: true },
-  });
-  if (!row) {
-    return { ok: false, error: "not_found" };
+  try {
+    const row = await prisma.listing.findFirst({
+      where: { id: normalizedId, ...listingWhereDeleted() },
+      select: { id: true },
+    });
+    if (!row) {
+      return { ok: false, error: "not_found" };
+    }
+
+    await prisma.$transaction([
+      prisma.listing.update({
+        where: { id: normalizedId },
+        data: listingUpdateRestore(),
+      }),
+      adminLog.create({
+        data: { adminId: session.user.id, action: "RESTORE_LISTING", targetId: normalizedId },
+      }),
+    ]);
+    revalidateListingSurfaces(normalizedId);
+
+    return { ok: true };
+  } catch (error) {
+    console.error("[actions/admin-listings] restoreListingAsAdmin failed", error);
+    return { ok: false, error: "service_unavailable" };
   }
-
-  await prisma.$transaction([
-    prisma.listing.update({
-      where: { id: listingId },
-      data: listingUpdateRestore(),
-    }),
-    adminLog.create({
-      data: { adminId: session.user.id, action: "RESTORE_LISTING", targetId: listingId },
-    }),
-  ]);
-  revalidateListingSurfaces(listingId);
-
-  return { ok: true };
 }
 
 export async function permanentlyDeleteListingAsAdmin(listingId: string): Promise<AdminListingMutationResult> {
+  const normalizedId = listingId.trim();
+  if (!normalizedId) {
+    return { ok: false, error: "invalid" };
+  }
   const session = await auth();
   if (!session?.user?.id) {
     return { ok: false, error: "unauthorized" };
@@ -98,21 +120,26 @@ export async function permanentlyDeleteListingAsAdmin(listingId: string): Promis
     return { ok: false, error: "forbidden" };
   }
 
-  const row = await prisma.listing.findFirst({
-    where: { id: listingId, ...listingWhereDeleted() },
-    select: { id: true },
-  });
-  if (!row) {
-    return { ok: false, error: "not_found" };
+  try {
+    const row = await prisma.listing.findFirst({
+      where: { id: normalizedId, ...listingWhereDeleted() },
+      select: { id: true },
+    });
+    if (!row) {
+      return { ok: false, error: "not_found" };
+    }
+
+    await prisma.$transaction([
+      prisma.listing.delete({ where: { id: normalizedId } }),
+      adminLog.create({
+        data: { adminId: session.user.id, action: "PERMANENT_DELETE_LISTING", targetId: normalizedId },
+      }),
+    ]);
+    revalidateListingSurfaces(normalizedId);
+
+    return { ok: true };
+  } catch (error) {
+    console.error("[actions/admin-listings] permanentlyDeleteListingAsAdmin failed", error);
+    return { ok: false, error: "service_unavailable" };
   }
-
-  await prisma.$transaction([
-    prisma.listing.delete({ where: { id: listingId } }),
-    adminLog.create({
-      data: { adminId: session.user.id, action: "PERMANENT_DELETE_LISTING", targetId: listingId },
-    }),
-  ]);
-  revalidateListingSurfaces(listingId);
-
-  return { ok: true };
 }

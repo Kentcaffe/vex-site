@@ -65,11 +65,11 @@ type RouteCtx = { request: Request };
  */
 export function safeApiRoute(
   scope: string,
-  handler: (ctx: RouteCtx) => Promise<NextResponse>,
-): (request: Request) => Promise<NextResponse> {
-  return async (request: Request) => {
+  handler: (ctx: RouteCtx, ...args: unknown[]) => Promise<NextResponse>,
+): (request: Request, ...args: unknown[]) => Promise<NextResponse> {
+  return async (request: Request, ...args: unknown[]) => {
     try {
-      return await handler({ request });
+      return await handler({ request }, ...args);
     } catch (cause) {
       logger.error(scope, "route handler failed", { err: cause });
       return jsonInternalError("An unexpected error occurred. Please try again.", { scope, cause });

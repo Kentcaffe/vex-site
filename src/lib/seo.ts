@@ -1,4 +1,17 @@
-const SITE_URL = (process.env.NEXT_PUBLIC_APP_URL ?? "https://vex.md").replace(/\/$/, "");
+const SITE_URL_FALLBACK = "https://vex.md";
+
+function normalizeSiteUrl(raw: string | undefined): string {
+  const trimmed = (raw ?? SITE_URL_FALLBACK).trim().replace(/\/$/, "");
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.origin;
+  } catch {
+    console.error("[seo] Invalid NEXT_PUBLIC_APP_URL. Falling back to https://vex.md");
+    return SITE_URL_FALLBACK;
+  }
+}
+
+const SITE_URL = normalizeSiteUrl(process.env.NEXT_PUBLIC_APP_URL);
 
 export function siteUrl(): string {
   return SITE_URL;

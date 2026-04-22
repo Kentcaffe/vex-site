@@ -1,6 +1,6 @@
 "use client";
 
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 import { useTranslations } from "next-intl";
 import type { OauthAvailability } from "@/components/auth/types";
 
@@ -36,12 +36,18 @@ type Props = {
 
 export function SocialAuthButtons({ oauth, callbackUrl, variant }: Props) {
   const t = useTranslations("Auth");
-  const supabase = createSupabaseBrowserClient();
+  const supabase = tryCreateSupabaseBrowserClient();
   const google = oauth?.google;
   const facebook = oauth?.facebook;
   if (!google && !facebook) return null;
 
   async function signInOAuth(provider: "google" | "facebook") {
+    if (!supabase) {
+      if (process.env.NODE_ENV === "development") {
+        console.error("[auth] Supabase public env is missing.");
+      }
+      return;
+    }
     const origin = window.location.origin;
     const redirectTo = `${origin}/api/auth/callback?next=${encodeURIComponent(callbackUrl)}`;
     const { error } = await supabase.auth.signInWithOAuth({

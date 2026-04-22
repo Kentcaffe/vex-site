@@ -30,6 +30,7 @@
     "seed:marketplace": "node seed.js",
     "listings:clear": "node scripts/clear-all-listings.js",
     "env:check": "node scripts/check-env.mjs",
+    "auth:test-flow": "node scripts/test-supabase-auth-flow.mjs",
     "test:smtp": "node scripts/test-smtp.mjs",
     "debug:smtp-env": "node scripts/debug-smtp-env.mjs"
   },

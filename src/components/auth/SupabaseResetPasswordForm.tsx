@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
 type Phase = "loading" | "ready" | "noSession" | "success";
 
@@ -20,7 +20,13 @@ export function SupabaseResetPasswordForm() {
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient();
+    const supabase = tryCreateSupabaseBrowserClient();
+    if (!supabase) {
+      const t = window.setTimeout(() => {
+        setPhase("noSession");
+      }, 0);
+      return () => window.clearTimeout(t);
+    }
     let cancelled = false;
 
     void supabase.auth.getSession().then(({ data: { session } }) => {
@@ -63,7 +69,12 @@ export function SupabaseResetPasswordForm() {
       return;
     }
     setPending(true);
-    const supabase = createSupabaseBrowserClient();
+    const supabase = tryCreateSupabaseBrowserClient();
+    if (!supabase) {
+      setPending(false);
+      setSubmitError(t("resetUpdateFailed"));
+      return;
+    }
     const { error } = await supabase.auth.updateUser({ password: p });
     setPending(false);
     if (error) {

@@ -1,6 +1,7 @@
 import { access, readFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
+import { safeApiRoute } from "@/lib/api-error";
 import { getSupabaseServiceClient, listingsObjectKey, listingsStorageBucket } from "@/lib/supabase-service-role";
 import { logRouteError } from "@/lib/server-log";
 
@@ -25,56 +26,60 @@ function contentTypeFor(filename: string): string {
   return MIME_BY_EXT[ext] ?? "application/octet-stream";
 }
 
-export async function GET(
-  _request: Request,
-  context: { params: Promise<{ name: string }> },
-) {
-  const { name: rawName } = await context.params;
-  const name = safeName(rawName);
-  if (!name) {
-    return NextResponse.json({ error: "invalid_image_name" }, { status: 400 });
-  }
-
-  const candidatePaths = [
-    path.join(process.cwd(), "public", "uploads", "listings", name),
-    path.join(process.cwd(), "uploads", "listings", name),
-  ];
-
-  for (const filePath of candidatePaths) {
-    try {
-      await access(filePath);
-      const buffer = await readFile(filePath);
-      return new NextResponse(new Uint8Array(buffer), {
-        status: 200,
-        headers: {
-          "Content-Type": contentTypeFor(name),
-          "Cache-Control": "public, max-age=604800, immutable",
-        },
-      });
-    } catch {
-      // try next candidate path
+export const GET = safeApiRoute(
+  "GET /api/listings/image/[name]",
+  async (_ctx, ...args) => {
+    const context = args[0] as { params: Promise<{ name: string }> } | undefined;
+    if (!context) {
+      return NextResponse.json({ ok: false, error: "invalid_context" }, { status: 500 });
     }
-  }
-
-  const supabase = getSupabaseServiceClient();
-  if (supabase) {
-    const bucket = listingsStorageBucket();
-    const key = listingsObjectKey(name);
-    const { data, error } = await supabase.storage.from(bucket).download(key);
-    if (!error && data) {
-      const ab = await data.arrayBuffer();
-      return new NextResponse(ab, {
-        status: 200,
-        headers: {
-          "Content-Type": contentTypeFor(name),
-          "Cache-Control": "public, max-age=604800, immutable",
-        },
-      });
+    const { name: rawName } = await context.params;
+    const name = safeName(rawName);
+    if (!name) {
+      return NextResponse.json({ ok: false, error: "invalid_image_name" }, { status: 400 });
     }
-    if (error) {
-      logRouteError("GET /api/listings/image/[name] Supabase download", error);
-    }
-  }
 
-  return NextResponse.json({ error: "image_not_found" }, { status: 404 });
-}
+    const candidatePaths = [
+      path.join(process.cwd(), "public", "uploads", "listings", name),
+      path.join(process.cwd(), "uploads", "listings", name),
+    ];
+
+    for (const filePath of candidatePaths) {
+      try {
+        await access(filePath);
+        const buffer = await readFile(filePath);
+        return new NextResponse(new Uint8Array(buffer), {
+          status: 200,
+          headers: {
+            "Content-Type": contentTypeFor(name),
+            "Cache-Control": "public, max-age=604800, immutable",
+          },
+        });
+      } catch {
+        // try next candidate path
+      }
+    }
+
+    const supabase = getSupabaseServiceClient();
+    if (supabase) {
+      const bucket = listingsStorageBucket();
+      const key = listingsObjectKey(name);
+      const { data, error } = await supabase.storage.from(bucket).download(key);
+      if (!error && data) {
+        const ab = await data.arrayBuffer();
+        return new NextResponse(ab, {
+          status: 200,
+          headers: {
+            "Content-Type": contentTypeFor(name),
+            "Cache-Control": "public, max-age=604800, immutable",
+          },
+        });
+      }
+      if (error) {
+        logRouteError("GET /api/listings/image/[name] Supabase download", error);
+      }
+    }
+
+    return NextResponse.json({ ok: false, error: "image_not_found" }, { status: 404 });
+  },
+);

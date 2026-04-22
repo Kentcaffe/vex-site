@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "@/i18n/navigation";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 
 /** Reîmprospătează UI-ul (badge notificări, listă) când sosește un broadcast pentru userul curent. */
@@ -18,7 +18,10 @@ export function NotificationRealtimeBridge() {
   useEffect(() => {
     if (status !== "authenticated" || !userId) return;
 
-    const supabase = createSupabaseBrowserClient();
+    const supabase = tryCreateSupabaseBrowserClient();
+    if (!supabase) {
+      return;
+    }
     const channelName = `user-notifications-${userId}`;
     const ch = supabase
       .channel(channelName)

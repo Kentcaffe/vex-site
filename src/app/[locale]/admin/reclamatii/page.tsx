@@ -43,6 +43,14 @@ type Props = {
   searchParams: Promise<{ status?: string; type?: string }>;
 };
 
+function extractGroupCount(value: unknown): number {
+  if (typeof value !== "object" || value === null || !("_all" in value)) {
+    return 0;
+  }
+  const count = (value as { _all?: unknown })._all;
+  return typeof count === "number" ? count : 0;
+}
+
 function statusWhere(raw: string | undefined): ReportStatus | undefined {
   if (raw === "pending") return "PENDING";
   if (raw === "reviewed") return "REVIEWED";
@@ -54,50 +62,87 @@ export default async function AdminReclamatiiPage({ params, searchParams }: Prop
   const { locale } = await params;
   const sp = await searchParams;
   setRequestLocale(locale);
-  const t = await getTranslations("Admin");
-  const session = await auth();
-  const canDeleteListing = isAdmin(session?.user?.role);
+  let t: Awaited<ReturnType<typeof getTranslations>>;
+  try {
+    t = await getTranslations("Admin");
+  } catch (error) {
+    console.error("[admin/reclamatii] translations failed", error);
+    return (
+      <div>
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Nu am putut încărca această pagină momentan.
+        </p>
+      </div>
+    );
+  }
+
+  let canDeleteListing = false;
+  try {
+    const session = await auth();
+    canDeleteListing = isAdmin(session?.user?.role);
+  } catch (error) {
+    console.error("[admin/reclamatii] auth failed", error);
+    canDeleteListing = false;
+  }
 
   const st = statusWhere(sp.status);
   const type = sp.type ?? "all";
 
   const statusFilter = st ? { status: st } : undefined;
 
-  const [lCounts, oCounts] = await Promise.all([
-    prisma.listingReport.groupBy({
-      by: ["status"],
-      _count: { _all: true },
-    }),
-    otherContentReport.groupBy({
-      by: ["status"],
-      _count: { _all: true },
-    }),
-  ]);
+  let lCounts: Array<{ status: ReportStatus; _count: { _all: number } }> = [];
+  let oCounts: Array<{ status: ReportStatus; _count: { _all: number } }> = [];
+  let listingRows: ListingReportRow[] = [];
+  let otherRows: OtherContentReportRow[] = [];
+  let loadFailed = false;
+  try {
+    const [listingCountsRaw, otherCountsRaw] = await Promise.all([
+      prisma.listingReport.groupBy({
+        by: ["status"],
+        _count: { _all: true },
+      }),
+      otherContentReport.groupBy({
+        by: ["status"],
+        _count: { _all: true },
+      }),
+    ]);
+    lCounts = listingCountsRaw.map((row: { status: ReportStatus; _count: unknown }) => ({
+      status: row.status,
+      _count: { _all: extractGroupCount(row._count) },
+    }));
+    oCounts = otherCountsRaw.map((row: { status: ReportStatus; _count: unknown }) => ({
+      status: row.status,
+      _count: { _all: extractGroupCount(row._count) },
+    }));
 
-  const listingRows: ListingReportRow[] =
-    type === "other"
-      ? []
-      : ((await prisma.listingReport.findMany({
-          where: statusFilter,
-          orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-          take: 250,
-          include: {
-            listing: { select: { id: true, title: true } },
-            reporter: { select: { email: true } },
-          },
-        })) as ListingReportRow[]);
+    listingRows =
+      type === "other"
+        ? []
+        : ((await prisma.listingReport.findMany({
+            where: statusFilter,
+            orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+            take: 250,
+            include: {
+              listing: { select: { id: true, title: true } },
+              reporter: { select: { email: true } },
+            },
+          })) as ListingReportRow[]);
 
-  const otherRows: OtherContentReportRow[] =
-    type === "listing"
-      ? []
-      : ((await otherContentReport.findMany({
-          where: statusFilter,
-          orderBy: [{ status: "asc" }, { createdAt: "desc" }],
-          take: 250,
-          include: {
-            reporter: { select: { email: true } },
-          },
-        })) as OtherContentReportRow[]);
+    otherRows =
+      type === "listing"
+        ? []
+        : ((await otherContentReport.findMany({
+            where: statusFilter,
+            orderBy: [{ status: "asc" }, { createdAt: "desc" }],
+            take: 250,
+            include: {
+              reporter: { select: { email: true } },
+            },
+          })) as OtherContentReportRow[]);
+  } catch (error) {
+    console.error("[admin/reclamatii] data fetch failed", error);
+    loadFailed = true;
+  }
 
   const lm = Object.fromEntries(
     lCounts.map((c: (typeof lCounts)[number]) => [c.status, c._count._all]),
@@ -192,6 +237,12 @@ export default async function AdminReclamatiiPage({ params, searchParams }: Prop
       </div>
 
       <p className="mt-4 text-xs text-zinc-500 dark:text-zinc-500">{t("complaintsHint")}</p>
+
+      {loadFailed ? (
+        <p className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Reclamările nu pot fi încărcate momentan.
+        </p>
+      ) : null}
 
       {merged.length === 0 ? (
         <p className="mt-8 rounded-xl border border-dashed border-zinc-300 bg-zinc-50 px-4 py-8 text-center text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/50 dark:text-zinc-400">

@@ -6,6 +6,15 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
+type AdminUserRow = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  createdAt: Date;
+  _count: { listings: number };
+};
+
 
 /** Lista trebuie să reflecte mereu DB-ul (fără cache la build). */
 export const dynamic = "force-dynamic";
@@ -13,20 +22,39 @@ export const dynamic = "force-dynamic";
 export default async function AdminUsersPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("Admin");
+  let t: Awaited<ReturnType<typeof getTranslations>>;
+  try {
+    t = await getTranslations("Admin");
+  } catch (error) {
+    console.error("[admin/users] translations failed", error);
+    return (
+      <div>
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Nu am putut încărca această pagină momentan.
+        </p>
+      </div>
+    );
+  }
 
-  const users = await prisma.user.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 400,
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      createdAt: true,
-      _count: { select: { listings: { where: listingWhereActive() } } },
-    },
-  });
+  let users: AdminUserRow[] = [];
+  let loadFailed = false;
+  try {
+    users = await prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 400,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        _count: { select: { listings: { where: listingWhereActive() } } },
+      },
+    });
+  } catch (error) {
+    console.error("[admin/users] prisma.user.findMany failed", error);
+    loadFailed = true;
+  }
 
   function roleLabel(role: string) {
     if (role === "ADMIN") return t("role_ADMIN");
@@ -39,7 +67,11 @@ export default async function AdminUsersPage({ params }: Props) {
       <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("usersTitle")}</h1>
       <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">{t("usersSubtitle")}</p>
 
-      {users.length === 0 ? (
+      {loadFailed ? (
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Lista utilizatorilor nu poate fi încărcată momentan.
+        </p>
+      ) : users.length === 0 ? (
         <p className="mt-8 text-zinc-600 dark:text-zinc-400">{t("usersEmpty")}</p>
       ) : (
         <div className="mt-8 overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">

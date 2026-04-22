@@ -10,7 +10,7 @@ import { authInputClass, IconField } from "@/components/auth/IconField";
 import { SocialAuthButtons } from "@/components/auth/SocialAuthButtons";
 import type { OauthAvailability } from "@/components/auth/types";
 import { loginErrorMessageKey } from "@/lib/auth-supabase-errors";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
 type Props = {
   callbackUrl: string;
@@ -20,7 +20,7 @@ type Props = {
 export function LoginTab({ callbackUrl, oauth }: Props) {
   const t = useTranslations("Auth");
   const router = useRouter();
-  const supabase = createSupabaseBrowserClient();
+  const supabase = tryCreateSupabaseBrowserClient();
   const [pending, setPending] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [identifierErr, setIdentifierErr] = useState<string | null>(null);
@@ -53,6 +53,10 @@ export function LoginTab({ callbackUrl, oauth }: Props) {
     }
     if (!identifier.includes("@")) {
       setFormError(t("invalidEmail"));
+      return;
+    }
+    if (!supabase) {
+      setFormError(t("validationError"));
       return;
     }
     setPending(true);

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { getRoomAccess } from "@/lib/chat-actions";
 import { prisma } from "@/lib/prisma";
 import { logRouteError } from "@/lib/server-log";
@@ -10,14 +11,17 @@ export async function POST(_req: Request, { params }: Props) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
     }
     const { roomId } = await params;
+    if (!roomId.trim()) {
+      return NextResponse.json({ ok: false, error: "invalid_room_id" }, { status: 400 });
+    }
     const userId = session.user.id;
 
     const access = await getRoomAccess(roomId, userId);
     if (!access) {
-      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+      return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
     }
 
     const now = new Date();
@@ -30,7 +34,6 @@ export async function POST(_req: Request, { params }: Props) {
     return NextResponse.json({ ok: true, lastReadAt: now.toISOString() });
   } catch (err) {
     logRouteError("POST /api/chat/room/[roomId]/read", err);
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
+    return jsonServiceUnavailable("Read state service is temporarily unavailable.", ApiErrorCode.DATABASE);
   }
 }

@@ -12,19 +12,46 @@ type Props = {
 export default async function AdminDashboardPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("Admin");
+  let t: Awaited<ReturnType<typeof getTranslations>>;
+  try {
+    t = await getTranslations("Admin");
+  } catch (error) {
+    console.error("[admin] translations failed", error);
+    return (
+      <div>
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Nu am putut încărca această pagină momentan.
+        </p>
+      </div>
+    );
+  }
 
-  const [listingCount, userCount, supportOpen, lp, lr, ld, op, or, od] = await Promise.all([
-    prisma.listing.count({ where: listingWhereActive() }),
-    prisma.user.count(),
-    countOpenSupportTicketsSafe(),
-    prisma.listingReport.count({ where: { status: "PENDING" } }),
-    prisma.listingReport.count({ where: { status: "REVIEWED" } }),
-    prisma.listingReport.count({ where: { status: "DISMISSED" } }),
-    otherContentReport.count({ where: { status: "PENDING" } }),
-    otherContentReport.count({ where: { status: "REVIEWED" } }),
-    otherContentReport.count({ where: { status: "DISMISSED" } }),
-  ]);
+  let listingCount = 0;
+  let userCount = 0;
+  let supportOpen = 0;
+  let lp = 0;
+  let lr = 0;
+  let ld = 0;
+  let op = 0;
+  let or = 0;
+  let od = 0;
+  let loadFailed = false;
+  try {
+    [listingCount, userCount, supportOpen, lp, lr, ld, op, or, od] = await Promise.all([
+      prisma.listing.count({ where: listingWhereActive() }),
+      prisma.user.count(),
+      countOpenSupportTicketsSafe(),
+      prisma.listingReport.count({ where: { status: "PENDING" } }),
+      prisma.listingReport.count({ where: { status: "REVIEWED" } }),
+      prisma.listingReport.count({ where: { status: "DISMISSED" } }),
+      otherContentReport.count({ where: { status: "PENDING" } }),
+      otherContentReport.count({ where: { status: "REVIEWED" } }),
+      otherContentReport.count({ where: { status: "DISMISSED" } }),
+    ]);
+  } catch (error) {
+    console.error("[admin] dashboard stats failed", error);
+    loadFailed = true;
+  }
   const pendingReports = lp + op;
   const reviewedReports = lr + or;
   const dismissedReports = ld + od;
@@ -33,6 +60,12 @@ export default async function AdminDashboardPage({ params }: Props) {
     <div>
       <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("dashboardTitle")}</h1>
       <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">{t("dashboardSubtitle")}</p>
+
+      {loadFailed ? (
+        <p className="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Statisticile admin sunt temporar indisponibile.
+        </p>
+      ) : null}
 
       {pendingReports > 0 ? (
         <div className="mt-8 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/60 dark:bg-amber-950/30">

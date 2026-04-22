@@ -22,6 +22,8 @@ export default async function ChatFromListingPage({ params }: Props) {
     redirect(localizedHref(locale, "/cont"));
   }
   const userId = session.user.id;
+  let bootstrap: ChatBootstrap | null = null;
+  let roomIdForKey = "";
 
   try {
     const buyerRow = await prisma.user.findUnique({ where: { id: userId }, select: { avatarUrl: true } });
@@ -57,7 +59,7 @@ export default async function ChatFromListingPage({ params }: Props) {
     const readByOther = room.readStates.find((s: { userId: string }) => s.userId !== userId);
     const myRead = room.readStates.find((s: { userId: string }) => s.userId === userId);
 
-    const bootstrap: ChatBootstrap = {
+    bootstrap = {
       roomId: room.id,
       listing: { id: listing.id, title: listing.title },
       seller: {
@@ -84,14 +86,18 @@ export default async function ChatFromListingPage({ params }: Props) {
       myLastReadAt: myRead?.lastReadAt.toISOString() ?? null,
       maxBodyLength: CHAT_MESSAGE_MAX,
     };
-
-    return (
-      <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-3 pt-2 pb-0 sm:px-6 sm:py-6">
-        <ChatRoomView key={room.id} bootstrap={bootstrap} currentUserId={userId} />
-      </div>
-    );
+    roomIdForKey = room.id;
   } catch (e) {
     console.error("[chat/listing]", e);
+  }
+
+  if (!bootstrap) {
     return <ChatServerError />;
   }
+
+  return (
+    <div className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col px-3 pt-2 pb-0 sm:px-6 sm:py-6">
+      <ChatRoomView key={roomIdForKey} bootstrap={bootstrap} currentUserId={userId} />
+    </div>
+  );
 }

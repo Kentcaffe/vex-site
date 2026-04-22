@@ -28,12 +28,36 @@ export const dynamic = "force-dynamic";
 export default async function AdminFeedbackPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const session = await auth();
+  let session: Awaited<ReturnType<typeof auth>> = null;
+  try {
+    session = await auth();
+  } catch (error) {
+    console.error("[admin/feedback] auth failed", error);
+    return (
+      <div className="max-w-4xl">
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Serviciul de autentificare este temporar indisponibil.
+        </p>
+      </div>
+    );
+  }
   if (!session?.user?.id || !isAdmin(session.user.role)) {
     redirect(localizedHref(locale, "/admin"));
   }
 
-  const t = await getTranslations("Admin");
+  let t: Awaited<ReturnType<typeof getTranslations>>;
+  try {
+    t = await getTranslations("Admin");
+  } catch (error) {
+    console.error("[admin/feedback] translations failed", error);
+    return (
+      <div className="max-w-4xl">
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Traducerile pentru această pagină nu au putut fi încărcate.
+        </p>
+      </div>
+    );
+  }
 
   let rows: AdminFeedbackQueryRow[] = [];
   let loadFailed = false;

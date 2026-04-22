@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { syncAuthenticatedUserToPrisma } from "@/auth";
+import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { logRouteError } from "@/lib/server-log";
 
 export async function POST() {
@@ -8,7 +9,7 @@ export async function POST() {
     session = await syncAuthenticatedUserToPrisma();
   } catch (error) {
     logRouteError("POST /api/auth/sync-user", error);
-    return NextResponse.json({ ok: false, error: "server_error" }, { status: 500 });
+    return jsonServiceUnavailable("User sync is temporarily unavailable.", ApiErrorCode.DATABASE);
   }
   if (!session) {
     return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });

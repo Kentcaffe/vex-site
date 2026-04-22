@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2 } from "lucide-react";
 import { getEmailConfirmationRedirectUrl } from "@/lib/auth-email-redirect";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
 const COOLDOWN_SEC = 60;
 
@@ -38,28 +38,56 @@ export function ResendConfirmationEmail({ email, callbackPath }: Props) {
     setLoading(true);
     setFeedback(null);
 
-    const supabase = createSupabaseBrowserClient();
-    const emailRedirectTo = getEmailConfirmationRedirectUrl(callbackPath);
-
-    const { data, error } = await supabase.auth.resend({
-      type: "signup",
-      email: trimmed,
-      options: { emailRedirectTo },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.log("[auth resend signup]", { data, error, emailRedirectTo });
-    }
-
-    setLoading(false);
-
-    if (error) {
+    const supabase = tryCreateSupabaseBrowserClient();
+    if (!supabase) {
+      setLoading(false);
       setFeedback({ kind: "err", text: t("resendConfirmError") });
       setCooldown(COOLDOWN_SEC);
       return;
     }
-    setFeedback({ kind: "ok", text: t("resendConfirmSuccess") });
-    setCooldown(COOLDOWN_SEC);
+    const emailRedirectTo = getEmailConfirmationRedirectUrl(callbackPath);
+
+    try {
+      const { data, error } = await supabase.auth.resend({
+        type: "signup",
+        email: trimmed,
+        options: { emailRedirectTo },
+      });
+
+      console.info("[auth resend signup] response", {
+        email: trimmed,
+        emailRedirectTo,
+        data,
+        error,
+      });
+
+      if (error) {
+        console.error("[auth resend signup] failed", {
+          code: (error as { code?: string }).code,
+          message: error.message,
+          name: error.name,
+          status: (error as { status?: number }).status,
+        });
+        const msg = (error.message ?? "").toLowerCase();
+        setFeedback({
+          kind: "err",
+          text: msg.includes("confirmation email")
+            ? "Supabase nu poate trimite emailul de confirmare (SMTP/Email provider)."
+            : t("resendConfirmError"),
+        });
+        setCooldown(COOLDOWN_SEC);
+        return;
+      }
+
+      setFeedback({ kind: "ok", text: t("resendConfirmSuccess") });
+      setCooldown(COOLDOWN_SEC);
+    } catch (error) {
+      console.error("[auth resend signup] unexpected exception", error);
+      setFeedback({ kind: "err", text: t("resendConfirmError") });
+      setCooldown(COOLDOWN_SEC);
+    } finally {
+      setLoading(false);
+    }
   }, [email, callbackPath, cooldown, loading, t]);
 
   const disabled = loading || cooldown > 0;

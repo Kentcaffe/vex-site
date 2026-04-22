@@ -6,7 +6,7 @@ import {
   getChatNotificationTitleFromLocale,
   showNewChatMessageNotification,
 } from "@/lib/chat-notifications-client";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
 type ChatSocketContextValue = {
   connected: boolean;
@@ -76,7 +76,10 @@ function ChatSocketConnectedProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const supabase = createSupabaseBrowserClient();
+    const supabase = tryCreateSupabaseBrowserClient();
+    if (!supabase) {
+      return;
+    }
     let cancelled = false;
     let activeChannel: ReturnType<typeof supabase.channel> | null = null;
 

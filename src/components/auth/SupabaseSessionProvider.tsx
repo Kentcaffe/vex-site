@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { AppSession } from "@/auth";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated";
 type SupabaseSessionContextValue = {
@@ -36,10 +36,15 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient();
+    const supabase = tryCreateSupabaseBrowserClient();
     const timer = window.setTimeout(() => {
       void refresh();
     }, 0);
+    if (!supabase) {
+      return () => {
+        window.clearTimeout(timer);
+      };
+    }
     const { data: sub } = supabase.auth.onAuthStateChange(() => {
       void refresh();
     });

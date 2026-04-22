@@ -13,7 +13,7 @@ import { routing } from "@/i18n/routing";
 import { evaluatePasswordRules, passwordMeetsAllRules } from "@/lib/auth-password-rules";
 import { ResendConfirmationEmail } from "@/components/auth/ResendConfirmationEmail";
 import { getEmailConfirmationRedirectUrl } from "@/lib/auth-email-redirect";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 import { clearRegisterFields, loadRegisterFields, saveRegisterFields } from "@/lib/auth-form-persist";
 
 type Props = {
@@ -25,7 +25,7 @@ const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function RegisterTab({ oauth }: Props) {
   const t = useTranslations("Auth");
   const locale = useLocale();
-  const supabase = createSupabaseBrowserClient();
+  const supabase = tryCreateSupabaseBrowserClient();
   const callbackUrl = locale === routing.defaultLocale ? "/" : `/${locale}`;
   const [regPending, setRegPending] = useState(false);
   const [registerError, setRegisterError] = useState<string | null>(null);
@@ -105,28 +105,47 @@ export function RegisterTab({ oauth }: Props) {
     const password = String(fd.get("password") ?? "");
     const phone = String(fd.get("phone") ?? "").replace(/\D/g, "");
     const name = String(fd.get("name") ?? "").trim();
+    if (!supabase) {
+      setRegisterError(t("validationError"));
+      return;
+    }
 
     setRegPending(true);
     const emailRedirectTo = getEmailConfirmationRedirectUrl(callbackUrl);
 
-    void supabase.auth
-      .signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo,
-          data: {
-            full_name: name || null,
-            phone: phone || null,
+    void (async () => {
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo,
+            data: {
+              full_name: name || null,
+              phone: phone || null,
+            },
           },
-        },
-      })
-      .then(async ({ data, error }) => {
-        if (process.env.NODE_ENV === "development") {
-          console.log("[auth signUp]", { data, error, emailRedirectTo });
-        }
+        });
+
+        console.info("[auth signUp] response", {
+          email,
+          emailRedirectTo,
+          data,
+          error,
+        });
 
         if (error) {
+          console.error("[auth signUp] failed", {
+            code: (error as { code?: string }).code,
+            message: error.message,
+            name: error.name,
+            status: (error as { status?: number }).status,
+          });
+          const errMessage = (error.message ?? "").toLowerCase();
+          if (errMessage.includes("confirmation email")) {
+            setRegisterError("Nu s-a putut trimite emailul de confirmare. Verifică setările Email/SMTP din Supabase.");
+            return;
+          }
           const msg = (error.message ?? "").toLowerCase();
           const code = String((error as { code?: string }).code ?? "");
           const duplicate =
@@ -146,7 +165,6 @@ export function RegisterTab({ oauth }: Props) {
           return;
         }
 
-        /** Confirmare email obligatorie: există `user`, dar nu e sesiune până deschizi linkul. */
         if (data.user) {
           clearRegisterFields();
           setPendingConfirmEmail(email);
@@ -154,12 +172,14 @@ export function RegisterTab({ oauth }: Props) {
           return;
         }
 
-        /** Fără user și fără sesiune — de obicei adresă deja înregistrată (protecție enumerare). */
         setRegisterError(t("emailTaken"));
-      })
-      .finally(() => {
+      } catch (error) {
+        console.error("[auth signUp] unexpected exception", error);
+        setRegisterError(t("validationError"));
+      } finally {
         setRegPending(false);
-      });
+      }
+    })();
   }
 
   const showOAuth = oauth?.google || oauth?.facebook;

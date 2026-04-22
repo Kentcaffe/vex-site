@@ -77,18 +77,20 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
 
   useEffect(() => {
     if (!open) {
-      setTicketId(null);
-      setTicketError(false);
-      setTicketErrorDetail(null);
-      setShowFeedback(false);
-      setThreadHasMessages(false);
-      setFeedbackSubmitted(false);
-      setRating(0);
-      setSatisfied(null);
-      setFeedbackSending(false);
-      setFeedbackError(null);
-      setFeedbackThanks(false);
-      setLoadingTicket(true);
+      queueMicrotask(() => {
+        setTicketId(null);
+        setTicketError(false);
+        setTicketErrorDetail(null);
+        setShowFeedback(false);
+        setThreadHasMessages(false);
+        setFeedbackSubmitted(false);
+        setRating(0);
+        setSatisfied(null);
+        setFeedbackSending(false);
+        setFeedbackError(null);
+        setFeedbackThanks(false);
+        setLoadingTicket(true);
+      });
     }
   }, [open]);
 
@@ -138,21 +140,28 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
     }
     const cached = getCachedSupportTicket();
     if (cached) {
-      setTicketId(cached.id);
-      setFeedbackSubmitted(Boolean(cached.feedbackAt));
-      setTicketError(false);
-      setTicketErrorDetail(null);
-      setLoadingTicket(false);
+      queueMicrotask(() => {
+        setTicketId(cached.id);
+        setFeedbackSubmitted(Boolean(cached.feedbackAt));
+        setTicketError(false);
+        setTicketErrorDetail(null);
+        setLoadingTicket(false);
+      });
       return;
     }
-    setLoadingTicket(true);
+    queueMicrotask(() => {
+      setLoadingTicket(true);
+    });
   }, [open, status]);
 
   useEffect(() => {
     if (!open || status !== "authenticated") return;
     if (ticketError) return;
     if (getCachedSupportTicket()) return;
-    void ensureTicket();
+    const id = window.setTimeout(() => {
+      void ensureTicket();
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [open, status, ticketError, ensureTicket]);
 
   if (!open || status !== "authenticated") {

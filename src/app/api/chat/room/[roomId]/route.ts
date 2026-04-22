@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { CHAT_MESSAGE_MAX, getRoomAccess } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
 import { prisma } from "@/lib/prisma";
@@ -11,14 +12,17 @@ export async function GET(_req: Request, { params }: Props) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
     }
     const { roomId } = await params;
+    if (!roomId.trim()) {
+      return NextResponse.json({ ok: false, error: "invalid_room_id" }, { status: 400 });
+    }
     const userId = session.user.id;
 
     const access = await getRoomAccess(roomId, userId);
     if (!access) {
-      return NextResponse.json({ error: "forbidden" }, { status: 403 });
+      return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
     }
 
     const me = await prisma.user.findUnique({
@@ -42,7 +46,7 @@ export async function GET(_req: Request, { params }: Props) {
       },
     });
     if (!room) {
-      return NextResponse.json({ error: "not_found" }, { status: 404 });
+      return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
     }
 
     const messages = await listRoomMessages(room.id, 200);
@@ -79,7 +83,6 @@ export async function GET(_req: Request, { params }: Props) {
     });
   } catch (err) {
     logRouteError("GET /api/chat/room/[roomId]", err);
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
+    return jsonServiceUnavailable("Chat room is temporarily unavailable.", ApiErrorCode.DATABASE);
   }
 }

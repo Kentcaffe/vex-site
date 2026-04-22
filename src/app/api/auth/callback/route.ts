@@ -3,10 +3,21 @@ import { syncAuthenticatedUserToPrisma } from "@/auth";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { logRouteError } from "@/lib/server-log";
 
+function safeNextPath(next: string | null): string {
+  if (!next) {
+    return "/";
+  }
+  const trimmed = next.trim();
+  if (!trimmed.startsWith("/") || trimmed.startsWith("//")) {
+    return "/";
+  }
+  return trimmed;
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const code = url.searchParams.get("code");
-  const next = url.searchParams.get("next") ?? "/";
+  const next = safeNextPath(url.searchParams.get("next"));
   const baseUrl = process.env.AUTH_URL ?? process.env.NEXT_PUBLIC_APP_URL ?? url.origin;
 
   if (!code) {
@@ -26,6 +37,11 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/cont?error=oauth_callback", baseUrl));
   }
 
-  await syncAuthenticatedUserToPrisma();
+  try {
+    await syncAuthenticatedUserToPrisma();
+  } catch (error) {
+    logRouteError("GET /api/auth/callback syncAuthenticatedUserToPrisma", error);
+    return NextResponse.redirect(new URL("/cont?error=user_sync_failed", baseUrl));
+  }
   return NextResponse.redirect(new URL(next, baseUrl));
 }

@@ -13,7 +13,7 @@ import {
 import { sameCalendarDay } from "@/lib/chat-ui";
 import { sortChatMessages, upsertChatMessagesSorted, type ChatMessageRow } from "@/lib/chat-merge-messages";
 import { listingSeoPath } from "@/lib/seo";
-import { createSupabaseBrowserClient } from "@/lib/supabase";
+import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
 export type ChatBootstrap = {
   roomId: string;
@@ -147,7 +147,10 @@ export function ChatRoomView({ bootstrap, currentUserId }: Props) {
   }, [appendIncomingMessage]);
 
   useEffect(() => {
-    const supabase = createSupabaseBrowserClient();
+    const supabase = tryCreateSupabaseBrowserClient();
+    if (!supabase) {
+      return;
+    }
     const channel = supabase
       .channel(`marketplace-room-${roomId}`)
       .on(

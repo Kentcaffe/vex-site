@@ -8,7 +8,7 @@ import { routing } from "@/i18n/routing";
 
 export type SubmitFeedbackResult =
   | { ok: true }
-  | { ok: false; error: "empty" | "too_long" | "invalid_email" };
+  | { ok: false; error: "empty" | "too_long" | "invalid_email" | "service_unavailable" };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -32,13 +32,18 @@ export async function submitFeedback(formData: FormData): Promise<SubmitFeedback
     email = emailRaw.toLowerCase();
   }
 
-  await feedback.create({
-    data: {
-      userId: session?.user?.id ?? null,
-      email,
-      message,
-    },
-  });
+  try {
+    await feedback.create({
+      data: {
+        userId: session?.user?.id ?? null,
+        email,
+        message,
+      },
+    });
+  } catch (error) {
+    console.error("[actions/feedback] feedback.create failed", error);
+    return { ok: false, error: "service_unavailable" };
+  }
 
   for (const loc of routing.locales) {
     revalidatePath(localizedHref(loc, "/admin/feedback"));

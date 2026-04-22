@@ -18,25 +18,52 @@ type Props = {
 export default async function AdminListingsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations("Admin");
-  const session = await auth();
-  const canDeleteListing = isAdmin(session?.user?.role);
-  const [listings, allCats] = await Promise.all([
-    prisma.listing.findMany({
-      where: listingWhereActive(),
-      orderBy: { createdAt: "desc" },
-      take: 200,
-      include: { category: true },
-    }) as Promise<ListingPayloadWithCategory[]>,
-    getAllCategories(),
-  ]);
+  let t: Awaited<ReturnType<typeof getTranslations>>;
+  try {
+    t = await getTranslations("Admin");
+  } catch (error) {
+    console.error("[admin/listings] translations failed", error);
+    return (
+      <div>
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Nu am putut încărca această pagină momentan.
+        </p>
+      </div>
+    );
+  }
+
+  let canDeleteListing = false;
+  let listings: ListingPayloadWithCategory[] = [];
+  let allCats: Awaited<ReturnType<typeof getAllCategories>> = [];
+  let loadFailed = false;
+
+  try {
+    const session = await auth();
+    canDeleteListing = isAdmin(session?.user?.role);
+    [listings, allCats] = await Promise.all([
+      prisma.listing.findMany({
+        where: listingWhereActive(),
+        orderBy: { createdAt: "desc" },
+        take: 200,
+        include: { category: true },
+      }) as Promise<ListingPayloadWithCategory[]>,
+      getAllCategories(),
+    ]);
+  } catch (error) {
+    console.error("[admin/listings] data fetch failed", error);
+    loadFailed = true;
+  }
 
   return (
     <div>
       <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{t("listingsTitle")}</h1>
       <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">{t("listingsSubtitle")}</p>
 
-      {listings.length === 0 ? (
+      {loadFailed ? (
+        <p className="mt-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-100">
+          Lista anunțurilor nu poate fi încărcată momentan.
+        </p>
+      ) : listings.length === 0 ? (
         <p className="mt-8 text-zinc-600 dark:text-zinc-400">{t("empty")}</p>
       ) : (
         <div className="mt-8 overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">

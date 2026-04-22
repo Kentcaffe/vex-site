@@ -88,39 +88,49 @@ export async function syncAuthenticatedUserToPrisma(): Promise<AppSession | null
   if (!hasSupabaseEnv()) {
     return null;
   }
-  const supabase = await createSupabaseServerClient();
-  const [{ data: userData, error: userError }] = await Promise.all([supabase.auth.getUser()]);
+  try {
+    const supabase = await createSupabaseServerClient();
+    const [{ data: userData, error: userError }] = await Promise.all([supabase.auth.getUser()]);
 
-  if (userError || !userData.user?.id || !userData.user.email) {
-    return null;
-  }
+    if (userError || !userData.user?.id || !userData.user.email) {
+      return null;
+    }
 
-  const authUser = userData.user;
-  const authEmail = authUser.email;
-  if (!authEmail) {
-    return null;
-  }
-  const dbUser = await upsertPrismaUserFromSupabase({
-    supabaseUserId: authUser.id,
-    email: authEmail,
-    name: metadataName(authUser.user_metadata as Record<string, unknown> | undefined),
-    avatarUrl: metadataAvatar(authUser.user_metadata as Record<string, unknown> | undefined),
-  });
-
-  return {
-    user: {
-      id: dbUser.id,
-      email: dbUser.email,
-      name: dbUser.name,
-      image: dbUser.avatarUrl,
-      role: dbUser.role,
+    const authUser = userData.user;
+    const authEmail = authUser.email;
+    if (!authEmail) {
+      return null;
+    }
+    const dbUser = await upsertPrismaUserFromSupabase({
       supabaseUserId: authUser.id,
-    },
-  };
+      email: authEmail,
+      name: metadataName(authUser.user_metadata as Record<string, unknown> | undefined),
+      avatarUrl: metadataAvatar(authUser.user_metadata as Record<string, unknown> | undefined),
+    });
+
+    return {
+      user: {
+        id: dbUser.id,
+        email: dbUser.email,
+        name: dbUser.name,
+        image: dbUser.avatarUrl,
+        role: dbUser.role,
+        supabaseUserId: authUser.id,
+      },
+    };
+  } catch (error) {
+    console.error("[auth] syncAuthenticatedUserToPrisma failed", error);
+    return null;
+  }
 }
 
 export async function auth(): Promise<AppSession | null> {
-  return syncAuthenticatedUserToPrisma();
+  try {
+    return await syncAuthenticatedUserToPrisma();
+  } catch (error) {
+    console.error("[auth] auth() failed", error);
+    return null;
+  }
 }
 
 export async function signOut(_opts?: { redirect?: boolean }): Promise<void> {

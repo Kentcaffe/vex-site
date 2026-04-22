@@ -10,6 +10,7 @@ export async function GET() {
     logRouteError("GET /api/auth/session", error);
   }
   return NextResponse.json({
+    ok: true,
     authenticated: Boolean(session?.user?.id),
     session,
   });

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
@@ -12,9 +13,12 @@ export async function GET(_req: Request, { params }: Props) {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
     }
     const { listingId } = await params;
+    if (!listingId.trim()) {
+      return NextResponse.json({ ok: false, error: "invalid_listing_id" }, { status: 400 });
+    }
     const userId = session.user.id;
 
     const listing = await prisma.listing.findFirst({
@@ -22,10 +26,10 @@ export async function GET(_req: Request, { params }: Props) {
       select: { id: true, title: true, userId: true },
     });
     if (!listing) {
-      return NextResponse.json({ error: "not_found" }, { status: 404 });
+      return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
     }
     if (listing.userId === userId) {
-      return NextResponse.json({ error: "own_listing" }, { status: 403 });
+      return NextResponse.json({ ok: false, error: "own_listing" }, { status: 403 });
     }
 
     const seller = await prisma.user.findUnique({
@@ -33,7 +37,7 @@ export async function GET(_req: Request, { params }: Props) {
       select: { id: true, name: true, email: true },
     });
     if (!seller) {
-      return NextResponse.json({ error: "not_found" }, { status: 404 });
+      return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
     }
 
     const room = await prisma.chatRoom.upsert({
@@ -67,7 +71,6 @@ export async function GET(_req: Request, { params }: Props) {
     });
   } catch (err) {
     logRouteError("GET /api/chat/listing/[listingId]", err);
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
+    return jsonServiceUnavailable("Chat listing room is temporarily unavailable.", ApiErrorCode.DATABASE);
   }
 }

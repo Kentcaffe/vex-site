@@ -43,9 +43,23 @@ const warnings = [];
 
 if (!ok("NEXT_PUBLIC_SUPABASE_URL")) {
   issues.push("NEXT_PUBLIC_SUPABASE_URL: obligatoriu pentru Supabase Auth.");
+} else {
+  try {
+    const supaUrl = new URL(env.NEXT_PUBLIC_SUPABASE_URL);
+    if (supaUrl.protocol !== "https:") {
+      issues.push("NEXT_PUBLIC_SUPABASE_URL: trebuie să folosească https://");
+    }
+    if (!supaUrl.hostname.endsWith(".supabase.co")) {
+      warnings.push("NEXT_PUBLIC_SUPABASE_URL: hostname neobișnuit (așteptat *.supabase.co).");
+    }
+  } catch {
+    issues.push("NEXT_PUBLIC_SUPABASE_URL: URL invalid.");
+  }
 }
 if (!ok("NEXT_PUBLIC_SUPABASE_ANON_KEY")) {
   issues.push("NEXT_PUBLIC_SUPABASE_ANON_KEY: obligatoriu pentru Supabase Auth.");
+} else if (!/^sb_(publishable|anon)_/i.test(env.NEXT_PUBLIC_SUPABASE_ANON_KEY)) {
+  warnings.push("NEXT_PUBLIC_SUPABASE_ANON_KEY: format neașteptat (așteptat prefix sb_publishable_ / sb_anon_).");
 }
 if (!ok("SUPABASE_SERVICE_ROLE_KEY")) {
   warnings.push(

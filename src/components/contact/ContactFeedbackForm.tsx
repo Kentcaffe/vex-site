@@ -24,6 +24,7 @@ export function ContactFeedbackForm({ showHeading = true, idSuffix = "" }: Props
     if (r.error === "empty") toast("error", t("errorEmpty"));
     else if (r.error === "too_long") toast("error", t("errorTooLong"));
     else if (r.error === "invalid_email") toast("error", t("errorEmail"));
+    else toast("error", t("errorGeneric"));
   }
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -32,13 +33,18 @@ export function ContactFeedbackForm({ showHeading = true, idSuffix = "" }: Props
     fd.set("message", message);
     fd.set("email", email);
     startTransition(async () => {
-      const r = await submitFeedback(fd);
-      if (r.ok) {
-        toast("success", t("success"));
-        setMessage("");
-        setEmail("");
-      } else {
-        applyError(r);
+      try {
+        const r = await submitFeedback(fd);
+        if (r.ok) {
+          toast("success", t("success"));
+          setMessage("");
+          setEmail("");
+        } else {
+          applyError(r);
+        }
+      } catch (error) {
+        console.error("[ContactFeedbackForm] submitFeedback failed", error);
+        toast("error", t("errorGeneric"));
       }
     });
   }

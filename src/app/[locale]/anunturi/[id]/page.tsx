@@ -28,46 +28,54 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params;
-  const listing = await findFirstListingResilient({
-    where: { id, ...listingWhereActive() },
-    select: {
-      id: true,
-      title: true,
-      city: true,
-      description: true,
-      images: true,
-    },
-  });
-  if (!listing) {
+  try {
+    const { id } = await params;
+    const listing = await findFirstListingResilient({
+      where: { id, ...listingWhereActive() },
+      select: {
+        id: true,
+        title: true,
+        city: true,
+        description: true,
+        images: true,
+      },
+    });
+    if (!listing) {
+      return {
+        title: "Anunț indisponibil",
+        description: "Acest anunț nu mai este disponibil pe VEX.",
+      };
+    }
+
+    const image = resolvePublicMediaUrl(parseStoredListingImages(listing.images)[0] ?? null) ?? "/marketplace-image-fallback.svg";
+    const description = `${listing.title} de vânzare în ${listing.city} pe VEX. Vezi poze și detalii complete.`;
+
+    return {
+      title: `${listing.title} de vânzare în ${listing.city}`,
+      description,
+      alternates: {
+        canonical: listingSeoPath({ id: listing.id, title: listing.title, city: listing.city }),
+      },
+      openGraph: {
+        title: listing.title,
+        description,
+        type: "article",
+        images: [{ url: image, alt: listing.title }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: listing.title,
+        description,
+        images: [image],
+      },
+    };
+  } catch (error) {
+    console.error("[anunturi/[id]] generateMetadata failed", error);
     return {
       title: "Anunț indisponibil",
       description: "Acest anunț nu mai este disponibil pe VEX.",
     };
   }
-
-  const image = resolvePublicMediaUrl(parseStoredListingImages(listing.images)[0] ?? null) ?? "/marketplace-image-fallback.svg";
-  const description = `${listing.title} de vânzare în ${listing.city} pe VEX. Vezi poze și detalii complete.`;
-
-  return {
-    title: `${listing.title} de vânzare în ${listing.city}`,
-    description,
-    alternates: {
-      canonical: listingSeoPath({ id: listing.id, title: listing.title, city: listing.city }),
-    },
-    openGraph: {
-      title: listing.title,
-      description,
-      type: "article",
-      images: [{ url: image, alt: listing.title }],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: listing.title,
-      description,
-      images: [image],
-    },
-  };
 }
 
 function conditionLabel(
@@ -87,29 +95,54 @@ export default async function ListingDetailPage({ params }: Props) {
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  const [listing, allCats, session, t] = await Promise.all([
-    findFirstListingResilient({
-      where: { id, ...listingWhereActive() },
-      include: { category: true },
-    }),
-    getAllCategories(),
-    auth(),
-    getTranslations("ListingDetail"),
-  ]);
+  let listing: Awaited<ReturnType<typeof findFirstListingResilient>> = null;
+  let allCats: Awaited<ReturnType<typeof getAllCategories>> = [];
+  let session: Awaited<ReturnType<typeof auth>> = null;
+  let t: Awaited<ReturnType<typeof getTranslations>>;
+
+  try {
+    [listing, allCats, session, t] = await Promise.all([
+      findFirstListingResilient({
+        where: { id, ...listingWhereActive() },
+        include: { category: true },
+      }),
+      getAllCategories(),
+      auth(),
+      getTranslations("ListingDetail"),
+    ]);
+  } catch (error) {
+    console.error("[anunturi/[id]] failed to load listing detail dependencies", error);
+    return (
+      <div className="app-shell app-section">
+        <div className="surface-card p-6 sm:p-8">
+          <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Nu am putut încărca anunțul</h1>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+            A apărut o eroare temporară. Încearcă din nou în câteva momente.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const userId = session?.user?.id;
   let favorited = false;
   if (userId) {
-    const fav = await prisma.listingFavorite.findUnique({
-      where: { userId_listingId: { userId, listingId: id } },
-      select: { id: true },
-    });
-    favorited = !!fav;
+    try {
+      const fav = await prisma.listingFavorite.findUnique({
+        where: { userId_listingId: { userId, listingId: id } },
+        select: { id: true },
+      });
+      favorited = !!fav;
+    } catch (error) {
+      console.error("[anunturi/[id]] failed to load favorite state", error);
+      favorited = false;
+    }
   }
 
   if (!listing) {
     notFound();
   }
+  const listingCategorySlug = (listing as NonNullable<typeof listing> & { category: { slug: string } }).category.slug;
 
   const images = parseStoredListingImages(listing.images);
   const path = categoryPathLabels(allCats, listing.categoryId, locale);
@@ -134,7 +167,7 @@ export default async function ListingDetailPage({ params }: Props) {
           <div className="surface-card p-5 sm:p-6">
             <p className="whitespace-pre-wrap text-base leading-relaxed text-zinc-700 dark:text-zinc-300">{listing.description}</p>
           </div>
-          <ListingSpecs categorySlug={listing.category.slug} listing={listing} />
+          <ListingSpecs categorySlug={listingCategorySlug} listing={listing} />
         </div>
         <aside className="space-y-4">
           <div className="surface-card sticky top-24 p-5">

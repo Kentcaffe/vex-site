@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { getLastRoomMessage } from "@/lib/chat-realtime-store";
 import { prisma } from "@/lib/prisma";
 import { logRouteError } from "@/lib/server-log";
@@ -8,7 +9,7 @@ export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
     }
     const userId = session.user.id;
 
@@ -62,7 +63,6 @@ export async function GET() {
     return NextResponse.json({ rooms: out });
   } catch (err) {
     logRouteError("GET /api/chat/inbox", err);
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ error: "service_unavailable", message }, { status: 503 });
+    return jsonServiceUnavailable("Chat inbox is temporarily unavailable.", ApiErrorCode.DATABASE);
   }
 }
