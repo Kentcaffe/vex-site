@@ -37,7 +37,13 @@ model User {
   email         String         @unique
   name          String?
   avatarUrl     String?
+  accountType   String         @default("user") @map("account_type")
+  companyName   String?        @map("company_name")
+  vatNumber     String?        @map("vat_number")
+  companyAddress String?       @map("company_address")
   phone         String?
+  isVerified    Boolean        @default(false) @map("is_verified")
+  companyLogo   String?        @map("company_logo")
   city          String?
   bio           String?
   passwordHash  String?

@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -22,6 +23,8 @@ import { listingSeoPath } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
 import { OwnListingDeleteButton } from "@/components/account/OwnListingDeleteButton";
+import { BusinessBadges } from "@/components/business/BusinessBadges";
+import { slugifyCompanyName } from "@/lib/company-slug";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -49,6 +52,12 @@ type ListingDetailRow = {
   areaSqm: number | null;
   detailsJson: string | null;
   category?: { slug?: string | null } | null;
+  user?: {
+    accountType?: string | null;
+    isVerified?: boolean | null;
+    companyName?: string | null;
+    companyLogo?: string | null;
+  } | null;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -150,7 +159,15 @@ export default async function ListingDetailPage({ params }: Props) {
           areaSqm: true,
           detailsJson: true,
           category: { select: { slug: true } },
-        },
+          user: {
+            select: {
+              accountType: true,
+              isVerified: true,
+              companyName: true,
+              companyLogo: true,
+            },
+          },
+        } as unknown as Prisma.ListingSelect,
       }) as Promise<ListingDetailRow | null>,
       getAllCategories(),
       auth(),
@@ -219,6 +236,28 @@ export default async function ListingDetailPage({ params }: Props) {
           <div className="surface-card sticky top-24 p-5">
             <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-50">{t("factsTitle")}</h2>
             <dl className="mt-3 space-y-2 text-sm">
+              <div className="flex justify-between gap-4">
+                <dt className="text-zinc-500">Vanzator</dt>
+                <dd className="text-right font-medium">
+                  <BusinessBadges
+                    isBusiness={listing.user?.accountType === "business"}
+                    isVerified={Boolean(listing.user?.isVerified)}
+                  />
+                </dd>
+              </div>
+              {listing.user?.accountType === "business" && listing.user.companyName ? (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-zinc-500">Companie</dt>
+                  <dd className="text-right font-medium">
+                    <Link
+                      href={`/firm/${slugifyCompanyName(listing.user.companyName)}`}
+                      className="text-blue-700 hover:underline dark:text-blue-400"
+                    >
+                      {listing.user.companyName}
+                    </Link>
+                  </dd>
+                </div>
+              ) : null}
               <div className="flex justify-between gap-4">
                 <dt className="text-zinc-500">{t("city")}</dt>
                 <dd className="text-right font-medium">

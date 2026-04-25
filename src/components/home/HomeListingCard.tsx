@@ -4,6 +4,7 @@ import { memo } from "react";
 import { MapPin } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { FavoriteButton } from "@/components/FavoriteButton";
+import { BusinessBadges } from "@/components/business/BusinessBadges";
 import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 
@@ -19,6 +20,8 @@ export type HomeListingCardProps = {
   initialFavorited: boolean;
   noImageTitle: string;
   noImageHint: string;
+  isBusiness: boolean;
+  isVerified: boolean;
 };
 
 export const HomeListingCard = memo(function HomeListingCard({
@@ -33,6 +36,8 @@ export const HomeListingCard = memo(function HomeListingCard({
   initialFavorited,
   noImageTitle,
   noImageHint,
+  isBusiness,
+  isVerified,
 }: HomeListingCardProps) {
   return (
     <li className="group">
@@ -65,6 +70,7 @@ export const HomeListingCard = memo(function HomeListingCard({
             <MapPin className="h-4 w-4 shrink-0 text-zinc-600" aria-hidden />
             <span className="line-clamp-1">{place}</span>
           </p>
+          <BusinessBadges isBusiness={isBusiness} isVerified={isVerified} className="mt-2" />
         </div>
       </article>
     </li>

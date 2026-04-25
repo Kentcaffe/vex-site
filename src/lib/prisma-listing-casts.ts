@@ -34,6 +34,12 @@ export type ListingBrowseRow = {
   district: string | null;
   images: string | null;
   categoryId: string;
+  user?: {
+    accountType?: string | null;
+    isVerified?: boolean | null;
+    companyName?: string | null;
+    companyLogo?: string | null;
+  } | null;
 };
 
 /** `listingFavorite.findMany` cu `include.listing` + câmpuri pentru listă favorite. */

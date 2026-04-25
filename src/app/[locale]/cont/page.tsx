@@ -1,3 +1,4 @@
+import type { Prisma } from "@prisma/client";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
@@ -19,10 +20,27 @@ export default async function ContPage({ params, searchParams }: Props) {
   const session = await auth();
 
   if (session?.user) {
+    type MeRow = {
+      email: string;
+      name: string | null;
+      avatarUrl: string | null;
+      accountType: string;
+      companyName: string | null;
+      companyLogo: string | null;
+      isVerified: boolean;
+    };
     const me = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { email: true, name: true, avatarUrl: true },
-    });
+      where: { id: session.user.id } as Prisma.UserWhereUniqueInput,
+      select: {
+        email: true,
+        name: true,
+        avatarUrl: true,
+        accountType: true,
+        companyName: true,
+        companyLogo: true,
+        isVerified: true,
+      } as unknown as Prisma.UserSelect,
+    }) as MeRow | null;
 
     if (!me) notFound();
 
@@ -32,6 +50,10 @@ export default async function ContPage({ params, searchParams }: Props) {
           email: me.email,
           name: me.name,
           avatarUrl: me.avatarUrl,
+          accountType: me.accountType,
+          companyName: me.companyName,
+          companyLogo: me.companyLogo,
+          isVerified: me.isVerified,
         }}
       />
     );

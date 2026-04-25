@@ -1,7 +1,7 @@
+import type { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
 import { devLog } from "@/lib/dev-log";
 import { getRootCategories } from "@/lib/category-queries";
-import { asListingSelect } from "@/lib/prisma-listing-casts";
 import { findManyListingsResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
@@ -23,7 +23,7 @@ export async function HomeLanding({ locale }: Props) {
         where: listingWhereActive(),
         orderBy: { createdAt: "desc" },
         take: 15,
-        select: asListingSelect({
+        select: {
           id: true,
           title: true,
           price: true,
@@ -32,7 +32,13 @@ export async function HomeLanding({ locale }: Props) {
           district: true,
           images: true,
           mileageKm: true,
-        }),
+          user: {
+            select: {
+              accountType: true,
+              isVerified: true,
+            },
+          },
+        } as unknown as Prisma.ListingSelect,
       }) as unknown as Promise<ListingCard[]>,
       getRootCategories(),
     ]);

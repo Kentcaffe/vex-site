@@ -11,10 +11,11 @@ import type { PriceCurrencyCode } from "@/lib/currency";
 import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 import { parseStoredListingImages } from "@/lib/listing-form-schema";
-import { asListingSelect, type ListingBrowseRow } from "@/lib/prisma-listing-casts";
+import { type ListingBrowseRow } from "@/lib/prisma-listing-casts";
 import { findManyListingsResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { AUTOTURISME_CATEGORY_SLUG } from "@/lib/category-slugs";
+import { BusinessBadges } from "@/components/business/BusinessBadges";
 import { listingSeoPath } from "@/lib/seo";
 import {
   ELECTRONICS_CONDITION,
@@ -274,7 +275,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
         where,
         orderBy: { createdAt: "desc" },
         take: 80,
-        select: asListingSelect({
+        select: {
           id: true,
           title: true,
           price: true,
@@ -283,7 +284,13 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
           district: true,
           images: true,
           categoryId: true,
-        }),
+          user: {
+            select: {
+              accountType: true,
+              isVerified: true,
+            },
+          },
+        } as unknown as Prisma.ListingSelect,
       }),
       getAllCategories(),
     ]);
@@ -397,6 +404,11 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
                         {item.city}
                         {item.district ? ` · ${item.district}` : ""}
                       </p>
+                      <BusinessBadges
+                        isBusiness={item.user?.accountType === "business"}
+                        isVerified={Boolean(item.user?.isVerified)}
+                        className="mt-3"
+                      />
                     </div>
                   </Link>
                 </li>

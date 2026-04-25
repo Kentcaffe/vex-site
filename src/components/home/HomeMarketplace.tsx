@@ -33,6 +33,10 @@ export type ListingCard = {
   district: string | null;
   images: string | null;
   mileageKm: number | null;
+  user?: {
+    accountType?: string | null;
+    isVerified?: boolean | null;
+  } | null;
 };
 
 type Props = {
@@ -179,6 +183,8 @@ export async function HomeMarketplace({
                     initialFavorited={favoritedIds.has(item.id)}
                     noImageTitle={tList("cardNoImageTitle")}
                     noImageHint={tList("cardNoImageHint")}
+                    isBusiness={item.user?.accountType === "business"}
+                    isVerified={Boolean(item.user?.isVerified)}
                   />
                 );
               })}
