@@ -12,6 +12,9 @@ export type ApplyBusinessState =
   | { ok: true }
   | { ok: false; error: "unauthorized" | "validation" | "unknown" };
 
+/** Backward-compatible alias for older UI imports. */
+export type UpgradeBusinessState = ApplyBusinessState;
+
 const companyTypeValues = ["SRL", "SA", "II", "PFA", "GOSPODARIE", "ALTELE"] as const;
 
 const applySchema = z.object({
@@ -109,6 +112,14 @@ export async function applyForBusiness(
   } catch {
     return { ok: false, error: "unknown" };
   }
+}
+
+/** Backward-compatible alias for older UI imports. */
+export async function upgradeToBusiness(
+  prev: UpgradeBusinessState | undefined,
+  formData: FormData,
+): Promise<UpgradeBusinessState> {
+  return applyForBusiness(prev, formData);
 }
 
 export async function approveBusinessApplication(
