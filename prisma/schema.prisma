@@ -70,6 +70,7 @@ model User {
   receivedMessages Message[]   @relation("MessageReceiver")
   supportTickets SupportTicket[]
   supportMessagesSent SupportMessage[] @relation("SupportMessages")
+  businessApplications BusinessApplication[]
   feedbacks     Feedback[]
   feedbackRepliesAsAdmin FeedbackReply[] @relation("FeedbackReplyAdmin")
   adminLogs     AdminLog[]
@@ -338,4 +339,32 @@ model SupportMessage {
 
   @@index([ticketId, createdAt])
   @@map("support_messages")
+}
+
+model BusinessApplication {
+  id                  String   @id @default(cuid())
+  userId              String   @map("user_id")
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status              String   @default("pending")
+  companyName         String   @map("company_name")
+  companyType         String   @map("company_type")
+  idno                String
+  vatNumber           String?  @map("vat_number")
+  administratorName   String   @map("administrator_name")
+  companyAddress      String   @map("company_address")
+  companyCity         String   @map("company_city")
+  phone               String
+  companyEmail        String   @map("company_email")
+  companyLogo         String?  @map("company_logo")
+  companyDocument     String   @map("company_document")
+  registrationNumber  String   @map("registration_number")
+  registrationDate    DateTime @db.Date @map("registration_date")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  reviewedAt          DateTime? @map("reviewed_at")
+  reviewedBy          String?  @map("reviewed_by")
+
+  @@index([status, createdAt])
+  @@index([userId, createdAt])
+  @@map("business_applications")
 }

@@ -52,6 +52,12 @@ function toNull(v: string | undefined): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+type BusinessApplicationRow = {
+  id: string;
+  user_id: string;
+  status: string;
+};
+
 export async function applyForBusiness(
   _prev: ApplyBusinessState | undefined,
   formData: FormData,
@@ -83,26 +89,55 @@ export async function applyForBusiness(
   }
 
   try {
-    await prisma.user.update({
-      where: { id: session.user.id } as Prisma.UserWhereUniqueInput,
-      data: {
-        accountType: "user",
-        businessStatus: "pending",
-        companyName: parsed.data.companyName.trim(),
-        companyType: parsed.data.companyType,
-        idno: parsed.data.idno,
-        vatNumber: toNull(parsed.data.vatNumber),
-        administratorName: parsed.data.administratorName.trim(),
-        companyAddress: parsed.data.companyAddress.trim(),
-        companyCity: parsed.data.companyCity.trim(),
-        phone: parsed.data.phone.trim(),
-        companyEmail: parsed.data.companyEmail.trim(),
-        registrationNumber: parsed.data.registrationNumber.trim(),
-        registrationDate: new Date(`${parsed.data.registrationDate}T00:00:00.000Z`),
-        isVerified: false,
-        companyLogo: toNull(parsed.data.companyLogo),
-        companyDocument: parsed.data.companyDocument.trim(),
-      } as unknown as Prisma.UserUpdateInput,
+    await prisma.$transaction(async (tx) => {
+      await tx.user.update({
+        where: { id: session.user.id } as Prisma.UserWhereUniqueInput,
+        data: {
+          accountType: "user",
+          businessStatus: "pending",
+          companyName: parsed.data.companyName.trim(),
+          companyType: parsed.data.companyType,
+          idno: parsed.data.idno,
+          vatNumber: toNull(parsed.data.vatNumber),
+          administratorName: parsed.data.administratorName.trim(),
+          companyAddress: parsed.data.companyAddress.trim(),
+          companyCity: parsed.data.companyCity.trim(),
+          phone: parsed.data.phone.trim(),
+          companyEmail: parsed.data.companyEmail.trim(),
+          registrationNumber: parsed.data.registrationNumber.trim(),
+          registrationDate: new Date(`${parsed.data.registrationDate}T00:00:00.000Z`),
+          isVerified: false,
+          companyLogo: toNull(parsed.data.companyLogo),
+          companyDocument: parsed.data.companyDocument.trim(),
+        } as unknown as Prisma.UserUpdateInput,
+      });
+      await tx.$executeRaw`
+        INSERT INTO "business_applications" (
+          "id", "user_id", "status", "company_name", "company_type", "idno", "vat_number",
+          "administrator_name", "company_address", "company_city", "phone", "company_email",
+          "company_logo", "company_document", "registration_number", "registration_date",
+          "created_at", "updated_at"
+        ) VALUES (
+          ${crypto.randomUUID()},
+          ${session.user.id},
+          'pending',
+          ${parsed.data.companyName.trim()},
+          ${parsed.data.companyType},
+          ${parsed.data.idno},
+          ${toNull(parsed.data.vatNumber)},
+          ${parsed.data.administratorName.trim()},
+          ${parsed.data.companyAddress.trim()},
+          ${parsed.data.companyCity.trim()},
+          ${parsed.data.phone.trim()},
+          ${parsed.data.companyEmail.trim()},
+          ${toNull(parsed.data.companyLogo)},
+          ${parsed.data.companyDocument.trim()},
+          ${parsed.data.registrationNumber.trim()},
+          ${new Date(`${parsed.data.registrationDate}T00:00:00.000Z`)},
+          now(),
+          now()
+        )
+      `;
     });
     revalidatePath(localizedHref(parsed.data.locale, "/cont"));
     revalidatePath(localizedHref(parsed.data.locale, "/anunturi"));
@@ -123,53 +158,81 @@ export async function upgradeToBusiness(
 }
 
 export async function approveBusinessApplication(
-  userId: string,
+  applicationId: string,
 ): Promise<{ ok: boolean; error?: "unauthorized" | "not_found" }> {
   const session = await auth();
   if (!session?.user || !isAdmin(session.user.role)) {
     return { ok: false, error: "unauthorized" };
   }
-  const id = userId.trim();
+  const id = applicationId.trim();
   if (!id) {
     return { ok: false, error: "not_found" };
   }
 
-  const updated = await prisma.user.updateMany({
-    where: { id, businessStatus: "pending" } as unknown as Prisma.UserWhereInput,
-    data: {
-      accountType: "business",
-      businessStatus: "approved",
-      isVerified: true,
-    } as unknown as Prisma.UserUpdateManyMutationInput,
-  });
-  if (updated.count === 0) {
+  const appRows = await prisma.$queryRaw<BusinessApplicationRow[]>`
+    SELECT "id", "user_id", "status"
+    FROM "business_applications"
+    WHERE "id" = ${id}
+    LIMIT 1
+  `;
+  const app = appRows[0];
+  if (!app || app.status !== "pending") {
     return { ok: false, error: "not_found" };
   }
+  await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`
+      UPDATE "business_applications"
+      SET "status" = 'approved', "reviewed_at" = now(), "reviewed_by" = ${session.user.id}, "updated_at" = now()
+      WHERE "id" = ${id}
+    `;
+    await tx.user.update({
+      where: { id: app.user_id } as Prisma.UserWhereUniqueInput,
+      data: {
+        accountType: "business",
+        businessStatus: "approved",
+        isVerified: true,
+      } as unknown as Prisma.UserUpdateInput,
+    });
+  });
   return { ok: true };
 }
 
 export async function rejectBusinessApplication(
-  userId: string,
+  applicationId: string,
 ): Promise<{ ok: boolean; error?: "unauthorized" | "not_found" }> {
   const session = await auth();
   if (!session?.user || !isAdmin(session.user.role)) {
     return { ok: false, error: "unauthorized" };
   }
-  const id = userId.trim();
+  const id = applicationId.trim();
   if (!id) {
     return { ok: false, error: "not_found" };
   }
 
-  const updated = await prisma.user.updateMany({
-    where: { id, businessStatus: "pending" } as unknown as Prisma.UserWhereInput,
-    data: {
-      accountType: "user",
-      businessStatus: "rejected",
-      isVerified: false,
-    } as unknown as Prisma.UserUpdateManyMutationInput,
-  });
-  if (updated.count === 0) {
+  const appRows = await prisma.$queryRaw<BusinessApplicationRow[]>`
+    SELECT "id", "user_id", "status"
+    FROM "business_applications"
+    WHERE "id" = ${id}
+    LIMIT 1
+  `;
+  const app = appRows[0];
+  if (!app || app.status !== "pending") {
     return { ok: false, error: "not_found" };
   }
+  await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`
+      UPDATE "business_applications"
+      SET "status" = 'rejected', "reviewed_at" = now(), "reviewed_by" = ${session.user.id}, "updated_at" = now()
+      WHERE "id" = ${id}
+    `;
+    await tx.user.update({
+      where: { id: app.user_id } as Prisma.UserWhereUniqueInput,
+      data: {
+        accountType: "user",
+        businessStatus: "rejected",
+        isVerified: false,
+      } as unknown as Prisma.UserUpdateInput,
+    });
+  });
   return { ok: true };
 }

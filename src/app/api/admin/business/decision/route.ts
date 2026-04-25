@@ -10,12 +10,15 @@ export const POST = safeApiRoute("POST /api/admin/business/decision", async ({ r
     return NextResponse.json({ ok: false, error: "invalid_body" }, { status: 400 });
   }
 
-  const userId = typeof body === "object" && body && "userId" in body ? String((body as { userId: unknown }).userId) : "";
+  const applicationId =
+    typeof body === "object" && body && "applicationId" in body ? String((body as { applicationId: unknown }).applicationId) : "";
   const decision =
     typeof body === "object" && body && "decision" in body ? String((body as { decision: unknown }).decision) : "";
 
   const result =
-    decision === "approve" ? await approveBusinessApplication(userId) : await rejectBusinessApplication(userId);
+    decision === "approve"
+      ? await approveBusinessApplication(applicationId)
+      : await rejectBusinessApplication(applicationId);
 
   if (!result.ok) {
     if (result.error === "unauthorized") {

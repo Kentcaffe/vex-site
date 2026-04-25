@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 
 type Props = {
-  userId: string;
+  applicationId: string;
   disabled?: boolean;
 };
 
-export function BusinessApplicationActions({ userId, disabled = false }: Props) {
+export function BusinessApplicationActions({ applicationId, disabled = false }: Props) {
   const router = useRouter();
   const [pending, setPending] = useState<"approve" | "reject" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export function BusinessApplicationActions({ userId, disabled = false }: Props) 
       const res = await fetch("/api/admin/business/decision", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId, decision }),
+        body: JSON.stringify({ applicationId, decision }),
       });
       if (!res.ok) {
         setError("Nu am putut salva decizia.");
