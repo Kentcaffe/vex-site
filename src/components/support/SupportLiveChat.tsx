@@ -10,6 +10,7 @@ import {
   showNewChatMessageNotification,
 } from "@/lib/chat-notifications-client";
 import { SUPPORT_SYSTEM_BODY_TICKET_REGISTERED, type SupportMessageDTO } from "@/lib/support-chat-types";
+import { isLiveSupportOpen, liveSupportScheduleLabel, SUPPORT_EMAIL } from "@/lib/support-hours";
 import { tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 
 type Props = {
@@ -53,6 +54,7 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
   /** Moderator vizibil în chat (broadcast) — doar perspectivă user. */
   const [staffOnline, setStaffOnline] = useState(false);
   const [staffTyping, setStaffTyping] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -61,6 +63,16 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
   const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSeenMessageIdRef = useRef<string | null>(null);
   const initialSyncDoneRef = useRef(false);
+
+  useEffect(() => {
+    if (variant !== "user") {
+      return;
+    }
+    const refresh = () => setScheduleOpen(isLiveSupportOpen());
+    refresh();
+    const id = window.setInterval(refresh, 60000);
+    return () => window.clearInterval(id);
+  }, [variant]);
 
   useEffect(() => {
     if (variant === "user") {
@@ -278,6 +290,10 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
   async function send() {
     const body = draft.trim();
     if (!body || sending) return;
+    if (variant === "user" && !scheduleOpen) {
+      setError(`Live chat este disponibil în programul ${liveSupportScheduleLabel()}. Ne poți scrie la ${SUPPORT_EMAIL}.`);
+      return;
+    }
     if (typingTimerRef.current) {
       clearTimeout(typingTimerRef.current);
       typingTimerRef.current = null;
@@ -458,6 +474,11 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
       ) : null}
 
       <div className="shrink-0 border-t border-zinc-100 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:p-4">
+        {variant === "user" && !scheduleOpen ? (
+          <p className="mb-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900">
+            Live chat este închis acum. Program: {liveSupportScheduleLabel()}. Ne poți scrie la {SUPPORT_EMAIL}.
+          </p>
+        ) : null}
         <div className="flex gap-2">
           <label htmlFor="support-chat-input" className="sr-only">
             {t("inputLabel")}
@@ -474,12 +495,13 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
               }
             }}
             placeholder={t("placeholder")}
+            disabled={variant === "user" && !scheduleOpen}
             className="min-h-[52px] flex-1 resize-none rounded-xl border border-zinc-200 bg-zinc-50/80 px-3 py-2.5 text-base text-zinc-900 placeholder:text-zinc-400 focus:border-orange-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-200"
           />
           <button
             type="button"
             onClick={() => void send()}
-            disabled={sending || !draft.trim()}
+            disabled={sending || !draft.trim() || (variant === "user" && !scheduleOpen)}
             className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-md transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={t("send")}
           >

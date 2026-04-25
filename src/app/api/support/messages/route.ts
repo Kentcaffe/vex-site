@@ -4,6 +4,7 @@ import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { isStaff } from "@/lib/auth-roles";
 import { supportTicket } from "@/lib/prisma-delegates";
 import { logRouteError } from "@/lib/server-log";
+import { isLiveSupportOpen, liveSupportScheduleLabel, SUPPORT_EMAIL } from "@/lib/support-hours";
 import {
   appendSupportMessage,
   assertTicketAccess,
@@ -77,6 +78,16 @@ export async function POST(req: Request) {
     const senderRole = staff ? "ADMIN" : "USER";
     if (!staff && full?.userId !== session.user.id) {
       return NextResponse.json({ ok: false, error: "forbidden" }, { status: 403 });
+    }
+    if (!staff && !isLiveSupportOpen()) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "outside_schedule",
+          message: `Live chat este disponibil în programul ${liveSupportScheduleLabel()}. Ne poți scrie la ${SUPPORT_EMAIL}.`,
+        },
+        { status: 403 },
+      );
     }
 
     await appendSupportMessage({

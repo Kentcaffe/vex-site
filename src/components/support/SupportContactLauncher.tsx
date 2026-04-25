@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 import { SupportChatModal } from "@/components/support/SupportChatModal";
 import { prefetchSupportTicket } from "@/lib/support-ticket-cache";
+import { isLiveSupportOpen, liveSupportScheduleLabel, SUPPORT_EMAIL } from "@/lib/support-hours";
 
 const ctaClasses =
   "inline-flex min-h-[48px] w-full min-w-0 items-center justify-center gap-2 rounded-xl px-5 text-base font-semibold shadow-md transition-all duration-200 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 focus-visible:ring-offset-2 active:scale-[0.99] sm:min-h-[52px] md:w-auto md:min-w-[240px]";
@@ -56,6 +57,14 @@ export function SupportContactLauncher({
   const t = useTranslations("Support");
   const { status } = useAuthSession();
   const [open, setOpen] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(true);
+
+  useEffect(() => {
+    const refresh = () => setScheduleOpen(isLiveSupportOpen());
+    refresh();
+    const id = window.setInterval(refresh, 60000);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -130,6 +139,18 @@ export function SupportContactLauncher({
             <div className={ctaWrapClass}>
               {status === "loading" ? (
                 <div className="h-12 w-full animate-pulse rounded-xl bg-zinc-200/75 md:h-[52px]" />
+              ) : !scheduleOpen ? (
+                <div className={`w-full ${embed ? "" : "md:max-w-[280px] md:self-end"}`}>
+                  <LiveChatCta
+                    disabled
+                    className={`cursor-not-allowed bg-zinc-300 text-zinc-600 shadow-none ${ctaWidthEmbed}`}
+                  >
+                    {`Live chat: ${liveSupportScheduleLabel()}`}
+                  </LiveChatCta>
+                  <p className="mt-2 text-center text-[11px] leading-relaxed text-zinc-500 md:text-right">
+                    Live chat este închis acum. Scrie-ne la <a className="font-semibold text-orange-700 hover:underline" href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
+                  </p>
+                </div>
               ) : status === "authenticated" ? (
                 <LiveChatCta
                   onPointerEnter={() => void prefetchSupportTicket()}
