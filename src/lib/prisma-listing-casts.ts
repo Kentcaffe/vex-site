@@ -37,11 +37,11 @@ export type ListingBrowseRow = {
   user?: {
     accountType?: string | null;
     isVerified?: boolean | null;
+    businessStatus?: string | null;
     companyName?: string | null;
     companyLogo?: string | null;
   } | null;
 };
-
 /** `listingFavorite.findMany` cu `include.listing` + câmpuri pentru listă favorite. */
 export type FavoriteRowWithListing = {
   id: string;

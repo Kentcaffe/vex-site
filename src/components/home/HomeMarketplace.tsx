@@ -36,6 +36,7 @@ export type ListingCard = {
   user?: {
     accountType?: string | null;
     isVerified?: boolean | null;
+    businessStatus?: string | null;
     companyName?: string | null;
   } | null;
 };

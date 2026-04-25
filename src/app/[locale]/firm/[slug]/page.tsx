@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { CheckCircle } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { formatPrice } from "@/lib/formatPrice";
 import type { PriceCurrencyCode } from "@/lib/currency";
@@ -8,28 +9,42 @@ import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { listingSeoPath } from "@/lib/seo";
-import { slugifyCompanyName } from "@/lib/company-slug";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
+import { UserBadges } from "@/components/business/UserBadges";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
 };
 
 export default async function FirmPage({ params }: Props) {
-  const { locale, slug } = await params;
+  const { locale, slug: id } = await params;
   setRequestLocale(locale);
 
   type BusinessPublicRow = {
     id: string;
     companyName: string | null;
+    companyType: string | null;
+    administratorName: string | null;
+    companyCity: string | null;
     companyLogo: string | null;
+    businessStatus: string;
+    accountType: string;
     isVerified: boolean;
   };
-  const businesses = await prisma.user.findMany({
-    where: { accountType: "business", companyName: { not: null } } as unknown as Prisma.UserWhereInput,
-    select: { id: true, companyName: true, companyLogo: true, isVerified: true } as unknown as Prisma.UserSelect,
-  }) as unknown as BusinessPublicRow[];
-  const company = businesses.find((u) => (u.companyName ? slugifyCompanyName(u.companyName) : "") === slug);
+  const company = (await prisma.user.findFirst({
+    where: { id, accountType: "business", businessStatus: "approved" } as unknown as Prisma.UserWhereInput,
+    select: {
+      id: true,
+      companyName: true,
+      companyType: true,
+      administratorName: true,
+      companyCity: true,
+      companyLogo: true,
+      businessStatus: true,
+      accountType: true,
+      isVerified: true,
+    } as unknown as Prisma.UserSelect,
+  })) as BusinessPublicRow | null;
   if (!company) {
     notFound();
   }
@@ -62,8 +77,15 @@ export default async function FirmPage({ params }: Props) {
             />
           ) : null}
           <div>
-            <h1 className="text-2xl font-bold text-zinc-900">{company.companyName}</h1>
-            <p className="mt-1 text-sm text-zinc-600">{company.isVerified ? "Firma verificata" : "Firma"}</p>
+            <h1 className="inline-flex items-center gap-1 text-2xl font-bold text-zinc-900">
+              {company.companyName}
+              {company.isVerified ? <CheckCircle className="h-5 w-5 text-emerald-600" aria-hidden /> : null}
+            </h1>
+            <p className="mt-1 text-sm text-zinc-600">
+              {company.companyType ?? "Companie"} · {company.companyCity ?? "Moldova"} · Admin:{" "}
+              {company.administratorName ?? "—"}
+            </p>
+            <UserBadges user={company} className="mt-2" />
           </div>
         </div>
       </div>

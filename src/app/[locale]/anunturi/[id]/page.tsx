@@ -1,5 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import type { Metadata } from "next";
+import { CheckCircle } from "lucide-react";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
@@ -23,8 +24,7 @@ import { listingSeoPath } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
 import { OwnListingDeleteButton } from "@/components/account/OwnListingDeleteButton";
-import { BusinessBadges } from "@/components/business/BusinessBadges";
-import { slugifyCompanyName } from "@/lib/company-slug";
+import { UserBadges } from "@/components/business/UserBadges";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -55,8 +55,12 @@ type ListingDetailRow = {
   user?: {
     accountType?: string | null;
     isVerified?: boolean | null;
+    businessStatus?: string | null;
     companyName?: string | null;
     companyLogo?: string | null;
+    companyType?: string | null;
+    administratorName?: string | null;
+    companyCity?: string | null;
   } | null;
 };
 
@@ -163,8 +167,12 @@ export default async function ListingDetailPage({ params }: Props) {
             select: {
               accountType: true,
               isVerified: true,
+              businessStatus: true,
               companyName: true,
               companyLogo: true,
+              companyType: true,
+              administratorName: true,
+              companyCity: true,
             },
           },
         } as unknown as Prisma.ListingSelect,
@@ -239,10 +247,7 @@ export default async function ListingDetailPage({ params }: Props) {
               <div className="flex justify-between gap-4">
                 <dt className="text-zinc-500">Vanzator</dt>
                 <dd className="text-right font-medium">
-                  <BusinessBadges
-                    isBusiness={listing.user?.accountType === "business"}
-                    isVerified={Boolean(listing.user?.isVerified)}
-                  />
+                  <UserBadges user={listing.user} />
                 </dd>
               </div>
               {listing.user?.accountType === "business" && listing.user.companyName ? (
@@ -250,10 +255,13 @@ export default async function ListingDetailPage({ params }: Props) {
                   <dt className="text-zinc-500">Companie</dt>
                   <dd className="text-right font-medium">
                     <Link
-                      href={`/firm/${slugifyCompanyName(listing.user.companyName)}`}
+                      href={`/firm/${listing.userId}`}
                       className="text-blue-700 hover:underline dark:text-blue-400"
                     >
-                      {listing.user.companyName}
+                      <span className="inline-flex items-center gap-1">
+                        {listing.user.companyName}
+                        {listing.user.isVerified ? <CheckCircle className="h-3.5 w-3.5 text-emerald-600" aria-hidden /> : null}
+                      </span>
                     </Link>
                   </dd>
                 </div>

@@ -38,12 +38,21 @@ model User {
   name          String?
   avatarUrl     String?
   accountType   String         @default("user") @map("account_type")
+  businessStatus String        @default("none") @map("business_status")
   companyName   String?        @map("company_name")
+  companyType   String?        @map("company_type")
+  idno          String?
   vatNumber     String?        @map("vat_number")
+  administratorName String?    @map("administrator_name")
   companyAddress String?       @map("company_address")
+  companyCity   String?        @map("company_city")
   phone         String?
+  companyEmail  String?        @map("company_email")
   isVerified    Boolean        @default(false) @map("is_verified")
   companyLogo   String?        @map("company_logo")
+  companyDocument String?      @map("company_document")
+  registrationNumber String?   @map("registration_number")
+  registrationDate DateTime?   @db.Date @map("registration_date")
   city          String?
   bio           String?
   passwordHash  String?

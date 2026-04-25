@@ -36,6 +36,7 @@ export async function HomeLanding({ locale }: Props) {
             select: {
               accountType: true,
               isVerified: true,
+              businessStatus: true,
               companyName: true,
             },
           },

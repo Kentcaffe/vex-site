@@ -23,6 +23,7 @@ export type HomeListingCardProps = {
   user?: {
     accountType?: string | null;
     isVerified?: boolean | null;
+    businessStatus?: string | null;
     companyName?: string | null;
   } | null;
 };
@@ -43,7 +44,7 @@ export const HomeListingCard = memo(function HomeListingCard({
 }: HomeListingCardProps) {
   const isBusiness = user?.accountType === "business";
   const companyName = user?.companyName?.trim() || "";
-  const isVerified = Boolean(user?.isVerified);
+  const isVerified = isBusiness && Boolean(user?.isVerified);
 
   return (
     <li className="group">

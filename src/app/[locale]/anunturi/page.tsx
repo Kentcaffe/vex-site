@@ -289,6 +289,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
             select: {
               accountType: true,
               isVerified: true,
+              businessStatus: true,
               companyName: true,
             },
           },

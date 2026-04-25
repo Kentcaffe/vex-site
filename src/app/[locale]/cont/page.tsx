@@ -21,10 +21,12 @@ export default async function ContPage({ params, searchParams }: Props) {
 
   if (session?.user) {
     type MeRow = {
+      id: string;
       email: string;
       name: string | null;
       avatarUrl: string | null;
       accountType: string;
+      businessStatus: string;
       companyName: string | null;
       companyLogo: string | null;
       isVerified: boolean;
@@ -32,10 +34,12 @@ export default async function ContPage({ params, searchParams }: Props) {
     const me = await prisma.user.findUnique({
       where: { id: session.user.id } as Prisma.UserWhereUniqueInput,
       select: {
+        id: true,
         email: true,
         name: true,
         avatarUrl: true,
         accountType: true,
+        businessStatus: true,
         companyName: true,
         companyLogo: true,
         isVerified: true,
@@ -48,9 +52,11 @@ export default async function ContPage({ params, searchParams }: Props) {
       <AccountHubView
         user={{
           email: me.email,
+          id: me.id,
           name: me.name,
           avatarUrl: me.avatarUrl,
           accountType: me.accountType,
+          businessStatus: me.businessStatus,
           companyName: me.companyName,
           companyLogo: me.companyLogo,
           isVerified: me.isVerified,
