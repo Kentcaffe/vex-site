@@ -11,6 +11,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { BusinessMobileStickyCta } from "@/components/business/BusinessMobileStickyCta";
+import { BusinessTestimonialsCarousel } from "@/components/business/BusinessTestimonialsCarousel";
 
 const logoStripCompanies = [
   "AutoNord",
@@ -32,6 +34,21 @@ const benefits = [
   { icon: BarChart3, title: "Statistici anunțuri", body: "Monitorizezi interesul și optimizezi anunțurile în funcție de rezultate." },
 ];
 
+const testimonials = [
+  {
+    quote: "În prima lună am primit lead-uri mai bune decât pe alte platforme.",
+    company: "AutoNord SRL",
+  },
+  {
+    quote: "Badge-ul verificat ne-a crescut rata de răspuns în chat.",
+    company: "CasaPlus Imobiliare",
+  },
+  {
+    quote: "Pagina de firmă ne ajută să ținem toate anunțurile într-un singur loc.",
+    company: "ConstructPro",
+  },
+];
+
 const steps = [
   { icon: FileCheck2, title: "Completezi formularul", body: "Introduci datele firmei și încarci documentele necesare." },
   { icon: Building2, title: "Echipa verifică datele", body: "Facem verificare manuală pentru autenticitate și siguranță." },
@@ -41,17 +58,17 @@ const steps = [
 export function BusinessLandingSections() {
   return (
     <div className="app-shell app-section pb-24 md:pb-10">
-      <section className="relative overflow-hidden rounded-3xl border border-orange-200/60 bg-gradient-to-br from-orange-50 via-amber-50 to-white px-6 py-10 shadow-sm sm:px-10 sm:py-14">
+      <section className="relative overflow-hidden rounded-3xl border border-orange-200/60 bg-gradient-to-br from-orange-50 via-amber-50 to-white px-5 py-9 shadow-sm sm:px-10 sm:py-14">
         <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-orange-200/35 blur-3xl" aria-hidden />
         <div className="relative mx-auto max-w-3xl text-center">
           <p className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-orange-800">
             <Star className="h-3.5 w-3.5" aria-hidden />
             Business VEX
           </p>
-          <h1 className="mt-4 text-balance text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+          <h1 className="mt-4 text-balance text-[1.72rem] font-bold tracking-tight text-zinc-900 sm:text-4xl">
             Creează cont de firmă pe VEX
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-zinc-600">
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg">
             Crește-ți vânzările și ajungi la mii de clienți
           </p>
           <div className="mt-8">
@@ -69,19 +86,21 @@ export function BusinessLandingSections() {
         <p className="text-center text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
           Firme care folosesc VEX
         </p>
-        <div className="mt-4 -mx-2 flex gap-2 overflow-x-auto px-2 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {logoStripCompanies.map((name) => (
-            <div
-              key={name}
-              className="inline-flex min-w-[122px] shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-semibold text-zinc-700"
-            >
-              {name}
-            </div>
-          ))}
+        <div className="relative mt-4 overflow-hidden rounded-xl">
+          <div className="business-logo-marquee flex w-max gap-2 pr-2">
+            {[...logoStripCompanies, ...logoStripCompanies].map((name, idx) => (
+              <div
+                key={`${name}-${idx}`}
+                className="inline-flex min-w-[122px] shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-semibold text-zinc-700"
+              >
+                {name}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
+      <section className="mt-7 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:mt-8 sm:p-6">
         <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <p className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
@@ -136,7 +155,7 @@ export function BusinessLandingSections() {
         </div>
       </section>
 
-      <section className="mt-10">
+      <section className="mt-8 sm:mt-10">
         <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Beneficii pentru firme</h2>
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {benefits.map((item) => (
@@ -149,7 +168,7 @@ export function BusinessLandingSections() {
         </div>
       </section>
 
-      <section className="mt-10 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:p-8">
+      <section className="mt-8 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm sm:mt-10 sm:p-8">
         <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Cum funcționează</h2>
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           {steps.map((step, idx) => (
@@ -167,14 +186,22 @@ export function BusinessLandingSections() {
         </div>
       </section>
 
-      <section className="mt-10 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 sm:p-8">
+      <section className="mt-8 sm:mt-10">
+        <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Ce spun firmele</h2>
+        <BusinessTestimonialsCarousel items={testimonials} />
+      </section>
+
+      <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 sm:mt-10 sm:p-8">
         <h2 className="text-xl font-bold text-emerald-900">Încredere și siguranță</h2>
         <p className="mt-3 text-sm leading-relaxed text-emerald-900/90">
           Verificăm manual fiecare firmă pentru a preveni fraudele și a menține platforma sigură.
         </p>
       </section>
 
-      <section className="mt-10 rounded-2xl border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 p-6 text-center sm:p-8">
+      <section
+        id="business-final-cta"
+        className="mt-10 rounded-2xl border border-orange-200 bg-gradient-to-r from-orange-50 to-amber-50 p-6 text-center sm:p-8"
+      >
         <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Pregătit să crești vânzările?</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm text-zinc-600">
           Trimite cererea acum și echipa VEX o va verifica manual cât mai rapid.
@@ -187,14 +214,26 @@ export function BusinessLandingSections() {
         </Link>
       </section>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-zinc-200 bg-white/95 p-3 shadow-[0_-8px_24px_rgba(15,23,42,0.12)] backdrop-blur md:hidden">
-        <Link
-          href="/apply-business"
-          className="inline-flex min-h-[52px] w-full items-center justify-center rounded-xl bg-orange-500 px-4 text-base font-semibold text-white shadow-md transition hover:bg-orange-600"
-        >
-          Aplică pentru cont firmă
-        </Link>
-      </div>
+      <BusinessMobileStickyCta hideWhenVisibleId="business-final-cta" />
+
+      <style jsx>{`
+        @keyframes businessLogoMarquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .business-logo-marquee {
+          animation: businessLogoMarquee 34s linear infinite;
+        }
+        @media (min-width: 768px) {
+          .business-logo-marquee {
+            animation-duration: 24s;
+          }
+        }
+      `}</style>
     </div>
   );
 }
