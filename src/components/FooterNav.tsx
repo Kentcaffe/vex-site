@@ -76,6 +76,9 @@ export function FooterNav() {
         <MobileFooterLink href="/gestioneaza-contul">{t("linkManageAccount")}</MobileFooterLink>
       </li>
       <li>
+        <MobileFooterLink href="/business">Cont firmă</MobileFooterLink>
+      </li>
+      <li>
         <MobileFooterLink href="/intrebari-frecvente">{t("linkFaq")}</MobileFooterLink>
       </li>
     </ul>
@@ -196,6 +199,11 @@ export function FooterNav() {
             <li>
               <Link href="/gestioneaza-contul" className={desktopLink}>
                 {t("linkManageAccount")}
+              </Link>
+            </li>
+            <li>
+              <Link href="/business" className={desktopLink}>
+                Cont firmă
               </Link>
             </li>
             <li>
