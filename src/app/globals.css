@@ -286,6 +286,39 @@ textarea {
   .animate-account-section {
     animation: accountFade 0.28s ease-out;
   }
+
+  .interactive-soft {
+    position: relative;
+    transition:
+      transform 0.16s ease,
+      box-shadow 0.22s ease,
+      border-color 0.2s ease,
+      background-color 0.2s ease;
+    will-change: transform, box-shadow;
+  }
+
+  .interactive-soft:hover {
+    box-shadow:
+      0 10px 24px -14px rgb(16 185 129 / 0.45),
+      0 2px 8px rgb(17 24 39 / 0.1);
+    border-color: rgb(167 243 208 / 0.95);
+  }
+
+  .interactive-soft:active {
+    transform: scale(0.985);
+  }
+
+  .interactive-soft:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 3px rgb(16 185 129 / 0.25),
+      0 10px 24px -14px rgb(16 185 129 / 0.45);
+  }
+
+  .interactive-soft-mobile:active {
+    transform: scale(0.98);
+    background-color: rgb(250 250 250 / 1);
+  }
 }
 
 @keyframes authTab {

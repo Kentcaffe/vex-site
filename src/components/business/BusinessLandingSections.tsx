@@ -5,8 +5,11 @@ import {
   BarChart3,
   Building2,
   CircleCheckBig,
+  Clock3,
   FileCheck2,
+  FileText,
   Megaphone,
+  ScanSearch,
   ShieldCheck,
   Star,
   Store,
@@ -14,18 +17,6 @@ import {
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { BusinessMobileStickyCta } from "@/components/business/BusinessMobileStickyCta";
-import { BusinessTestimonialsCarousel } from "@/components/business/BusinessTestimonialsCarousel";
-
-const logoStripCompanies = [
-  "AutoNord",
-  "CasaPlus",
-  "TechZone",
-  "AgroMax",
-  "Mobila.md",
-  "ConstructPro",
-  "ElectroHub",
-  "CityRent",
-];
 
 const benefits = [
   { icon: BadgeCheck, title: 'Badge "Firmă" și "Verificat"', body: "Clientul vede imediat că reprezinți o companie reală." },
@@ -36,25 +27,35 @@ const benefits = [
   { icon: BarChart3, title: "Statistici anunțuri", body: "Monitorizezi interesul și optimizezi anunțurile în funcție de rezultate." },
 ];
 
-const testimonials = [
-  {
-    quote: "În prima lună am primit lead-uri mai bune decât pe alte platforme.",
-    company: "AutoNord SRL",
-  },
-  {
-    quote: "Badge-ul verificat ne-a crescut rata de răspuns în chat.",
-    company: "CasaPlus Imobiliare",
-  },
-  {
-    quote: "Pagina de firmă ne ajută să ținem toate anunțurile într-un singur loc.",
-    company: "ConstructPro",
-  },
-];
-
 const steps = [
   { icon: FileCheck2, title: "Completezi formularul", body: "Introduci datele firmei și încarci documentele necesare." },
   { icon: Building2, title: "Echipa verifică datele", body: "Facem verificare manuală pentru autenticitate și siguranță." },
   { icon: CircleCheckBig, title: "Primești cont firmă verificat", body: 'După aprobare, primești badge-urile "Firmă" și "Verificat".' },
+];
+
+const requiredData = [
+  "Denumire companie + tip companie (SRL, SA, II etc.)",
+  "IDNO valid (13 cifre) și date de înregistrare",
+  "Nume administrator, telefon și email companie",
+  "Document de înregistrare (poză clară)",
+];
+
+const reviewFlow = [
+  {
+    icon: FileText,
+    title: "Status: pending (În verificare)",
+    body: "După trimitere, cererea intră în revizie manuală și apare în cont ca pending.",
+  },
+  {
+    icon: ScanSearch,
+    title: "Verificare manuală",
+    body: "Echipa validează datele firmei și documentele, fără aprobare automată.",
+  },
+  {
+    icon: Clock3,
+    title: "Decizie finală: approved / rejected",
+    body: "Dacă este approved, contul devine business + verified; dacă este rejected, rămâne neaprobat.",
+  },
 ];
 
 export function BusinessLandingSections() {
@@ -80,79 +81,6 @@ export function BusinessLandingSections() {
             >
               Aplică acum
             </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-8 rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
-        <p className="text-center text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
-          Firme care folosesc VEX
-        </p>
-        <div className="relative mt-4 overflow-hidden rounded-xl">
-          <div className="business-logo-marquee flex w-max gap-2 pr-2">
-            {[...logoStripCompanies, ...logoStripCompanies].map((name, idx) => (
-              <div
-                key={`${name}-${idx}`}
-                className="inline-flex min-w-[122px] shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-semibold text-zinc-700"
-              >
-                {name}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-7 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:mt-8 sm:p-6">
-        <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-          <div>
-            <p className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
-              Exemplu profil business
-            </p>
-            <h2 className="mt-3 text-2xl font-bold tracking-tight text-zinc-900">Lead magnet vizual</h2>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-600">
-              Așa arată pentru clienți un cont de firmă verificat: logo, badge-uri de încredere, profil clar și anunțuri
-              grupate într-o pagină dedicată.
-            </p>
-            <ul className="mt-4 space-y-2 text-sm text-zinc-700">
-              <li className="flex items-start gap-2">
-                <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
-                Identitate de firmă vizibilă instant
-              </li>
-              <li className="flex items-start gap-2">
-                <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
-                Mai multă încredere în fiecare anunț
-              </li>
-              <li className="flex items-start gap-2">
-                <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
-                Conversie mai bună din vizualizări în lead-uri
-              </li>
-            </ul>
-          </div>
-
-          <div className="mx-auto w-full max-w-sm rounded-2xl border border-zinc-200 bg-zinc-50 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-orange-600 shadow-sm">
-                <Building2 className="h-6 w-6" aria-hidden />
-              </div>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-bold text-zinc-900">AutoNord SRL</p>
-                <div className="mt-1 flex items-center gap-1.5">
-                  <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
-                    Firmă
-                  </span>
-                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
-                    ✔ Verificat
-                  </span>
-                </div>
-              </div>
-            </div>
-            <div className="mt-4 rounded-xl border border-zinc-200 bg-white p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Pagina firmei</p>
-              <div className="mt-2 grid grid-cols-2 gap-2">
-                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-2 text-xs text-zinc-700">Anunțuri active: 24</div>
-                <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-2 text-xs text-zinc-700">Răspuns rapid în chat</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -188,9 +116,35 @@ export function BusinessLandingSections() {
         </div>
       </section>
 
-      <section className="mt-8 sm:mt-10">
-        <h2 className="text-2xl font-bold tracking-tight text-zinc-900">Ce spun firmele</h2>
-        <BusinessTestimonialsCarousel items={testimonials} />
+      <section className="mt-8 grid gap-4 sm:mt-10 lg:grid-cols-2">
+        <article className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-bold tracking-tight text-zinc-900">Date reale necesare la aplicare</h2>
+          <p className="mt-2 text-sm text-zinc-600">Pentru a menține platforma sigură, aplicațiile business se fac doar cu date verificabile.</p>
+          <ul className="mt-4 space-y-2 text-sm text-zinc-700">
+            {requiredData.map((item) => (
+              <li key={item} className="flex items-start gap-2">
+                <CircleCheckBig className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" aria-hidden />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </article>
+
+        <article className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-bold tracking-tight text-zinc-900">Proces transparent de aprobare</h2>
+          <p className="mt-2 text-sm text-zinc-600">Flux statusuri: pending - approved - rejected.</p>
+          <div className="mt-4 space-y-3">
+            {reviewFlow.map((item) => (
+              <div key={item.title} className="rounded-xl border border-zinc-200 bg-zinc-50 p-3">
+                <p className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900">
+                  <item.icon className="h-4 w-4 text-orange-600" aria-hidden />
+                  {item.title}
+                </p>
+                <p className="mt-1 text-sm text-zinc-600">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </article>
       </section>
 
       <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-6 sm:mt-10 sm:p-8">
@@ -217,25 +171,6 @@ export function BusinessLandingSections() {
       </section>
 
       <BusinessMobileStickyCta hideWhenVisibleId="business-final-cta" />
-
-      <style jsx>{`
-        @keyframes businessLogoMarquee {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        .business-logo-marquee {
-          animation: businessLogoMarquee 34s linear infinite;
-        }
-        @media (min-width: 768px) {
-          .business-logo-marquee {
-            animation-duration: 24s;
-          }
-        }
-      `}</style>
     </div>
   );
 }

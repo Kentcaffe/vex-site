@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, useActionState } from "react";
-import { Bell, Cog, Eye, History, Shield, SlidersHorizontal, User } from "lucide-react";
+import { Bell, Cog, Eye, Shield, SlidersHorizontal, Sparkles, User } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -16,7 +16,6 @@ import { useToast } from "@/components/ui/SimpleToast";
 import { routing } from "@/i18n/routing";
 import type { UserPrefsShape } from "@/lib/user-preferences";
 import { AccountSection } from "@/components/account-settings/sections/AccountSection";
-import { ActivitySection } from "@/components/account-settings/sections/ActivitySection";
 import { NotificationsSection } from "@/components/account-settings/sections/NotificationsSection";
 import { PreferencesSection } from "@/components/account-settings/sections/PreferencesSection";
 import { PrivacySection } from "@/components/account-settings/sections/PrivacySection";
@@ -38,7 +37,7 @@ export type AccountSettingsViewProps = {
   preferences: UserPrefsShape;
 };
 
-const SECTIONS = ["profile", "security", "notifications", "preferences", "activity", "privacy", "account"] as const;
+const SECTIONS = ["profile", "security", "notifications", "preferences", "privacy", "account"] as const;
 export type AccountSection = (typeof SECTIONS)[number];
 
 function isSection(s: string | null): s is AccountSection {
@@ -134,31 +133,29 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
         { id: "security" as const, label: t("nav.security"), icon: Shield },
         { id: "notifications" as const, label: t("nav.notifications"), icon: Bell },
         { id: "preferences" as const, label: t("nav.preferences"), icon: SlidersHorizontal },
-        { id: "activity" as const, label: t("nav.activity"), icon: History },
         { id: "privacy" as const, label: t("nav.privacy"), icon: Eye },
         { id: "account" as const, label: t("nav.account"), icon: Cog },
       ] as const,
     [t],
   );
 
-  const memberSince = useMemo(() => {
-    try {
-      return new Date(user.createdAt).toLocaleDateString(uiLocale, { year: "numeric", month: "long", day: "numeric" });
-    } catch {
-      return user.createdAt;
-    }
-  }, [user.createdAt, uiLocale]);
-
   return (
     <div className="app-shell app-section">
-      <header className="mb-8 text-zinc-900 lg:mb-10">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{t("title")}</h1>
+      <header className="mb-8 overflow-hidden rounded-3xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-6 text-zinc-900 shadow-sm lg:mb-10 lg:p-8">
+        <p className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-800">
+          <Sparkles className="h-3.5 w-3.5" aria-hidden />
+          Premium account
+        </p>
+        <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">{t("title")}</h1>
         <p className="mt-2 max-w-2xl text-base leading-relaxed text-zinc-600">{t("subtitle")}</p>
+        <p className="mt-3 text-xs font-medium text-zinc-500">
+          {new Date(user.createdAt).toLocaleDateString(uiLocale, { year: "numeric", month: "long", day: "numeric" })}
+        </p>
       </header>
 
       <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
         <aside className="lg:w-64 lg:shrink-0">
-          <nav className="surface-card-soft sticky top-24 z-10 flex gap-1 overflow-x-auto p-2 [-ms-overflow-style:none] [scrollbar-width:none] lg:flex-col lg:overflow-visible [&::-webkit-scrollbar]:hidden">
+          <nav className="sticky top-24 z-10 flex gap-1 overflow-x-auto rounded-2xl border border-zinc-200/80 bg-white p-2 shadow-sm [-ms-overflow-style:none] [scrollbar-width:none] lg:flex-col lg:overflow-visible [&::-webkit-scrollbar]:hidden">
             {navItems.map(({ id, label, icon: Icon }) => {
               const isActive = active === id;
               return (
@@ -166,10 +163,10 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
                   key={id}
                   type="button"
                   onClick={() => setSection(id)}
-                  className={`flex min-h-[44px] min-w-[9.5rem] shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors lg:min-w-0 lg:w-full ${
+                  className={`interactive-soft interactive-soft-mobile flex min-h-[44px] min-w-[9.5rem] shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold lg:min-w-0 lg:w-full ${
                     isActive
-                      ? "bg-emerald-100 text-emerald-950 ring-1 ring-emerald-200/90"
-                      : "text-zinc-700 hover:bg-zinc-100"
+                      ? "bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-950 ring-1 ring-emerald-200/90"
+                      : "text-zinc-700 hover:bg-zinc-100/80"
                   }`}
                 >
                   <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
@@ -180,8 +177,8 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
           </nav>
         </aside>
 
-        <div className="min-w-0 flex-1">
-          <div key={active} className="animate-account-section space-y-6 transition-all duration-300 ease-out">
+        <div className="min-w-0 flex-1 rounded-2xl border border-zinc-200/80 bg-white p-3 shadow-sm sm:p-4">
+          <div key={active} className="animate-account-section space-y-6 rounded-xl transition-all duration-300 ease-out">
             {active === "profile" ? <ProfileSection locale={locale} user={user} /> : null}
 
             {active === "security" ? (
@@ -202,8 +199,6 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
             {active === "preferences" ? (
               <PreferencesSection prefs={prefs} setPrefs={setPrefs} savePrefsPatch={savePrefsPatch} />
             ) : null}
-
-            {active === "activity" ? <ActivitySection memberSince={memberSince} activityLog={prefs.activityLog} /> : null}
 
             {active === "privacy" ? (
               <PrivacySection prefs={prefs} setPrefs={setPrefs} savePrefsPatch={savePrefsPatch} />
