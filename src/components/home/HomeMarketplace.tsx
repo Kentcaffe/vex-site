@@ -36,6 +36,7 @@ export type ListingCard = {
   user?: {
     accountType?: string | null;
     isVerified?: boolean | null;
+    companyName?: string | null;
   } | null;
 };
 
@@ -183,8 +184,7 @@ export async function HomeMarketplace({
                     initialFavorited={favoritedIds.has(item.id)}
                     noImageTitle={tList("cardNoImageTitle")}
                     noImageHint={tList("cardNoImageHint")}
-                    isBusiness={item.user?.accountType === "business"}
-                    isVerified={Boolean(item.user?.isVerified)}
+                    user={item.user}
                   />
                 );
               })}

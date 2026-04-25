@@ -36,6 +36,7 @@ export async function HomeLanding({ locale }: Props) {
             select: {
               accountType: true,
               isVerified: true,
+              companyName: true,
             },
           },
         } as unknown as Prisma.ListingSelect,

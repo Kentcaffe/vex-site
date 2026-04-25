@@ -15,7 +15,8 @@ import { type ListingBrowseRow } from "@/lib/prisma-listing-casts";
 import { findManyListingsResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { AUTOTURISME_CATEGORY_SLUG } from "@/lib/category-slugs";
-import { BusinessBadges } from "@/components/business/BusinessBadges";
+import { CheckCircle } from "lucide-react";
+import { UserBadges } from "@/components/business/UserBadges";
 import { listingSeoPath } from "@/lib/seo";
 import {
   ELECTRONICS_CONDITION,
@@ -288,6 +289,7 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
             select: {
               accountType: true,
               isVerified: true,
+              companyName: true,
             },
           },
         } as unknown as Prisma.ListingSelect,
@@ -404,11 +406,13 @@ export default async function AnunturiListPage({ params, searchParams }: Props) 
                         {item.city}
                         {item.district ? ` · ${item.district}` : ""}
                       </p>
-                      <BusinessBadges
-                        isBusiness={item.user?.accountType === "business"}
-                        isVerified={Boolean(item.user?.isVerified)}
-                        className="mt-3"
-                      />
+                      {item.user?.accountType === "business" && item.user.companyName ? (
+                        <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-zinc-600">
+                          {item.user.companyName}
+                          {item.user.isVerified ? <CheckCircle className="h-3.5 w-3.5 text-emerald-600" aria-hidden /> : null}
+                        </p>
+                      ) : null}
+                      <UserBadges user={item.user} className="mt-3" />
                     </div>
                   </Link>
                 </li>

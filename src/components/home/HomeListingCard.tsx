@@ -1,10 +1,10 @@
 "use client";
 
 import { memo } from "react";
-import { MapPin } from "lucide-react";
+import { CheckCircle, MapPin } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { FavoriteButton } from "@/components/FavoriteButton";
-import { BusinessBadges } from "@/components/business/BusinessBadges";
+import { UserBadges } from "@/components/business/UserBadges";
 import { ListingCoverImg } from "@/components/listing/ListingCoverImg";
 import { ListingImagePlaceholder } from "@/components/listing/ListingImagePlaceholder";
 
@@ -20,8 +20,11 @@ export type HomeListingCardProps = {
   initialFavorited: boolean;
   noImageTitle: string;
   noImageHint: string;
-  isBusiness: boolean;
-  isVerified: boolean;
+  user?: {
+    accountType?: string | null;
+    isVerified?: boolean | null;
+    companyName?: string | null;
+  } | null;
 };
 
 export const HomeListingCard = memo(function HomeListingCard({
@@ -36,9 +39,12 @@ export const HomeListingCard = memo(function HomeListingCard({
   initialFavorited,
   noImageTitle,
   noImageHint,
-  isBusiness,
-  isVerified,
+  user,
 }: HomeListingCardProps) {
+  const isBusiness = user?.accountType === "business";
+  const companyName = user?.companyName?.trim() || "";
+  const isVerified = Boolean(user?.isVerified);
+
   return (
     <li className="group">
       <article className="flex h-full w-full min-w-0 flex-col overflow-hidden rounded-2xl border border-[var(--mp-border)] bg-[var(--mp-surface)] shadow-[var(--mp-shadow-md)] transition-shadow hover:shadow-[var(--mp-shadow-lg)]">
@@ -64,13 +70,19 @@ export const HomeListingCard = memo(function HomeListingCard({
             <span className="line-clamp-2 text-base font-bold leading-snug text-zinc-900 group-hover:text-[#c2410c]">
               {title}
             </span>
+            {isBusiness && companyName ? (
+              <span className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-zinc-600">
+                {companyName}
+                {isVerified ? <CheckCircle className="h-3.5 w-3.5 text-emerald-600" aria-hidden /> : null}
+              </span>
+            ) : null}
           </Link>
           <p className="mt-2 text-base font-extrabold text-[#c2410c] tabular-nums">{formattedPrice}</p>
           <p className="mt-1.5 flex items-center gap-1 text-sm text-zinc-700">
             <MapPin className="h-4 w-4 shrink-0 text-zinc-600" aria-hidden />
             <span className="line-clamp-1">{place}</span>
           </p>
-          <BusinessBadges isBusiness={isBusiness} isVerified={isVerified} className="mt-2" />
+          <UserBadges user={user} className="mt-2" />
         </div>
       </article>
     </li>
