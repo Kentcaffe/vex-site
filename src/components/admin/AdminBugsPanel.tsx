@@ -60,7 +60,21 @@ export function AdminBugsPanel({
   function exportAcceptedCsv() {
     const accepted = bugs.filter((bug) => bug.status === "accepted");
     const rows = [
-      ["id", "tester", "email", "title", "category", "severity", "reward", "created_at"],
+      [
+        "id",
+        "tester",
+        "email",
+        "title",
+        "category",
+        "severity",
+        "reproducibility",
+        "page_url",
+        "browser_info",
+        "device_info",
+        "image_urls",
+        "reward",
+        "created_at",
+      ],
       ...accepted.map((bug) => [
         bug.id,
         bug.user_name,
@@ -72,6 +86,7 @@ export function AdminBugsPanel({
         bug.page_url ?? "",
         bug.browser_info ?? "",
         bug.device_info ?? "",
+        (bug.image_urls ?? []).join(" | "),
         String(bug.reward),
         bug.created_at,
       ]),
@@ -185,11 +200,26 @@ export function AdminBugsPanel({
                 </div>
                 <p className="mt-1 text-xs text-zinc-500">
                   Raportat la: {new Date(bug.created_at).toLocaleString("ro-RO")}
-                  {bug.image_url ? (
+                  {bug.image_urls && bug.image_urls.length > 0 ? (
+                    <>
+                      {" · "}
+                      {bug.image_urls.map((url, index) => (
+                        <a
+                          key={`${bug.id}-img-${index}`}
+                          href={url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="mr-2 text-violet-300 hover:underline"
+                        >
+                          Screenshot {index + 1}
+                        </a>
+                      ))}
+                    </>
+                  ) : bug.image_url ? (
                     <>
                       {" · "}
                       <a href={bug.image_url} target="_blank" rel="noreferrer" className="text-violet-300 hover:underline">
-                        Deschide screenshot
+                        Screenshot
                       </a>
                     </>
                   ) : null}

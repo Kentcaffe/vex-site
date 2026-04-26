@@ -19,6 +19,7 @@ export type BugRow = {
   device_info: string | null;
   reproducibility: string | null;
   image_url: string | null;
+  image_urls: string[] | null;
   category: BugCategory;
   severity: BugSeverity;
   status: BugStatus;
@@ -40,7 +41,7 @@ export async function listOwnBugs(supabaseUserId: string): Promise<BugRow[]> {
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase
     .from("bugs")
-    .select("id,user_id,title,description,steps_to_reproduce,expected_result,actual_result,page_url,browser_info,device_info,reproducibility,image_url,category,severity,status,reward,created_at")
+    .select("id,user_id,title,description,steps_to_reproduce,expected_result,actual_result,page_url,browser_info,device_info,reproducibility,image_url,image_urls,category,severity,status,reward,created_at")
     .eq("user_id", supabaseUserId)
     .order("created_at", { ascending: false });
   return (data ?? []) as BugRow[];
@@ -53,7 +54,7 @@ export async function listAllBugsForAdmin(): Promise<BugAdminRow[]> {
   }
   const { data } = await service
     .from("bugs")
-    .select("id,user_id,title,description,steps_to_reproduce,expected_result,actual_result,page_url,browser_info,device_info,reproducibility,image_url,category,severity,status,reward,created_at")
+    .select("id,user_id,title,description,steps_to_reproduce,expected_result,actual_result,page_url,browser_info,device_info,reproducibility,image_url,image_urls,category,severity,status,reward,created_at")
     .order("created_at", { ascending: false });
   const rows = (data ?? []) as BugRow[];
   if (rows.length === 0) {

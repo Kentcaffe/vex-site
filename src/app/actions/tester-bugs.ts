@@ -53,7 +53,7 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
   const reproducibility = String(formData.get("reproducibility") ?? "").trim();
   const category = String(formData.get("category") ?? "").toLowerCase() as BugCategory;
   const severity = String(formData.get("severity") ?? "").toLowerCase() as BugSeverity;
-  const image = formData.get("image");
+  const imagesRaw = formData.getAll("images");
 
   if (title.length < 4 || description.length < 10 || stepsToReproduce.length < 10) {
     return { ok: false, message: "", error: "Completeaza titlu, descriere si pasii de reproducere (minim 10 caractere)." };
@@ -72,20 +72,28 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
   const supabase = await createSupabaseServerClient();
 
   let imageUrl: string | null = null;
+  const imageUrls: string[] = [];
   const canUseFile = typeof File !== "undefined";
-  if (canUseFile && image instanceof File && image.size > 0) {
-    const ext = image.name.includes(".") ? image.name.split(".").pop() : "png";
-    const fileName = `${supabaseUserId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-    const upload = await supabase.storage.from("bugs").upload(fileName, image, {
-      cacheControl: "3600",
-      upsert: false,
-      contentType: image.type || "image/png",
-    });
-    if (upload.error) {
-      return { ok: false, message: "", error: "Upload imagine esuat. Incearca din nou." };
+  if (canUseFile) {
+    const images = imagesRaw.filter((entry): entry is File => entry instanceof File && entry.size > 0);
+    if (images.length > 5) {
+      return { ok: false, message: "", error: "Poți încărca maximum 5 imagini." };
     }
-    const publicUrlRes = supabase.storage.from("bugs").getPublicUrl(fileName);
-    imageUrl = publicUrlRes.data.publicUrl;
+    for (const image of images) {
+      const ext = image.name.includes(".") ? image.name.split(".").pop() : "png";
+      const fileName = `${supabaseUserId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+      const upload = await supabase.storage.from("bugs").upload(fileName, image, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: image.type || "image/png",
+      });
+      if (upload.error) {
+        return { ok: false, message: "", error: "Upload imagini eșuat. Încearcă din nou." };
+      }
+      const publicUrlRes = supabase.storage.from("bugs").getPublicUrl(fileName);
+      imageUrls.push(publicUrlRes.data.publicUrl);
+    }
+    imageUrl = imageUrls[0] ?? null;
   }
 
   const insert = await supabase.from("bugs").insert({
@@ -100,6 +108,7 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
     device_info: deviceInfo || null,
     reproducibility: reproducibility || null,
     image_url: imageUrl,
+    image_urls: imageUrls,
     category,
     severity,
     status: "open",
@@ -118,7 +127,7 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
 
   revalidatePath("/tester");
   revalidatePath("/admin/bugs");
-  return { ok: true, message: "Bug trimis cu succes 🚀" };
+  return { ok: true, message: "Raport trimis cu succes 🚀" };
 }
 
 export async function reviewBugReport(_prevState: ReviewState, formData: FormData): Promise<ReviewState> {

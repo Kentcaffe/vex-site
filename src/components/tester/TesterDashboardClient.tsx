@@ -5,6 +5,34 @@ import { useRouter } from "next/navigation";
 import { submitBugReport } from "@/app/actions/tester-bugs";
 import type { BugRow } from "@/lib/tester-bugs";
 
+type BugFormValues = {
+  title: string;
+  description: string;
+  stepsToReproduce: string;
+  expectedResult: string;
+  actualResult: string;
+  pageUrl: string;
+  reproducibility: "always" | "sometimes" | "once";
+  browserInfo: string;
+  deviceInfo: string;
+  category: "ui" | "functional" | "security";
+  severity: "low" | "medium" | "high";
+};
+
+const initialBugFormValues: BugFormValues = {
+  title: "",
+  description: "",
+  stepsToReproduce: "",
+  expectedResult: "",
+  actualResult: "",
+  pageUrl: "",
+  reproducibility: "always",
+  browserInfo: "",
+  deviceInfo: "",
+  category: "ui",
+  severity: "medium",
+};
+
 function SubmitButton() {
   return (
     <button
@@ -52,6 +80,9 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
   const formRef = useRef<HTMLFormElement | null>(null);
   const initialSubmitState: { ok: boolean; message: string; error?: string } = { ok: false, message: "" };
   const [state, formAction, pending] = useActionState(submitBugReport, initialSubmitState);
+  const [formValues, setFormValues] = useState<BugFormValues>(initialBugFormValues);
+  const [fileInputKey, setFileInputKey] = useState(0);
+  const [fileCount, setFileCount] = useState(0);
   const [statusFilter, setStatusFilter] = useState<"all" | "open" | "accepted" | "rejected">("all");
   const [severityFilter, setSeverityFilter] = useState<"all" | "low" | "medium" | "high">("all");
   const [searchText, setSearchText] = useState("");
@@ -69,7 +100,12 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
 
   useEffect(() => {
     if (state.ok) {
-      formRef.current?.reset();
+      queueMicrotask(() => {
+        formRef.current?.reset();
+        setFormValues(initialBugFormValues);
+        setFileInputKey((v) => v + 1);
+        setFileCount(0);
+      });
       router.refresh();
     }
   }, [router, state.ok]);
@@ -142,6 +178,8 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             name="title"
             required
             minLength={4}
+            value={formValues.title}
+            onChange={(e) => setFormValues((prev) => ({ ...prev, title: e.target.value }))}
             placeholder="Titlu bug"
             className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
           />
@@ -150,6 +188,8 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             name="description"
             required
             minLength={10}
+            value={formValues.description}
+            onChange={(e) => setFormValues((prev) => ({ ...prev, description: e.target.value }))}
             placeholder="Descriere detaliata"
             rows={5}
             className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
@@ -159,6 +199,8 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             name="stepsToReproduce"
             required
             minLength={10}
+            value={formValues.stepsToReproduce}
+            onChange={(e) => setFormValues((prev) => ({ ...prev, stepsToReproduce: e.target.value }))}
             placeholder="Pași de reproducere (1. ... 2. ... 3. ...)"
             rows={4}
             className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
@@ -169,6 +211,8 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
               name="expectedResult"
               required
               minLength={5}
+              value={formValues.expectedResult}
+              onChange={(e) => setFormValues((prev) => ({ ...prev, expectedResult: e.target.value }))}
               placeholder="Rezultat așteptat"
               rows={3}
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
@@ -177,6 +221,8 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
               name="actualResult"
               required
               minLength={5}
+              value={formValues.actualResult}
+              onChange={(e) => setFormValues((prev) => ({ ...prev, actualResult: e.target.value }))}
               placeholder="Rezultat actual"
               rows={3}
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
@@ -186,12 +232,20 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             <input
               name="pageUrl"
               type="url"
+              value={formValues.pageUrl}
+              onChange={(e) => setFormValues((prev) => ({ ...prev, pageUrl: e.target.value }))}
               placeholder="URL pagină afectată (https://...)"
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
             />
             <select
               name="reproducibility"
-              defaultValue="always"
+              value={formValues.reproducibility}
+              onChange={(e) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  reproducibility: e.target.value as BugFormValues["reproducibility"],
+                }))
+              }
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
             >
               <option value="always">Se reproduce mereu</option>
@@ -202,11 +256,15 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
           <div className="grid gap-4 sm:grid-cols-2">
             <input
               name="browserInfo"
+              value={formValues.browserInfo}
+              onChange={(e) => setFormValues((prev) => ({ ...prev, browserInfo: e.target.value }))}
               placeholder="Browser (ex: Chrome 135, Safari 17)"
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
             />
             <input
               name="deviceInfo"
+              value={formValues.deviceInfo}
+              onChange={(e) => setFormValues((prev) => ({ ...prev, deviceInfo: e.target.value }))}
               placeholder="Device/OS (ex: iPhone 13 iOS 18, Windows 11)"
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
             />
@@ -216,7 +274,13 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             <select
               name="category"
               required
-              defaultValue="ui"
+              value={formValues.category}
+              onChange={(e) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  category: e.target.value as BugFormValues["category"],
+                }))
+              }
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
             >
               <option value="ui">Interfață (UI)</option>
@@ -226,7 +290,13 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             <select
               name="severity"
               required
-              defaultValue="medium"
+              value={formValues.severity}
+              onChange={(e) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  severity: e.target.value as BugFormValues["severity"],
+                }))
+              }
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
             >
               <option value="low">Mică</option>
@@ -235,13 +305,27 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             </select>
           </div>
           <label className="grid gap-2 text-sm text-zinc-300">
-            Screenshot (opțional)
+            Screenshot-uri (opțional, max 5)
             <input
+              key={fileInputKey}
               type="file"
-              name="image"
+              name="images"
+              multiple
               accept="image/*"
+              onChange={(e) => {
+                const files = e.target.files;
+                const safeCount = files ? Math.min(files.length, 5) : 0;
+                setFileCount(safeCount);
+                if (files && files.length > 5) {
+                  setTimeout(() => {
+                    e.currentTarget.value = "";
+                    setFileCount(0);
+                  }, 0);
+                }
+              }}
               className="rounded-xl border border-dashed border-zinc-700 bg-zinc-900 px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-violet-600 file:px-3 file:py-1.5 file:font-medium file:text-white hover:file:bg-violet-500"
             />
+            <span className="text-xs text-zinc-400">Selectate: {fileCount}/5</span>
           </label>
           {state.error ? (
             <p className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{state.error}</p>

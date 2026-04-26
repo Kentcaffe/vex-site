@@ -14,6 +14,7 @@ create table if not exists public.bugs (
   device_info text,
   reproducibility text,
   image_url text,
+  image_urls text[] not null default '{}',
   category text not null check (category in ('ui', 'functional', 'security')),
   severity text not null check (severity in ('low', 'medium', 'high')),
   status text not null default 'open' check (status in ('open', 'accepted', 'rejected')),
@@ -28,6 +29,7 @@ alter table public.bugs add column if not exists page_url text;
 alter table public.bugs add column if not exists browser_info text;
 alter table public.bugs add column if not exists device_info text;
 alter table public.bugs add column if not exists reproducibility text;
+alter table public.bugs add column if not exists image_urls text[] not null default '{}';
 
 create index if not exists bugs_user_id_idx on public.bugs(user_id);
 create index if not exists bugs_status_idx on public.bugs(status);
