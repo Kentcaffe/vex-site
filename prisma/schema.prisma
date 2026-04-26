@@ -8,6 +8,7 @@ datasource db {
 
 enum UserRole {
   USER
+  TESTER
   MODERATOR
   ADMIN
 }

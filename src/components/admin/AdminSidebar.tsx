@@ -87,6 +87,16 @@ const links = [
     ),
   },
   {
+    href: "/admin/bugs",
+    adminOnly: true,
+    labelKey: "navBugs" as const,
+    icon: (
+      <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M9 3v2m6-2v2M8 19h8m-9-8h10m-5 0v8M5 7h14l-1 12H6L5 7z" />
+      </svg>
+    ),
+  },
+  {
     href: "/admin/support",
     adminOnly: false,
     labelKey: "navSupport" as const,
