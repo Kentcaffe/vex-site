@@ -7,6 +7,7 @@ import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { localizedHref } from "@/lib/paths";
+import { publicDisplayName } from "@/lib/public-privacy";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
@@ -33,7 +34,7 @@ export default async function ChatFromListingPage({ params }: Props) {
 
     const listing = await prisma.listing.findFirst({
       where: { id: listingId, ...listingWhereActive() },
-      include: { user: { select: { id: true, name: true, email: true, avatarUrl: true } } },
+      include: { user: { select: { id: true, name: true, avatarUrl: true } } },
     });
     if (!listing) {
       notFound();
@@ -48,7 +49,7 @@ export default async function ChatFromListingPage({ params }: Props) {
       update: {},
       include: {
         readStates: { where: { userId: { in: [userId, listing.userId] } } },
-        buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        buyer: { select: { id: true, name: true, avatarUrl: true } },
       },
     });
 
@@ -64,16 +65,16 @@ export default async function ChatFromListingPage({ params }: Props) {
       listing: { id: listing.id, title: listing.title },
       seller: {
         id: seller.id,
-        name: seller.name ?? seller.email ?? "",
+        name: publicDisplayName(seller.name, "Seller"),
         avatarUrl: resolvePublicMediaUrl(seller.avatarUrl ?? null),
       },
       buyer: {
         id: room.buyer.id,
-        name: room.buyer.name ?? room.buyer.email ?? "",
+        name: publicDisplayName(room.buyer.name, "Buyer"),
         avatarUrl: resolvePublicMediaUrl(room.buyer.avatarUrl ?? null),
       },
       meIsBuyer: true,
-      otherUserName: seller.name ?? seller.email ?? "",
+      otherUserName: publicDisplayName(seller.name, "Seller"),
       otherUserAvatarUrl: resolvePublicMediaUrl(seller.avatarUrl ?? null),
       myAvatarUrl: resolvePublicMediaUrl(buyerRow.avatarUrl ?? null),
       messages: messageRows.map((m: { id: string; senderId: string; content: string; createdAt: Date }) => ({

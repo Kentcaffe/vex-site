@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { CHAT_MESSAGE_MAX, getRoomAccess } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
+import { publicDisplayName } from "@/lib/public-privacy";
 import { prisma } from "@/lib/prisma";
 import { logRouteError } from "@/lib/server-log";
 
@@ -38,10 +39,10 @@ export async function GET(_req: Request, { params }: Props) {
             id: true,
             title: true,
             userId: true,
-            user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+            user: { select: { id: true, name: true, avatarUrl: true } },
           },
         },
-        buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        buyer: { select: { id: true, name: true, avatarUrl: true } },
         readStates: { where: { userId: { in: [access.buyerId, access.sellerId] } } },
       },
     });
@@ -59,16 +60,16 @@ export async function GET(_req: Request, { params }: Props) {
     return NextResponse.json({
       roomId: room.id,
       listing: { id: room.listing.id, title: room.listing.title },
-      seller: { id: seller.id, name: seller.name ?? seller.email ?? "", avatarUrl: seller.avatarUrl ?? null },
+      seller: { id: seller.id, name: publicDisplayName(seller.name, "Seller"), avatarUrl: seller.avatarUrl ?? null },
       buyer: {
         id: room.buyer.id,
-        name: room.buyer.name ?? room.buyer.email ?? "",
+        name: publicDisplayName(room.buyer.name, "Buyer"),
         avatarUrl: room.buyer.avatarUrl ?? null,
       },
       meIsBuyer: isBuyer,
       otherUserName: isBuyer
-        ? seller.name ?? seller.email ?? ""
-        : room.buyer.name ?? room.buyer.email ?? "",
+        ? publicDisplayName(seller.name, "Seller")
+        : publicDisplayName(room.buyer.name, "Buyer"),
       otherUserAvatarUrl: isBuyer ? seller.avatarUrl ?? null : room.buyer.avatarUrl ?? null,
       myAvatarUrl: me?.avatarUrl ?? null,
       messages: messages.map((m: { id: string; senderId: string; content: string; createdAt: Date }) => ({

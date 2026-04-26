@@ -25,6 +25,7 @@ import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
 import { OwnListingDeleteButton } from "@/components/account/OwnListingDeleteButton";
 import { UserBadges } from "@/components/business/UserBadges";
+import { canShowPublicPhone } from "@/lib/public-privacy";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -61,6 +62,7 @@ type ListingDetailRow = {
     companyType?: string | null;
     administratorName?: string | null;
     companyCity?: string | null;
+    preferences?: Prisma.JsonValue | null;
   } | null;
 };
 
@@ -173,6 +175,7 @@ export default async function ListingDetailPage({ params }: Props) {
               companyType: true,
               administratorName: true,
               companyCity: true,
+              preferences: true,
             },
           },
         } as unknown as Prisma.ListingSelect,
@@ -221,6 +224,7 @@ export default async function ListingDetailPage({ params }: Props) {
   const canAdminDeleteListing = session?.user && isAdmin(session.user.role);
   const isOwner = !!userId && listing.userId === userId;
   const canReport = !!userId && !isOwner;
+  const phoneVisible = canShowPublicPhone(listing.user?.preferences, Boolean(userId));
 
   return (
     <div className="app-shell app-section">
@@ -277,7 +281,7 @@ export default async function ListingDetailPage({ params }: Props) {
                 <dt className="text-zinc-500">{t("condition")}</dt>
                 <dd className="text-right font-medium">{conditionLabel(listing.condition, t)}</dd>
               </div>
-              {listing.phone ? (
+              {listing.phone && phoneVisible ? (
                 <div className="flex justify-between gap-4">
                   <dt className="text-zinc-500">{t("phone")}</dt>
                   <dd className="text-right font-medium">

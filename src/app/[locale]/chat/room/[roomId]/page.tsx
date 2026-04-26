@@ -7,6 +7,7 @@ import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { localizedHref } from "@/lib/paths";
+import { publicDisplayName } from "@/lib/public-privacy";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
@@ -44,10 +45,10 @@ export default async function ChatRoomPage({ params }: Props) {
             id: true,
             title: true,
             userId: true,
-            user: { select: { id: true, name: true, email: true, avatarUrl: true } },
+            user: { select: { id: true, name: true, avatarUrl: true } },
           },
         },
-        buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        buyer: { select: { id: true, name: true, avatarUrl: true } },
         readStates: true,
       },
     });
@@ -61,7 +62,7 @@ export default async function ChatRoomPage({ params }: Props) {
 
     const seller = room.listing.user;
     const isBuyer = userId === room.buyerId;
-    const otherName = isBuyer ? seller.name ?? seller.email ?? "" : room.buyer.name ?? room.buyer.email ?? "";
+    const otherName = isBuyer ? publicDisplayName(seller.name, "Seller") : publicDisplayName(room.buyer.name, "Buyer");
     const readByOther = room.readStates.find((s: { userId: string }) => s.userId !== userId);
     const myRead = room.readStates.find((s: { userId: string }) => s.userId === userId);
 
@@ -70,12 +71,12 @@ export default async function ChatRoomPage({ params }: Props) {
       listing: { id: room.listing.id, title: room.listing.title },
       seller: {
         id: seller.id,
-        name: seller.name ?? seller.email ?? "",
+        name: publicDisplayName(seller.name, "Seller"),
         avatarUrl: resolvePublicMediaUrl(seller.avatarUrl ?? null),
       },
       buyer: {
         id: room.buyer.id,
-        name: room.buyer.name ?? room.buyer.email ?? "",
+        name: publicDisplayName(room.buyer.name, "Buyer"),
         avatarUrl: resolvePublicMediaUrl(room.buyer.avatarUrl ?? null),
       },
       meIsBuyer: isBuyer,

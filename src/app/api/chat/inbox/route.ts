@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { getLastRoomMessage } from "@/lib/chat-realtime-store";
+import { publicDisplayName } from "@/lib/public-privacy";
 import { prisma } from "@/lib/prisma";
 import { logRouteError } from "@/lib/server-log";
 
@@ -21,10 +22,10 @@ export async function GET() {
             id: true,
             title: true,
             userId: true,
-            user: { select: { name: true, email: true, avatarUrl: true } },
+            user: { select: { name: true, avatarUrl: true } },
           },
         },
-        buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        buyer: { select: { id: true, name: true, avatarUrl: true } },
         readStates: { where: { userId }, select: { lastReadAt: true } },
       },
       orderBy: { updatedAt: "desc" },
@@ -36,8 +37,8 @@ export async function GET() {
       const seller = r.listing.user;
       const isBuyer = r.buyerId === userId;
       const otherName = isBuyer
-        ? seller.name ?? seller.email ?? "Seller"
-        : r.buyer.name ?? r.buyer.email ?? "Buyer";
+        ? publicDisplayName(seller.name, "Seller")
+        : publicDisplayName(r.buyer.name, "Buyer");
       const otherAvatar = isBuyer ? seller.avatarUrl ?? null : r.buyer.avatarUrl ?? null;
       const lastReadAt = r.readStates[0]?.lastReadAt;
       const sentToCurrentUser = last?.receiverId

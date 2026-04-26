@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
+import { publicDisplayName } from "@/lib/public-privacy";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { logRouteError } from "@/lib/server-log";
@@ -34,7 +35,7 @@ export async function GET(_req: Request, { params }: Props) {
 
     const seller = await prisma.user.findUnique({
       where: { id: listing.userId },
-      select: { id: true, name: true, email: true },
+      select: { id: true, name: true },
     });
     if (!seller) {
       return NextResponse.json({ ok: false, error: "not_found" }, { status: 404 });
@@ -57,7 +58,7 @@ export async function GET(_req: Request, { params }: Props) {
     return NextResponse.json({
       roomId: room.id,
       listing: { id: listing.id, title: listing.title },
-      seller: { id: seller.id, name: seller.name ?? seller.email ?? "" },
+      seller: { id: seller.id, name: publicDisplayName(seller.name, "Seller") },
       meIsBuyer: true,
       messages: messages.map((m: { id: string; senderId: string; content: string; createdAt: Date }) => ({
         id: m.id,

@@ -24,7 +24,7 @@ export const defaultUserPreferences: UserPrefsShape = {
   currency: "MDL",
   profileVisibility: "registered",
   showEmailPublic: false,
-  showPhonePublic: true,
+  showPhonePublic: false,
   twoFactorEnabled: false,
   activityLog: [],
 };

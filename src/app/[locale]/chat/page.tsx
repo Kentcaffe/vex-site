@@ -6,6 +6,7 @@ import { ChatServerError } from "@/components/chat/ChatServerError";
 import { getLastRoomMessage } from "@/lib/chat-realtime-store";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { localizedHref } from "@/lib/paths";
+import { publicDisplayName } from "@/lib/public-privacy";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
@@ -42,10 +43,10 @@ export default async function ChatInboxPage({ params }: Props) {
             id: true,
             title: true,
             userId: true,
-            user: { select: { name: true, email: true, avatarUrl: true } },
+            user: { select: { name: true, avatarUrl: true } },
           },
         },
-        buyer: { select: { id: true, name: true, email: true, avatarUrl: true } },
+        buyer: { select: { id: true, name: true, avatarUrl: true } },
         readStates: { where: { userId }, select: { lastReadAt: true } },
       },
       orderBy: { updatedAt: "desc" },
@@ -64,7 +65,7 @@ export default async function ChatInboxPage({ params }: Props) {
         }
         const seller = r.listing.user;
         const isBuyer = r.buyerId === userId;
-        const otherName = isBuyer ? seller.name ?? seller.email ?? "" : r.buyer.name ?? r.buyer.email ?? "";
+        const otherName = isBuyer ? publicDisplayName(seller.name, "Seller") : publicDisplayName(r.buyer.name, "Buyer");
         const otherAvatarRaw = isBuyer ? seller.avatarUrl ?? null : r.buyer.avatarUrl ?? null;
         const lastReadAt = r.readStates[0]?.lastReadAt;
         const unread = Boolean(
