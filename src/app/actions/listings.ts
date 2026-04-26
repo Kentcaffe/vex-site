@@ -25,6 +25,7 @@ import {
   isModelAllowedForCategoryBrand,
   resolveCategoryConfigKey,
 } from "@/lib/listing-category-config";
+import { evaluateListingFraudRisk } from "@/lib/listing-fraud";
 
 export type CreateListingState =
   | { ok: true; listingId: string; details?: string }
@@ -253,6 +254,23 @@ export async function createListing(
   const detailsObj = parseDetailsJsonFromForm(slug, (name) => formData.get(name));
   const detailsJson = detailsObj;
 
+  const fraud = evaluateListingFraudRisk({
+    title: parsed.data.title,
+    description: parsed.data.description,
+    price: parsed.data.price,
+    brand: parsed.data.brand,
+    modelName: parsed.data.modelName,
+    city: parsed.data.city,
+    phone: parsed.data.phone,
+  });
+  if (fraud.level === "high") {
+    return {
+      ok: false,
+      error: "validation",
+      details: `Anunț blocat de protecția anti-fraudă (${fraud.reasons.slice(0, 2).join(" ")}).`,
+    };
+  }
+
   let listingId: string;
   try {
     const created = await prisma.listing.create({
@@ -455,6 +473,23 @@ export async function updateOwnListing(
 
   const detailsObj = parseDetailsJsonFromForm(slug, (name) => formData.get(name));
   const detailsJson = detailsObj;
+
+  const fraud = evaluateListingFraudRisk({
+    title: parsed.data.title,
+    description: parsed.data.description,
+    price: parsed.data.price,
+    brand: parsed.data.brand,
+    modelName: parsed.data.modelName,
+    city: parsed.data.city,
+    phone: parsed.data.phone,
+  });
+  if (fraud.level === "high") {
+    return {
+      ok: false,
+      error: "validation",
+      details: `Anunț blocat de protecția anti-fraudă (${fraud.reasons.slice(0, 2).join(" ")}).`,
+    };
+  }
 
   try {
     await prisma.listing.update({

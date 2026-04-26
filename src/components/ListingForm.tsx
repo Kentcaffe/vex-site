@@ -66,6 +66,7 @@ import {
   type ListingFieldConfig,
   type ListingFieldId,
 } from "@/lib/listing-category-config";
+import { evaluateListingFraudRisk } from "@/lib/listing-fraud";
 
 type Props = {
   locale: string;
@@ -641,6 +642,23 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     ) {
       toast("error", "Modelul selectat nu aparține mărcii curente.");
       return;
+    }
+
+    const fraud = evaluateListingFraudRisk({
+      title: publishValues.title,
+      description: publishValues.description,
+      price: Number(publishValues.price || 0),
+      brand: publishValues.brand,
+      modelName: publishValues.modelName,
+      city: publishValues.city,
+      phone: publishValues.phone,
+    });
+    if (fraud.level === "high") {
+      toast("error", "Anunțul pare suspect (anti-fraudă). Revizuiește descrierea, prețul și contactul.");
+      return;
+    }
+    if (fraud.level === "medium") {
+      toast("error", "Atenție: anunțul are semnale de risc. Completează mai clar detaliile înainte de publicare.");
     }
 
     const payload = {
