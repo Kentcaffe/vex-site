@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
-import { getOrCreateActiveSupportTicket } from "@/lib/support-chat";
+import { getActiveSupportTicket } from "@/lib/support-chat";
 import { logRouteError } from "@/lib/server-log";
 
 export async function GET() {
@@ -10,7 +10,10 @@ export async function GET() {
     if (!session?.user?.id) {
       return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
     }
-    const ticket = await getOrCreateActiveSupportTicket(session.user.id);
+    const ticket = await getActiveSupportTicket(session.user.id);
+    if (!ticket) {
+      return NextResponse.json({ ticket: null });
+    }
     return NextResponse.json({
       ticket: {
         id: ticket.id,

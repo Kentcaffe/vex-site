@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Star, X } from "lucide-react";
+import { Loader2, Send, Star, X } from "lucide-react";
 import { useAuthSession } from "@/components/auth/SupabaseSessionProvider";
 import { SupportLiveChat } from "@/components/support/SupportLiveChat";
 import { getCachedSupportTicket, setSupportTicketCache } from "@/lib/support-ticket-cache";
+import { isLiveSupportOpen, liveSupportScheduleLabel, SUPPORT_EMAIL } from "@/lib/support-hours";
 
 type Props = {
   open: boolean;
@@ -28,6 +29,9 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
   const [feedbackSending, setFeedbackSending] = useState(false);
   const [feedbackError, setFeedbackError] = useState<string | null>(null);
   const [feedbackThanks, setFeedbackThanks] = useState(false);
+  const [draft, setDraft] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(true);
 
   const ensureTicket = useCallback(async () => {
     const cached = getCachedSupportTicket();
@@ -60,7 +64,11 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
         setTicketErrorDetail(msg);
         throw new Error("ticket");
       }
-      if (!data.ticket?.id) throw new Error("ticket");
+      if (!data.ticket?.id) {
+        setTicketId(null);
+        setFeedbackSubmitted(false);
+        return;
+      }
       setSupportTicketCache({
         id: data.ticket.id,
         feedbackAt: data.ticket.feedbackAt ?? null,
@@ -73,6 +81,13 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
     } finally {
       setLoadingTicket(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const refresh = () => setScheduleOpen(isLiveSupportOpen());
+    refresh();
+    const id = window.setInterval(refresh, 60000);
+    return () => window.clearInterval(id);
   }, []);
 
   useEffect(() => {
@@ -89,6 +104,8 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
         setFeedbackSending(false);
         setFeedbackError(null);
         setFeedbackThanks(false);
+        setDraft("");
+        setCreating(false);
         setLoadingTicket(true);
       });
     }
@@ -153,6 +170,41 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
       setLoadingTicket(true);
     });
   }, [open, status]);
+
+  async function sendFirstMessage() {
+    const body = draft.trim();
+    if (!body || creating) return;
+    if (!scheduleOpen) return;
+    setCreating(true);
+    setTicketError(false);
+    setTicketErrorDetail(null);
+    try {
+      const res = await fetch("/api/support/messages", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ body }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { ticketId?: string; message?: string; debug?: { message?: string } };
+      if (!res.ok || !data.ticketId) {
+        const msg =
+          typeof data.message === "string"
+            ? data.message
+            : typeof data.debug?.message === "string"
+              ? data.debug.message
+              : t("sendError");
+        throw new Error(msg);
+      }
+      setSupportTicketCache({ id: data.ticketId, feedbackAt: null });
+      setTicketId(data.ticketId);
+      setDraft("");
+    } catch (error) {
+      setTicketError(true);
+      setTicketErrorDetail(error instanceof Error ? error.message : t("sendError"));
+    } finally {
+      setCreating(false);
+    }
+  }
 
   useEffect(() => {
     if (!open || status !== "authenticated") return;
@@ -285,10 +337,44 @@ export function SupportChatModal({ open, onDismissAction }: Props) {
           ) : ticketId ? (
             <SupportLiveChat variant="user" ticketId={ticketId} onThreadHasMessagesAction={setThreadHasMessages} />
           ) : (
-            <div className="flex h-full min-h-[280px] flex-col justify-center gap-4 rounded-xl bg-white px-4 py-6">
-              <div className="h-4 w-36 animate-pulse rounded-md bg-zinc-200" />
-              <div className="h-12 w-full animate-pulse rounded-xl bg-zinc-100" />
-              <div className="h-12 max-w-[70%] animate-pulse rounded-xl bg-zinc-100" />
+            <div className="flex h-full min-h-[280px] flex-col justify-between rounded-xl bg-white p-4">
+              <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3">
+                <p className="text-sm font-semibold text-zinc-900">Începe conversația cu suportul</p>
+                <p className="mt-1 text-xs text-zinc-600">
+                  Ticket-ul se creează doar când trimiți primul mesaj.
+                </p>
+              </div>
+              {!scheduleOpen ? (
+                <p className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-900">
+                  Live chat este închis acum. Program: {liveSupportScheduleLabel()}. Ne poți scrie la {SUPPORT_EMAIL}.
+                </p>
+              ) : null}
+              <div className="mt-3 flex gap-2">
+                <textarea
+                  rows={3}
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      void sendFirstMessage();
+                    }
+                  }}
+                  placeholder={t("placeholder")}
+                  disabled={!scheduleOpen}
+                  className="min-h-[52px] flex-1 resize-none rounded-xl border border-zinc-200 bg-zinc-50/80 px-3 py-2.5 text-base text-zinc-900 placeholder:text-zinc-400 focus:border-orange-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => void sendFirstMessage()}
+                  disabled={!draft.trim() || creating || !scheduleOpen}
+                  className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-md transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label={t("send")}
+                >
+                  {creating ? <Loader2 className="h-5 w-5 animate-spin" /> : <Send className="h-5 w-5" />}
+                </button>
+              </div>
+              <p className="mt-2 text-center text-[11px] text-zinc-400">{t("hintEnter")}</p>
             </div>
           )}
         </div>

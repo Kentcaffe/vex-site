@@ -8,6 +8,8 @@ import { isLiveSupportOpen, liveSupportScheduleLabel, SUPPORT_EMAIL } from "@/li
 import {
   appendSupportMessage,
   assertTicketAccess,
+  createActiveSupportTicket,
+  getActiveSupportTicket,
   listSupportMessages,
   normalizeSupportBody,
 } from "@/lib/support-chat";
@@ -49,18 +51,39 @@ export async function POST(req: Request) {
     } catch {
       return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
     }
-    const ticketId =
+    const ticketIdRaw =
       typeof body === "object" && body && "ticketId" in body ? String((body as { ticketId?: unknown }).ticketId ?? "").trim() : "";
     const text = typeof body === "object" && body && "body" in body ? String((body as { body?: unknown }).body ?? "") : "";
-    if (!ticketId) {
-      return NextResponse.json({ ok: false, error: "missing_ticket" }, { status: 400 });
-    }
     const norm = normalizeSupportBody(text);
     if (!norm.ok) {
       return NextResponse.json({ ok: false, error: norm.error }, { status: 400 });
     }
 
     const staff = isStaff(session.user.role);
+    let ticketId = ticketIdRaw;
+
+    if (!ticketId) {
+      if (staff) {
+        return NextResponse.json({ ok: false, error: "missing_ticket" }, { status: 400 });
+      }
+      if (!isLiveSupportOpen()) {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: "outside_schedule",
+            message: `Live chat este disponibil în programul ${liveSupportScheduleLabel()}. Ne poți scrie la ${SUPPORT_EMAIL}.`,
+          },
+          { status: 403 },
+        );
+      }
+      const active = await getActiveSupportTicket(session.user.id);
+      if (active) {
+        ticketId = active.id;
+      } else {
+        const created = await createActiveSupportTicket(session.user.id);
+        ticketId = created.id;
+      }
+    }
 
     const access = await assertTicketAccess(ticketId, session.user.id, staff);
     if (!access.ok) {
@@ -98,7 +121,7 @@ export async function POST(req: Request) {
     });
 
     const messages = await listSupportMessages(ticketId);
-    return NextResponse.json({ ok: true, messages });
+    return NextResponse.json({ ok: true, ticketId, messages });
   } catch (e) {
     logRouteError("POST /api/support/messages", e);
     return jsonServiceUnavailable("Support messages are temporarily unavailable.", ApiErrorCode.DATABASE);

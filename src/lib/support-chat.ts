@@ -19,21 +19,39 @@ export function normalizeSupportBody(raw: string): { ok: true; body: string } | 
 }
 
 /** Un singur fir activ (OPEN) per utilizator. */
-export async function getOrCreateActiveSupportTicket(userId: string) {
+export async function getActiveSupportTicket(userId: string) {
   try {
-    const existing = await supportTicket.findFirst({
+    return await supportTicket.findFirst({
       where: {
         userId,
         status: "OPEN",
       },
       orderBy: { updatedAt: "desc" },
     });
+  } catch (e) {
+    logSupportDbFailure("getActiveSupportTicket (SupportTicket findFirst)", e);
+    throw e;
+  }
+}
+
+export async function createActiveSupportTicket(userId: string) {
+  try {
+    return await supportTicket.create({
+      data: { userId, status: "OPEN" },
+    });
+  } catch (e) {
+    logSupportDbFailure("createActiveSupportTicket (SupportTicket create)", e);
+    throw e;
+  }
+}
+
+export async function getOrCreateActiveSupportTicket(userId: string) {
+  try {
+    const existing = await getActiveSupportTicket(userId);
     if (existing) {
       return existing;
     }
-    const created = await supportTicket.create({
-      data: { userId, status: "OPEN" },
-    });
+    const created = await createActiveSupportTicket(userId);
     await appendSystemSupportMessage(created.id, userId, SUPPORT_SYSTEM_BODY_TICKET_REGISTERED);
     return created;
   } catch (e) {
