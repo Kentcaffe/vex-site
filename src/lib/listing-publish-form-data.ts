@@ -174,6 +174,12 @@ export function buildFormDataFromPublishValues(
     const name = getDetailFormName(field);
     fd.set(name, values.extra[name] ?? "");
   }
+  for (const [key, value] of Object.entries(values.extra)) {
+    if (!key.startsWith("cfg_")) {
+      continue;
+    }
+    fd.set(key, value ?? "");
+  }
 
   return fd;
 }

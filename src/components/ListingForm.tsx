@@ -16,9 +16,7 @@ import {
   type DetailField,
 } from "@/lib/listing-detail-config";
 import { SearchableSelect } from "@/components/publish/SearchableSelect";
-import { ELECTRONICS_BRANDS, getElectronicsModelsForBrand } from "@/lib/electronics-taxonomy";
-import { isElectronicsBrandSlug, needsCoreConditionSlug } from "@/lib/listing-profiles";
-import { LISTING_YEAR_OPTIONS, RE_ROOM_COUNTS } from "@/lib/listing-form-options";
+import { needsCoreConditionSlug } from "@/lib/listing-profiles";
 import {
   type CategoryTreeNode,
   findCategoryNodeById,
@@ -55,8 +53,16 @@ import {
   type PublishFormValues,
 } from "@/lib/listing-publish-form-data";
 import { MOLDOVA_CITY_SET, moldovaCitySelectOptions } from "@/lib/moldova-cities";
-import { getModelsForBrand } from "@/lib/vehicle-models-by-brand";
-import { VEHICLE_BRANDS } from "@/lib/vehicle-taxonomy";
+import {
+  categoryConfig,
+  getCategoryBrands,
+  getModelsForCategoryBrand,
+  isBrandAllowedForCategory,
+  isModelAllowedForCategoryBrand,
+  resolveCategoryConfigKey,
+  type ListingFieldConfig,
+  type ListingFieldId,
+} from "@/lib/listing-category-config";
 
 type Props = {
   locale: string;
@@ -128,6 +134,11 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
 
   const { isVeh, isRe, isBrandish } = getListingFormFlags(selectedSlug);
   const needsCoreCondition = needsCoreConditionSlug(selectedSlug);
+  const selectedCategoryKey = useMemo(() => resolveCategoryConfigKey(selectedSlug), [selectedSlug]);
+  const selectedCategoryDynamicConfig = useMemo(
+    () => (selectedCategoryKey ? categoryConfig[selectedCategoryKey] : null),
+    [selectedCategoryKey],
+  );
   const liveRequiredFields = useMemo((): ListingFormFieldId[] => {
     const fields: ListingFormFieldId[] = ["title", "description", "price", "city"];
     if (needsCoreCondition) {
@@ -140,12 +151,39 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     () => getDetailFieldsForSlug(selectedSlug, { brand: publishValues.brand, model: publishValues.modelName }),
     [selectedSlug, publishValues.brand, publishValues.modelName],
   );
-  const vehicleModelSuggestions = useMemo(() => getModelsForBrand(publishValues.brand), [publishValues.brand]);
-  const electronicsModelSuggestions = useMemo(
-    () => getElectronicsModelsForBrand(publishValues.brand),
-    [publishValues.brand],
+  const dynamicBrandOptions = useMemo(
+    () => getCategoryBrands(selectedCategoryKey).map((value) => ({ value, label: value })),
+    [selectedCategoryKey],
   );
-  const isElectronics = isElectronicsBrandSlug(selectedSlug);
+  const dynamicModelOptions = useMemo(
+    () =>
+      getModelsForCategoryBrand(selectedCategoryKey, publishValues.brand).map((value) => ({
+        value,
+        label: value,
+      })),
+    [selectedCategoryKey, publishValues.brand],
+  );
+  const hasDynamicCategoryConfig = Boolean(selectedCategoryDynamicConfig);
+
+  useEffect(() => {
+    if (isBrandAllowedForCategory(selectedCategoryKey, publishValues.brand)) {
+      return;
+    }
+    setPublishValues((prev) => ({ ...prev, brand: "", modelName: "" }));
+  }, [selectedCategoryKey, publishValues.brand]);
+
+  useEffect(() => {
+    if (
+      isModelAllowedForCategoryBrand(
+        selectedCategoryKey,
+        publishValues.brand,
+        publishValues.modelName,
+      )
+    ) {
+      return;
+    }
+    setPublishValues((prev) => ({ ...prev, modelName: "" }));
+  }, [selectedCategoryKey, publishValues.brand, publishValues.modelName]);
 
   const citySelectOptions = useMemo(() => {
     const base = moldovaCitySelectOptions();
@@ -456,6 +494,99 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     setPublishValues((p) => ({ ...p, extra: { ...p.extra, [name]: value } }));
   }
 
+  function dynamicExtraStorageKey(fieldId: ListingFieldId): string {
+    if (fieldId === "fuel") return "d_fuel";
+    if (fieldId === "transmission") return "d_transmission";
+    if (fieldId === "engineCc") return "d_engine_cc";
+    if (fieldId === "propertyType") return "d_property_type";
+    if (fieldId === "floor") return "d_floor";
+    if (fieldId === "furnished") return "d_furnished";
+    if (fieldId === "condition") return "d_electronics_condition";
+    if (fieldId === "sizeLabel") return "d_size_label";
+    if (fieldId === "jobType") return "d_employment_type";
+    if (fieldId === "experienceYears") return "d_experience_years";
+    if (fieldId === "salary") return "d_salary_from";
+    return `cfg_${fieldId}`;
+  }
+
+  function getDynamicFieldValue(fieldId: ListingFieldId): string {
+    if (fieldId === "brand") return publishValues.brand;
+    if (fieldId === "modelName") return publishValues.modelName;
+    if (fieldId === "year") return publishValues.year;
+    if (fieldId === "mileageKm") return publishValues.mileageKm;
+    if (fieldId === "rooms") return publishValues.rooms;
+    if (fieldId === "areaSqm") return publishValues.areaSqm;
+    if (fieldId === "condition") return publishValues.condition;
+    return publishValues.extra[dynamicExtraStorageKey(fieldId)] ?? "";
+  }
+
+  function setDynamicFieldValue(fieldId: ListingFieldId, value: string) {
+    setPublishValues((prev) => {
+      if (fieldId === "brand") {
+        return { ...prev, brand: value, modelName: "" };
+      }
+      if (fieldId === "modelName") {
+        return { ...prev, modelName: value };
+      }
+      if (fieldId === "year") {
+        return { ...prev, year: value };
+      }
+      if (fieldId === "mileageKm") {
+        return { ...prev, mileageKm: value };
+      }
+      if (fieldId === "rooms") {
+        return { ...prev, rooms: value };
+      }
+      if (fieldId === "areaSqm") {
+        return { ...prev, areaSqm: value };
+      }
+      if (fieldId === "condition") {
+        return { ...prev, extra: { ...prev.extra, [dynamicExtraStorageKey(fieldId)]: value } };
+      }
+      return { ...prev, extra: { ...prev.extra, [dynamicExtraStorageKey(fieldId)]: value } };
+    });
+  }
+
+  function renderDynamicField(field: ListingFieldConfig) {
+    const value = getDynamicFieldValue(field.id);
+    const isBrandField = field.id === "brand";
+    const isModelField = field.id === "modelName";
+    const options = isBrandField
+      ? dynamicBrandOptions
+      : isModelField
+        ? dynamicModelOptions
+        : (field.options ?? []).map((option) => ({ value: option, label: option }));
+
+    if (field.input === "select") {
+      return (
+        <SearchableSelect
+          id={`cfg-${field.id}`}
+          value={value}
+          onValueChangeAction={(nextValue) => setDynamicFieldValue(field.id, nextValue)}
+          options={options}
+          placeholder={t("detailOptional")}
+          emptyLabel={t("detailOptional")}
+          searchPlaceholder={t("searchableSearch")}
+          noResultsLabel={t("searchableEmpty")}
+          disabled={isModelField && !publishValues.brand.trim()}
+        />
+      );
+    }
+
+    return (
+      <input
+        id={`cfg-${field.id}`}
+        type="number"
+        inputMode="numeric"
+        min={field.min}
+        max={field.max}
+        value={value}
+        onChange={(e) => setDynamicFieldValue(field.id, e.target.value)}
+        className={`${baseInputClass}`}
+      />
+    );
+  }
+
   function handleSubmit() {
     devWarn("handleSubmit() START");
     setLiveValidateEnabled(true);
@@ -483,6 +614,21 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       queueMicrotask(() => {
         scrollAndFocusField("categoryId");
       });
+      return;
+    }
+
+    if (!isBrandAllowedForCategory(selectedCategoryKey, publishValues.brand)) {
+      toast("error", "Marca selectată nu aparține categoriei curente.");
+      return;
+    }
+    if (
+      !isModelAllowedForCategoryBrand(
+        selectedCategoryKey,
+        publishValues.brand,
+        publishValues.modelName,
+      )
+    ) {
+      toast("error", "Modelul selectat nu aparține mărcii curente.");
       return;
     }
 
@@ -818,193 +964,28 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
         ) : null}
       </section>
 
-      {isVeh ||
-      isRe ||
-      (isBrandish && !isVeh && !isElectronics) ||
-      isElectronics ||
-      detailFields.length > 0 ? (
+      {hasDynamicCategoryConfig || isVeh || isRe || isBrandish || detailFields.length > 0 ? (
         <section className="space-y-6 border-t border-zinc-200 pt-6 text-zinc-900 md:pt-8">
           <div>
             <h2 className="text-base font-semibold text-zinc-900">{t("formSectionSpecs")}</h2>
           </div>
 
-          {isVeh ? (
+          {selectedCategoryDynamicConfig ? (
             <div className="grid gap-5 md:grid-cols-2">
-              <div>
-                <label className={labelClass} htmlFor="brand">
-                  {t("brand")}
-                </label>
-                <SearchableSelect
-                  id="brand"
-                  value={publishValues.brand}
-                  onValueChangeAction={(v) => setPublishValues((p) => ({ ...p, brand: v, modelName: "" }))}
-                  options={VEHICLE_BRANDS.map((b) => ({ value: b, label: b }))}
-                  placeholder={t("pickBrand")}
-                  emptyLabel={t("detailOptional")}
-                  searchPlaceholder={t("searchableSearch")}
-                  noResultsLabel={t("searchableEmpty")}
-                />
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="modelName">
-                  {t("model")}
-                </label>
-                <SearchableSelect
-                  id="modelName"
-                  value={publishValues.modelName}
-                  onValueChangeAction={(v) => setPublishValues((p) => ({ ...p, modelName: v }))}
-                  options={vehicleModelSuggestions.map((m) => ({ value: m, label: m }))}
-                  placeholder={t("pickModel")}
-                  emptyLabel={t("detailOptional")}
-                  searchPlaceholder={t("searchableSearch")}
-                  noResultsLabel={t("searchableEmpty")}
-                  disabled={!publishValues.brand.trim()}
-                />
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="year">
-                  {t("year")}
-                </label>
-                <select
-                  id="year"
-                  name="year"
-                  value={publishValues.year}
-                  onChange={(e) => setPublishValues((p) => ({ ...p, year: e.target.value }))}
-                  className={`${baseInputClass}`}
-                >
-                  <option value="">{t("detailOptional")}</option>
-                  {LISTING_YEAR_OPTIONS.map((y) => (
-                    <option key={y} value={y}>
-                      {y}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="mileageKm">
-                  {t("mileage")}
-                </label>
-                <input
-                  id="mileageKm"
-                  name="mileageKm"
-                  type="number"
-                  inputMode="numeric"
-                  value={publishValues.mileageKm}
-                  onChange={(e) => setPublishValues((p) => ({ ...p, mileageKm: e.target.value }))}
-                  className={`${baseInputClass}`}
-                />
-              </div>
+              {selectedCategoryDynamicConfig.fields.map((field) => (
+                <div key={field.id}>
+                  <label className={labelClass} htmlFor={`cfg-${field.id}`}>
+                    {field.label}
+                  </label>
+                  {renderDynamicField(field)}
+                </div>
+              ))}
             </div>
           ) : null}
 
-          {isElectronics ? (
+          {!selectedCategoryDynamicConfig ? (
             <div className="grid gap-5 md:grid-cols-2">
-              <div>
-                <label className={labelClass} htmlFor="brand-el">
-                  {t("brand")}
-                </label>
-                <SearchableSelect
-                  id="brand-el"
-                  value={publishValues.brand}
-                  onValueChangeAction={(v) => setPublishValues((p) => ({ ...p, brand: v, modelName: "" }))}
-                  options={ELECTRONICS_BRANDS.map((b) => ({ value: b, label: b }))}
-                  placeholder={t("pickBrand")}
-                  emptyLabel={t("detailOptional")}
-                  searchPlaceholder={t("searchableSearch")}
-                  noResultsLabel={t("searchableEmpty")}
-                />
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="modelName-el">
-                  {t("model")}
-                </label>
-                <SearchableSelect
-                  id="modelName-el"
-                  value={publishValues.modelName}
-                  onValueChangeAction={(v) => setPublishValues((p) => ({ ...p, modelName: v }))}
-                  options={electronicsModelSuggestions.map((m) => ({ value: m, label: m }))}
-                  placeholder={t("pickModel")}
-                  emptyLabel={t("detailOptional")}
-                  searchPlaceholder={t("searchableSearch")}
-                  noResultsLabel={t("searchableEmpty")}
-                  disabled={!publishValues.brand.trim()}
-                />
-              </div>
-            </div>
-          ) : null}
-
-          {isRe ? (
-            <div className="grid gap-5 md:grid-cols-2">
-              <div>
-                <label className={labelClass} htmlFor="rooms">
-                  {t("rooms")}
-                </label>
-                <select
-                  id="rooms"
-                  name="rooms"
-                  value={publishValues.rooms}
-                  onChange={(e) => setPublishValues((p) => ({ ...p, rooms: e.target.value }))}
-                  className={`${baseInputClass}`}
-                >
-                  <option value="">{t("detailOptional")}</option>
-                  {RE_ROOM_COUNTS.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="areaSqm">
-                  {t("areaSqm")}
-                </label>
-                <input
-                  id="areaSqm"
-                  name="areaSqm"
-                  type="number"
-                  inputMode="numeric"
-                  min={1}
-                  value={publishValues.areaSqm}
-                  onChange={(e) => setPublishValues((p) => ({ ...p, areaSqm: e.target.value }))}
-                  className={`${baseInputClass}`}
-                />
-              </div>
-            </div>
-          ) : null}
-
-          {isBrandish && !isVeh && !isElectronics ? (
-            <div className="grid gap-5 md:grid-cols-2">
-              <div>
-                <label className={labelClass} htmlFor="brand2">
-                  {t("brand")}
-                </label>
-                <input
-                  id="brand2"
-                  name="brand"
-                  maxLength={80}
-                  value={publishValues.brand}
-                  onChange={(e) => setPublishValues((p) => ({ ...p, brand: e.target.value }))}
-                  className={`${baseInputClass}`}
-                />
-              </div>
-              <div>
-                <label className={labelClass} htmlFor="modelName2">
-                  {t("model")}
-                </label>
-                <input
-                  id="modelName2"
-                  name="modelName"
-                  maxLength={80}
-                  value={publishValues.modelName}
-                  onChange={(e) => setPublishValues((p) => ({ ...p, modelName: e.target.value }))}
-                  className={`${baseInputClass}`}
-                />
-              </div>
-            </div>
-          ) : null}
-
-          <div className="grid gap-5 md:grid-cols-2">
-            {detailFields.map((field) => {
+              {detailFields.map((field) => {
               const fname = getDetailFormName(field);
               const val = publishValues.extra[fname] ?? "";
               const searchOpts =
@@ -1012,66 +993,67 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
                   value: v,
                   label: selectOptionLabel(field, v),
                 })) ?? [];
-              return (
-                <div key={field.id}>
-                  <label className={labelClass} htmlFor={fname}>
-                    {detailLabel(field)}
-                  </label>
-                  {field.input === "select" && field.selectValues && field.searchable ? (
-                    <SearchableSelect
-                      id={fname}
-                      value={val}
-                      onValueChangeAction={(v) => setExtra(fname, v)}
-                      options={searchOpts}
-                      placeholder={t("detailOptional")}
-                      emptyLabel={t("detailOptional")}
-                      searchPlaceholder={t("searchableSearch")}
-                      noResultsLabel={t("searchableEmpty")}
-                    />
-                  ) : null}
-                  {field.input === "select" && field.selectValues && !field.searchable ? (
-                    <select
-                      id={fname}
-                      name={fname}
-                      value={val}
-                      onChange={(e) => setExtra(fname, e.target.value)}
-                      className={`${baseInputClass}`}
-                    >
-                      <option value="">{t("detailOptional")}</option>
-                      {field.selectValues.map((v) => (
-                        <option key={v} value={v}>
-                          {selectOptionLabel(field, v)}
-                        </option>
-                      ))}
-                    </select>
-                  ) : null}
-                  {field.input === "text" ? (
-                    <input
-                      id={fname}
-                      name={fname}
-                      maxLength={field.maxLength ?? 80}
-                      value={val}
-                      onChange={(e) => setExtra(fname, e.target.value)}
-                      className={`${baseInputClass}`}
-                    />
-                  ) : null}
-                  {field.input === "number" ? (
-                    <input
-                      id={fname}
-                      name={fname}
-                      type="number"
-                      inputMode="numeric"
-                      min={field.min}
-                      max={field.max}
-                      value={val}
-                      onChange={(e) => setExtra(fname, e.target.value)}
-                      className={`${baseInputClass}`}
-                    />
-                  ) : null}
-                </div>
-              );
-            })}
-          </div>
+                return (
+                  <div key={field.id}>
+                    <label className={labelClass} htmlFor={fname}>
+                      {detailLabel(field)}
+                    </label>
+                    {field.input === "select" && field.selectValues && field.searchable ? (
+                      <SearchableSelect
+                        id={fname}
+                        value={val}
+                        onValueChangeAction={(v) => setExtra(fname, v)}
+                        options={searchOpts}
+                        placeholder={t("detailOptional")}
+                        emptyLabel={t("detailOptional")}
+                        searchPlaceholder={t("searchableSearch")}
+                        noResultsLabel={t("searchableEmpty")}
+                      />
+                    ) : null}
+                    {field.input === "select" && field.selectValues && !field.searchable ? (
+                      <select
+                        id={fname}
+                        name={fname}
+                        value={val}
+                        onChange={(e) => setExtra(fname, e.target.value)}
+                        className={`${baseInputClass}`}
+                      >
+                        <option value="">{t("detailOptional")}</option>
+                        {field.selectValues.map((v) => (
+                          <option key={v} value={v}>
+                            {selectOptionLabel(field, v)}
+                          </option>
+                        ))}
+                      </select>
+                    ) : null}
+                    {field.input === "text" ? (
+                      <input
+                        id={fname}
+                        name={fname}
+                        maxLength={field.maxLength ?? 80}
+                        value={val}
+                        onChange={(e) => setExtra(fname, e.target.value)}
+                        className={`${baseInputClass}`}
+                      />
+                    ) : null}
+                    {field.input === "number" ? (
+                      <input
+                        id={fname}
+                        name={fname}
+                        type="number"
+                        inputMode="numeric"
+                        min={field.min}
+                        max={field.max}
+                        value={val}
+                        onChange={(e) => setExtra(fname, e.target.value)}
+                        className={`${baseInputClass}`}
+                      />
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
         </section>
       ) : null}
 

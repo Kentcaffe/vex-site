@@ -20,6 +20,11 @@ import { devLog, devWarn } from "@/lib/dev-log";
 import { asListingCreateInput } from "@/lib/prisma-listing-casts";
 import { listingUpdateSoftDelete, listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
+import {
+  isBrandAllowedForCategory,
+  isModelAllowedForCategoryBrand,
+  resolveCategoryConfigKey,
+} from "@/lib/listing-category-config";
 
 export type CreateListingState =
   | { ok: true; listingId: string; details?: string }
@@ -215,6 +220,27 @@ export async function createListing(
   }
 
   const slug = categoryRow.slug;
+  const categoryConfigKey = resolveCategoryConfigKey(slug);
+  if (!isBrandAllowedForCategory(categoryConfigKey, parsed.data.brand ?? "")) {
+    return {
+      ok: false,
+      error: "validation",
+      details: "Marca selectată nu aparține categoriei selectate.",
+    };
+  }
+  if (
+    !isModelAllowedForCategoryBrand(
+      categoryConfigKey,
+      parsed.data.brand ?? "",
+      parsed.data.modelName ?? "",
+    )
+  ) {
+    return {
+      ok: false,
+      error: "validation",
+      details: "Modelul selectat nu aparține mărcii selectate.",
+    };
+  }
   const cols = sanitizeColumnPayload(slug, {
     brand: parsed.data.brand,
     modelName: parsed.data.modelName,
@@ -397,6 +423,27 @@ export async function updateOwnListing(
   }
 
   const slug = categoryRow.slug;
+  const categoryConfigKey = resolveCategoryConfigKey(slug);
+  if (!isBrandAllowedForCategory(categoryConfigKey, parsed.data.brand ?? "")) {
+    return {
+      ok: false,
+      error: "validation",
+      details: "Marca selectată nu aparține categoriei selectate.",
+    };
+  }
+  if (
+    !isModelAllowedForCategoryBrand(
+      categoryConfigKey,
+      parsed.data.brand ?? "",
+      parsed.data.modelName ?? "",
+    )
+  ) {
+    return {
+      ok: false,
+      error: "validation",
+      details: "Modelul selectat nu aparține mărcii selectate.",
+    };
+  }
   const cols = sanitizeColumnPayload(slug, {
     brand: parsed.data.brand,
     modelName: parsed.data.modelName,
