@@ -27,7 +27,12 @@ for select
 to authenticated
 using (
   auth.uid() = user_id
-  or lower(coalesce(auth.jwt() ->> 'role', auth.jwt() -> 'user_metadata' ->> 'role', '')) = 'admin'
+  or exists (
+    select 1
+    from public.users u
+    where u."supabaseAuthId" = auth.uid()::text
+      and u.role = 'ADMIN'
+  )
 );
 
 drop policy if exists "bugs_insert_tester_or_admin" on public.bugs;
@@ -37,7 +42,12 @@ for insert
 to authenticated
 with check (
   auth.uid() = user_id
-  and lower(coalesce(auth.jwt() ->> 'role', auth.jwt() -> 'user_metadata' ->> 'role', '')) in ('tester', 'admin')
+  and exists (
+    select 1
+    from public.users u
+    where u."supabaseAuthId" = auth.uid()::text
+      and lower(u.role::text) in ('tester', 'moderator', 'admin')
+  )
 );
 
 drop policy if exists "bugs_update_admin_only" on public.bugs;
@@ -46,10 +56,20 @@ on public.bugs
 for update
 to authenticated
 using (
-  lower(coalesce(auth.jwt() ->> 'role', auth.jwt() -> 'user_metadata' ->> 'role', '')) = 'admin'
+  exists (
+    select 1
+    from public.users u
+    where u."supabaseAuthId" = auth.uid()::text
+      and u.role = 'ADMIN'
+  )
 )
 with check (
-  lower(coalesce(auth.jwt() ->> 'role', auth.jwt() -> 'user_metadata' ->> 'role', '')) = 'admin'
+  exists (
+    select 1
+    from public.users u
+    where u."supabaseAuthId" = auth.uid()::text
+      and u.role = 'ADMIN'
+  )
 );
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -70,6 +90,11 @@ for insert
 to authenticated
 with check (
   bucket_id = 'bugs'
-  and lower(coalesce(auth.jwt() ->> 'role', auth.jwt() -> 'user_metadata' ->> 'role', '')) in ('tester', 'admin')
+  and exists (
+    select 1
+    from public.users u
+    where u."supabaseAuthId" = auth.uid()::text
+      and lower(u.role::text) in ('tester', 'moderator', 'admin')
+  )
 );
 
