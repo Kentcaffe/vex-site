@@ -113,6 +113,8 @@ export type ListingFieldConfig = {
   appliesTo?: ReadonlyArray<string | RegExp>;
 };
 
+export type ListingUiLocale = "ro" | "ru" | "en";
+
 type CategoryConfig = {
   fields: readonly ListingFieldConfig[];
   brands?: Record<string, readonly string[]>;
@@ -333,6 +335,117 @@ export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
     ],
   },
 };
+
+const FIELD_LABELS: Partial<Record<ListingFieldId, Record<ListingUiLocale, string>>> = {
+  brand: { ro: "Marcă", ru: "Марка", en: "Brand" },
+  modelName: { ro: "Model", ru: "Модель", en: "Model" },
+  year: { ro: "An", ru: "Год", en: "Year" },
+  mileageKm: { ro: "Kilometraj (km)", ru: "Пробег (км)", en: "Mileage (km)" },
+  fuel: { ro: "Combustibil", ru: "Топливо", en: "Fuel type" },
+  transmission: { ro: "Transmisie", ru: "Коробка передач", en: "Transmission" },
+  bodyType: { ro: "Caroserie", ru: "Тип кузова", en: "Body type" },
+  doors: { ro: "Număr uși", ru: "Количество дверей", en: "Doors" },
+  seats: { ro: "Locuri", ru: "Количество мест", en: "Seats" },
+  color: { ro: "Culoare", ru: "Цвет", en: "Color" },
+  powerHp: { ro: "Putere (CP)", ru: "Мощность (л.с.)", en: "Power (HP)" },
+  engineCc: { ro: "Cilindree (cm3)", ru: "Объем двигателя (см3)", en: "Engine capacity (cc)" },
+  registrationCountry: { ro: "Țară înmatriculare", ru: "Страна регистрации", en: "Registration country" },
+  serviceHistory: { ro: "Istoric service", ru: "Сервисная история", en: "Service history" },
+  accidentFree: { ro: "Fără accidente", ru: "Без ДТП", en: "Accident free" },
+  numberOfOwners: { ro: "Număr proprietari", ru: "Количество владельцев", en: "Number of owners" },
+  emissionClass: { ro: "Normă poluare", ru: "Экокласс", en: "Emission class" },
+  batteryCapacityKwh: { ro: "Capacitate baterie (kWh)", ru: "Емкость батареи (кВтч)", en: "Battery capacity (kWh)" },
+  rangeKm: { ro: "Autonomie (km)", ru: "Запас хода (км)", en: "Range (km)" },
+  fastCharge: { ro: "Încărcare rapidă", ru: "Быстрая зарядка", en: "Fast charging" },
+  payloadKg: { ro: "Sarcină utilă (kg)", ru: "Грузоподъемность (кг)", en: "Payload (kg)" },
+  axlesCount: { ro: "Număr axe", ru: "Количество осей", en: "Axles" },
+  cargoVolumeM3: { ro: "Volum marfă (m3)", ru: "Объем груза (м3)", en: "Cargo volume (m3)" },
+  propertyType: { ro: "Tip proprietate", ru: "Тип недвижимости", en: "Property type" },
+  areaSqm: { ro: "Suprafață (m²)", ru: "Площадь (м²)", en: "Area (sqm)" },
+  rooms: { ro: "Camere", ru: "Комнаты", en: "Rooms" },
+  floor: { ro: "Etaj", ru: "Этаж", en: "Floor" },
+  furnished: { ro: "Mobilat", ru: "Меблировка", en: "Furnished" },
+  buildYear: { ro: "An construcție", ru: "Год постройки", en: "Build year" },
+  landAreaSqm: { ro: "Suprafață teren (m²)", ru: "Площадь участка (м²)", en: "Land area (sqm)" },
+  totalFloors: { ro: "Total etaje", ru: "Всего этажей", en: "Total floors" },
+  balconies: { ro: "Balcoane", ru: "Балконы", en: "Balconies" },
+  bathrooms: { ro: "Băi", ru: "Санузлы", en: "Bathrooms" },
+  heatingType: { ro: "Tip încălzire", ru: "Тип отопления", en: "Heating type" },
+  parkingType: { ro: "Parcare", ru: "Парковка", en: "Parking" },
+  energyClass: { ro: "Clasă energetică", ru: "Класс энергоэффективности", en: "Energy class" },
+  availableFrom: { ro: "Disponibil din", ru: "Доступно с", en: "Available from" },
+  petsAllowed: { ro: "Animale permise", ru: "Можно с животными", en: "Pets allowed" },
+  elevator: { ro: "Lift", ru: "Лифт", en: "Elevator" },
+  internet: { ro: "Internet inclus", ru: "Интернет включен", en: "Internet included" },
+  condition: { ro: "Stare", ru: "Состояние", en: "Condition" },
+  warranty: { ro: "Garanție", ru: "Гарантия", en: "Warranty" },
+  productType: { ro: "Tip produs", ru: "Тип товара", en: "Product type" },
+  storageGb: { ro: "Stocare (GB)", ru: "Память (GB)", en: "Storage (GB)" },
+  ramGb: { ro: "RAM (GB)", ru: "ОЗУ (GB)", en: "RAM (GB)" },
+  screenInch: { ro: "Diagonală ecran", ru: "Диагональ экрана", en: "Screen size" },
+  processorType: { ro: "Procesor", ru: "Процессор", en: "Processor" },
+  videoCard: { ro: "Placă video", ru: "Видеокарта", en: "Graphics card" },
+  salary: { ro: "Salariu", ru: "Зарплата", en: "Salary" },
+  jobType: { ro: "Tip job", ru: "Тип занятости", en: "Job type" },
+};
+
+const OPTION_LABELS: Record<string, Record<ListingUiLocale, string>> = {
+  yes: { ro: "Da", ru: "Да", en: "Yes" },
+  no: { ro: "Nu", ru: "Нет", en: "No" },
+  unknown: { ro: "Necunoscut", ru: "Неизвестно", en: "Unknown" },
+  petrol: { ro: "Benzină", ru: "Бензин", en: "Petrol" },
+  diesel: { ro: "Motorină", ru: "Дизель", en: "Diesel" },
+  hybrid: { ro: "Hibrid", ru: "Гибрид", en: "Hybrid" },
+  electric: { ro: "Electric", ru: "Электро", en: "Electric" },
+  lpg: { ro: "GPL", ru: "Газ", en: "LPG" },
+  manual: { ro: "Manuală", ru: "Механика", en: "Manual" },
+  automatic: { ro: "Automată", ru: "Автомат", en: "Automatic" },
+  "semi-automatic": { ro: "Semi-automată", ru: "Полуавтомат", en: "Semi-automatic" },
+  "front-wheel": { ro: "Față", ru: "Передний", en: "Front-wheel" },
+  "rear-wheel": { ro: "Spate", ru: "Задний", en: "Rear-wheel" },
+  "all-wheel": { ro: "Integrală", ru: "Полный", en: "All-wheel" },
+  sedan: { ro: "Sedan", ru: "Седан", en: "Sedan" },
+  hatchback: { ro: "Hatchback", ru: "Хэтчбек", en: "Hatchback" },
+  suv: { ro: "SUV", ru: "SUV", en: "SUV" },
+  coupe: { ro: "Coupe", ru: "Купе", en: "Coupe" },
+  wagon: { ro: "Break", ru: "Универсал", en: "Wagon" },
+  pickup: { ro: "Pick-up", ru: "Пикап", en: "Pickup" },
+  van: { ro: "Van", ru: "Фургон", en: "Van" },
+  convertible: { ro: "Cabrio", ru: "Кабриолет", en: "Convertible" },
+  apartment: { ro: "Apartament", ru: "Квартира", en: "Apartment" },
+  house: { ro: "Casă", ru: "Дом", en: "House" },
+  "commercial-space": { ro: "Spațiu comercial", ru: "Коммерческое помещение", en: "Commercial space" },
+  land: { ro: "Teren", ru: "Земля", en: "Land" },
+  new: { ro: "Nou", ru: "Новый", en: "New" },
+  used: { ro: "Folosit", ru: "Б/у", en: "Used" },
+  refurbished: { ro: "Recondiționat", ru: "Восстановленный", en: "Refurbished" },
+  none: { ro: "Fără", ru: "Нет", en: "None" },
+};
+
+function humanizeFieldId(fieldId: string): string {
+  return fieldId
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
+export function resolveListingUiLocale(locale: string): ListingUiLocale {
+  const l = locale.toLowerCase();
+  if (l.startsWith("ru")) return "ru";
+  if (l.startsWith("ro")) return "ro";
+  return "en";
+}
+
+export function getLocalizedFieldLabel(fieldId: ListingFieldId, locale: string): string {
+  const lang = resolveListingUiLocale(locale);
+  return FIELD_LABELS[fieldId]?.[lang] ?? FIELD_LABELS[fieldId]?.en ?? humanizeFieldId(fieldId);
+}
+
+export function getLocalizedFieldOptionLabel(fieldId: ListingFieldId, value: string, locale: string): string {
+  void fieldId;
+  const lang = resolveListingUiLocale(locale);
+  return OPTION_LABELS[value]?.[lang] ?? OPTION_LABELS[value]?.en ?? value;
+}
 
 function fieldMatchesSlug(field: ListingFieldConfig, slug: string): boolean {
   const rules = field.appliesTo;

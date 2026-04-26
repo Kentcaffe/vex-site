@@ -2,7 +2,7 @@
 
 import { startTransition, useActionState, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { saveListing, type CreateListingState } from "@/app/actions/listings";
 import { devLog, devWarn } from "@/lib/dev-log";
 import { CategorySelector } from "@/components/publish/CategorySelector";
@@ -57,6 +57,8 @@ import {
   categoryConfig,
   getCategoryBrands,
   getCategoryFieldsForSlug,
+  getLocalizedFieldLabel,
+  getLocalizedFieldOptionLabel,
   getModelsForCategoryBrand,
   isBrandAllowedForCategory,
   isModelAllowedForCategoryBrand,
@@ -90,6 +92,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
   const { toast } = useToast();
   const t = useTranslations("ListingForm");
   const tVal = useTranslations("ListingForm.validation");
+  const uiLocale = useLocale();
 
   const msg: ListingFormValidationMessages = useMemo(
     () => ({
@@ -560,7 +563,10 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       ? dynamicBrandOptions
       : isModelField
         ? dynamicModelOptions
-        : (field.options ?? []).map((option) => ({ value: option, label: option }));
+        : (field.options ?? []).map((option) => ({
+            value: option,
+            label: getLocalizedFieldOptionLabel(field.id, option, uiLocale),
+          }));
 
     if (field.input === "select") {
       return (
@@ -980,7 +986,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
               {selectedCategoryFields.map((field) => (
                 <div key={field.id}>
                   <label className={labelClass} htmlFor={`cfg-${field.id}`}>
-                    {field.label}
+                    {getLocalizedFieldLabel(field.id, uiLocale)}
                   </label>
                   {renderDynamicField(field)}
                 </div>
