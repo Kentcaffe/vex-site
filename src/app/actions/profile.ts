@@ -48,6 +48,21 @@ function extractStoragePathFromPublicUrl(url: string | null | undefined): string
   return path || null;
 }
 
+function isMissingProfilesTableError(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+  const maybe = error as { message?: unknown; code?: unknown };
+  const message = typeof maybe.message === "string" ? maybe.message : "";
+  const code = typeof maybe.code === "string" ? maybe.code : "";
+  return (
+    message.includes("public.profiles") ||
+    message.includes("schema cache") ||
+    code === "PGRST205" ||
+    code === "42P01"
+  );
+}
+
 export async function updateProfile(
   _prev: UpdateProfileState | undefined,
   formData: FormData,
@@ -101,10 +116,14 @@ export async function updateProfile(
       .maybeSingle();
 
     if (existingProfileError) {
-      console.error("[profile:update] profiles select error", existingProfileError);
-      return { ok: false, error: "unknown", message: existingProfileError.message };
+      if (!isMissingProfilesTableError(existingProfileError)) {
+        console.error("[profile:update] profiles select error", existingProfileError);
+        return { ok: false, error: "unknown", message: existingProfileError.message };
+      }
+      console.warn("[profile:update] profiles table missing; fallback to prisma.user only");
     }
 
+    const profilesAvailable = !existingProfileError || !isMissingProfilesTableError(existingProfileError);
     const existingAvatarPath = extractStoragePathFromPublicUrl(existingProfileRow?.avatar_url);
 
     if (intent === "delete_avatar") {
@@ -143,40 +162,45 @@ export async function updateProfile(
       }
     }
 
-    const { data: updatedProfileRows, error: profileUpdateError } = await supabase
-      .from("profiles")
-      .update({
-        name: nextName,
-        avatar_url: nextAvatarUrl,
-      })
-      .eq("id", supabaseUserId)
-      .select("id,name,avatar_url");
+    let finalName = nextName;
+    let finalAvatarUrl = nextAvatarUrl;
 
-    console.log("[profile:update] profiles update result", {
-      count: updatedProfileRows?.length ?? 0,
-      error: profileUpdateError?.message ?? null,
-    });
-    if (profileUpdateError) {
-      console.error("[profile:update] profiles update error", profileUpdateError);
-      return { ok: false, error: "unknown", message: profileUpdateError.message };
+    if (profilesAvailable) {
+      const { data: updatedProfileRows, error: profileUpdateError } = await supabase
+        .from("profiles")
+        .update({
+          name: nextName,
+          avatar_url: nextAvatarUrl,
+        })
+        .eq("id", supabaseUserId)
+        .select("id,name,avatar_url");
+
+      console.log("[profile:update] profiles update result", {
+        count: updatedProfileRows?.length ?? 0,
+        error: profileUpdateError?.message ?? null,
+      });
+      if (profileUpdateError) {
+        console.error("[profile:update] profiles update error", profileUpdateError);
+        return { ok: false, error: "unknown", message: profileUpdateError.message };
+      }
+
+      const { data: refreshedProfile, error: refreshError } = await supabase
+        .from("profiles")
+        .select("name,avatar_url")
+        .eq("id", supabaseUserId)
+        .maybeSingle();
+      console.log("[profile:update] profiles refresh result", {
+        hasData: Boolean(refreshedProfile),
+        error: refreshError?.message ?? null,
+      });
+      if (refreshError) {
+        console.error("[profile:update] profiles refresh error", refreshError);
+        return { ok: false, error: "unknown", message: refreshError.message };
+      }
+
+      finalName = toNull(refreshedProfile?.name ?? undefined) ?? nextName;
+      finalAvatarUrl = toNull(refreshedProfile?.avatar_url ?? undefined) ?? nextAvatarUrl;
     }
-
-    const { data: refreshedProfile, error: refreshError } = await supabase
-      .from("profiles")
-      .select("name,avatar_url")
-      .eq("id", supabaseUserId)
-      .maybeSingle();
-    console.log("[profile:update] profiles refresh result", {
-      hasData: Boolean(refreshedProfile),
-      error: refreshError?.message ?? null,
-    });
-    if (refreshError) {
-      console.error("[profile:update] profiles refresh error", refreshError);
-      return { ok: false, error: "unknown", message: refreshError.message };
-    }
-
-    const finalName = toNull(refreshedProfile?.name ?? undefined) ?? nextName;
-    const finalAvatarUrl = toNull(refreshedProfile?.avatar_url ?? undefined) ?? nextAvatarUrl;
 
     await prisma.user.update({
       where: { id: session.user.id },
@@ -195,7 +219,12 @@ export async function updateProfile(
       ok: true,
       name: finalName,
       avatarUrl: finalAvatarUrl,
-      message: intent === "delete_avatar" ? "Avatar șters." : "Profil actualizat.",
+      message:
+        intent === "delete_avatar"
+          ? "Avatar șters."
+          : profilesAvailable
+            ? "Profil actualizat."
+            : "Profil actualizat (fallback local, tabela Supabase profiles lipsește).",
     };
   } catch (error) {
     console.error("[profile:update] unknown error", error);
