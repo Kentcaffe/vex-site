@@ -31,7 +31,10 @@ export default async function TesterDashboardPage({ params }: Props) {
         <header className="rounded-2xl border border-zinc-800 bg-gradient-to-r from-zinc-950 via-violet-950/70 to-zinc-950 p-6 shadow-2xl shadow-black/30">
           <h1 className="text-3xl font-bold tracking-tight text-zinc-100">Tester Dashboard 🧪</h1>
           <p className="mt-2 text-sm text-zinc-300">
-            Raporteaza bug-uri, urmareste statusul si ajuta echipa Vex sa livreze o platforma mai sigura.
+            Raportează bug-uri, urmărește statusul și ajută echipa Vex să livreze o platformă mai stabilă și mai sigură.
+          </p>
+          <p className="mt-3 text-xs text-zinc-400">
+            Pont: rapoartele cu pași clari de reproducere și capturi relevante sunt validate mai rapid.
           </p>
         </header>
         <TesterDashboardClient bugs={bugs} />

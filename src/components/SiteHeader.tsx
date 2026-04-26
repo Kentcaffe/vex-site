@@ -24,6 +24,7 @@ export async function SiteHeader() {
 
   const accountHref = localizedHref(locale, "/cont");
   const publishHref = localizedHref(locale, "/publica");
+  const isTester = String(session?.user?.role ?? "").toUpperCase() === "TESTER";
 
   return (
     <header className="static w-full max-w-[100vw] border-b border-[var(--mp-border)] bg-[var(--mp-page)] md:bg-[var(--mp-surface)]">
@@ -59,6 +60,14 @@ export async function SiteHeader() {
                 <div className="flex items-center justify-between gap-2 px-2 py-2">
                   <LanguageSwitcher />
                 </div>
+                {isTester ? (
+                  <Link
+                    href="/tester"
+                    className="block rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--mp-text)] hover:bg-[var(--mp-surface-muted)]"
+                  >
+                    {t("tester")}
+                  </Link>
+                ) : null}
                 {session?.user && isStaff(session.user.role) ? (
                   <Link
                     href="/admin"
@@ -186,6 +195,11 @@ export async function SiteHeader() {
                     {t("reportContent")}
                   </Link>
                 </>
+              ) : null}
+              {isTester ? (
+                <Link href="/tester" className="text-[var(--mp-text-muted)] transition hover:text-[var(--mp-text)]">
+                  {t("tester")}
+                </Link>
               ) : null}
               {session?.user && isStaff(session.user.role) ? (
                 <Link href="/admin" className="text-[var(--mp-text-muted)] transition hover:text-[var(--mp-text)]">

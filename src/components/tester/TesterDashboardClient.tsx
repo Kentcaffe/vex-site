@@ -16,16 +16,52 @@ function SubmitButton() {
   );
 }
 
-function statusChip(status: string) {
-  if (status === "accepted") return "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
-  if (status === "rejected") return "bg-rose-500/20 text-rose-300 border-rose-500/40";
-  return "bg-amber-500/20 text-amber-200 border-amber-500/40";
+function statusMeta(status: string) {
+  if (status === "accepted") {
+    return {
+      label: "Acceptat",
+      classes: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
+    };
+  }
+  if (status === "rejected") {
+    return {
+      label: "Respins",
+      classes: "bg-rose-500/20 text-rose-300 border-rose-500/40",
+    };
+  }
+  return {
+    label: "Deschis",
+    classes: "bg-amber-500/20 text-amber-200 border-amber-500/40",
+  };
+}
+
+function categoryLabel(category: string) {
+  if (category === "functional") return "Funcțional";
+  if (category === "security") return "Securitate";
+  return "Interfață (UI)";
+}
+
+function severityLabel(severity: string) {
+  if (severity === "low") return "Mică";
+  if (severity === "high") return "Ridicată";
+  return "Medie";
 }
 
 export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
   const router = useRouter();
   const initialSubmitState: { ok: boolean; message: string; error?: string } = { ok: false, message: "" };
   const [state, formAction, pending] = useActionState(submitBugReport, initialSubmitState);
+  const stats = bugs.reduce(
+    (acc, bug) => {
+      acc.total += 1;
+      if (bug.status === "accepted") acc.accepted += 1;
+      else if (bug.status === "rejected") acc.rejected += 1;
+      else acc.open += 1;
+      acc.reward += Number(bug.reward ?? 0);
+      return acc;
+    },
+    { total: 0, open: 0, accepted: 0, rejected: 0, reward: 0 },
+  );
 
   useEffect(() => {
     if (state.ok) {
@@ -35,6 +71,25 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
 
   return (
     <div className="space-y-6">
+      <section className="grid gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl shadow-black/30 sm:grid-cols-2 lg:grid-cols-4">
+        <article className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-4">
+          <p className="text-xs uppercase tracking-wide text-zinc-400">Total raportări</p>
+          <p className="mt-2 text-2xl font-bold text-zinc-100">{stats.total}</p>
+        </article>
+        <article className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
+          <p className="text-xs uppercase tracking-wide text-amber-200/80">Deschise</p>
+          <p className="mt-2 text-2xl font-bold text-amber-100">{stats.open}</p>
+        </article>
+        <article className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
+          <p className="text-xs uppercase tracking-wide text-emerald-200/80">Acceptate</p>
+          <p className="mt-2 text-2xl font-bold text-emerald-100">{stats.accepted}</p>
+        </article>
+        <article className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4">
+          <p className="text-xs uppercase tracking-wide text-yellow-200/80">Recompense totale</p>
+          <p className="mt-2 text-2xl font-bold text-yellow-100">{stats.reward} lei</p>
+        </article>
+      </section>
+
       <section className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl shadow-black/30">
         <div className="mb-5 flex items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-zinc-100">Raporteaza bug nou</h2>
@@ -65,9 +120,9 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
               defaultValue="ui"
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
             >
-              <option value="ui">UI</option>
-              <option value="functional">Functional</option>
-              <option value="security">Security</option>
+              <option value="ui">Interfață (UI)</option>
+              <option value="functional">Funcțional</option>
+              <option value="security">Securitate</option>
             </select>
             <select
               name="severity"
@@ -75,13 +130,13 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
               defaultValue="medium"
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
             >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
+              <option value="low">Mică</option>
+              <option value="medium">Medie</option>
+              <option value="high">Ridicată</option>
             </select>
           </div>
           <label className="grid gap-2 text-sm text-zinc-300">
-            Screenshot (optional)
+            Screenshot (opțional)
             <input
               type="file"
               name="image"
@@ -104,6 +159,17 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
         </form>
       </section>
 
+      <section className="rounded-2xl border border-violet-700/40 bg-gradient-to-r from-zinc-950 to-violet-950/40 p-6 shadow-2xl shadow-black/30">
+        <h3 className="text-lg font-semibold text-zinc-100">Ghid rapid pentru testeri</h3>
+        <ul className="mt-3 space-y-2 text-sm text-zinc-300">
+          <li>1) Reproduce problema de 2 ori și notează pașii exacți.</li>
+          <li>2) În titlu descrie scurt impactul (ex: „Nu se poate publica anunț pe mobil”).</li>
+          <li>3) În descriere adaugă: pași, rezultat actual, rezultat așteptat, browser/dispozitiv.</li>
+          <li>4) Alege severitate „Ridicată” doar pentru blocaje majore sau risc de securitate.</li>
+          <li>5) Atașează screenshot/video scurt ca să poată fi confirmat rapid de echipă.</li>
+        </ul>
+      </section>
+
       <section className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl shadow-black/30">
         <h3 className="text-lg font-semibold text-zinc-100">Bug-urile tale</h3>
         <div className="mt-4 space-y-3">
@@ -116,13 +182,13 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
               <article key={bug.id} className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-semibold text-zinc-100">{bug.title}</p>
-                  <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold uppercase ${statusChip(bug.status)}`}>
-                    {bug.status}
+                  <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold uppercase ${statusMeta(bug.status).classes}`}>
+                    {statusMeta(bug.status).label}
                   </span>
                 </div>
                 <p className="mt-2 text-sm text-zinc-300">{bug.description}</p>
                 <p className="mt-2 text-xs text-zinc-400">
-                  {bug.category.toUpperCase()} · {bug.severity.toUpperCase()} · Reward: {bug.reward} lei
+                  {categoryLabel(bug.category)} · Severitate: {severityLabel(bug.severity)} · Recompensă: {bug.reward} lei
                 </p>
               </article>
             ))

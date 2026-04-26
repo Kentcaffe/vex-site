@@ -10,6 +10,24 @@ function statusBadge(status: string) {
   return "bg-amber-500/20 text-amber-200 border-amber-500/40";
 }
 
+function statusLabel(status: string) {
+  if (status === "accepted") return "Acceptat";
+  if (status === "rejected") return "Respins";
+  return "Deschis";
+}
+
+function categoryLabel(category: string) {
+  if (category === "functional") return "Funcțional";
+  if (category === "security") return "Securitate";
+  return "Interfață (UI)";
+}
+
+function severityLabel(severity: string) {
+  if (severity === "low") return "Mică";
+  if (severity === "high") return "Ridicată";
+  return "Medie";
+}
+
 export function AdminBugsPanel({
   bugs,
   leaderboard,
@@ -31,8 +49,8 @@ export function AdminBugsPanel({
             leaderboard.map((item, idx) => (
               <article key={`${item.user_name}-${idx}`} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
                 <p className="text-sm font-semibold text-zinc-100">#{idx + 1} {item.user_name}</p>
-                <p className="mt-1 text-xs text-zinc-400">Accepted: {item.accepted_count}</p>
-                <p className="text-xs text-yellow-300">Reward total: {item.total_reward} lei</p>
+                <p className="mt-1 text-xs text-zinc-400">Bug-uri acceptate: {item.accepted_count}</p>
+                <p className="text-xs text-yellow-300">Recompensă totală: {item.total_reward} lei</p>
               </article>
             ))
           )}
@@ -55,11 +73,22 @@ export function AdminBugsPanel({
                     <p className="font-semibold text-zinc-100">{bug.title}</p>
                     <p className="text-xs text-zinc-400">de {bug.user_name} ({bug.user_email})</p>
                   </div>
-                  <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold uppercase ${statusBadge(bug.status)}`}>{bug.status}</span>
+                  <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold uppercase ${statusBadge(bug.status)}`}>{statusLabel(bug.status)}</span>
                 </div>
                 <p className="mt-2 text-sm text-zinc-300">{bug.description}</p>
                 <p className="mt-2 text-xs text-zinc-400">
-                  {bug.category.toUpperCase()} · {bug.severity.toUpperCase()} · Reward: {bug.reward} lei
+                  {categoryLabel(bug.category)} · Severitate: {severityLabel(bug.severity)} · Recompensă: {bug.reward} lei
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  Raportat la: {new Date(bug.created_at).toLocaleString("ro-RO")}
+                  {bug.image_url ? (
+                    <>
+                      {" · "}
+                      <a href={bug.image_url} target="_blank" rel="noreferrer" className="text-violet-300 hover:underline">
+                        Deschide screenshot
+                      </a>
+                    </>
+                  ) : null}
                 </p>
                 <form action={action} className="mt-4 flex flex-wrap items-center gap-2">
                   <input type="hidden" name="bugId" value={bug.id} />
@@ -68,9 +97,9 @@ export function AdminBugsPanel({
                     defaultValue={bug.status}
                     className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
                   >
-                    <option value="open">open</option>
-                    <option value="accepted">accepted</option>
-                    <option value="rejected">rejected</option>
+                    <option value="open">deschis</option>
+                    <option value="accepted">acceptat</option>
+                    <option value="rejected">respins</option>
                   </select>
                   <input
                     type="number"
