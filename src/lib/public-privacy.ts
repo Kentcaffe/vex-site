@@ -23,3 +23,20 @@ export function canShowPublicPhone(
   return true;
 }
 
+export function canShowPublicEmail(
+  preferencesRaw: Prisma.JsonValue | null | undefined,
+  isViewerAuthenticated: boolean,
+): boolean {
+  const prefs = parsePreferences(preferencesRaw);
+  if (!prefs.showEmailPublic) {
+    return false;
+  }
+  if (prefs.profileVisibility === "minimal") {
+    return false;
+  }
+  if (prefs.profileVisibility === "registered" && !isViewerAuthenticated) {
+    return false;
+  }
+  return true;
+}
+

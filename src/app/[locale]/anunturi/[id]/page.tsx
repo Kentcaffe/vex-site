@@ -25,7 +25,7 @@ import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
 import { OwnListingDeleteButton } from "@/components/account/OwnListingDeleteButton";
 import { UserBadges } from "@/components/business/UserBadges";
-import { canShowPublicPhone } from "@/lib/public-privacy";
+import { canShowPublicEmail, canShowPublicPhone } from "@/lib/public-privacy";
 
 type Props = {
   params: Promise<{ locale: string; id: string }>;
@@ -54,6 +54,7 @@ type ListingDetailRow = {
   detailsJson: string | null;
   category?: { slug?: string | null } | null;
   user?: {
+    email?: string | null;
     accountType?: string | null;
     isVerified?: boolean | null;
     businessStatus?: string | null;
@@ -168,6 +169,7 @@ export default async function ListingDetailPage({ params }: Props) {
           user: {
             select: {
               accountType: true,
+              email: true,
               isVerified: true,
               businessStatus: true,
               companyName: true,
@@ -225,6 +227,7 @@ export default async function ListingDetailPage({ params }: Props) {
   const isOwner = !!userId && listing.userId === userId;
   const canReport = !!userId && !isOwner;
   const phoneVisible = canShowPublicPhone(listing.user?.preferences, Boolean(userId));
+  const emailVisible = canShowPublicEmail(listing.user?.preferences, Boolean(userId));
 
   return (
     <div className="app-shell app-section">
@@ -287,6 +290,16 @@ export default async function ListingDetailPage({ params }: Props) {
                   <dd className="text-right font-medium">
                     <a href={`tel:${listing.phone}`} className="text-emerald-700 hover:underline dark:text-emerald-400">
                       {listing.phone}
+                    </a>
+                  </dd>
+                </div>
+              ) : null}
+              {listing.user?.email && emailVisible ? (
+                <div className="flex justify-between gap-4">
+                  <dt className="text-zinc-500">Email</dt>
+                  <dd className="text-right font-medium">
+                    <a href={`mailto:${listing.user.email}`} className="text-emerald-700 hover:underline dark:text-emerald-400">
+                      {listing.user.email}
                     </a>
                   </dd>
                 </div>

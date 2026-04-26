@@ -4,6 +4,7 @@ import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { otherContentReport } from "@/lib/prisma-delegates";
 import { countOpenSupportTicketsSafe } from "@/lib/support-db-safe";
+import { getPresenceStats } from "@/lib/live-presence-store";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -55,6 +56,7 @@ export default async function AdminDashboardPage({ params }: Props) {
   const pendingReports = lp + op;
   const reviewedReports = lr + or;
   const dismissedReports = ld + od;
+  const live = getPresenceStats();
 
   return (
     <div>
@@ -110,6 +112,21 @@ export default async function AdminDashboardPage({ params }: Props) {
           >
             <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">{t("statSupportOpen")}</p>
             <p className="mt-2 text-3xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">{supportOpen}</p>
+            <p className="mt-4 text-xs font-medium text-emerald-700 dark:text-emerald-400">{t("openSection")} →</p>
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/admin"
+            className="block h-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-sky-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-sky-800"
+          >
+            <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              Vizitatori live (estimativ)
+            </p>
+            <p className="mt-2 text-3xl font-bold tabular-nums text-zinc-900 dark:text-zinc-50">{live.total}</p>
+            <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+              Logați: {live.authenticated} · Guest: {live.guests}
+            </p>
             <p className="mt-4 text-xs font-medium text-emerald-700 dark:text-emerald-400">{t("openSection")} →</p>
           </Link>
         </li>

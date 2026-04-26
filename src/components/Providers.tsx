@@ -7,10 +7,12 @@ import { ForceLightTheme } from "@/components/theme/ForceLightTheme";
 import { SupportTicketCacheInvalidator } from "@/components/support/SupportTicketCacheInvalidator";
 import { NotificationRealtimeBridge } from "@/components/notifications/NotificationRealtimeBridge";
 import { ToastProvider } from "@/components/ui/SimpleToast";
+import { PresenceHeartbeat } from "@/components/analytics/PresenceHeartbeat";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <SupabaseSessionProvider>
+      <PresenceHeartbeat />
       <NotificationRealtimeBridge />
       <SupportTicketCacheInvalidator />
       <ToastProvider>
