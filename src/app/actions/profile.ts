@@ -109,6 +109,11 @@ export async function updateProfile(
         typeof File !== "undefined" && avatarFile instanceof File ? avatarFile.size > 0 : false,
     });
 
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { avatarUrl: true },
+    });
+
     const { data: existingProfileRow, error: existingProfileError } = await supabase
       .from("profiles")
       .select("avatar_url")
@@ -124,7 +129,9 @@ export async function updateProfile(
     }
 
     const profilesAvailable = !existingProfileError || !isMissingProfilesTableError(existingProfileError);
-    const existingAvatarPath = extractStoragePathFromPublicUrl(existingProfileRow?.avatar_url);
+    const existingAvatarPath =
+      extractStoragePathFromPublicUrl(existingProfileRow?.avatar_url) ??
+      extractStoragePathFromPublicUrl(currentUser?.avatarUrl);
 
     if (intent === "delete_avatar") {
       if (existingAvatarPath) {
@@ -200,6 +207,21 @@ export async function updateProfile(
 
       finalName = toNull(refreshedProfile?.name ?? undefined) ?? nextName;
       finalAvatarUrl = toNull(refreshedProfile?.avatar_url ?? undefined) ?? nextAvatarUrl;
+    }
+
+    const { error: authUpdateError } = await supabase.auth.updateUser({
+      data: {
+        name: finalName,
+        full_name: finalName,
+        avatar_url: finalAvatarUrl,
+      },
+    });
+    console.log("[profile:update] auth metadata update result", {
+      error: authUpdateError?.message ?? null,
+    });
+    if (authUpdateError) {
+      console.error("[profile:update] auth metadata update error", authUpdateError);
+      return { ok: false, error: "unknown", message: authUpdateError.message };
     }
 
     await prisma.user.update({
