@@ -106,6 +106,11 @@ export type ListingFieldConfig = {
   options?: readonly string[];
   min?: number;
   max?: number;
+  /**
+   * Optional slug matcher(s) for subcategory-specific fields.
+   * Example: ["imobiliare-teren", /electrice/]
+   */
+  appliesTo?: ReadonlyArray<string | RegExp>;
 };
 
 type CategoryConfig = {
@@ -156,7 +161,7 @@ const GENDER_OPTIONS = ["men", "women", "unisex", "kids"] as const;
 const SEASON_OPTIONS = ["spring", "summer", "autumn", "winter", "all-season"] as const;
 const WORK_SCHEDULE_OPTIONS = ["full-time", "part-time", "flexible", "shift", "weekend"] as const;
 const EDUCATION_LEVELS = ["none", "high-school", "college", "bachelor", "master", "doctorate"] as const;
-const LANGUAGE_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2", "nativ"] as const;
+const LANGUAGE_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2", "native"] as const;
 const REMOTE_POLICY = ["on-site", "hybrid", "remote"] as const;
 const EMISSION_CLASSES = ["euro-3", "euro-4", "euro-5", "euro-6", "euro-6d", "zero"] as const;
 const RENOVATION_TYPES = ["shell-and-core", "partial", "complete", "premium", "not-renovated"] as const;
@@ -199,6 +204,12 @@ export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
       { id: "accidentFree", label: "Accident free", input: "select", options: YES_NO_UNKNOWN },
       { id: "numberOfOwners", label: "Number of owners", input: "number", min: 1, max: 20 },
       { id: "emissionClass", label: "Emission class", input: "select", options: EMISSION_CLASSES },
+      { id: "batteryCapacityKwh", label: "Battery capacity (kWh)", input: "number", min: 5, max: 250, appliesTo: [/transport-electrice/] },
+      { id: "rangeKm", label: "Range (km)", input: "number", min: 50, max: 1200, appliesTo: [/transport-electrice/] },
+      { id: "fastCharge", label: "Fast charging", input: "select", options: YES_NO_UNKNOWN, appliesTo: [/transport-electrice/] },
+      { id: "payloadKg", label: "Payload (kg)", input: "number", min: 100, max: 50_000, appliesTo: [/transport-(camioane|microbuze|autobuze|remorci-auto|rulote)/] },
+      { id: "axlesCount", label: "Axles", input: "number", min: 1, max: 10, appliesTo: [/transport-(camioane|autobuze|remorci-auto|rulote)/] },
+      { id: "cargoVolumeM3", label: "Cargo volume (m3)", input: "number", min: 1, max: 300, appliesTo: [/transport-(camioane|microbuze|autobuze|remorci-auto|rulote)/] },
     ],
     subcategories: {
       auto: ["autovehicule", "camioane", "electrice"],
@@ -234,24 +245,24 @@ export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
     fields: [
       { id: "propertyType", label: "Property type", input: "select", options: PROPERTY_TYPES },
       { id: "areaSqm", label: "Area (sqm)", input: "number", min: 1, max: 999_999_999 },
-      { id: "rooms", label: "Rooms", input: "number", min: 1, max: 100 },
-      { id: "floor", label: "Floor", input: "select", options: FLOOR_OPTIONS },
-      { id: "furnished", label: "Furnished", input: "select", options: YES_NO_PARTIAL },
+      { id: "rooms", label: "Rooms", input: "number", min: 1, max: 100, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere)/] },
+      { id: "floor", label: "Floor", input: "select", options: FLOOR_OPTIONS, appliesTo: [/imobiliare-(apartamente|garsoniere|camere|birouri|spatii-comerciale|hoteluri)/] },
+      { id: "furnished", label: "Furnished", input: "select", options: YES_NO_PARTIAL, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|birouri|spatii-comerciale)/] },
       { id: "buildYear", label: "Build year", input: "number", min: 1800, max: 2030 },
-      { id: "landAreaSqm", label: "Land area (sqm)", input: "number", min: 1, max: 999_999_999 },
-      { id: "totalFloors", label: "Total floors", input: "number", min: 1, max: 200 },
-      { id: "balconies", label: "Balconies", input: "number", min: 0, max: 20 },
-      { id: "bathrooms", label: "Bathrooms", input: "number", min: 1, max: 30 },
+      { id: "landAreaSqm", label: "Land area (sqm)", input: "number", min: 1, max: 999_999_999, appliesTo: [/imobiliare-(teren|case|case-tara|hale-productie|depozite|hoteluri)/] },
+      { id: "totalFloors", label: "Total floors", input: "number", min: 1, max: 200, appliesTo: [/imobiliare-(apartamente|garsoniere|camere|case|birouri|spatii-comerciale|depozite|hoteluri|hale-productie)/] },
+      { id: "balconies", label: "Balconies", input: "number", min: 0, max: 20, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere)/] },
+      { id: "bathrooms", label: "Bathrooms", input: "number", min: 1, max: 30, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|hoteluri)/] },
       { id: "heatingType", label: "Heating type", input: "select", options: HEATING_OPTIONS },
       { id: "parkingType", label: "Parking", input: "select", options: PARKING_OPTIONS },
       { id: "energyClass", label: "Energy class", input: "select", options: ENERGY_CLASS_OPTIONS },
-      { id: "livingAreaSqm", label: "Living area (sqm)", input: "number", min: 1, max: 999_999_999 },
-      { id: "kitchenAreaSqm", label: "Kitchen area (sqm)", input: "number", min: 1, max: 999_999_999 },
-      { id: "renovationType", label: "Renovation level", input: "select", options: RENOVATION_TYPES },
+      { id: "livingAreaSqm", label: "Living area (sqm)", input: "number", min: 1, max: 999_999_999, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|case-tara)/] },
+      { id: "kitchenAreaSqm", label: "Kitchen area (sqm)", input: "number", min: 1, max: 999_999_999, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|case-tara)/] },
+      { id: "renovationType", label: "Renovation level", input: "select", options: RENOVATION_TYPES, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|birouri|spatii-comerciale|depozite|hoteluri|hale-productie)/] },
       { id: "availableFrom", label: "Available from", input: "select", options: DATE_OPTIONS },
       { id: "petsAllowed", label: "Pets allowed", input: "select", options: YES_NO_UNKNOWN },
-      { id: "elevator", label: "Lift", input: "select", options: YES_NO_UNKNOWN },
-      { id: "internet", label: "Internet inclus", input: "select", options: YES_NO_UNKNOWN },
+      { id: "elevator", label: "Elevator", input: "select", options: YES_NO_UNKNOWN, appliesTo: [/imobiliare-(apartamente|garsoniere|camere|birouri|spatii-comerciale|hoteluri)/] },
+      { id: "internet", label: "Internet included", input: "select", options: YES_NO_UNKNOWN, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|birouri|spatii-comerciale|hoteluri)/] },
     ],
   },
   electronice: {
@@ -322,6 +333,27 @@ export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
     ],
   },
 };
+
+function fieldMatchesSlug(field: ListingFieldConfig, slug: string): boolean {
+  const rules = field.appliesTo;
+  if (!rules || rules.length === 0) {
+    return true;
+  }
+  return rules.some((rule) => {
+    if (typeof rule === "string") {
+      return slug.includes(rule);
+    }
+    return rule.test(slug);
+  });
+}
+
+export function getCategoryFieldsForSlug(slug: string): ListingFieldConfig[] {
+  const key = resolveCategoryConfigKey(slug);
+  if (!key) {
+    return [];
+  }
+  return categoryConfig[key].fields.filter((field) => fieldMatchesSlug(field, slug));
+}
 
 export function resolveCategoryConfigKey(slug: string): ListingCategoryKey | null {
   if (!slug.trim()) {

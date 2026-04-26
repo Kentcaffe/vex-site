@@ -56,6 +56,7 @@ import { MOLDOVA_CITY_SET, moldovaCitySelectOptions } from "@/lib/moldova-cities
 import {
   categoryConfig,
   getCategoryBrands,
+  getCategoryFieldsForSlug,
   getModelsForCategoryBrand,
   isBrandAllowedForCategory,
   isModelAllowedForCategoryBrand,
@@ -139,6 +140,10 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     () => (selectedCategoryKey ? categoryConfig[selectedCategoryKey] : null),
     [selectedCategoryKey],
   );
+  const selectedCategoryFields = useMemo(
+    () => getCategoryFieldsForSlug(selectedSlug),
+    [selectedSlug],
+  );
   const liveRequiredFields = useMemo((): ListingFormFieldId[] => {
     const fields: ListingFormFieldId[] = ["title", "description", "price", "city"];
     if (needsCoreCondition) {
@@ -163,7 +168,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       })),
     [selectedCategoryKey, publishValues.brand],
   );
-  const hasDynamicCategoryConfig = Boolean(selectedCategoryDynamicConfig);
+  const hasDynamicCategoryConfig = selectedCategoryFields.length > 0;
 
   useEffect(() => {
     if (isBrandAllowedForCategory(selectedCategoryKey, publishValues.brand)) {
@@ -972,7 +977,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
 
           {selectedCategoryDynamicConfig ? (
             <div className="grid gap-5 md:grid-cols-2">
-              {selectedCategoryDynamicConfig.fields.map((field) => (
+              {selectedCategoryFields.map((field) => (
                 <div key={field.id}>
                   <label className={labelClass} htmlFor={`cfg-${field.id}`}>
                     {field.label}
