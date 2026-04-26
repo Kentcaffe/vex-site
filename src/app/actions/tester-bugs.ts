@@ -31,15 +31,29 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
 
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  const stepsToReproduce = String(formData.get("stepsToReproduce") ?? "").trim();
+  const expectedResult = String(formData.get("expectedResult") ?? "").trim();
+  const actualResult = String(formData.get("actualResult") ?? "").trim();
+  const pageUrlRaw = String(formData.get("pageUrl") ?? "").trim();
+  const browserInfo = String(formData.get("browserInfo") ?? "").trim();
+  const deviceInfo = String(formData.get("deviceInfo") ?? "").trim();
+  const reproducibility = String(formData.get("reproducibility") ?? "").trim();
   const category = String(formData.get("category") ?? "").toLowerCase() as BugCategory;
   const severity = String(formData.get("severity") ?? "").toLowerCase() as BugSeverity;
   const image = formData.get("image");
 
-  if (title.length < 4 || description.length < 10) {
-    return { ok: false, message: "", error: "Completeaza corect titlul si descrierea bug-ului." };
+  if (title.length < 4 || description.length < 10 || stepsToReproduce.length < 10) {
+    return { ok: false, message: "", error: "Completeaza titlu, descriere si pasii de reproducere (minim 10 caractere)." };
   }
   if (!VALID_CATEGORIES.has(category) || !VALID_SEVERITIES.has(severity)) {
     return { ok: false, message: "", error: "Categoria sau severitatea sunt invalide." };
+  }
+  if (expectedResult.length < 5 || actualResult.length < 5) {
+    return { ok: false, message: "", error: "Completeaza rezultatul asteptat si rezultatul actual." };
+  }
+  const pageUrl = pageUrlRaw.length > 0 ? pageUrlRaw : null;
+  if (pageUrl && !/^https?:\/\//i.test(pageUrl)) {
+    return { ok: false, message: "", error: "Linkul paginii trebuie sa inceapa cu http:// sau https://." };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -64,6 +78,13 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
     user_id: supabaseUserId,
     title,
     description,
+    steps_to_reproduce: stepsToReproduce,
+    expected_result: expectedResult,
+    actual_result: actualResult,
+    page_url: pageUrl,
+    browser_info: browserInfo || null,
+    device_info: deviceInfo || null,
+    reproducibility: reproducibility || null,
     image_url: imageUrl,
     category,
     severity,

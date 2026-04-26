@@ -132,6 +132,61 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             rows={5}
             className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
           />
+          <textarea
+            name="stepsToReproduce"
+            required
+            minLength={10}
+            placeholder="Pași de reproducere (1. ... 2. ... 3. ...)"
+            rows={4}
+            className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
+          />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <textarea
+              name="expectedResult"
+              required
+              minLength={5}
+              placeholder="Rezultat așteptat"
+              rows={3}
+              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
+            />
+            <textarea
+              name="actualResult"
+              required
+              minLength={5}
+              placeholder="Rezultat actual"
+              rows={3}
+              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
+            />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <input
+              name="pageUrl"
+              type="url"
+              placeholder="URL pagină afectată (https://...)"
+              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
+            />
+            <select
+              name="reproducibility"
+              defaultValue="always"
+              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
+            >
+              <option value="always">Se reproduce mereu</option>
+              <option value="sometimes">Se reproduce uneori</option>
+              <option value="once">S-a întâmplat o singură dată</option>
+            </select>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <input
+              name="browserInfo"
+              placeholder="Browser (ex: Chrome 135, Safari 17)"
+              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
+            />
+            <input
+              name="deviceInfo"
+              placeholder="Device/OS (ex: iPhone 13 iOS 18, Windows 11)"
+              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
+            />
+          </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <select
               name="category"

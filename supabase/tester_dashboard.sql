@@ -6,6 +6,13 @@ create table if not exists public.bugs (
   user_id uuid not null references auth.users(id) on delete cascade,
   title text not null,
   description text not null,
+  steps_to_reproduce text,
+  expected_result text,
+  actual_result text,
+  page_url text,
+  browser_info text,
+  device_info text,
+  reproducibility text,
   image_url text,
   category text not null check (category in ('ui', 'functional', 'security')),
   severity text not null check (severity in ('low', 'medium', 'high')),
@@ -13,6 +20,14 @@ create table if not exists public.bugs (
   reward numeric not null default 0,
   created_at timestamptz not null default now()
 );
+
+alter table public.bugs add column if not exists steps_to_reproduce text;
+alter table public.bugs add column if not exists expected_result text;
+alter table public.bugs add column if not exists actual_result text;
+alter table public.bugs add column if not exists page_url text;
+alter table public.bugs add column if not exists browser_info text;
+alter table public.bugs add column if not exists device_info text;
+alter table public.bugs add column if not exists reproducibility text;
 
 create index if not exists bugs_user_id_idx on public.bugs(user_id);
 create index if not exists bugs_status_idx on public.bugs(status);

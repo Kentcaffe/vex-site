@@ -68,6 +68,10 @@ export function AdminBugsPanel({
         bug.title.replaceAll('"', '""'),
         bug.category,
         bug.severity,
+        bug.reproducibility ?? "",
+        bug.page_url ?? "",
+        bug.browser_info ?? "",
+        bug.device_info ?? "",
         String(bug.reward),
         bug.created_at,
       ]),
@@ -162,6 +166,23 @@ export function AdminBugsPanel({
                 <p className="mt-2 text-xs text-zinc-400">
                   {categoryLabel(bug.category)} · Severitate: {severityLabel(bug.severity)} · Recompensă: {bug.reward} lei
                 </p>
+                <div className="mt-2 rounded-lg border border-zinc-800 bg-zinc-950/70 p-3 text-xs text-zinc-300">
+                  <p><span className="font-semibold text-zinc-100">Pași reproducere:</span> {bug.steps_to_reproduce ?? "—"}</p>
+                  <p className="mt-1"><span className="font-semibold text-zinc-100">Rezultat așteptat:</span> {bug.expected_result ?? "—"}</p>
+                  <p className="mt-1"><span className="font-semibold text-zinc-100">Rezultat actual:</span> {bug.actual_result ?? "—"}</p>
+                  <p className="mt-1">
+                    <span className="font-semibold text-zinc-100">Context:</span>{" "}
+                    {bug.reproducibility ?? "—"} · {bug.browser_info ?? "browser n/a"} · {bug.device_info ?? "device n/a"}
+                  </p>
+                  {bug.page_url ? (
+                    <p className="mt-1">
+                      <span className="font-semibold text-zinc-100">Pagină:</span>{" "}
+                      <a href={bug.page_url} target="_blank" rel="noreferrer" className="text-violet-300 hover:underline">
+                        {bug.page_url}
+                      </a>
+                    </p>
+                  ) : null}
+                </div>
                 <p className="mt-1 text-xs text-zinc-500">
                   Raportat la: {new Date(bug.created_at).toLocaleString("ro-RO")}
                   {bug.image_url ? (
