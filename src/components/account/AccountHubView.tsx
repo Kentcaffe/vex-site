@@ -84,7 +84,9 @@ export function AccountHubView({ user }: Props) {
   const avatarSrc = resolvePublicMediaUrl(user.avatarUrl);
   const companyLogo = resolvePublicMediaUrl(user.companyLogo);
   const displayName = user.name?.trim() || user.email.split("@")[0] || user.email;
-  const isTester = String(user.role ?? "").toUpperCase() === "TESTER";
+  const roleValue = String(user.role ?? "").toUpperCase();
+  const canAccessTester = roleValue === "TESTER" || roleValue === "MODERATOR" || roleValue === "ADMIN";
+  const isTester = roleValue === "TESTER";
 
   return (
     <div className="app-shell app-section pb-4">
@@ -153,7 +155,7 @@ export function AccountHubView({ user }: Props) {
         <div className="[&>*]:animate-account-section">
           <HubRow href="/cont/favorite" icon={Heart} label={t("saved")} />
         </div>
-        {isTester ? (
+        {canAccessTester ? (
           <div className="[&>*]:animate-account-section">
             <HubRow href="/tester" icon={BadgeCheck} label={t("testerDashboard")} />
           </div>
