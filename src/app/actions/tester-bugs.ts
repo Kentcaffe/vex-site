@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { checkRateLimit } from "@/lib/request-rate-limit";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getSupabaseServiceClient } from "@/lib/supabase-service-role";
 import { isTesterLikeRole, type BugCategory, type BugSeverity, type BugStatus } from "@/lib/tester-bugs";
@@ -27,6 +28,18 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
   const supabaseUserId = session?.user?.supabaseUserId;
   if (!session?.user?.id || !supabaseUserId || !isTesterLikeRole(role)) {
     return { ok: false, message: "", error: "Nu ai acces la tester dashboard." };
+  }
+  const rl = checkRateLimit({
+    key: `tester_bug_submit:${session.user.id}`,
+    limit: 6,
+    windowMs: 60_000,
+  });
+  if (!rl.ok) {
+    return {
+      ok: false,
+      message: "",
+      error: `Prea multe încercări. Încearcă din nou în ${rl.retryAfterSec}s.`,
+    };
   }
 
   const title = String(formData.get("title") ?? "").trim();
@@ -94,6 +107,12 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
   });
 
   if (insert.error) {
+    console.error("[tester-bugs] submit insert failed", {
+      userId: supabaseUserId,
+      error: insert.error.message,
+      code: insert.error.code,
+      hint: insert.error.hint,
+    });
     return { ok: false, message: "", error: insert.error.message || "Nu am putut salva bug-ul." };
   }
 

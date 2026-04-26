@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 import { auth } from "@/auth";
 import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
 import { isStaff } from "@/lib/auth-roles";
+import { checkRateLimit } from "@/lib/request-rate-limit";
 import { supportTicket } from "@/lib/prisma-delegates";
 import { logRouteError } from "@/lib/server-log";
 import { isLiveSupportOpen, liveSupportScheduleLabel, SUPPORT_EMAIL } from "@/lib/support-hours";
@@ -13,6 +15,11 @@ import {
   listSupportMessages,
   normalizeSupportBody,
 } from "@/lib/support-chat";
+
+const supportMessagePayloadSchema = z.object({
+  ticketId: z.string().trim().optional().nullable(),
+  body: z.string(),
+});
 
 export async function GET(req: Request) {
   try {
@@ -51,15 +58,29 @@ export async function POST(req: Request) {
     } catch {
       return NextResponse.json({ ok: false, error: "invalid_json" }, { status: 400 });
     }
-    const ticketIdRaw =
-      typeof body === "object" && body && "ticketId" in body ? String((body as { ticketId?: unknown }).ticketId ?? "").trim() : "";
-    const text = typeof body === "object" && body && "body" in body ? String((body as { body?: unknown }).body ?? "") : "";
+    const parsed = supportMessagePayloadSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ ok: false, error: "invalid_payload" }, { status: 400 });
+    }
+    const ticketIdRaw = String(parsed.data.ticketId ?? "").trim();
+    const text = parsed.data.body;
     const norm = normalizeSupportBody(text);
     if (!norm.ok) {
       return NextResponse.json({ ok: false, error: norm.error }, { status: 400 });
     }
 
     const staff = isStaff(session.user.role);
+    const rl = checkRateLimit({
+      key: `support_msg:${session.user.id}:${staff ? "staff" : "user"}`,
+      limit: staff ? 60 : 20,
+      windowMs: 60_000,
+    });
+    if (!rl.ok) {
+      return NextResponse.json(
+        { ok: false, error: "rate_limited", message: `Prea multe mesaje. Reîncearcă în ${rl.retryAfterSec}s.` },
+        { status: 429 },
+      );
+    }
     let ticketId = ticketIdRaw;
 
     if (!ticketId) {

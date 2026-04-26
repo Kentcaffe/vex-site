@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitBugReport } from "@/app/actions/tester-bugs";
 import type { BugRow } from "@/lib/tester-bugs";
@@ -49,6 +49,7 @@ function severityLabel(severity: string) {
 
 export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
   const router = useRouter();
+  const formRef = useRef<HTMLFormElement | null>(null);
   const initialSubmitState: { ok: boolean; message: string; error?: string } = { ok: false, message: "" };
   const [state, formAction, pending] = useActionState(submitBugReport, initialSubmitState);
   const [statusFilter, setStatusFilter] = useState<"all" | "open" | "accepted" | "rejected">("all");
@@ -68,6 +69,7 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
 
   useEffect(() => {
     if (state.ok) {
+      formRef.current?.reset();
       router.refresh();
     }
   }, [router, state.ok]);
@@ -131,10 +133,10 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             </p>
             <p className="rounded-lg border border-rose-600/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-200">
               <span className="font-semibold">Exemplu slab:</span> &quot;Nu merge site-ul!!!&quot;
-            </p>
+                          </p>
           </div>
         </div>
-        <form action={formAction} className="grid gap-4">
+        <form ref={formRef} action={formAction} className="grid gap-4">
           <p className="text-xs text-zinc-400">Titlu scurt + impact (ex: „Nu se poate publica anunț pe mobil”).</p>
           <input
             name="title"
