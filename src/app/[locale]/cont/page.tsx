@@ -24,6 +24,7 @@ export default async function ContPage({ params, searchParams }: Props) {
       id: string;
       email: string;
       name: string | null;
+      role: string;
       avatarUrl: string | null;
       accountType: string;
       businessStatus: string;
@@ -37,6 +38,7 @@ export default async function ContPage({ params, searchParams }: Props) {
         id: true,
         email: true,
         name: true,
+        role: true,
         avatarUrl: true,
         accountType: true,
         businessStatus: true,
@@ -54,6 +56,7 @@ export default async function ContPage({ params, searchParams }: Props) {
           email: me.email,
           id: me.id,
           name: me.name,
+          role: me.role,
           avatarUrl: me.avatarUrl,
           accountType: me.accountType,
           businessStatus: me.businessStatus,

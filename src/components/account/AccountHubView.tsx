@@ -25,6 +25,7 @@ type Props = {
     id: string;
     name: string | null;
     email: string;
+    role?: string | null;
     avatarUrl: string | null;
     accountType: string;
     businessStatus: string;
@@ -83,6 +84,7 @@ export function AccountHubView({ user }: Props) {
   const avatarSrc = resolvePublicMediaUrl(user.avatarUrl);
   const companyLogo = resolvePublicMediaUrl(user.companyLogo);
   const displayName = user.name?.trim() || user.email.split("@")[0] || user.email;
+  const isTester = String(user.role ?? "").toUpperCase() === "TESTER";
 
   return (
     <div className="app-shell app-section pb-4">
@@ -104,6 +106,12 @@ export function AccountHubView({ user }: Props) {
               <Crown className="h-3.5 w-3.5" aria-hidden />
               Premium account
             </p>
+            {isTester ? (
+              <p className="ml-2 inline-flex items-center gap-1 rounded-full border border-violet-300 bg-violet-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-violet-800">
+                <BadgeCheck className="h-3.5 w-3.5" aria-hidden />
+                {t("testerBadge")}
+              </p>
+            ) : null}
             <h1 className="mt-2 truncate text-xl font-bold tracking-tight text-zinc-900">{displayName}</h1>
             <p className="truncate text-sm text-zinc-500">{user.email}</p>
             <UserBadges user={user} className="mt-2" />
@@ -145,6 +153,11 @@ export function AccountHubView({ user }: Props) {
         <div className="[&>*]:animate-account-section">
           <HubRow href="/cont/favorite" icon={Heart} label={t("saved")} />
         </div>
+        {isTester ? (
+          <div className="[&>*]:animate-account-section">
+            <HubRow href="/tester" icon={BadgeCheck} label={t("testerDashboard")} />
+          </div>
+        ) : null}
         <div className="[&>*]:animate-account-section">
           <HubRow icon={Headphones} label={t("support")} onClick={() => setSupportOpen(true)} />
         </div>
