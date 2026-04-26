@@ -126,11 +126,11 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
           </ul>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <p className="rounded-lg border border-emerald-600/30 bg-emerald-950/20 px-3 py-2 text-xs text-emerald-200">
-              <span className="font-semibold">Exemplu bun:</span> "La publicare anunț, după click pe Salvează, primesc eroare 500.
-              Așteptat: anunț salvat. Actual: blocat. Chrome 135 / Windows 11."
+              <span className="font-semibold">Exemplu bun:</span> &quot;La publicare anunț, după click pe Salvează, primesc eroare 500.
+              Așteptat: anunț salvat. Actual: blocat. Chrome 135 / Windows 11.&quot;
             </p>
             <p className="rounded-lg border border-rose-600/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-200">
-              <span className="font-semibold">Exemplu slab:</span> "Nu merge site-ul!!!"
+              <span className="font-semibold">Exemplu slab:</span> &quot;Nu merge site-ul!!!&quot;
             </p>
           </div>
         </div>
