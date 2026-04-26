@@ -5,10 +5,11 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 export type UpdateProfileState =
-  | { ok: true }
-  | { ok: false; error: "unauthorized" | "validation" | "unknown" };
+  | { ok: true; name: string | null; avatarUrl: string | null; message?: string }
+  | { ok: false; error: "unauthorized" | "validation" | "unknown"; message?: string };
 
 const profileSchema = z.object({
   locale: z.string().min(2).max(8),
@@ -22,6 +23,7 @@ const profileSchema = z.object({
     .max(500)
     .refine((v) => !v || /^https?:\/\//i.test(v), "invalid")
     .optional(),
+  intent: z.enum(["save_profile", "delete_avatar"]).default("save_profile"),
 });
 
 function toNull(v: string | undefined): string | null {
@@ -30,12 +32,33 @@ function toNull(v: string | undefined): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+const AVATAR_BUCKET = "avatars";
+
+function safeFileName(name: string): string {
+  return name.replace(/[^a-zA-Z0-9._-]/g, "-");
+}
+
+function extractStoragePathFromPublicUrl(url: string | null | undefined): string | null {
+  const value = (url ?? "").trim();
+  if (!value) return null;
+  const marker = `/storage/v1/object/public/${AVATAR_BUCKET}/`;
+  const idx = value.indexOf(marker);
+  if (idx < 0) return null;
+  const path = value.slice(idx + marker.length).trim();
+  return path || null;
+}
+
 export async function updateProfile(
   _prev: UpdateProfileState | undefined,
   formData: FormData,
 ): Promise<UpdateProfileState> {
   const session = await auth();
   if (!session?.user?.id) {
+    console.error("[profile:update] unauthorized: missing app session user id");
+    return { ok: false, error: "unauthorized" };
+  }
+  if (!session.user.supabaseUserId?.trim()) {
+    console.error("[profile:update] unauthorized: missing supabase auth id in session");
     return { ok: false, error: "unauthorized" };
   }
 
@@ -46,27 +69,140 @@ export async function updateProfile(
     city: formData.get("city") || undefined,
     bio: formData.get("bio") || undefined,
     avatarUrl: formData.get("avatarUrl") || undefined,
+    intent: formData.get("intent") || "save_profile",
   });
 
   if (!parsed.success) {
+    console.error("[profile:update] validation failed", parsed.error.flatten());
     return { ok: false, error: "validation" };
   }
 
+  const avatarFile = formData.get("avatarFile");
+
   try {
+    const supabase = await createSupabaseServerClient();
+    const supabaseUserId = session.user.supabaseUserId.trim();
+    const intent = parsed.data.intent;
+    const nextName = toNull(parsed.data.name);
+    let nextAvatarUrl = toNull(parsed.data.avatarUrl);
+
+    console.log("[profile:update] start", {
+      userId: session.user.id,
+      supabaseUserId,
+      intent,
+      hasAvatarFile:
+        typeof File !== "undefined" && avatarFile instanceof File ? avatarFile.size > 0 : false,
+    });
+
+    const { data: existingProfileRow, error: existingProfileError } = await supabase
+      .from("profiles")
+      .select("avatar_url")
+      .eq("id", supabaseUserId)
+      .maybeSingle();
+
+    if (existingProfileError) {
+      console.error("[profile:update] profiles select error", existingProfileError);
+      return { ok: false, error: "unknown", message: existingProfileError.message };
+    }
+
+    const existingAvatarPath = extractStoragePathFromPublicUrl(existingProfileRow?.avatar_url);
+
+    if (intent === "delete_avatar") {
+      if (existingAvatarPath) {
+        const { error: removeError } = await supabase.storage.from(AVATAR_BUCKET).remove([existingAvatarPath]);
+        if (removeError) {
+          console.error("[profile:update] avatar remove error", removeError);
+          return { ok: false, error: "unknown", message: removeError.message };
+        }
+      }
+      nextAvatarUrl = null;
+    } else if (typeof File !== "undefined" && avatarFile instanceof File && avatarFile.size > 0) {
+      const objectPath = `${supabaseUserId}/${Date.now()}-${safeFileName(avatarFile.name || "avatar")}`;
+      const { error: uploadError } = await supabase.storage
+        .from(AVATAR_BUCKET)
+        .upload(objectPath, avatarFile, {
+          upsert: true,
+          cacheControl: "3600",
+          contentType: avatarFile.type || undefined,
+        });
+      if (uploadError) {
+        console.error("[profile:update] avatar upload error", uploadError);
+        return { ok: false, error: "unknown", message: uploadError.message };
+      }
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(objectPath);
+      nextAvatarUrl = publicUrl;
+
+      if (existingAvatarPath && existingAvatarPath !== objectPath) {
+        const { error: removeOldError } = await supabase.storage.from(AVATAR_BUCKET).remove([existingAvatarPath]);
+        if (removeOldError) {
+          console.warn("[profile:update] old avatar remove warning", removeOldError);
+        }
+      }
+    }
+
+    const { data: updatedProfileRows, error: profileUpdateError } = await supabase
+      .from("profiles")
+      .update({
+        name: nextName,
+        avatar_url: nextAvatarUrl,
+      })
+      .eq("id", supabaseUserId)
+      .select("id,name,avatar_url");
+
+    console.log("[profile:update] profiles update result", {
+      count: updatedProfileRows?.length ?? 0,
+      error: profileUpdateError?.message ?? null,
+    });
+    if (profileUpdateError) {
+      console.error("[profile:update] profiles update error", profileUpdateError);
+      return { ok: false, error: "unknown", message: profileUpdateError.message };
+    }
+
+    const { data: refreshedProfile, error: refreshError } = await supabase
+      .from("profiles")
+      .select("name,avatar_url")
+      .eq("id", supabaseUserId)
+      .maybeSingle();
+    console.log("[profile:update] profiles refresh result", {
+      hasData: Boolean(refreshedProfile),
+      error: refreshError?.message ?? null,
+    });
+    if (refreshError) {
+      console.error("[profile:update] profiles refresh error", refreshError);
+      return { ok: false, error: "unknown", message: refreshError.message };
+    }
+
+    const finalName = toNull(refreshedProfile?.name ?? undefined) ?? nextName;
+    const finalAvatarUrl = toNull(refreshedProfile?.avatar_url ?? undefined) ?? nextAvatarUrl;
+
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
-        name: toNull(parsed.data.name),
+        name: finalName,
         phone: toNull(parsed.data.phone),
         city: toNull(parsed.data.city),
         bio: toNull(parsed.data.bio),
-        avatarUrl: toNull(parsed.data.avatarUrl),
+        avatarUrl: finalAvatarUrl,
       },
     });
     revalidatePath(localizedHref(parsed.data.locale, "/cont"));
+    revalidatePath(localizedHref(parsed.data.locale, "/cont/setari"));
     revalidatePath(localizedHref(parsed.data.locale, "/chat"));
-    return { ok: true };
-  } catch {
-    return { ok: false, error: "unknown" };
+    return {
+      ok: true,
+      name: finalName,
+      avatarUrl: finalAvatarUrl,
+      message: intent === "delete_avatar" ? "Avatar șters." : "Profil actualizat.",
+    };
+  } catch (error) {
+    console.error("[profile:update] unknown error", error);
+    return {
+      ok: false,
+      error: "unknown",
+      message: error instanceof Error ? error.message : "Unknown profile update error",
+    };
   }
 }
