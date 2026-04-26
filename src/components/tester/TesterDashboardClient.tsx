@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { submitBugReport } from "@/app/actions/tester-bugs";
 import type { BugRow } from "@/lib/tester-bugs";
@@ -51,6 +51,9 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
   const router = useRouter();
   const initialSubmitState: { ok: boolean; message: string; error?: string } = { ok: false, message: "" };
   const [state, formAction, pending] = useActionState(submitBugReport, initialSubmitState);
+  const [statusFilter, setStatusFilter] = useState<"all" | "open" | "accepted" | "rejected">("all");
+  const [severityFilter, setSeverityFilter] = useState<"all" | "low" | "medium" | "high">("all");
+  const [searchText, setSearchText] = useState("");
   const stats = bugs.reduce(
     (acc, bug) => {
       acc.total += 1;
@@ -68,6 +71,22 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
       router.refresh();
     }
   }, [router, state.ok]);
+
+  const filteredBugs = useMemo(() => {
+    const query = searchText.trim().toLowerCase();
+    return bugs.filter((bug) => {
+      if (statusFilter !== "all" && bug.status !== statusFilter) {
+        return false;
+      }
+      if (severityFilter !== "all" && bug.severity !== severityFilter) {
+        return false;
+      }
+      if (!query) {
+        return true;
+      }
+      return `${bug.title} ${bug.description}`.toLowerCase().includes(query);
+    });
+  }, [bugs, searchText, severityFilter, statusFilter]);
 
   return (
     <div className="space-y-6">
@@ -171,14 +190,44 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
       </section>
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl shadow-black/30">
-        <h3 className="text-lg font-semibold text-zinc-100">Bug-urile tale</h3>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <h3 className="text-lg font-semibold text-zinc-100">Bug-urile tale</h3>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <input
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Caută titlu/descriere..."
+              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-100"
+            />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as "all" | "open" | "accepted" | "rejected")}
+              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-100"
+            >
+              <option value="all">Toate statusurile</option>
+              <option value="open">Deschis</option>
+              <option value="accepted">Acceptat</option>
+              <option value="rejected">Respins</option>
+            </select>
+            <select
+              value={severityFilter}
+              onChange={(e) => setSeverityFilter(e.target.value as "all" | "low" | "medium" | "high")}
+              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-100"
+            >
+              <option value="all">Toate severitățile</option>
+              <option value="low">Mică</option>
+              <option value="medium">Medie</option>
+              <option value="high">Ridicată</option>
+            </select>
+          </div>
+        </div>
         <div className="mt-4 space-y-3">
-          {bugs.length === 0 ? (
+          {filteredBugs.length === 0 ? (
             <p className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-zinc-400">
-              Nu ai trimis inca niciun bug.
+              Nu există rezultate pentru filtrele selectate.
             </p>
           ) : (
-            bugs.map((bug) => (
+            filteredBugs.map((bug) => (
               <article key={bug.id} className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="font-semibold text-zinc-100">{bug.title}</p>

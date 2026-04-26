@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { reviewBugReport } from "@/app/actions/tester-bugs";
 import type { BugAdminRow } from "@/lib/tester-bugs";
 
@@ -37,6 +37,52 @@ export function AdminBugsPanel({
 }) {
   const initialReviewState: { ok: boolean; error?: string } = { ok: false };
   const [state, action, pending] = useActionState(reviewBugReport, initialReviewState);
+  const [searchText, setSearchText] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "open" | "accepted" | "rejected">("all");
+  const [severityFilter, setSeverityFilter] = useState<"all" | "low" | "medium" | "high">("all");
+
+  const filteredBugs = useMemo(() => {
+    const query = searchText.trim().toLowerCase();
+    return bugs.filter((bug) => {
+      if (statusFilter !== "all" && bug.status !== statusFilter) {
+        return false;
+      }
+      if (severityFilter !== "all" && bug.severity !== severityFilter) {
+        return false;
+      }
+      if (!query) {
+        return true;
+      }
+      return `${bug.title} ${bug.description} ${bug.user_name} ${bug.user_email}`.toLowerCase().includes(query);
+    });
+  }, [bugs, searchText, severityFilter, statusFilter]);
+
+  function exportAcceptedCsv() {
+    const accepted = bugs.filter((bug) => bug.status === "accepted");
+    const rows = [
+      ["id", "tester", "email", "title", "category", "severity", "reward", "created_at"],
+      ...accepted.map((bug) => [
+        bug.id,
+        bug.user_name,
+        bug.user_email,
+        bug.title.replaceAll('"', '""'),
+        bug.category,
+        bug.severity,
+        String(bug.reward),
+        bug.created_at,
+      ]),
+    ];
+    const csv = rows
+      .map((row) => row.map((cell) => `"${String(cell)}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `bugs-acceptate-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <div className="space-y-6">
@@ -58,15 +104,52 @@ export function AdminBugsPanel({
       </section>
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
-        <h2 className="text-lg font-semibold text-zinc-100">Toate bug-urile raportate</h2>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <h2 className="text-lg font-semibold text-zinc-100">Toate bug-urile raportate</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <input
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              placeholder="Caută titlu, descriere, tester..."
+              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-100"
+            />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as "all" | "open" | "accepted" | "rejected")}
+              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-100"
+            >
+              <option value="all">Toate statusurile</option>
+              <option value="open">Deschis</option>
+              <option value="accepted">Acceptat</option>
+              <option value="rejected">Respins</option>
+            </select>
+            <select
+              value={severityFilter}
+              onChange={(e) => setSeverityFilter(e.target.value as "all" | "low" | "medium" | "high")}
+              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-100"
+            >
+              <option value="all">Toate severitățile</option>
+              <option value="low">Mică</option>
+              <option value="medium">Medie</option>
+              <option value="high">Ridicată</option>
+            </select>
+            <button
+              type="button"
+              onClick={exportAcceptedCsv}
+              className="rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs font-semibold text-yellow-200 hover:bg-yellow-500/20"
+            >
+              Export CSV (acceptate)
+            </button>
+          </div>
+        </div>
         {state.error ? (
           <p className="mt-3 rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{state.error}</p>
         ) : null}
         <div className="mt-4 space-y-3">
-          {bugs.length === 0 ? (
+          {filteredBugs.length === 0 ? (
             <p className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-zinc-400">Nu exista bug-uri.</p>
           ) : (
-            bugs.map((bug) => (
+            filteredBugs.map((bug) => (
               <article key={bug.id} className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div>
