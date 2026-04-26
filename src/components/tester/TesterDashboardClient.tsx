@@ -116,7 +116,26 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             Tester VEX
           </span>
         </div>
+        <div className="mb-5 rounded-xl border border-violet-600/30 bg-violet-950/20 p-4 text-sm text-zinc-200">
+          <p className="font-semibold text-violet-200">Cum trimiți un raport util (obligatoriu)</p>
+          <ul className="mt-2 list-inside list-disc space-y-1 text-zinc-300">
+            <li>Descrie exact pașii, în ordine (ce ai apăsat și unde).</li>
+            <li>Scrie clar diferența dintre rezultatul așteptat și rezultatul actual.</li>
+            <li>Adaugă browser + device + link pagină, ca echipa să poată reproduce rapid.</li>
+            <li>Nu trimite „nu merge” fără detalii; astfel de rapoarte vor fi respinse.</li>
+          </ul>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <p className="rounded-lg border border-emerald-600/30 bg-emerald-950/20 px-3 py-2 text-xs text-emerald-200">
+              <span className="font-semibold">Exemplu bun:</span> "La publicare anunț, după click pe Salvează, primesc eroare 500.
+              Așteptat: anunț salvat. Actual: blocat. Chrome 135 / Windows 11."
+            </p>
+            <p className="rounded-lg border border-rose-600/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-200">
+              <span className="font-semibold">Exemplu slab:</span> "Nu merge site-ul!!!"
+            </p>
+          </div>
+        </div>
         <form action={formAction} className="grid gap-4">
+          <p className="text-xs text-zinc-400">Titlu scurt + impact (ex: „Nu se poate publica anunț pe mobil”).</p>
           <input
             name="title"
             required
@@ -124,6 +143,7 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             placeholder="Titlu bug"
             className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
           />
+          <p className="text-xs text-zinc-400">Descriere pe scurt: când apare, cât de des apare, ce secțiune e afectată.</p>
           <textarea
             name="description"
             required
@@ -132,6 +152,7 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             rows={5}
             className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
           />
+          <p className="text-xs text-zinc-400">Pași clari, numerotați (1, 2, 3...). Fără pași exacți, bug-ul nu poate fi validat.</p>
           <textarea
             name="stepsToReproduce"
             required
@@ -140,6 +161,7 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             rows={4}
             className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
           />
+          <p className="text-xs text-zinc-400">Compară clar: ce trebuia să se întâmple vs ce s-a întâmplat de fapt.</p>
           <div className="grid gap-4 sm:grid-cols-2">
             <textarea
               name="expectedResult"
@@ -187,6 +209,7 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
               className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
             />
           </div>
+          <p className="text-xs text-zinc-400">Alege categoria și severitatea realist, ca trierea să fie corectă.</p>
           <div className="grid gap-4 sm:grid-cols-2">
             <select
               name="category"
@@ -225,7 +248,7 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
             <p className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{state.message}</p>
           ) : null}
           <div className="flex items-center justify-between">
-            <p className="text-xs text-zinc-400">Status implicit: open · Reward implicit: 0</p>
+            <p className="text-xs text-zinc-400">Status implicit: open · Reward implicit: 0 · Rapoartele fără detalii suficiente pot fi respinse.</p>
             <div aria-busy={pending}>
               <SubmitButton />
             </div>
@@ -236,11 +259,11 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
       <section className="rounded-2xl border border-violet-700/40 bg-gradient-to-r from-zinc-950 to-violet-950/40 p-6 shadow-2xl shadow-black/30">
         <h3 className="text-lg font-semibold text-zinc-100">Ghid rapid pentru testeri</h3>
         <ul className="mt-3 space-y-2 text-sm text-zinc-300">
-          <li>1) Reproduce problema de 2 ori și notează pașii exacți.</li>
-          <li>2) În titlu descrie scurt impactul (ex: „Nu se poate publica anunț pe mobil”).</li>
-          <li>3) În descriere adaugă: pași, rezultat actual, rezultat așteptat, browser/dispozitiv.</li>
-          <li>4) Alege severitate „Ridicată” doar pentru blocaje majore sau risc de securitate.</li>
-          <li>5) Atașează screenshot/video scurt ca să poată fi confirmat rapid de echipă.</li>
+          <li>1) Verifică bug-ul de minim 2 ori înainte să raportezi.</li>
+          <li>2) Dacă e posibil, testează și pe alt browser/dispozitiv ca să confirmi.</li>
+          <li>3) Scrie pașii numerotați; evită formulări generale („nu merge”).</li>
+          <li>4) „Ridicată” = blocaj sever / securitate. Pentru bug-uri minore folosește „Mică” sau „Medie”.</li>
+          <li>5) Un screenshot clar + URL exact reduc timpul de analiză și cresc șansele de acceptare.</li>
         </ul>
       </section>
 
