@@ -59,7 +59,8 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
   const supabase = await createSupabaseServerClient();
 
   let imageUrl: string | null = null;
-  if (image instanceof File && image.size > 0) {
+  const canUseFile = typeof File !== "undefined";
+  if (canUseFile && image instanceof File && image.size > 0) {
     const ext = image.name.includes(".") ? image.name.split(".").pop() : "png";
     const fileName = `${supabaseUserId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
     const upload = await supabase.storage.from("bugs").upload(fileName, image, {
