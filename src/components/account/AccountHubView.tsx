@@ -19,8 +19,6 @@ import { canAccessTesterDashboard } from "@/lib/auth-roles";
 import { UserBadges } from "@/components/business/UserBadges";
 import { SignOutButton } from "@/components/SignOutButton";
 import { SupportChatModal } from "@/components/support/SupportChatModal";
-import { TesterDashboardClient } from "@/components/tester/TesterDashboardClient";
-import type { BugRow } from "@/lib/tester-bugs";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 
 type Props = {
@@ -36,8 +34,6 @@ type Props = {
     companyLogo: string | null;
     isVerified: boolean;
   };
-  /** Raportare bug-uri în cont (testeri + staff); același panou ca pe /tester. */
-  testerBugs?: BugRow[];
 };
 
 function HubRow({
@@ -83,7 +79,7 @@ function HubRow({
   );
 }
 
-export function AccountHubView({ user, testerBugs }: Props) {
+export function AccountHubView({ user }: Props) {
   const t = useTranslations("AccountHub");
   const [supportOpen, setSupportOpen] = useState(false);
   const avatarSrc = resolvePublicMediaUrl(user.avatarUrl);
@@ -92,32 +88,9 @@ export function AccountHubView({ user, testerBugs }: Props) {
   const roleValue = String(user.role ?? "").toUpperCase();
   const canAccessTester = canAccessTesterDashboard(user.role);
   const isTester = roleValue === "TESTER";
-  const showTesterPanel = canAccessTester && testerBugs !== undefined;
 
   return (
     <div className="app-shell app-section pb-4">
-      {showTesterPanel ? (
-        <section
-          className="mb-6 rounded-3xl border border-zinc-800 bg-zinc-950 px-3 py-5 shadow-lg sm:px-5"
-          aria-labelledby="account-tester-heading"
-        >
-          <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <h2 id="account-tester-heading" className="text-lg font-bold tracking-tight text-zinc-100">
-                {t("testerSectionTitle")}
-              </h2>
-              <p className="mt-1 text-sm text-zinc-400">{t("testerSectionSubtitle")}</p>
-            </div>
-            <Link
-              href="/tester"
-              className="shrink-0 rounded-xl border border-violet-500/50 bg-violet-950/40 px-3 py-2 text-center text-xs font-semibold text-violet-200 transition hover:bg-violet-900/50 sm:text-sm"
-            >
-              {t("testerDedicatedLink")}
-            </Link>
-          </div>
-          <TesterDashboardClient bugs={testerBugs} />
-        </section>
-      ) : null}
       <header className="relative mb-6 overflow-hidden rounded-3xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-5 shadow-sm sm:p-6">
         <div className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full bg-emerald-200/40 blur-2xl" aria-hidden />
         <div className="relative flex items-center gap-4">

@@ -5,8 +5,6 @@ import { auth } from "@/auth";
 import { AccountHubView } from "@/components/account/AccountHubView";
 import { AuthForms } from "@/components/AuthForms";
 import { getOAuthAvailability } from "@/lib/oauth-env";
-import { canAccessTesterDashboard } from "@/lib/auth-roles";
-import { listOwnBugs } from "@/lib/tester-bugs";
 import { prisma } from "@/lib/prisma";
 
 type Props = {
@@ -52,10 +50,6 @@ export default async function ContPage({ params, searchParams }: Props) {
 
     if (!me) notFound();
 
-    const supabaseUserId = session.user.supabaseUserId;
-    const testerBugs =
-      canAccessTesterDashboard(me.role) && supabaseUserId ? await listOwnBugs(supabaseUserId) : undefined;
-
     return (
       <AccountHubView
         user={{
@@ -70,7 +64,6 @@ export default async function ContPage({ params, searchParams }: Props) {
           companyLogo: me.companyLogo,
           isVerified: me.isVerified,
         }}
-        testerBugs={testerBugs}
       />
     );
   }
