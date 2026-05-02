@@ -1,8 +1,22 @@
 import type { Metadata } from "next";
+import type { Prisma } from "@prisma/client";
+import { SupportMessageSenderRole, SupportTicketStatus } from "@prisma/client";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import type { SupportTicketStatus } from "@/lib/support-enums";
 import { Link } from "@/i18n/navigation";
 import { supportTicket } from "@/lib/prisma-delegates";
+
+const RECENT_OPEN_DAYS = 14;
+
+type SupportListView = "all" | "recent" | "unanswered" | "closed";
+
+function parseSupportListView(v: string | undefined): SupportListView {
+  if (v === "recent" || v === "unanswered" || v === "closed") return v;
+  return "all";
+}
+
+function supportListHref(view: SupportListView): string {
+  return view === "all" ? "/admin/support" : `/admin/support?v=${view}`;
+}
 
 /** Rând listă — tip explicit (Prisma 7 nu exportă `SupportTicketGetPayload` pe namespace-ul `Prisma`). */
 type SupportListRow = {
@@ -14,7 +28,7 @@ type SupportListRow = {
   updatedAt: Date;
 };
 
-type Props = { params: Promise<{ locale: string }> };
+type Props = { params: Promise<{ locale: string }>; searchParams: Promise<{ v?: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
@@ -22,10 +36,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: t("supportTitle") };
 }
 
-export default async function AdminSupportListPage({ params }: Props) {
+export default async function AdminSupportListPage({ params, searchParams }: Props) {
   const { locale } = await params;
+  const sp = await searchParams;
   setRequestLocale(locale);
   const t = await getTranslations("Admin");
+  const listView = parseSupportListView(typeof sp.v === "string" ? sp.v : undefined);
 
   const statusLabel = (s: string) => {
     const key = `supportStatus_${String(s).toUpperCase()}` as "supportStatus_OPEN";
@@ -47,11 +63,44 @@ export default async function AdminSupportListPage({ params }: Props) {
     }
   };
 
+  const recentSince = new Date();
+  recentSince.setDate(recentSince.getDate() - RECENT_OPEN_DAYS);
+
+  let where: Prisma.SupportTicketWhereInput = {};
+  let orderBy: Prisma.SupportTicketOrderByWithRelationInput[] = [
+    { lastMessageAt: "desc" },
+    { updatedAt: "desc" },
+  ];
+
+  switch (listView) {
+    case "recent":
+      where = {
+        status: { in: [SupportTicketStatus.OPEN, SupportTicketStatus.PENDING] },
+        createdAt: { gte: recentSince },
+      };
+      orderBy = [{ createdAt: "desc" }];
+      break;
+    case "unanswered":
+      where = {
+        status: { in: [SupportTicketStatus.OPEN, SupportTicketStatus.PENDING] },
+        messages: { none: { senderRole: SupportMessageSenderRole.ADMIN } },
+      };
+      orderBy = [{ createdAt: "asc" }];
+      break;
+    case "closed":
+      where = { status: SupportTicketStatus.CLOSED };
+      orderBy = [{ lastMessageAt: "desc" }, { updatedAt: "desc" }];
+      break;
+    default:
+      break;
+  }
+
   let tickets: SupportListRow[] = [];
   let supportDbError = false;
   try {
     tickets = await supportTicket.findMany({
-      orderBy: [{ lastMessageAt: "desc" }, { updatedAt: "desc" }],
+      where,
+      orderBy,
       take: 200,
       include: {
         user: { select: { email: true, name: true } },
@@ -72,6 +121,42 @@ export default async function AdminSupportListPage({ params }: Props) {
     <div>
       <h1 className="text-2xl font-bold tracking-tight text-zinc-900">{t("supportTitle")}</h1>
       <p className="mt-2 max-w-2xl text-zinc-600">{t("supportSubtitle")}</p>
+
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <span className="mr-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          {t("supportFilterLabel")}:
+        </span>
+        {(
+          [
+            { key: "all" as const, label: t("supportFilterAll") },
+            { key: "recent" as const, label: t("supportFilterRecent") },
+            { key: "unanswered" as const, label: t("supportFilterUnanswered") },
+            { key: "closed" as const, label: t("supportFilterClosed") },
+          ] as const
+        ).map((f) => {
+          const active = listView === f.key;
+          return (
+            <Link
+              key={f.key}
+              href={supportListHref(f.key)}
+              className={`inline-flex rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                active
+                  ? "border-emerald-600 bg-emerald-600 text-white"
+                  : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300"
+              }`}
+            >
+              {f.label}
+            </Link>
+          );
+        })}
+      </div>
+
+      {listView === "recent" ? (
+        <p className="mt-3 text-xs text-zinc-500">{t("supportFilterRecentHint", { days: RECENT_OPEN_DAYS })}</p>
+      ) : null}
+      {listView === "unanswered" ? (
+        <p className="mt-3 text-xs text-zinc-500">{t("supportFilterUnansweredHint")}</p>
+      ) : null}
 
       {supportDbError ? (
         <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
@@ -94,7 +179,13 @@ export default async function AdminSupportListPage({ params }: Props) {
             {tickets.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-12 text-center text-zinc-500">
-                  {t("supportEmpty")}
+                  {listView === "recent"
+                    ? t("supportEmptyRecent")
+                    : listView === "unanswered"
+                      ? t("supportEmptyUnanswered")
+                      : listView === "closed"
+                        ? t("supportEmptyClosed")
+                        : t("supportEmpty")}
                 </td>
               </tr>
             ) : (
