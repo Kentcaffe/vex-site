@@ -32,9 +32,9 @@ export type BugAdminRow = BugRow & {
   user_email: string;
 };
 
-export function isTesterLikeRole(role: unknown): boolean {
-  const value = String(role ?? "").toUpperCase();
-  return value === "TESTER" || value === "MODERATOR" || value === "ADMIN";
+/** Doar utilizatorii cu rol TESTER pot trimite bug-uri și accesa /tester. */
+export function isTesterRole(role: unknown): boolean {
+  return String(role ?? "").toUpperCase() === "TESTER";
 }
 
 export async function listOwnBugs(supabaseUserId: string): Promise<BugRow[]> {

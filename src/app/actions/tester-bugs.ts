@@ -2,10 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { routing } from "@/i18n/routing";
 import { checkRateLimit } from "@/lib/request-rate-limit";
+import { localizedHref } from "@/lib/paths";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getSupabaseServiceClient } from "@/lib/supabase-service-role";
-import { isTesterLikeRole, type BugCategory, type BugSeverity, type BugStatus } from "@/lib/tester-bugs";
+import { isTesterRole, type BugCategory, type BugSeverity, type BugStatus } from "@/lib/tester-bugs";
 
 type SubmitState = {
   ok: boolean;
@@ -26,7 +28,7 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
   const session = await auth();
   const role = session?.user?.role;
   const supabaseUserId = session?.user?.supabaseUserId;
-  if (!session?.user?.id || !supabaseUserId || !isTesterLikeRole(role)) {
+  if (!session?.user?.id || !supabaseUserId || !isTesterRole(role)) {
     return { ok: false, message: "", error: "Nu ai acces la tester dashboard." };
   }
   const rl = checkRateLimit({
@@ -125,7 +127,10 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
     return { ok: false, message: "", error: insert.error.message || "Nu am putut salva bug-ul." };
   }
 
-  revalidatePath("/tester");
+  for (const loc of routing.locales) {
+    revalidatePath(localizedHref(loc, "/tester"));
+    revalidatePath(localizedHref(loc, "/cont"));
+  }
   revalidatePath("/admin/bugs");
   return { ok: true, message: "Raport trimis cu succes 🚀" };
 }
@@ -159,7 +164,10 @@ export async function reviewBugReport(_prevState: ReviewState, formData: FormDat
   }
 
   revalidatePath("/admin/bugs");
-  revalidatePath("/tester");
+  for (const loc of routing.locales) {
+    revalidatePath(localizedHref(loc, "/tester"));
+    revalidatePath(localizedHref(loc, "/cont"));
+  }
   return { ok: true };
 }
 

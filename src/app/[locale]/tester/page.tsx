@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { TesterDashboardClient } from "@/components/tester/TesterDashboardClient";
 import { localizedHref } from "@/lib/paths";
-import { isTesterLikeRole, listOwnBugs } from "@/lib/tester-bugs";
+import { isTesterRole, listOwnBugs } from "@/lib/tester-bugs";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -19,7 +19,7 @@ export default async function TesterDashboardPage({ params }: Props) {
   if (!session?.user?.id || !supabaseUserId) {
     redirect(localizedHref(locale, "/cont"));
   }
-  if (!isTesterLikeRole(role)) {
+  if (!isTesterRole(role)) {
     redirect(localizedHref(locale, "/"));
   }
 

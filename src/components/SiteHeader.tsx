@@ -25,7 +25,7 @@ export async function SiteHeader() {
   const accountHref = localizedHref(locale, "/cont");
   const publishHref = localizedHref(locale, "/publica");
   const roleValue = String(session?.user?.role ?? "").toUpperCase();
-  const canAccessTester = roleValue === "TESTER" || roleValue === "MODERATOR" || roleValue === "ADMIN";
+  const canAccessTester = roleValue === "TESTER";
 
   return (
     <header className="static w-full max-w-[100vw] border-b border-[var(--mp-border)] bg-[var(--mp-page)] md:bg-[var(--mp-surface)]">
