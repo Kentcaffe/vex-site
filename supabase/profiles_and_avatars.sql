@@ -97,7 +97,7 @@ with check (auth.uid() = id);
 -- Create avatars bucket if missing.
 insert into storage.buckets (id, name, public)
 values ('avatars', 'avatars', true)
-on conflict (id) do nothing;
+on conflict (id) do update set public = excluded.public;
 
 -- Storage policies: users manage only their own avatar files inside "<auth.uid()>/..."
 drop policy if exists "avatars_public_read" on storage.objects;

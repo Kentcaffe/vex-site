@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { updateProfile, type UpdateProfileState } from "@/app/actions/profile";
+import { resolvePublicMediaUrl } from "@/lib/media-url";
 import {
   accountInputClass,
   accountLabelClass,
@@ -41,6 +42,7 @@ export function ProfileSettingsForm({ locale, initial }: Props) {
 
   const isBusy = pending || isRefreshing;
   const saveButtonLabel = useMemo(() => (isBusy ? t("profileSaving") : t("profileSave")), [isBusy, t]);
+  const avatarPreviewResolved = useMemo(() => resolvePublicMediaUrl(avatarPreview || null), [avatarPreview]);
 
   return (
     <form
@@ -87,10 +89,10 @@ export function ProfileSettingsForm({ locale, initial }: Props) {
         <label htmlFor="acc-avatar" className={accountLabelClass}>
           {t("profileAvatarUrl")}
         </label>
-        {avatarPreview ? (
+        {avatarPreviewResolved ? (
           <div className="mb-2">
             <Image
-              src={avatarPreview}
+              src={avatarPreviewResolved}
               alt={nameValue || "avatar"}
               className="h-14 w-14 rounded-full border border-zinc-200 object-cover"
               width={56}
