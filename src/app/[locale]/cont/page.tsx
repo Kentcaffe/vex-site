@@ -5,7 +5,8 @@ import { auth } from "@/auth";
 import { AccountHubView } from "@/components/account/AccountHubView";
 import { AuthForms } from "@/components/AuthForms";
 import { getOAuthAvailability } from "@/lib/oauth-env";
-import { isTesterRole, listOwnBugs } from "@/lib/tester-bugs";
+import { canAccessTesterDashboard } from "@/lib/auth-roles";
+import { listOwnBugs } from "@/lib/tester-bugs";
 import { prisma } from "@/lib/prisma";
 
 type Props = {
@@ -53,7 +54,7 @@ export default async function ContPage({ params, searchParams }: Props) {
 
     const supabaseUserId = session.user.supabaseUserId;
     const testerBugs =
-      isTesterRole(me.role) && supabaseUserId ? await listOwnBugs(supabaseUserId) : undefined;
+      canAccessTesterDashboard(me.role) && supabaseUserId ? await listOwnBugs(supabaseUserId) : undefined;
 
     return (
       <AccountHubView

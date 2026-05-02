@@ -32,7 +32,7 @@ export type BugAdminRow = BugRow & {
   user_email: string;
 };
 
-/** Doar utilizatorii cu rol TESTER pot trimite bug-uri și accesa /tester. */
+/** Doar rolul TESTER (ex. badge în cont); accesul la /tester include și staff — vezi `canAccessTesterDashboard` în `auth-roles`. */
 export function isTesterRole(role: unknown): boolean {
   return String(role ?? "").toUpperCase() === "TESTER";
 }

@@ -2,12 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
+import { canAccessTesterDashboard } from "@/lib/auth-roles";
 import { routing } from "@/i18n/routing";
 import { checkRateLimit } from "@/lib/request-rate-limit";
 import { localizedHref } from "@/lib/paths";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getSupabaseServiceClient } from "@/lib/supabase-service-role";
-import { isTesterRole, type BugCategory, type BugSeverity, type BugStatus } from "@/lib/tester-bugs";
+import { type BugCategory, type BugSeverity, type BugStatus } from "@/lib/tester-bugs";
 
 type SubmitState = {
   ok: boolean;
@@ -28,7 +29,7 @@ export async function submitBugReport(_prevState: SubmitState, formData: FormDat
   const session = await auth();
   const role = session?.user?.role;
   const supabaseUserId = session?.user?.supabaseUserId;
-  if (!session?.user?.id || !supabaseUserId || !isTesterRole(role)) {
+  if (!session?.user?.id || !supabaseUserId || !canAccessTesterDashboard(role)) {
     return { ok: false, message: "", error: "Nu ai acces la tester dashboard." };
   }
   const rl = checkRateLimit({

@@ -15,6 +15,7 @@ import {
   Settings,
 } from "lucide-react";
 import { Link } from "@/i18n/navigation";
+import { canAccessTesterDashboard } from "@/lib/auth-roles";
 import { UserBadges } from "@/components/business/UserBadges";
 import { SignOutButton } from "@/components/SignOutButton";
 import { SupportChatModal } from "@/components/support/SupportChatModal";
@@ -35,7 +36,7 @@ type Props = {
     companyLogo: string | null;
     isVerified: boolean;
   };
-  /** Raportare bug-uri în cont (doar rol TESTER); același panou ca pe /tester. */
+  /** Raportare bug-uri în cont (testeri + staff); același panou ca pe /tester. */
   testerBugs?: BugRow[];
 };
 
@@ -89,9 +90,9 @@ export function AccountHubView({ user, testerBugs }: Props) {
   const companyLogo = resolvePublicMediaUrl(user.companyLogo);
   const displayName = user.name?.trim() || user.email.split("@")[0] || user.email;
   const roleValue = String(user.role ?? "").toUpperCase();
-  const canAccessTester = roleValue === "TESTER";
+  const canAccessTester = canAccessTesterDashboard(user.role);
   const isTester = roleValue === "TESTER";
-  const showTesterPanel = isTester && testerBugs !== undefined;
+  const showTesterPanel = canAccessTester && testerBugs !== undefined;
 
   return (
     <div className="app-shell app-section pb-4">

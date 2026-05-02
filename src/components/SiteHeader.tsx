@@ -2,7 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import Image from "next/image";
 import { auth } from "@/auth";
 import { Link } from "@/i18n/navigation";
-import { isStaff } from "@/lib/auth-roles";
+import { canAccessTesterDashboard, isStaff } from "@/lib/auth-roles";
 import { localizedHref } from "@/lib/paths";
 import { userNotification } from "@/lib/prisma-delegates";
 import { UserRound } from "lucide-react";
@@ -24,8 +24,7 @@ export async function SiteHeader() {
 
   const accountHref = localizedHref(locale, "/cont");
   const publishHref = localizedHref(locale, "/publica");
-  const roleValue = String(session?.user?.role ?? "").toUpperCase();
-  const canAccessTester = roleValue === "TESTER";
+  const canAccessTester = session?.user?.role ? canAccessTesterDashboard(session.user.role) : false;
 
   return (
     <header className="static w-full max-w-[100vw] border-b border-[var(--mp-border)] bg-[var(--mp-page)] md:bg-[var(--mp-surface)]">
