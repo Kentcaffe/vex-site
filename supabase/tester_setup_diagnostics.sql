@@ -126,3 +126,19 @@ ORDER BY cnt DESC;
 
 SELECT '8) Câte rânduri în tester_messages' AS verificare, count(*)::text AS total_mesaje
 FROM public.tester_messages;
+
+-- ─── 9) Politica DELETE (fără ea, coșul din browser nu șterge nimic) ───────
+SELECT
+  '9) Politica DELETE tester_messages_delete_moderators' AS verificare,
+  CASE
+    WHEN EXISTS (
+      SELECT 1 FROM pg_policy p
+      JOIN pg_class c ON c.oid = p.polrelid
+      JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE n.nspname = 'public'
+        AND c.relname = 'tester_messages'
+        AND p.polname = 'tester_messages_delete_moderators'
+    )
+    THEN 'OK — ștergerea din client Supabase poate merge (dacă RLS îți permite)'
+    ELSE 'LIPSEȘTE — rulează tester_chat_messages_rls_levels.sql sau users_tester_level_enum.sql (partea de CREATE POLICY delete)'
+  END AS rezultat;

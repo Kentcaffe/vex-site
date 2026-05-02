@@ -345,16 +345,28 @@ export function TesterChatClient({
 
   async function deleteMessage(messageId: string) {
     if (!canDeleteOthers) return;
-    const supabase = tryCreateSupabaseBrowserClient();
-    if (!supabase) {
-      setError(t("supabaseMissing"));
+    setError(null);
+    /** Ștergere pe server: evită RLS din browser (politici lipsă / tester_level nesincron cu JWT). */
+    const res = await fetch(
+      `/api/tester/messages?messageId=${encodeURIComponent(messageId)}`,
+      { method: "DELETE", credentials: "include" },
+    );
+    if (res.status === 204) {
+      setMessages((prev) => prev.filter((m) => m.id !== messageId));
       return;
     }
-    setError(null);
-    const { error: delErr } = await supabase.from(TABLE).delete().eq("id", messageId);
-    if (delErr) {
-      setError(t("deleteError"));
+    let detail = "";
+    try {
+      const body = (await res.json()) as { message?: string };
+      if (body.message) detail = ` (${body.message})`;
+    } catch {
+      /* ignore */
     }
+    if (res.status === 403) {
+      setError(t("deleteErrorForbidden"));
+      return;
+    }
+    setError(`${t("deleteError")}${detail}`);
   }
 
   function handleFormSubmit(e: React.FormEvent) {

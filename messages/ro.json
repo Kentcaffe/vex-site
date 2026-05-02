@@ -847,7 +847,8 @@
     "sendError": "Nu s-a putut trimite mesajul. Verifică conexiunea și permisiunile.",
     "trialReadOnly": "Nivelul tău de tester este „începător”: poți citi chatul. Un administrator îți poate ridica nivelul ca să poți scrie mesaje.",
     "deleteAria": "Șterge mesajul",
-    "deleteError": "Nu s-a putut șterge mesajul (verifică nivelul de tester sau permisiunile)."
+    "deleteError": "Nu s-a putut șterge mesajul (verifică nivelul de tester sau permisiunile).",
+    "deleteErrorForbidden": "Nu ai dreptul de a șterge mesaje (nivelul de tester sau rolul nu permite)."
   },
   "Notifications": {
     "title": "Notificări",

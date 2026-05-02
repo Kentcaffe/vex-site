@@ -847,7 +847,8 @@
     "sendError": "Could not send the message. Check your connection and permissions.",
     "trialReadOnly": "Your tester level is “beginner”: you can read the chat. An admin can raise your level so you can write messages.",
     "deleteAria": "Delete message",
-    "deleteError": "Could not delete the message (check your tester level or permissions)."
+    "deleteError": "Could not delete the message (check your tester level or permissions).",
+    "deleteErrorForbidden": "You are not allowed to delete messages (tester level or role)."
   },
   "Notifications": {
     "title": "Notifications",
