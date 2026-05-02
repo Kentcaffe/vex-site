@@ -2,6 +2,8 @@
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { submitBugReport } from "@/app/actions/tester-bugs";
 import type { BugRow } from "@/lib/tester-bugs";
 
@@ -76,6 +78,7 @@ function severityLabel(severity: string) {
 }
 
 export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
+  const tChat = useTranslations("TesterChat");
   const router = useRouter();
   const formRef = useRef<HTMLFormElement | null>(null);
   const initialSubmitState: { ok: boolean; message: string; error?: string } = { ok: false, message: "" };
@@ -128,6 +131,14 @@ export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Link
+          href="/tester/chat"
+          className="inline-flex items-center justify-center rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-400/60 hover:bg-emerald-500/20"
+        >
+          {tChat("dashboardLink")}
+        </Link>
+      </div>
       <section className="grid gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl shadow-black/30 sm:grid-cols-2 lg:grid-cols-4">
         <article className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-4">
           <p className="text-xs uppercase tracking-wide text-zinc-400">Total raportări</p>
