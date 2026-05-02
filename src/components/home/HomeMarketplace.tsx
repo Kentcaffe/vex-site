@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { ChevronRight, Gift, Headphones, ShieldCheck, Sparkles, Zap } from "lucide-react";
+import { ChevronRight, Flame, Gift, Headphones, ShieldCheck, Sparkles, Zap } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { HomeListingCard } from "@/components/home/HomeListingCard";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
@@ -11,6 +11,7 @@ import type { PriceCurrencyCode } from "@/lib/currency";
 import { listingSeoPath } from "@/lib/seo";
 import { localizedHref } from "@/lib/paths";
 import { HomeHeroSearchForm } from "@/components/home/HomeHeroSearchForm";
+import { HeroFloatingVisual } from "@/components/home/HeroFloatingVisual";
 
 type LabelJson = { ro?: string; ru?: string; en?: string };
 
@@ -89,73 +90,71 @@ export async function HomeMarketplace({
 
   return (
     <>
-      {/* Hero — spațiu alb, accent verde, tipografie clară */}
-      <section className="relative w-full overflow-hidden border-b border-emerald-100/80 bg-gradient-to-b from-white via-emerald-50/40 to-zinc-50/90">
+      {/* Hero — gradient premium + vizual flotant (doar UI) */}
+      <section
+        className="relative w-full overflow-hidden border-b border-emerald-100/60"
+        style={{ background: "linear-gradient(135deg, #f8fafc 0%, #e6f4ea 55%, #f1f5f4 100%)" }}
+      >
         <div
-          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-emerald-200/25 blur-3xl"
+          className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-emerald-200/20 blur-3xl"
           aria-hidden
         />
         <div
-          className="pointer-events-none absolute -bottom-16 -left-20 h-64 w-64 rounded-full bg-teal-200/20 blur-3xl"
+          className="pointer-events-none absolute -bottom-20 -left-24 h-72 w-72 rounded-full bg-teal-200/15 blur-3xl"
           aria-hidden
         />
-        <div className="relative mx-auto w-full max-w-6xl px-4 pb-10 pt-8 sm:px-6 sm:pb-12 sm:pt-10 lg:px-8 lg:pb-14 lg:pt-12">
-          <div className="mx-auto flex max-w-4xl flex-col gap-6 lg:mx-0 lg:max-w-none lg:flex-row lg:items-start lg:justify-between lg:gap-10">
-            <div className="min-w-0 flex-1 space-y-4 text-center lg:text-left">
+        <div className="relative mx-auto w-full max-w-6xl px-4 pb-12 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8 lg:pb-16 lg:pt-12">
+          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(260px,1fr)] lg:gap-12">
+            <div className="min-w-0 space-y-5 text-center lg:text-left">
               <p
-                className="inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-white/90 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-900/85 shadow-sm backdrop-blur-sm sm:text-xs"
+                className="inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-white/90 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-900/85 shadow-sm backdrop-blur-sm sm:text-xs lg:mx-0 mx-auto"
                 data-nosnippet
               >
-                <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
+                <Sparkles className="h-3.5 w-3.5 shrink-0 text-[#22c55e]" aria-hidden />
                 {t("heroBadge")}
               </p>
-              <h1 className="text-balance text-3xl font-bold leading-[1.12] tracking-tight text-zinc-900 sm:text-4xl sm:leading-[1.1] lg:text-5xl lg:leading-[1.08]">
-                {t("heroHeadline")}
+              <h1 className="text-balance text-3xl font-bold leading-[1.1] tracking-tight text-zinc-900 sm:text-4xl lg:text-[2.65rem] lg:leading-[1.08]">
+                <span className="text-zinc-900">{t("heroHeadlineLead")}</span>{" "}
+                <span className="text-[#22c55e]">{t("heroHeadlineAccent")}</span>
               </h1>
               <p className="mx-auto max-w-xl text-pretty text-base leading-relaxed text-zinc-600 sm:text-lg lg:mx-0">
                 {t("heroSubheadline")}
               </p>
+              <div className="mx-auto w-full max-w-2xl pt-2 lg:mx-0">
+                <HomeHeroSearchForm action={anunturiAction} />
+              </div>
             </div>
-            <Link
-              href="/cont"
-              className="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-zinc-200/90 bg-white text-lg text-emerald-700 shadow-md shadow-emerald-900/5 ring-1 ring-zinc-100 transition hover:border-emerald-200 hover:bg-emerald-50/90 hover:text-emerald-800 hover:shadow-lg lg:mx-0 lg:mt-2"
-              aria-label="Cont"
-            >
-              <span aria-hidden>👤</span>
-            </Link>
-          </div>
-
-          <div className="mx-auto mt-8 max-w-3xl lg:mt-10">
-            <HomeHeroSearchForm action={anunturiAction} />
+            <HeroFloatingVisual />
           </div>
         </div>
       </section>
 
-      {/* Bară categorii — pills sub hero, același routing `?c=` */}
-      <section className="relative z-10 border-b border-zinc-200/80 bg-white/95 shadow-[0_1px_0_rgb(0_0_0/0.03)] backdrop-blur-md">
-        <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
-          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">{t("categoriesTitle")}</h2>
-            <Link
-              href="/categorii"
-              className="inline-flex min-h-[40px] items-center gap-0.5 text-sm font-semibold text-emerald-700 transition hover:text-emerald-800"
-            >
-              <span className="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-emerald-600 after:transition-transform after:duration-200 hover:after:scale-x-100">
-                {t("viewAll")}
-              </span>
-              <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
-            </Link>
-          </div>
-          <div className="flex flex-wrap gap-2 sm:gap-2.5">
-            {rootCategories.map((cat) => {
-              const rootEmoji = emojiForRootSlug(cat.slug);
-              const accent = categoryAccentRing(cat.slug);
-              return (
-                <Link
-                  key={cat.id}
-                  href={`/categorii?c=${encodeURIComponent(cat.slug)}`}
-                  className="group relative inline-flex min-h-[48px] items-center gap-2.5 rounded-full border border-zinc-200/90 bg-zinc-50/80 px-3.5 py-2.5 text-sm font-semibold text-zinc-800 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-emerald-200/90 hover:bg-white hover:shadow-md"
-                >
+      {/* Categorii — container premium, același routing `?c=` */}
+      <section className="relative z-10 border-b border-zinc-100/90 bg-zinc-50/80 py-6 sm:py-8">
+        <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-[20px] border border-zinc-200/80 bg-white p-4 shadow-[0_10px_30px_rgba(0,0,0,0.05)] sm:p-5">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">{t("categoriesTitle")}</h2>
+              <Link
+                href="/categorii"
+                className="inline-flex min-h-[40px] items-center gap-0.5 text-sm font-semibold text-[#16a34a] transition hover:text-[#15803d]"
+              >
+                <span className="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-[#22c55e] after:transition-transform after:duration-200 hover:after:scale-x-100">
+                  {t("viewAll")}
+                </span>
+                <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
+              </Link>
+            </div>
+            <div className="flex flex-wrap gap-2 sm:gap-2.5">
+              {rootCategories.map((cat) => {
+                const rootEmoji = emojiForRootSlug(cat.slug);
+                const accent = categoryAccentRing(cat.slug);
+                return (
+                  <Link
+                    key={cat.id}
+                    href={`/categorii?c=${encodeURIComponent(cat.slug)}`}
+                    className="group relative inline-flex min-h-[52px] items-center gap-2.5 rounded-full border border-zinc-200/90 bg-zinc-50/90 px-3.5 py-2.5 text-sm font-semibold text-zinc-800 shadow-sm transition duration-200 hover:-translate-y-[5px] hover:border-[#22c55e]/35 hover:bg-white hover:shadow-md"
+                  >
                   <span
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg leading-none ring-1 ring-inset ${accent}`}
                     aria-hidden
@@ -169,11 +168,12 @@ export async function HomeMarketplace({
                       aria-hidden
                     />
                   </span>
-                </Link>
-              );
-            })}
+                  </Link>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-zinc-500">{t("categoriesHint")}</p>
           </div>
-          <p className="mt-3 text-xs leading-relaxed text-zinc-500">{t("categoriesHint")}</p>
         </div>
       </section>
 
@@ -181,14 +181,18 @@ export async function HomeMarketplace({
         <section>
           <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
             <div className="space-y-1.5">
-              <h2 className="text-xl font-bold tracking-tight text-zinc-900 sm:text-2xl">{t("latestListingsTitle")}</h2>
+              <h2 className="inline-flex items-center gap-2 text-xl font-bold tracking-tight text-zinc-900 sm:text-2xl">
+                <Flame className="h-6 w-6 shrink-0 text-orange-500" strokeWidth={2} aria-hidden />
+                {t("gridTitle")}
+              </h2>
               <p className="max-w-xl text-sm leading-relaxed text-zinc-600 sm:text-base">{t("latestListingsSubtitle")}</p>
             </div>
             <Link
               href="/anunturi"
-              className="inline-flex min-h-[44px] items-center text-sm font-semibold text-emerald-700 underline-offset-4 transition hover:text-emerald-800 hover:underline"
+              className="inline-flex min-h-[44px] items-center gap-0.5 text-sm font-semibold text-[#16a34a] underline-offset-4 transition hover:text-[#15803d] hover:underline"
             >
               {t("viewAll")}
+              <ChevronRight className="h-4 w-4" aria-hidden />
             </Link>
           </div>
 
