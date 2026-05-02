@@ -1,92 +1,56 @@
 import Image from "next/image";
 
-const PRODUCT_SHADOW = "0 15px 40px rgba(0,0,0,0.1)";
-const PHONE_SHADOW = "0 30px 60px rgba(0,0,0,0.15)";
-
 /**
- * Decor hero dreapta — imagini locale `/public/hero/*` (doar UI, fără logică).
- * Pe ecrane < `lg` nu ocupă spațiu (ascuns).
+ * Artwork hero dreapta — o singură imagine `/hero.png`, integrată în fundal (doar UI).
  */
 export function HeroFloatingVisual() {
   return (
     <div
-      className="relative mx-auto hidden h-[min(460px,50vh)] w-full max-w-[560px] select-none overflow-visible lg:block"
+      className="relative flex w-full max-w-[280px] shrink-0 justify-center justify-self-center sm:max-w-[360px] md:max-w-[440px] lg:max-w-[550px] lg:justify-self-end lg:self-center"
       aria-hidden
     >
-      {/* Mașină — stânga sus */}
+      {/* Halou verde → alb, legat de fundalul hero */}
       <div
-        className="absolute left-0 top-[10%] z-[5] w-[30%] max-w-[200px] rounded-[20px] bg-transparent"
-        style={{ boxShadow: PRODUCT_SHADOW, transform: "rotate(-5deg)" }}
-      >
-        <Image
-          src="/hero/car.png"
-          alt=""
-          width={200}
-          height={150}
-          className="h-auto w-full rounded-[20px] object-contain"
-          sizes="200px"
-        />
-      </div>
+        className="pointer-events-none absolute inset-[-18%] -z-10 rounded-[48px] opacity-[0.95]"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 65% at 50% 42%, rgba(34,197,94,0.22) 0%, rgba(230,244,234,0.55) 42%, rgba(255,255,255,0.85) 68%, transparent 100%)",
+        }}
+      />
 
-      {/* Laptop — dreapta sus */}
       <div
-        className="absolute right-0 top-[8%] z-[5] w-[30%] max-w-[200px] rounded-[20px] bg-transparent"
-        style={{ boxShadow: PRODUCT_SHADOW, transform: "rotate(5deg)" }}
+        className="relative w-full max-w-[550px] rounded-[28px] p-2 sm:p-3 lg:p-4"
+        style={{
+          boxShadow: "0 18px 48px -18px rgba(15, 23, 42, 0.1)",
+        }}
       >
-        <Image
-          src="/hero/laptop.png"
-          alt=""
-          width={200}
-          height={150}
-          className="h-auto w-full rounded-[20px] object-contain"
-          sizes="200px"
+        {/* Blend margini — fără chenar dur */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[28px] bg-gradient-to-br from-emerald-100/35 via-transparent to-white/75 ring-1 ring-inset ring-white/50"
+          aria-hidden
         />
-      </div>
+        <div
+          className="pointer-events-none absolute inset-0 rounded-[28px] backdrop-blur-[0.5px]"
+          aria-hidden
+        />
 
-      {/* Casă — stânga jos */}
-      <div
-        className="absolute bottom-[8%] left-[4%] z-[5] w-[28%] max-w-[190px] rounded-[20px] bg-transparent"
-        style={{ boxShadow: PRODUCT_SHADOW, transform: "rotate(5deg)" }}
-      >
-        <Image
-          src="/hero/house.png"
-          alt=""
-          width={190}
-          height={140}
-          className="h-auto w-full rounded-[20px] object-contain"
-          sizes="190px"
-        />
-      </div>
-
-      {/* Canapea — dreapta jos */}
-      <div
-        className="absolute bottom-[10%] right-[2%] z-[5] w-[30%] max-w-[200px] rounded-[20px] bg-transparent"
-        style={{ boxShadow: PRODUCT_SHADOW, transform: "rotate(-5deg)" }}
-      >
-        <Image
-          src="/hero/sofa.png"
-          alt=""
-          width={200}
-          height={150}
-          className="h-auto w-full rounded-[20px] object-contain"
-          sizes="200px"
-        />
-      </div>
-
-      {/* Telefon — centru zona dreaptă, cel mai mare, deasupra produselor */}
-      <div
-        className="absolute left-1/2 top-1/2 z-[20] w-[min(52%,300px)] -translate-x-1/2 -translate-y-1/2 rounded-[20px] bg-transparent"
-        style={{ boxShadow: PHONE_SHADOW }}
-      >
-        <Image
-          src="/hero/phone.png"
-          alt=""
-          width={300}
-          height={560}
-          priority
-          className="h-auto w-full rounded-[20px] object-contain"
-          sizes="(min-width: 1024px) 300px, 0px"
-        />
+        <div
+          className="relative w-full"
+          style={{
+            WebkitMaskImage: "radial-gradient(ellipse 82% 88% at 50% 50%, #000 58%, transparent 100%)",
+            maskImage: "radial-gradient(ellipse 82% 88% at 50% 50%, #000 58%, transparent 100%)",
+          }}
+        >
+          <Image
+            src="/hero.png"
+            alt=""
+            width={1100}
+            height={880}
+            priority
+            className="mx-auto h-auto w-full max-h-[200px] object-contain opacity-[0.97] drop-shadow-[0_14px_40px_rgba(15,23,42,0.09)] sm:max-h-[260px] md:max-h-[320px] lg:max-h-[min(440px,50vh)]"
+            sizes="(max-width: 640px) 280px, (max-width: 768px) 360px, 550px"
+          />
+        </div>
       </div>
     </div>
   );

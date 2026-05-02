@@ -104,7 +104,7 @@ export async function HomeMarketplace({
           aria-hidden
         />
         <div className="relative mx-auto w-full max-w-6xl px-4 pb-12 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:px-8 lg:pb-16 lg:pt-12">
-          <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(260px,1fr)] lg:gap-12">
+          <div className="grid items-stretch gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(260px,1fr)] lg:items-center lg:gap-12">
             <div className="min-w-0 space-y-5 text-center lg:text-left">
               <p
                 className="inline-flex items-center gap-2 rounded-full border border-emerald-200/90 bg-white/90 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-emerald-900/85 shadow-sm backdrop-blur-sm sm:text-xs lg:mx-0 mx-auto"
