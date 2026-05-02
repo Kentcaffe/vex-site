@@ -1,6 +1,18 @@
 import type { UserRole } from "@prisma/client";
-import { TesterProgramLevel } from "@prisma/client";
 import { isStaff } from "@/lib/auth-roles";
+
+/**
+ * Valori aliniate cu enum-ul Prisma/Postgres `TesterProgramLevel` (definite aici ca să nu depindem
+ * de `@prisma/client` generat în IDE — rulează `npx prisma generate` după schimbări de schema).
+ */
+export const TesterProgramLevel = {
+  trial: "trial",
+  tester: "tester",
+  advanced: "advanced",
+  lead: "lead",
+} as const;
+
+export type TesterProgramLevel = (typeof TesterProgramLevel)[keyof typeof TesterProgramLevel];
 
 export const TESTER_LEVEL_VALUES: readonly TesterProgramLevel[] = [
   TesterProgramLevel.trial,

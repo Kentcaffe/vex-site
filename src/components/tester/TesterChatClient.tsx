@@ -5,7 +5,6 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { UserRole } from "@prisma/client";
-import { TesterProgramLevel } from "@prisma/client";
 import { ArrowLeft, Loader2, Paperclip, Send, Shield, Trash2 } from "lucide-react";
 import { hasSupabasePublicEnv, tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 import {
@@ -14,6 +13,7 @@ import {
   normalizeTesterLevel,
   testerLevelBadgeClasses,
   testerLevelLabelRo,
+  TesterProgramLevel,
   type TesterLevel,
 } from "@/lib/tester-level";
 

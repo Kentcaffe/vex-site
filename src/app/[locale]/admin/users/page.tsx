@@ -1,4 +1,5 @@
-import { Prisma, TesterProgramLevel } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import { TesterProgramLevel } from "@/lib/tester-level";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import {
