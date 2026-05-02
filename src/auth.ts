@@ -34,39 +34,51 @@ function hasSupabaseEnv(): boolean {
 
 async function upsertPrismaUserFromSupabase(input: SyncInput) {
   const email = normalizeEmail(input.email);
-  try {
-    return await prisma.user.upsert({
+
+  async function syncWithOptionalSupabaseAuthId(includeSupabaseAuthId: boolean) {
+    const existing = await prisma.user.findUnique({
       where: { email },
-      create: {
+      select: { name: true, avatarUrl: true },
+    });
+
+    if (existing) {
+      const data: { supabaseAuthId?: string; name?: string | null; avatarUrl?: string | null } = {};
+      if (includeSupabaseAuthId) {
+        data.supabaseAuthId = input.supabaseUserId;
+      }
+      // Nu suprascrie numele/poza salvate din cont: la login Google reîmprospătează user_metadata
+      // și ar anula updateProfile. Completăm din OAuth doar dacă în DB încă e gol.
+      if (!existing.name?.trim() && input.name?.trim()) {
+        data.name = input.name.trim();
+      }
+      if (!existing.avatarUrl?.trim() && input.avatarUrl?.trim()) {
+        data.avatarUrl = input.avatarUrl.trim();
+      }
+      if (Object.keys(data).length === 0) {
+        return prisma.user.findUniqueOrThrow({ where: { email } });
+      }
+      return prisma.user.update({ where: { email }, data });
+    }
+
+    return prisma.user.create({
+      data: {
         email,
         name: input.name ?? null,
         avatarUrl: input.avatarUrl ?? null,
-        supabaseAuthId: input.supabaseUserId,
-      },
-      update: {
-        name: input.name ?? undefined,
-        avatarUrl: input.avatarUrl ?? undefined,
-        supabaseAuthId: input.supabaseUserId,
+        ...(includeSupabaseAuthId ? { supabaseAuthId: input.supabaseUserId } : {}),
       },
     });
+  }
+
+  try {
+    return await syncWithOptionalSupabaseAuthId(true);
   } catch (err) {
     if (isMissingListingColumnError(err, "supabaseAuthId")) {
       console.error(
         "[auth] Coloana User.supabaseAuthId lipsește în DB — sincronizare fără ea (rulează migrările sau ALTER TABLE).",
         err,
       );
-      return prisma.user.upsert({
-        where: { email },
-        create: {
-          email,
-          name: input.name ?? null,
-          avatarUrl: input.avatarUrl ?? null,
-        },
-        update: {
-          name: input.name ?? undefined,
-          avatarUrl: input.avatarUrl ?? undefined,
-        },
-      });
+      return syncWithOptionalSupabaseAuthId(false);
     }
     throw err;
   }
