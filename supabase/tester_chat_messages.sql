@@ -1,6 +1,12 @@
 -- Tester community chat (separat de tabelul Prisma `messages` folosit pentru DM marketplace).
--- Coloane logice: id, user (nume afișat), text, created_at + user_id (legătură auth.uid() pentru RLS).
--- Rulează în Supabase SQL Editor după migrările Prisma.
+-- Coloane: id, user (nume afișat), text, created_at + user_id → auth.users.
+-- Modelul Prisma `User` este mapat la tabelul **public.users** (@@map("users")), nu "User".
+-- Rulează în Supabase SQL Editor.
+--
+-- Dacă primești „relation public.users does not exist” (Postgres Supabase fără migrări Prisma),
+-- rulează în schimb: supabase/tester_chat_messages_rls_auth_only.sql (după ce există deja tabelul
+-- tester_messages — poți rula mai întâi acest fișier până la «alter table … enable row level security»,
+-- apoi politicile din fișierul auth_only).
 
 begin;
 
@@ -17,7 +23,7 @@ create index if not exists tester_messages_created_at_idx
 
 alter table public.tester_messages enable row level security;
 
--- Citire: utilizatori autentificați cu rol tester / moderator / admin în aplicația Prisma.
+-- Citire: autentificat + rând în public.users legat de Supabase + rol tester/moderator/admin.
 drop policy if exists "tester_messages_select_tester" on public.tester_messages;
 create policy "tester_messages_select_tester"
 on public.tester_messages
@@ -26,13 +32,13 @@ to authenticated
 using (
   exists (
     select 1
-    from public."User" u
+    from public.users u
     where u."supabaseAuthId" = auth.uid()::text
       and lower(u.role::text) in ('tester', 'moderator', 'admin')
   )
 );
 
--- Inserare: doar pentru propriul cont auth și același rol.
+-- Inserare: doar în numele propriului auth.uid() + același rol.
 drop policy if exists "tester_messages_insert_own_tester" on public.tester_messages;
 create policy "tester_messages_insert_own_tester"
 on public.tester_messages
@@ -42,7 +48,7 @@ with check (
   auth.uid() = user_id
   and exists (
     select 1
-    from public."User" u
+    from public.users u
     where u."supabaseAuthId" = auth.uid()::text
       and lower(u.role::text) in ('tester', 'moderator', 'admin')
   )
