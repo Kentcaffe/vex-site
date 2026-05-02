@@ -178,33 +178,6 @@ export async function HomeMarketplace({
       </section>
 
       <div className="app-shell app-section w-full min-w-0 bg-[linear-gradient(180deg,var(--mp-page)_0%,#fafafa_100%)] pb-12 pt-8 md:pb-14 md:pt-10">
-        {/* Carduri categorii — grid, același href ca bara */}
-        <section className="mb-10 md:mb-12">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
-            {rootCategories.map((cat) => {
-              const rootEmoji = emojiForRootSlug(cat.slug);
-              const accent = categoryAccentRing(cat.slug);
-              return (
-                <Link
-                  key={`card-${cat.id}`}
-                  href={`/categorii?c=${encodeURIComponent(cat.slug)}`}
-                  className="group flex min-h-[108px] flex-col justify-between rounded-2xl border border-zinc-200/90 bg-white p-4 shadow-[0_8px_30px_-12px_rgb(15_23_42/0.08)] transition duration-300 hover:-translate-y-1 hover:border-emerald-200/80 hover:shadow-[0_16px_40px_-14px_rgb(5_150_105/0.18)]"
-                >
-                  <span
-                    className={`flex h-12 w-12 items-center justify-center rounded-xl text-2xl leading-none ring-1 ring-inset ${accent}`}
-                    aria-hidden
-                  >
-                    {rootEmoji}
-                  </span>
-                  <span className="mt-3 line-clamp-2 text-sm font-bold leading-snug text-zinc-900 group-hover:text-emerald-800">
-                    {labelFor(cat, locale)}
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
         <section>
           <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
             <div className="space-y-1.5">
@@ -276,32 +249,6 @@ export async function HomeMarketplace({
             ))}
           </div>
         </section>
-
-        <div className="mt-12 hidden md:block">
-          <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-            <Link
-              href="/anunturi"
-              className="group rounded-2xl border border-zinc-200/90 bg-white p-6 shadow-[0_10px_32px_-14px_rgb(15_23_42/0.1)] transition hover:-translate-y-0.5 hover:border-emerald-200/80 hover:shadow-[0_18px_44px_-16px_rgb(5_150_105/0.15)]"
-            >
-              <p className="text-sm font-bold text-zinc-900">{t("promoBrowseCardTitle")}</p>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("promoBrowseCardBody")}</p>
-            </Link>
-            <Link
-              href="/chat"
-              className="group rounded-2xl border border-zinc-200/90 bg-white p-6 shadow-[0_10px_32px_-14px_rgb(15_23_42/0.1)] transition hover:-translate-y-0.5 hover:border-emerald-200/80 hover:shadow-[0_18px_44px_-16px_rgb(5_150_105/0.15)]"
-            >
-              <p className="text-sm font-bold text-zinc-900">{t("promoTile2Title")}</p>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("promoTile2Body")}</p>
-            </Link>
-            <Link
-              href="/publica"
-              className="group rounded-2xl border border-zinc-200/90 bg-white p-6 shadow-[0_10px_32px_-14px_rgb(15_23_42/0.1)] transition hover:-translate-y-0.5 hover:border-emerald-200/80 hover:shadow-[0_18px_44px_-16px_rgb(5_150_105/0.15)]"
-            >
-              <p className="text-sm font-bold text-zinc-900">{t("promoTile3Title")}</p>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t("promoTile3Body")}</p>
-            </Link>
-          </section>
-        </div>
 
         <ScrollToTopButton />
       </div>
