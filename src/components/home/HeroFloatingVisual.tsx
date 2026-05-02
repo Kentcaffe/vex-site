@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 /**
- * Artwork hero dreapta — o singură imagine `/hero.png`, integrată în fundal (doar UI).
+ * Artwork hero dreapta — imagine `public/hero/poza.png`, integrată în fundal (doar UI).
  */
 export function HeroFloatingVisual() {
   return (
@@ -42,7 +42,7 @@ export function HeroFloatingVisual() {
           }}
         >
           <Image
-            src="/hero.png"
+            src="/hero/poza.png"
             alt=""
             width={1100}
             height={880}
