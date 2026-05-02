@@ -47,7 +47,7 @@ export async function GET(req: Request) {
   const levels: Record<string, LevelPayload> = {};
   for (const id of unique) {
     const row = rows.find((r) => r.supabaseAuthId === id);
-    const testerLevel = normalizeTesterLevel(row?.tester_level ?? "trial");
+    const testerLevel = normalizeTesterLevel(row?.tester_level);
     levels[id] = { testerLevel, labelRo: testerLevelLabelRo(testerLevel) };
   }
 

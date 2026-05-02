@@ -8,7 +8,6 @@ import {
   TESTER_LEVEL_VALUES,
   testerLevelBadgeClasses,
   testerLevelLabelRo,
-  type TesterLevel,
 } from "@/lib/tester-level";
 
 function SaveButton() {
@@ -60,7 +59,7 @@ export function AdminUserTesterLevelSelect({
         className="rounded-lg border border-zinc-300 bg-white px-2 py-1 text-xs text-zinc-900 dark:border-zinc-600 dark:bg-zinc-950 dark:text-zinc-100"
         aria-label={t("testerLevelSelectAria")}
       >
-        {(TESTER_LEVEL_VALUES as readonly TesterLevel[]).map((v) => (
+        {TESTER_LEVEL_VALUES.map((v) => (
           <option key={v} value={v}>
             {testerLevelLabelRo(v)}
           </option>

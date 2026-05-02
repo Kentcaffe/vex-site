@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, TesterProgramLevel } from "@prisma/client";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import {
@@ -127,7 +127,7 @@ export default async function AdminUsersPage({ params }: Props) {
       const row = u as unknown as Omit<AdminUserRow, "testerLevel">;
       return {
         ...row,
-        testerLevel: levelById.get(row.id) ?? "trial",
+        testerLevel: levelById.get(row.id) ?? TesterProgramLevel.trial,
       };
     }) as AdminUserRow[];
     applications = applicationRows;

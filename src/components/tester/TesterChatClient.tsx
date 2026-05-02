@@ -5,6 +5,7 @@ import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import type { UserRole } from "@prisma/client";
+import { TesterProgramLevel } from "@prisma/client";
 import { ArrowLeft, Loader2, Paperclip, Send, Shield, Trash2 } from "lucide-react";
 import { hasSupabasePublicEnv, tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 import {
@@ -470,11 +471,17 @@ export function TesterChatClient({
                             )}
                             <span
                               className={`inline-flex max-w-full shrink-0 truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${testerLevelBadgeClasses(
-                                levelBySupabaseId[m.user_id] ?? "trial",
+                                levelBySupabaseId[m.user_id] ?? TesterProgramLevel.trial,
                               )}`}
-                              title={testerLevelLabelRo(levelBySupabaseId[m.user_id] ?? "trial")}
+                              title={testerLevelLabelRo(
+                                levelBySupabaseId[m.user_id] ?? TesterProgramLevel.trial,
+                              )}
                             >
-                              [{testerLevelLabelRo(levelBySupabaseId[m.user_id] ?? "trial")}]
+                              [
+                              {testerLevelLabelRo(
+                                levelBySupabaseId[m.user_id] ?? TesterProgramLevel.trial,
+                              )}
+                              ]
                             </span>
                             <time dateTime={m.created_at} className="tabular-nums text-zinc-400">
                               {formatTime(m.created_at, locale)}

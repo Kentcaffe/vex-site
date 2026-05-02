@@ -32,6 +32,14 @@ enum SupportMessageSenderRole {
   SYSTEM
 }
 
+/** Nivel program testare (chat); separat de `UserRole`. */
+enum TesterProgramLevel {
+  trial
+  tester
+  advanced
+  lead
+}
+
 model User {
   id            String         @id @default(cuid())
   supabaseAuthId String?
@@ -58,8 +66,8 @@ model User {
   bio           String?
   passwordHash  String?
   role          UserRole       @default(USER)
-  /** Nivel în programul de testare (chat tester): trial | tester | advanced | lead — separat de `role`. */
-  testerLevel   String         @default("trial") @map("tester_level")
+  /** Nivel în programul de testare (chat tester) — tip enum în Postgres = dropdown în Supabase. */
+  testerLevel   TesterProgramLevel @default(trial) @map("tester_level")
   listings      Listing[]
   buyerChatRooms ChatRoom[]    @relation("BuyerRooms")
   chatMessages  ChatMessage[]

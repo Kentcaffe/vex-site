@@ -26,7 +26,7 @@ with check (
       and lower(u.role::text) in ('tester', 'moderator', 'admin')
       and (
         lower(u.role::text) in ('moderator', 'admin')
-        or coalesce(u."tester_level", 'trial') in ('tester', 'advanced', 'lead')
+        or coalesce(u."tester_level"::text, 'trial') in ('tester', 'advanced', 'lead')
       )
   )
 );
@@ -44,7 +44,7 @@ using (
       and (
         lower(u.role::text) = 'admin'
         or lower(u.role::text) = 'moderator'
-        or coalesce(u."tester_level", 'trial') in ('advanced', 'lead')
+        or coalesce(u."tester_level"::text, 'trial') in ('advanced', 'lead')
       )
   )
 );
@@ -61,7 +61,7 @@ using (
     where u."supabaseAuthId" = auth.uid()::text
       and (
         lower(u.role::text) = 'admin'
-        or coalesce(u."tester_level", 'trial') = 'lead'
+        or coalesce(u."tester_level"::text, 'trial') = 'lead'
       )
   )
 )
