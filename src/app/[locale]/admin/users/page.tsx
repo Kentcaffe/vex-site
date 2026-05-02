@@ -1,6 +1,12 @@
-import type { Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { auth } from "@/auth";
+import {
+  AdminUserTesterLevelBadge,
+  AdminUserTesterLevelSelect,
+} from "@/components/admin/AdminUserTesterLevelSelect";
 import { BusinessApplicationActions } from "@/components/admin/BusinessApplicationActions";
+import { isAdmin } from "@/lib/auth-roles";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 
@@ -13,6 +19,7 @@ type AdminUserRow = {
   email: string;
   name: string | null;
   role: string;
+  testerLevel: string;
   accountType: string;
   businessStatus: string;
   companyName: string | null;
@@ -59,11 +66,14 @@ export default async function AdminUsersPage({ params }: Props) {
     );
   }
 
+  const session = await auth();
+  const canEditTesterLevel = isAdmin(session?.user?.role);
+
   let users: AdminUserRow[] = [];
   let applications: BusinessApplicationRow[] = [];
   let loadFailed = false;
   try {
-    [users, applications] = await Promise.all([
+    const [userRows, applicationRows] = await Promise.all([
       prisma.user.findMany({
         orderBy: { createdAt: "desc" },
         take: 400,
@@ -78,8 +88,8 @@ export default async function AdminUsersPage({ params }: Props) {
           isVerified: true,
           createdAt: true,
           _count: { select: { listings: { where: listingWhereActive() } } },
-        } as unknown as Prisma.UserSelect,
-      }) as unknown as Promise<AdminUserRow[]>,
+        },
+      } as never),
       prisma.$queryRaw<BusinessApplicationRow[]>`
         SELECT
           ba."id" AS "id",
@@ -103,6 +113,24 @@ export default async function AdminUsersPage({ params }: Props) {
         LIMIT 200
       `,
     ]);
+    const ids = userRows.map((u) => u.id);
+    const levelById = new Map<string, string>();
+    if (ids.length > 0) {
+      const levelRows = await prisma.$queryRaw<Array<{ id: string; tester_level: string }>>(
+        Prisma.sql`SELECT id, tester_level FROM users WHERE id IN (${Prisma.join(ids.map((id) => Prisma.sql`${id}`))})`,
+      );
+      for (const row of levelRows) {
+        levelById.set(row.id, row.tester_level);
+      }
+    }
+    users = userRows.map((u) => {
+      const row = u as unknown as Omit<AdminUserRow, "testerLevel">;
+      return {
+        ...row,
+        testerLevel: levelById.get(row.id) ?? "trial",
+      };
+    }) as AdminUserRow[];
+    applications = applicationRows;
   } catch (error) {
     console.error("[admin/users] prisma.user.findMany failed", error);
     loadFailed = true;
@@ -185,12 +213,13 @@ export default async function AdminUsersPage({ params }: Props) {
         <p className="mt-8 text-zinc-600 dark:text-zinc-400">{t("usersEmpty")}</p>
           ) : (
         <div className="mt-8 overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <table className="w-full min-w-[900px] text-left text-sm">
+          <table className="w-full min-w-[1040px] text-left text-sm">
             <thead>
               <tr className="border-b border-zinc-200 bg-zinc-50/90 text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-400">
                 <th className="px-4 py-3">{t("usersColEmail")}</th>
                 <th className="px-4 py-3">{t("usersColName")}</th>
                 <th className="px-4 py-3">{t("usersColRole")}</th>
+                <th className="px-4 py-3">{t("usersColTesterLevel")}</th>
                 <th className="px-4 py-3">Firmă</th>
                 <th className="px-4 py-3">Status business</th>
                 <th className="px-4 py-3">{t("usersColListings")}</th>
@@ -215,6 +244,13 @@ export default async function AdminUsersPage({ params }: Props) {
                     >
                       {roleLabel(u.role)}
                     </span>
+                  </td>
+                  <td className="max-w-[220px] px-4 py-3 align-top">
+                    {canEditTesterLevel ? (
+                      <AdminUserTesterLevelSelect userId={u.id} currentLevel={u.testerLevel} />
+                    ) : (
+                      <AdminUserTesterLevelBadge level={u.testerLevel} />
+                    )}
                   </td>
                   <td className="px-4 py-3 text-zinc-700 dark:text-zinc-300">
                     {u.companyName ? (

@@ -844,7 +844,10 @@
     "empty": "No messages yet. Say hello!",
     "supabaseMissing": "Chat is unavailable: Supabase public env vars are missing.",
     "loadError": "Could not load messages. Try again.",
-    "sendError": "Could not send the message. Check your connection and permissions."
+    "sendError": "Could not send the message. Check your connection and permissions.",
+    "trialReadOnly": "Your tester level is “beginner”: you can read the chat. An admin can raise your level so you can write messages.",
+    "deleteAria": "Delete message",
+    "deleteError": "Could not delete the message (check your tester level or permissions)."
   },
   "Notifications": {
     "title": "Notifications",
@@ -957,6 +960,12 @@
     "usersColEmail": "Email",
     "usersColName": "Name",
     "usersColRole": "Role",
+    "usersColTesterLevel": "Tester level",
+    "testerLevelSave": "Save",
+    "testerLevelSaved": "Saved",
+    "testerLevelSelectAria": "Tester program level",
+    "testerLevelForbidden": "No permission.",
+    "testerLevelError": "Could not save.",
     "usersColListings": "Listings",
     "usersColJoined": "Joined",
     "usersEmpty": "No users yet.",

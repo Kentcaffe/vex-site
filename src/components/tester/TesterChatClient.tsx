@@ -4,8 +4,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { ArrowLeft, Loader2, Paperclip, Send, Shield } from "lucide-react";
+import type { UserRole } from "@prisma/client";
+import { ArrowLeft, Loader2, Paperclip, Send, Shield, Trash2 } from "lucide-react";
 import { hasSupabasePublicEnv, tryCreateSupabaseBrowserClient } from "@/lib/supabase";
+import {
+  canTesterDeleteChatMessages,
+  canTesterSendChatMessage,
+  normalizeTesterLevel,
+  testerLevelBadgeClasses,
+  testerLevelLabelRo,
+  type TesterLevel,
+} from "@/lib/tester-level";
 
 const TESTER_CHAT_CHANNEL = "tester-chat-global";
 const TABLE = "tester_messages";
@@ -22,6 +31,7 @@ type PresencePayload = {
   name: string;
   role?: string;
   avatarUrl?: string | null;
+  testerLevel?: string;
 };
 
 type Props = {
@@ -29,6 +39,8 @@ type Props = {
   supabaseUserId: string;
   displayName: string;
   userRole: string;
+  appRole: UserRole;
+  myTesterLevel: TesterLevel;
   avatarUrl?: string | null;
 };
 
@@ -70,6 +82,8 @@ export function TesterChatClient({
   supabaseUserId,
   displayName,
   userRole,
+  appRole,
+  myTesterLevel,
   avatarUrl,
 }: Props) {
   const t = useTranslations("TesterChat");
@@ -78,11 +92,64 @@ export function TesterChatClient({
   const [sending, setSending] = useState(false);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [levelBySupabaseId, setLevelBySupabaseId] = useState<Record<string, TesterLevel>>(() => ({
+    [supabaseUserId]: myTesterLevel,
+  }));
   const [onlineByUserId, setOnlineByUserId] = useState<
-    Record<string, { name: string; role?: string; avatarUrl?: string | null }>
+    Record<
+      string,
+      { name: string; role?: string; avatarUrl?: string | null; testerLevel?: string }
+    >
   >({});
   const listRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
+
+  const canSend = canTesterSendChatMessage(myTesterLevel, appRole);
+  const canDeleteOthers = canTesterDeleteChatMessages(myTesterLevel, appRole);
+
+  useEffect(() => {
+    setLevelBySupabaseId((prev) => ({ ...prev, [supabaseUserId]: myTesterLevel }));
+  }, [supabaseUserId, myTesterLevel]);
+
+  const levelRef = useRef(levelBySupabaseId);
+  levelRef.current = levelBySupabaseId;
+
+  useEffect(() => {
+    const fromMessages = messages.map((m) => m.user_id);
+    const fromOnline = Object.keys(onlineByUserId);
+    const unique = [...new Set([...fromMessages, ...fromOnline, supabaseUserId])].filter(Boolean);
+    const missing = unique.filter((id) => levelRef.current[id] === undefined);
+    if (missing.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/tester/levels?ids=${encodeURIComponent(missing.join(","))}`,
+          { credentials: "include" },
+        );
+        if (!res.ok) return;
+        const data = (await res.json()) as {
+          levels?: Record<string, { testerLevel: TesterLevel }>;
+        };
+        const levels = data.levels;
+        if (cancelled || !levels) return;
+        setLevelBySupabaseId((prev) => {
+          const next = { ...prev };
+          for (const [id, meta] of Object.entries(levels)) {
+            next[id] = normalizeTesterLevel(meta.testerLevel);
+          }
+          return next;
+        });
+      } catch {
+        /* ignore */
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [messages, onlineByUserId, supabaseUserId]);
 
   const scrollToBottom = useCallback(() => {
     const el = listRef.current;
@@ -153,13 +220,35 @@ export function TesterChatClient({
           });
         },
       )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: TABLE },
+        (payload) => {
+          const oldRow = payload.old as Pick<TesterChatMessage, "id">;
+          if (!oldRow?.id) return;
+          setMessages((prev) => prev.filter((m) => m.id !== oldRow.id));
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: TABLE },
+        (payload) => {
+          const row = payload.new as TesterChatMessage;
+          if (!row?.id) return;
+          setMessages((prev) =>
+            prev.map((m) => (m.id === row.id ? { ...m, ...row } : m)),
+          );
+        },
+      )
       .on("presence", { event: "sync" }, () => {
         const state = channel.presenceState() as Record<
           string,
           PresencePayload[]
         >;
-        const next: Record<string, { name: string; role?: string; avatarUrl?: string | null }> =
-          {};
+        const next: Record<
+          string,
+          { name: string; role?: string; avatarUrl?: string | null; testerLevel?: string }
+        > = {};
         for (const [key, presences] of Object.entries(state)) {
           const first = presences?.[0];
           if (first?.name) {
@@ -167,6 +256,7 @@ export function TesterChatClient({
               name: first.name,
               role: first.role,
               avatarUrl: first.avatarUrl ?? null,
+              testerLevel: first.testerLevel,
             };
           }
         }
@@ -178,6 +268,7 @@ export function TesterChatClient({
             name: displayName || t("anonymous"),
             role: userRole,
             avatarUrl: avatarUrl ?? null,
+            testerLevel: myTesterLevel,
           } satisfies PresencePayload);
         }
       });
@@ -187,7 +278,7 @@ export function TesterChatClient({
       void supabase.removeChannel(channel);
       channelRef.current = null;
     };
-  }, [avatarUrl, displayName, supabaseUserId, t, userRole]);
+  }, [avatarUrl, displayName, myTesterLevel, supabaseUserId, t, userRole]);
 
   const onlineList = useMemo(() => {
     return Object.entries(onlineByUserId).map(([id, meta]) => ({
@@ -226,6 +317,7 @@ export function TesterChatClient({
   }
 
   async function submitMessage() {
+    if (!canSend) return;
     const text = draft.trim();
     if (!text || sending) return;
 
@@ -248,6 +340,20 @@ export function TesterChatClient({
       return;
     }
     setDraft("");
+  }
+
+  async function deleteMessage(messageId: string) {
+    if (!canDeleteOthers) return;
+    const supabase = tryCreateSupabaseBrowserClient();
+    if (!supabase) {
+      setError(t("supabaseMissing"));
+      return;
+    }
+    setError(null);
+    const { error: delErr } = await supabase.from(TABLE).delete().eq("id", messageId);
+    if (delErr) {
+      setError(t("deleteError"));
+    }
   }
 
   function handleFormSubmit(e: React.FormEvent) {
@@ -348,18 +454,42 @@ export function TesterChatClient({
                         }`}
                       >
                         <div
-                          className={`mb-1 flex flex-wrap items-baseline gap-2 text-xs ${
-                            mine ? "justify-end text-emerald-800" : "text-zinc-500"
+                          className={`mb-1 flex flex-wrap items-center gap-2 text-xs ${
+                            mine ? "justify-end text-emerald-800" : "justify-between text-zinc-500"
                           }`}
                         >
-                          {!mine ? (
-                            <span className="font-semibold text-emerald-700">{m.user}</span>
-                          ) : (
-                            <span className="font-semibold text-emerald-800">{t("you")}</span>
-                          )}
-                          <time dateTime={m.created_at} className="tabular-nums text-zinc-400">
-                            {formatTime(m.created_at, locale)}
-                          </time>
+                          <div
+                            className={`flex min-w-0 flex-wrap items-center gap-2 ${
+                              mine ? "justify-end" : ""
+                            }`}
+                          >
+                            {!mine ? (
+                              <span className="font-semibold text-emerald-700">{m.user}</span>
+                            ) : (
+                              <span className="font-semibold text-emerald-800">{t("you")}</span>
+                            )}
+                            <span
+                              className={`inline-flex max-w-full shrink-0 truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${testerLevelBadgeClasses(
+                                levelBySupabaseId[m.user_id] ?? "trial",
+                              )}`}
+                              title={testerLevelLabelRo(levelBySupabaseId[m.user_id] ?? "trial")}
+                            >
+                              [{testerLevelLabelRo(levelBySupabaseId[m.user_id] ?? "trial")}]
+                            </span>
+                            <time dateTime={m.created_at} className="tabular-nums text-zinc-400">
+                              {formatTime(m.created_at, locale)}
+                            </time>
+                          </div>
+                          {canDeleteOthers ? (
+                            <button
+                              type="button"
+                              onClick={() => void deleteMessage(m.id)}
+                              className="shrink-0 rounded-lg p-1 text-zinc-400 transition hover:bg-rose-50 hover:text-rose-600"
+                              aria-label={t("deleteAria")}
+                            >
+                              <Trash2 className="size-4" />
+                            </button>
+                          ) : null}
                         </div>
                         <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-800">
                           {m.text}
@@ -372,51 +502,57 @@ export function TesterChatClient({
             ))}
           </div>
 
-          <form
-            onSubmit={handleFormSubmit}
-            className="shrink-0 border-t border-zinc-100 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:p-4"
-          >
-            <div className="flex items-end gap-2 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-2 shadow-inner ring-1 ring-zinc-100/80">
-              <button
-                type="button"
-                className="flex size-10 shrink-0 items-center justify-center rounded-xl text-zinc-400 hover:bg-zinc-200/60 hover:text-zinc-600"
-                aria-label={t("attachSoon")}
-                title={t("attachSoon")}
-                disabled
-              >
-                <Paperclip className="size-5" />
-              </button>
-              <label className="sr-only" htmlFor="tester-chat-input">
-                {t("inputLabel")}
-              </label>
-              <textarea
-                id="tester-chat-input"
-                rows={1}
-                value={draft}
-                onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    void submitMessage();
-                  }
-                }}
-                placeholder={t("placeholder")}
-                className="max-h-32 min-h-[44px] flex-1 resize-none bg-transparent px-2 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
-              />
-              <button
-                type="submit"
-                disabled={sending || !draft.trim()}
-                className="flex size-11 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-600 disabled:pointer-events-none disabled:opacity-40"
-                aria-label={t("sendAria")}
-              >
-                {sending ? (
-                  <Loader2 className="size-5 animate-spin" />
-                ) : (
-                  <Send className="size-5" />
-                )}
-              </button>
+          {canSend ? (
+            <form
+              onSubmit={handleFormSubmit}
+              className="shrink-0 border-t border-zinc-100 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:p-4"
+            >
+              <div className="flex items-end gap-2 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-2 shadow-inner ring-1 ring-zinc-100/80">
+                <button
+                  type="button"
+                  className="flex size-10 shrink-0 items-center justify-center rounded-xl text-zinc-400 hover:bg-zinc-200/60 hover:text-zinc-600"
+                  aria-label={t("attachSoon")}
+                  title={t("attachSoon")}
+                  disabled
+                >
+                  <Paperclip className="size-5" />
+                </button>
+                <label className="sr-only" htmlFor="tester-chat-input">
+                  {t("inputLabel")}
+                </label>
+                <textarea
+                  id="tester-chat-input"
+                  rows={1}
+                  value={draft}
+                  onChange={(e) => setDraft(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      void submitMessage();
+                    }
+                  }}
+                  placeholder={t("placeholder")}
+                  className="max-h-32 min-h-[44px] flex-1 resize-none bg-transparent px-2 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  disabled={sending || !draft.trim()}
+                  className="flex size-11 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-600 disabled:pointer-events-none disabled:opacity-40"
+                  aria-label={t("sendAria")}
+                >
+                  {sending ? (
+                    <Loader2 className="size-5 animate-spin" />
+                  ) : (
+                    <Send className="size-5" />
+                  )}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="shrink-0 border-t border-zinc-100 bg-zinc-50/90 px-4 py-4 text-center text-sm text-zinc-600">
+              {t("trialReadOnly")}
             </div>
-          </form>
+          )}
         </div>
 
         <aside className="hidden w-80 shrink-0 flex-col gap-4 lg:flex">
@@ -441,9 +577,22 @@ export function TesterChatClient({
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-zinc-900">{u.name}</p>
-                    <p className="truncate text-xs font-medium text-emerald-600">
-                      {roleLabel(u.role)}
-                    </p>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
+                      <span
+                        className={`inline-flex max-w-full truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${testerLevelBadgeClasses(
+                          levelBySupabaseId[u.id] ?? normalizeTesterLevel(u.testerLevel),
+                        )}`}
+                      >
+                        [
+                        {testerLevelLabelRo(
+                          levelBySupabaseId[u.id] ?? normalizeTesterLevel(u.testerLevel),
+                        )}
+                        ]
+                      </span>
+                      <p className="truncate text-xs font-medium text-emerald-600">
+                        {roleLabel(u.role)}
+                      </p>
+                    </div>
                   </div>
                   <span
                     className="size-2 shrink-0 rounded-full bg-emerald-500"

@@ -58,6 +58,8 @@ model User {
   bio           String?
   passwordHash  String?
   role          UserRole       @default(USER)
+  /** Nivel în programul de testare (chat tester): trial | tester | advanced | lead — separat de `role`. */
+  testerLevel   String         @default("trial") @map("tester_level")
   listings      Listing[]
   buyerChatRooms ChatRoom[]    @relation("BuyerRooms")
   chatMessages  ChatMessage[]

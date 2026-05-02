@@ -844,7 +844,10 @@
     "empty": "Niciun mesaj încă. Fii primul care scrie!",
     "supabaseMissing": "Chatul nu e disponibil: lipesc variabilele publice Supabase.",
     "loadError": "Nu am putut încărca mesajele. Reîncearcă.",
-    "sendError": "Nu s-a putut trimite mesajul. Verifică conexiunea și permisiunile."
+    "sendError": "Nu s-a putut trimite mesajul. Verifică conexiunea și permisiunile.",
+    "trialReadOnly": "Nivelul tău de tester este „începător”: poți citi chatul. Un administrator îți poate ridica nivelul ca să poți scrie mesaje.",
+    "deleteAria": "Șterge mesajul",
+    "deleteError": "Nu s-a putut șterge mesajul (verifică nivelul de tester sau permisiunile)."
   },
   "Notifications": {
     "title": "Notificări",
@@ -957,6 +960,12 @@
     "usersColEmail": "Email",
     "usersColName": "Nume",
     "usersColRole": "Rol",
+    "usersColTesterLevel": "Nivel tester",
+    "testerLevelSave": "Salvează",
+    "testerLevelSaved": "Salvat",
+    "testerLevelSelectAria": "Nivel în programul de testare",
+    "testerLevelForbidden": "Fără permisiune.",
+    "testerLevelError": "Nu s-a putut salva.",
     "usersColListings": "Anunțuri",
     "usersColJoined": "Înregistrat",
     "usersEmpty": "Nu există utilizatori.",

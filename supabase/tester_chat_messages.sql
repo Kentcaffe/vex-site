@@ -3,6 +3,9 @@
 -- Modelul Prisma `User` este mapat la tabelul **public.users** (@@map("users")), nu "User".
 -- Rulează în Supabase SQL Editor.
 --
+-- După ce există coloana users.tester_level (migrare Prisma), aplică și politicile pe nivel:
+--   supabase/tester_chat_messages_rls_levels.sql
+--
 -- Dacă primești „relation public.users does not exist” (Postgres Supabase fără migrări Prisma),
 -- rulează în schimb: supabase/tester_chat_messages_rls_auth_only.sql (după ce există deja tabelul
 -- tester_messages — poți rula mai întâi acest fișier până la «alter table … enable row level security»,
