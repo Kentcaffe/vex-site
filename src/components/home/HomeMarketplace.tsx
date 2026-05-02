@@ -145,7 +145,7 @@ export async function HomeMarketplace({
                 <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
               </Link>
             </div>
-            <div className="flex flex-wrap gap-2 sm:gap-2.5">
+            <div className="-mx-1 flex snap-x snap-mandatory flex-nowrap gap-2 overflow-x-auto overflow-y-hidden scroll-smooth px-1 pb-1 max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden md:snap-none md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0">
               {rootCategories.map((cat) => {
                 const rootEmoji = emojiForRootSlug(cat.slug);
                 const accent = categoryAccentRing(cat.slug);
@@ -153,21 +153,23 @@ export async function HomeMarketplace({
                   <Link
                     key={cat.id}
                     href={`/categorii?c=${encodeURIComponent(cat.slug)}`}
-                    className="group relative inline-flex min-h-[52px] items-center gap-2.5 rounded-full border border-zinc-200/90 bg-zinc-50/90 px-3.5 py-2.5 text-sm font-semibold text-zinc-800 shadow-sm transition duration-200 hover:-translate-y-[5px] hover:border-[#22c55e]/35 hover:bg-white hover:shadow-md"
+                    className="group relative flex w-[88px] shrink-0 snap-start flex-col items-center justify-center gap-1 rounded-2xl border border-zinc-200/90 bg-white p-2 text-center shadow-[0_8px_24px_-10px_rgba(0,0,0,0.08)] transition duration-200 [-webkit-tap-highlight-color:transparent] active:scale-[0.98] hover:border-[#22c55e]/30 hover:shadow-[0_10px_28px_-8px_rgba(34,197,94,0.15)] max-md:hover:-translate-y-0.5 md:inline-flex md:h-auto md:min-h-[52px] md:w-auto md:max-w-none md:flex-row md:gap-2.5 md:rounded-full md:bg-zinc-50/90 md:px-3.5 md:py-2.5 md:text-left md:text-sm md:font-semibold md:shadow-sm md:hover:-translate-y-[5px] md:hover:border-[#22c55e]/35 md:hover:bg-white md:hover:shadow-md"
                   >
-                  <span
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg leading-none ring-1 ring-inset ${accent}`}
-                    aria-hidden
-                  >
-                    {rootEmoji}
-                  </span>
-                  <span className="relative pr-0.5">
-                    {labelFor(cat, locale)}
                     <span
-                      className="absolute -bottom-1 left-0 h-0.5 w-full origin-left scale-x-0 rounded-full bg-emerald-600 transition-transform duration-200 ease-out group-hover:scale-x-100"
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg leading-none ring-1 ring-inset md:h-9 md:w-9 md:text-lg ${accent}`}
                       aria-hidden
-                    />
-                  </span>
+                    >
+                      {rootEmoji}
+                    </span>
+                    <span className="relative min-h-0 w-full md:pr-0.5">
+                      <span className="line-clamp-2 text-center text-[11px] font-semibold leading-tight text-zinc-800 md:line-clamp-none md:text-left md:text-sm">
+                        {labelFor(cat, locale)}
+                      </span>
+                      <span
+                        className="absolute -bottom-1 left-0 hidden h-0.5 w-full origin-left scale-x-0 rounded-full bg-emerald-600 transition-transform duration-200 ease-out group-hover:scale-x-100 md:block"
+                        aria-hidden
+                      />
+                    </span>
                   </Link>
                 );
               })}
