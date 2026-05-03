@@ -3,30 +3,33 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import type { UserRole } from "@prisma/client";
-import { ArrowLeft, Loader2, Paperclip, Send, Shield, Trash2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { hasSupabasePublicEnv, tryCreateSupabaseBrowserClient } from "@/lib/supabase";
 import {
   canTesterDeleteChatMessages,
   canTesterSendChatMessage,
   normalizeTesterLevel,
-  testerLevelBadgeClasses,
-  testerLevelLabelRo,
   TesterProgramLevel,
   type TesterLevel,
 } from "@/lib/tester-level";
+import { TesterSidebar } from "@/components/tester/dashboard/TesterSidebar";
+import { useTesterSidebarItems } from "@/components/tester/useTesterSidebarItems";
+import { TesterChatHeader } from "@/components/tester/chat/TesterChatHeader";
+import { TesterChatPinnedBar } from "@/components/tester/chat/TesterChatPinnedBar";
+import { TesterChatTypingBar } from "@/components/tester/chat/TesterChatTypingBar";
+import {
+  TesterChatMessageRow,
+  type ChatMessageModel,
+} from "@/components/tester/chat/TesterChatMessageRow";
+import { TesterChatInput } from "@/components/tester/chat/TesterChatInput";
+import { TesterChatRightPanel } from "@/components/tester/chat/TesterChatRightPanel";
+import { dayKey } from "@/components/tester/chat/tester-chat-utils";
+
+export type TesterChatMessage = ChatMessageModel;
 
 const TESTER_CHAT_CHANNEL = "tester-chat-global";
 const TABLE = "tester_messages";
-
-export type TesterChatMessage = {
-  id: string;
-  user_id: string;
-  user: string;
-  text: string;
-  created_at: string;
-};
 
 type PresencePayload = {
   name: string;
@@ -45,37 +48,8 @@ type Props = {
   avatarUrl?: string | null;
 };
 
-function initials(name: string) {
-  const p = name.trim().split(/\s+/).filter(Boolean);
-  if (p.length === 0) return "?";
-  if (p.length === 1) return p[0]!.slice(0, 2).toUpperCase();
-  return (p[0]![0]! + p[p.length - 1]![0]!).toUpperCase();
-}
-
-function bubbleColor(seed: string) {
-  let h = 0;
-  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
-  const hue = h % 360;
-  return `hsl(${hue} 55% 42%)`;
-}
-
-function formatTime(iso: string, locale: string) {
-  try {
-    return new Date(iso).toLocaleTimeString(locale, {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return "";
-  }
-}
-
-function dayKey(iso: string) {
-  try {
-    return new Date(iso).toDateString();
-  } catch {
-    return iso;
-  }
+function bugDiscussedHeuristic(text: string) {
+  return /\bbug\b|buguri|bugs|#bug|raport|report|repro|reproduce|crash|eroare|error/i.test(text);
 }
 
 export function TesterChatClient({
@@ -88,10 +62,12 @@ export function TesterChatClient({
   avatarUrl,
 }: Props) {
   const t = useTranslations("TesterChat");
+  const sidebarItems = useTesterSidebarItems();
   const [messages, setMessages] = useState<TesterChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [draft, setDraft] = useState("");
+  const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [levelBySupabaseId, setLevelBySupabaseId] = useState<Record<string, TesterLevel>>(() => ({
     [supabaseUserId]: myTesterLevel,
@@ -102,8 +78,16 @@ export function TesterChatClient({
       { name: string; role?: string; avatarUrl?: string | null; testerLevel?: string }
     >
   >({});
+  const [typingLine, setTypingLine] = useState<string | null>(null);
+  const [reactionCountsByMessage, setReactionCountsByMessage] = useState<
+    Record<string, Record<string, number>>
+  >({});
+  const [myReactionKeys, setMyReactionKeys] = useState<Record<string, true>>({});
+
   const listRef = useRef<HTMLDivElement>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
+  const typingClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTypingSentRef = useRef(0);
 
   const canSend = canTesterSendChatMessage(myTesterLevel, appRole);
   const canDeleteOthers = canTesterDeleteChatMessages(myTesterLevel, appRole);
@@ -204,7 +188,10 @@ export function TesterChatClient({
 
     const channel = supabase
       .channel(TESTER_CHAT_CHANNEL, {
-        config: { presence: { key: supabaseUserId } },
+        config: {
+          presence: { key: supabaseUserId },
+          broadcast: { self: false },
+        },
       })
       .on(
         "postgres_changes",
@@ -215,8 +202,7 @@ export function TesterChatClient({
           setMessages((prev) => {
             if (prev.some((m) => m.id === row.id)) return prev;
             return [...prev, row].sort(
-              (a, b) =>
-                new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+              (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
             );
           });
         },
@@ -228,6 +214,19 @@ export function TesterChatClient({
           const oldRow = payload.old as Pick<TesterChatMessage, "id">;
           if (!oldRow?.id) return;
           setMessages((prev) => prev.filter((m) => m.id !== oldRow.id));
+          setReactionCountsByMessage((prev) => {
+            const next = { ...prev };
+            delete next[oldRow.id];
+            return next;
+          });
+          setMyReactionKeys((prev) => {
+            const prefix = `${oldRow.id}::`;
+            const next = { ...prev };
+            for (const k of Object.keys(next)) {
+              if (k.startsWith(prefix)) delete next[k];
+            }
+            return next;
+          });
         },
       )
       .on(
@@ -236,16 +235,11 @@ export function TesterChatClient({
         (payload) => {
           const row = payload.new as TesterChatMessage;
           if (!row?.id) return;
-          setMessages((prev) =>
-            prev.map((m) => (m.id === row.id ? { ...m, ...row } : m)),
-          );
+          setMessages((prev) => prev.map((m) => (m.id === row.id ? { ...m, ...row } : m)));
         },
       )
       .on("presence", { event: "sync" }, () => {
-        const state = channel.presenceState() as Record<
-          string,
-          PresencePayload[]
-        >;
+        const state = channel.presenceState() as Record<string, PresencePayload[]>;
         const next: Record<
           string,
           { name: string; role?: string; avatarUrl?: string | null; testerLevel?: string }
@@ -263,6 +257,33 @@ export function TesterChatClient({
         }
         setOnlineByUserId(next);
       })
+      .on("broadcast", { event: "typing" }, ({ payload }) => {
+        const p = payload as { name?: string; userId?: string };
+        if (!p?.name || p.userId === supabaseUserId) return;
+        setTypingLine(t("typingLine", { name: p.name }));
+        if (typingClearRef.current) clearTimeout(typingClearRef.current);
+        typingClearRef.current = setTimeout(() => setTypingLine(null), 2800);
+      })
+      .on("broadcast", { event: "reaction" }, ({ payload }) => {
+        const p = payload as {
+          messageId?: string;
+          emoji?: string;
+          userId?: string;
+          active?: boolean;
+        };
+        if (!p?.messageId || !p?.emoji || typeof p.active !== "boolean") return;
+        if (p.userId === supabaseUserId) return;
+        setReactionCountsByMessage((prev) => {
+          const msg = { ...(prev[p.messageId!] ?? {}) };
+          const n = Math.max(0, (msg[p.emoji!] ?? 0) + (p.active ? 1 : -1));
+          if (n === 0) delete msg[p.emoji!];
+          else msg[p.emoji!] = n;
+          const out = { ...prev };
+          if (Object.keys(msg).length === 0) delete out[p.messageId!];
+          else out[p.messageId!] = msg;
+          return out;
+        });
+      })
       .subscribe(async (status) => {
         if (status === "SUBSCRIBED") {
           await channel.track({
@@ -276,6 +297,7 @@ export function TesterChatClient({
 
     channelRef.current = channel;
     return () => {
+      if (typingClearRef.current) clearTimeout(typingClearRef.current);
       void supabase.removeChannel(channel);
       channelRef.current = null;
     };
@@ -288,10 +310,21 @@ export function TesterChatClient({
     }));
   }, [onlineByUserId]);
 
+  const filteredMessages = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return messages;
+    return messages.filter(
+      (m) =>
+        m.text.toLowerCase().includes(q) ||
+        m.user.toLowerCase().includes(q) ||
+        m.user_id.toLowerCase().includes(q),
+    );
+  }, [messages, search]);
+
   const grouped = useMemo(() => {
     const groups: { day: string; items: TesterChatMessage[] }[] = [];
     let currentDay = "";
-    for (const m of messages) {
+    for (const m of filteredMessages) {
       const dk = dayKey(m.created_at);
       if (dk !== currentDay) {
         currentDay = dk;
@@ -301,7 +334,7 @@ export function TesterChatClient({
       }
     }
     return groups;
-  }, [messages]);
+  }, [filteredMessages]);
 
   function formatDayLabel(iso: string) {
     const today = new Date().toDateString();
@@ -315,6 +348,89 @@ export function TesterChatClient({
     } catch {
       return iso;
     }
+  }
+
+  const badgeForMessageAuthor = useCallback(
+    (userId: string) => {
+      const r = onlineByUserId[userId]?.role?.toUpperCase();
+      if (r === "ADMIN") return t("roleAdmin");
+      if (r === "MODERATOR") return t("roleModerator");
+      const lvl = levelBySupabaseId[userId] ?? TesterProgramLevel.trial;
+      switch (lvl) {
+        case TesterProgramLevel.tester:
+          return t("badgeTester");
+        case TesterProgramLevel.advanced:
+          return t("badgeAdvanced");
+        case TesterProgramLevel.lead:
+          return t("badgeLead");
+        default:
+          return t("badgeTrial");
+      }
+    },
+    [levelBySupabaseId, onlineByUserId, t],
+  );
+
+  const myMessageCount = useMemo(
+    () => messages.filter((m) => m.user_id === supabaseUserId).length,
+    [messages, supabaseUserId],
+  );
+  const bugDiscussedCount = useMemo(
+    () => messages.filter((m) => bugDiscussedHeuristic(m.text)).length,
+    [messages],
+  );
+  const onlineCount = onlineList.length;
+
+  function myReactionKey(mid: string, emoji: string) {
+    return `${mid}::${emoji}`;
+  }
+
+  function hasMyReaction(key: string) {
+    return !!myReactionKeys[key];
+  }
+
+  function toggleReaction(messageId: string, emoji: string) {
+    const ch = channelRef.current;
+    if (!ch) return;
+    const key = myReactionKey(messageId, emoji);
+    const active = !myReactionKeys[key];
+
+    setMyReactionKeys((prev) => {
+      const next = { ...prev };
+      if (active) next[key] = true;
+      else delete next[key];
+      return next;
+    });
+    setReactionCountsByMessage((prev) => {
+      const cur = { ...(prev[messageId] ?? {}) };
+      const n = Math.max(0, (cur[emoji] ?? 0) + (active ? 1 : -1));
+      if (n === 0) delete cur[emoji];
+      else cur[emoji] = n;
+      const out = { ...prev };
+      if (Object.keys(cur).length === 0) delete out[messageId];
+      else out[messageId] = cur;
+      return out;
+    });
+
+    void ch.send({
+      type: "broadcast",
+      event: "reaction",
+      payload: { messageId, emoji, userId: supabaseUserId, active },
+    });
+  }
+
+  function onDraftChange(next: string) {
+    setDraft(next);
+    if (!canSend) return;
+    const ch = channelRef.current;
+    if (!ch) return;
+    const now = Date.now();
+    if (now - lastTypingSentRef.current < 1400) return;
+    lastTypingSentRef.current = now;
+    void ch.send({
+      type: "broadcast",
+      event: "typing",
+      payload: { name: displayName || t("anonymous"), userId: supabaseUserId },
+    });
   }
 
   async function submitMessage() {
@@ -346,7 +462,6 @@ export function TesterChatClient({
   async function deleteMessage(messageId: string) {
     if (!canDeleteOthers) return;
     setError(null);
-    /** Ștergere pe server: evită RLS din browser (politici lipsă / tester_level nesincron cu JWT). */
     const res = await fetch(
       `/api/tester/messages?messageId=${encodeURIComponent(messageId)}`,
       { method: "DELETE", credentials: "include" },
@@ -369,287 +484,134 @@ export function TesterChatClient({
     setError(`${t("deleteError")}${detail}`);
   }
 
-  function handleFormSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    void submitMessage();
-  }
-
-  function roleLabel(role: string | undefined) {
-    if (!role) return t("statusOnline");
-    const k = role.toUpperCase();
-    if (k === "TESTER") return t("roleTester");
-    if (k === "MODERATOR") return t("roleModerator");
-    if (k === "ADMIN") return t("roleAdmin");
-    if (k === "USER") return t("roleUser");
-    return t("statusOnline");
-  }
-
-  const onlineCount = onlineList.length;
+  const guideSteps = useMemo(
+    () =>
+      [t("chatGuide1"), t("chatGuide2"), t("chatGuide3"), t("chatGuide4"), t("chatGuide5")] as [
+        string,
+        string,
+        string,
+        string,
+        string,
+      ],
+    [t],
+  );
 
   return (
-    <div className="min-h-[calc(100vh-3.5rem)] bg-gradient-to-b from-zinc-50 to-zinc-100/90 px-3 py-6 sm:px-6">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 lg:flex-row lg:items-stretch lg:gap-5">
-        <div className="flex min-h-[calc(100dvh-5.5rem)] flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-lg shadow-zinc-900/5 lg:min-h-[min(70vh,640px)]">
-          <header className="flex shrink-0 flex-wrap items-start justify-between gap-3 border-b border-zinc-100 px-4 py-4 sm:px-5">
-            <div className="space-y-1">
-              <Link
-                href="/tester"
-                className="mb-1 inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700 hover:text-emerald-800"
-              >
-                <ArrowLeft className="size-3.5" aria-hidden />
-                {t("backToDashboard")}
-              </Link>
-              <h1 className="text-xl font-bold tracking-tight text-zinc-900 sm:text-2xl">
-                {t("title")}
-              </h1>
-              <p className="text-sm text-zinc-500">{t("subtitle")}</p>
-            </div>
-            <div className="flex items-center gap-2 rounded-full border border-emerald-200/80 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-800">
-              <span className="size-2 rounded-full bg-emerald-500 shadow-[0_0_0_3px_rgba(34,197,94,0.25)]" />
-              {t("onlineBadge", { count: onlineCount })}
-            </div>
-          </header>
+    <div className="min-h-[calc(100vh-3.5rem)] bg-[#0B0F1A] text-slate-200">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(124,58,237,0.22),transparent)]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_60%_40%_at_100%_0%,rgba(56,189,248,0.12),transparent)]" />
 
-          <div
-            ref={listRef}
-            className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-4 sm:px-5"
-            role="log"
-            aria-live="polite"
-            aria-relevant="additions"
-          >
-            {loading ? (
-              <div className="flex justify-center py-16 text-zinc-400">
-                <Loader2 className="size-8 animate-spin" aria-hidden />
-              </div>
-            ) : null}
+      <div className="relative mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:py-8">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[220px_minmax(0,1fr)_300px]">
+          <TesterSidebar items={sidebarItems} chatHref="/tester/chat" chatLabel={t("dashboardLink")} />
 
-            {error ? (
-              <p
-                className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
-                role="alert"
-              >
-                {error}
-              </p>
-            ) : null}
+          <div className="flex min-h-[min(100dvh,880px)] min-w-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-2xl shadow-black/50 backdrop-blur-xl lg:min-h-[calc(100dvh-10rem)]">
+            <TesterChatHeader
+              backLabel={t("backToDashboard")}
+              backHref="/tester"
+              title={t("title")}
+              subtitle={t("subtitle")}
+              onlineBadge={t("onlineNow", { count: onlineCount })}
+              searchPlaceholder={t("searchPlaceholder")}
+              search={search}
+              onSearchChangeAction={setSearch}
+            />
 
-            {!loading && messages.length === 0 && !error ? (
-              <p className="py-12 text-center text-sm text-zinc-500">{t("empty")}</p>
-            ) : null}
+            <TesterChatPinnedBar title={t("pinnedTitle")} body={t("pinnedBody")} />
+            <TesterChatTypingBar label={typingLine} />
 
-            {grouped.map((group) => (
-              <div key={group.day} className="space-y-3">
-                <div className="flex justify-center">
-                  <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-500">
-                    {formatDayLabel(group.items[0]!.created_at)}
-                  </span>
+            <div
+              ref={listRef}
+              className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-4 sm:px-5"
+              role="log"
+              aria-live="polite"
+              aria-relevant="additions"
+            >
+              {loading ? (
+                <div className="flex justify-center py-16 text-violet-400/80">
+                  <Loader2 className="h-8 w-8 animate-spin" aria-hidden />
                 </div>
-                {group.items.map((m) => {
-                  const mine = m.user_id === supabaseUserId;
-                  return (
-                    <div
-                      key={m.id}
-                      className={`flex gap-2 ${mine ? "flex-row-reverse" : "flex-row"}`}
-                    >
-                      <div
-                        className="flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-inner ring-2 ring-white"
-                        style={{
-                          backgroundColor: mine ? "#22c55e" : bubbleColor(m.user_id),
-                        }}
-                        aria-hidden
-                      >
-                        {initials(m.user)}
-                      </div>
-                      <div
-                        className={`max-w-[min(100%,28rem)] rounded-2xl px-4 py-2.5 shadow-sm ${
-                          mine
-                            ? "rounded-br-md bg-emerald-50 text-zinc-900 ring-1 ring-emerald-100/80"
-                            : "rounded-bl-md bg-zinc-100 text-zinc-900 ring-1 ring-zinc-200/80"
-                        }`}
-                      >
-                        <div
-                          className={`mb-1 flex flex-wrap items-center gap-2 text-xs ${
-                            mine ? "justify-end text-emerald-800" : "justify-between text-zinc-500"
-                          }`}
-                        >
-                          <div
-                            className={`flex min-w-0 flex-wrap items-center gap-2 ${
-                              mine ? "justify-end" : ""
-                            }`}
-                          >
-                            {!mine ? (
-                              <span className="font-semibold text-emerald-700">{m.user}</span>
-                            ) : (
-                              <span className="font-semibold text-emerald-800">{t("you")}</span>
-                            )}
-                            <span
-                              className={`inline-flex max-w-full shrink-0 truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${testerLevelBadgeClasses(
-                                levelBySupabaseId[m.user_id] ?? TesterProgramLevel.trial,
-                              )}`}
-                              title={testerLevelLabelRo(
-                                levelBySupabaseId[m.user_id] ?? TesterProgramLevel.trial,
-                              )}
-                            >
-                              [
-                              {testerLevelLabelRo(
-                                levelBySupabaseId[m.user_id] ?? TesterProgramLevel.trial,
-                              )}
-                              ]
-                            </span>
-                            <time dateTime={m.created_at} className="tabular-nums text-zinc-400">
-                              {formatTime(m.created_at, locale)}
-                            </time>
-                          </div>
-                          {canDeleteOthers ? (
-                            <button
-                              type="button"
-                              onClick={() => void deleteMessage(m.id)}
-                              className="shrink-0 rounded-lg p-1 text-zinc-400 transition hover:bg-rose-50 hover:text-rose-600"
-                              aria-label={t("deleteAria")}
-                            >
-                              <Trash2 className="size-4" />
-                            </button>
-                          ) : null}
-                        </div>
-                        <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-800">
-                          {m.text}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
+              ) : null}
+
+              {error ? (
+                <p
+                  className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100"
+                  role="alert"
+                >
+                  {error}
+                </p>
+              ) : null}
+
+              {!loading && filteredMessages.length === 0 && !error ? (
+                <p className="py-12 text-center text-sm text-slate-500">
+                  {messages.length === 0 ? t("empty") : t("searchEmpty")}
+                </p>
+              ) : null}
+
+              {grouped.map((group) => (
+                <div key={group.day} className="space-y-4">
+                  <div className="flex justify-center">
+                    <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-xs font-medium text-slate-400">
+                      {formatDayLabel(group.items[0]!.created_at)}
+                    </span>
+                  </div>
+                  {group.items.map((m) => {
+                    const mine = m.user_id === supabaseUserId;
+                    return (
+                      <TesterChatMessageRow
+                        key={m.id}
+                        message={m}
+                        mine={mine}
+                        locale={locale}
+                        badgeText={badgeForMessageAuthor(m.user_id)}
+                        canDelete={canDeleteOthers}
+                        onDeleteAction={canDeleteOthers ? (id) => void deleteMessage(id) : undefined}
+                        reactionCounts={reactionCountsByMessage[m.id] ?? {}}
+                        myReactionKeyAction={myReactionKey}
+                        hasMyReactionAction={hasMyReaction}
+                        onToggleReactionAction={toggleReaction}
+                        reactionAria={t("reactionToggleAria")}
+                        deleteAria={t("deleteAria")}
+                      />
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+
+            {canSend ? (
+              <TesterChatInput
+                value={draft}
+                onChangeAction={onDraftChange}
+                onSubmitAction={() => void submitMessage()}
+                sending={sending}
+                disabled={sending}
+                placeholder={t("placeholder")}
+                emojiPickerAria={t("emojiPickerAria")}
+                attachAria={t("attachAria")}
+              />
+            ) : (
+              <div className="shrink-0 border-t border-white/[0.08] bg-black/30 px-4 py-4 text-center text-sm text-slate-400">
+                {t("trialReadOnly")}
               </div>
-            ))}
+            )}
           </div>
 
-          {canSend ? (
-            <form
-              onSubmit={handleFormSubmit}
-              className="shrink-0 border-t border-zinc-100 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:p-4"
-            >
-              <div className="flex items-end gap-2 rounded-2xl border border-zinc-200 bg-zinc-50/80 p-2 shadow-inner ring-1 ring-zinc-100/80">
-                <button
-                  type="button"
-                  className="flex size-10 shrink-0 items-center justify-center rounded-xl text-zinc-400 hover:bg-zinc-200/60 hover:text-zinc-600"
-                  aria-label={t("attachSoon")}
-                  title={t("attachSoon")}
-                  disabled
-                >
-                  <Paperclip className="size-5" />
-                </button>
-                <label className="sr-only" htmlFor="tester-chat-input">
-                  {t("inputLabel")}
-                </label>
-                <textarea
-                  id="tester-chat-input"
-                  rows={1}
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      void submitMessage();
-                    }
-                  }}
-                  placeholder={t("placeholder")}
-                  className="max-h-32 min-h-[44px] flex-1 resize-none bg-transparent px-2 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none"
-                />
-                <button
-                  type="submit"
-                  disabled={sending || !draft.trim()}
-                  className="flex size-11 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white shadow-md shadow-emerald-600/25 transition hover:bg-emerald-600 disabled:pointer-events-none disabled:opacity-40"
-                  aria-label={t("sendAria")}
-                >
-                  {sending ? (
-                    <Loader2 className="size-5 animate-spin" />
-                  ) : (
-                    <Send className="size-5" />
-                  )}
-                </button>
-              </div>
-            </form>
-          ) : (
-            <div className="shrink-0 border-t border-zinc-100 bg-zinc-50/90 px-4 py-4 text-center text-sm text-zinc-600">
-              {t("trialReadOnly")}
-            </div>
-          )}
+          <TesterChatRightPanel
+            guideTitle={t("guideChatTitle")}
+            steps={guideSteps}
+            onlineTitle={t("onlineTitle")}
+            onlineEmpty={t("onlineEmpty")}
+            onlineUsers={onlineList.map((u) => ({ id: u.id, name: u.name }))}
+            statsTitle={t("statsChatTitle")}
+            statMessages={t("statMessagesSent")}
+            statBugs={t("statBugsDiscussed")}
+            statReporters={t("statActiveReporters")}
+            statMessagesValue={myMessageCount}
+            statBugsValue={bugDiscussedCount}
+            statReportersValue={onlineCount}
+          />
         </div>
-
-        <aside className="hidden w-80 shrink-0 flex-col gap-4 lg:flex">
-          <section className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-lg shadow-zinc-900/5">
-            <div className="mb-3 flex items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold text-zinc-900">{t("onlineTitle")}</h2>
-              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700">
-                {onlineCount}
-              </span>
-            </div>
-            <ul className="max-h-64 space-y-2 overflow-y-auto lg:max-h-[min(50vh,320px)]">
-              {onlineList.map((u) => (
-                <li
-                  key={u.id}
-                  className="flex items-center gap-3 rounded-xl border border-zinc-100 bg-zinc-50/80 px-3 py-2"
-                >
-                  <div
-                    className="flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                    style={{ backgroundColor: bubbleColor(u.id) }}
-                  >
-                    {initials(u.name)}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-zinc-900">{u.name}</p>
-                    <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-                      <span
-                        className={`inline-flex max-w-full truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${testerLevelBadgeClasses(
-                          levelBySupabaseId[u.id] ?? normalizeTesterLevel(u.testerLevel),
-                        )}`}
-                      >
-                        [
-                        {testerLevelLabelRo(
-                          levelBySupabaseId[u.id] ?? normalizeTesterLevel(u.testerLevel),
-                        )}
-                        ]
-                      </span>
-                      <p className="truncate text-xs font-medium text-emerald-600">
-                        {roleLabel(u.role)}
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    className="size-2 shrink-0 rounded-full bg-emerald-500"
-                    title={t("statusOnline")}
-                  />
-                </li>
-              ))}
-            </ul>
-            {onlineList.length === 0 ? (
-              <p className="mt-2 text-center text-xs text-zinc-400">{t("onlineEmpty")}</p>
-            ) : null}
-          </section>
-
-          <section className="rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-lg shadow-zinc-900/5">
-            <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-zinc-900">
-              <Shield className="size-4 text-emerald-600" aria-hidden />
-              {t("rulesTitle")}
-            </div>
-            <ul className="space-y-2.5 text-sm text-zinc-600">
-              <li className="flex gap-2">
-                <span className="mt-0.5 text-emerald-500">✓</span>
-                {t("rule1")}
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-0.5 text-emerald-500">✓</span>
-                {t("rule2")}
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-0.5 text-emerald-500">✓</span>
-                {t("rule3")}
-              </li>
-              <li className="flex gap-2">
-                <span className="mt-0.5 text-emerald-500">✓</span>
-                {t("rule4")}
-              </li>
-            </ul>
-          </section>
-        </aside>
       </div>
     </div>
   );

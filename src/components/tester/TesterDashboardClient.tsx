@@ -3,7 +3,6 @@
 import { useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Bug, FlaskConical, LayoutDashboard, Medal, Settings, Trophy } from "lucide-react";
 import type { BugRow } from "@/lib/tester-bugs";
 import type { LeaderboardEntry } from "@/components/tester/dashboard/TesterRightRail";
 import { TesterBugReportForm } from "@/components/tester/dashboard/TesterBugReportForm";
@@ -11,8 +10,9 @@ import type { TesterBugReportFormCopy } from "@/components/tester/dashboard/Test
 import { TesterBugsTable } from "@/components/tester/dashboard/TesterBugsTable";
 import type { TesterBugsTableCopy } from "@/components/tester/dashboard/TesterBugsTable";
 import { TesterRightRail } from "@/components/tester/dashboard/TesterRightRail";
-import { TesterSidebar, type TesterSidebarItem } from "@/components/tester/dashboard/TesterSidebar";
+import { TesterSidebar } from "@/components/tester/dashboard/TesterSidebar";
 import { TesterWelcomeHero } from "@/components/tester/dashboard/TesterWelcomeHero";
+import { useTesterSidebarItems } from "@/components/tester/useTesterSidebarItems";
 
 export function TesterDashboardClient({
   bugs,
@@ -25,6 +25,7 @@ export function TesterDashboardClient({
   const tChat = useTranslations("TesterChat");
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const sidebarItems = useTesterSidebarItems();
 
   const stats = useMemo(
     () =>
@@ -40,18 +41,6 @@ export function TesterDashboardClient({
         { total: 0, open: 0, accepted: 0, rejected: 0, reward: 0 },
       ),
     [bugs],
-  );
-
-  const sidebarItems: TesterSidebarItem[] = useMemo(
-    () => [
-      { id: "dash", href: "/tester", label: t("nav.dashboard"), icon: LayoutDashboard },
-      { id: "test", href: "/tester#report", label: t("nav.test"), icon: FlaskConical },
-      { id: "reports", href: "/tester#reports", label: t("nav.reports"), icon: Bug },
-      { id: "rewards", href: "/tester#rewards", label: t("nav.rewards"), icon: Trophy },
-      { id: "lb", href: "/tester#leaderboard", label: t("nav.leaderboard"), icon: Medal },
-      { id: "settings", href: "/cont", label: t("nav.settings"), icon: Settings },
-    ],
-    [t],
   );
 
   const guideSteps = useMemo(
