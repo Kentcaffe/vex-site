@@ -33,7 +33,11 @@ export function resolveListingSpecValueDisplay(
 
   if (detailKey === "engine_l") {
     if (rawValue === "electric") {
-      return bucket?.electric ?? "Electric";
+      const tr = bucket?.electric;
+      if (typeof tr === "string" && tr.length > 0) {
+        return tr;
+      }
+      return rawValue;
     }
     if (/^[\d.]+$/.test(rawValue)) {
       return `${rawValue.replace(/\./g, ",")} l`;

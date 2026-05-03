@@ -27,45 +27,7 @@ export const VEHICLE_BRANDS = [
   "Volvo",
 ] as const;
 
-export const VEHICLE_FUEL_VALUES = [
-  { value: "petrol", label: "Benzina" },
-  { value: "diesel", label: "Diesel" },
-  { value: "hybrid", label: "Hybrid" },
-  { value: "electric", label: "Electricitate" },
-  { value: "lpg", label: "Gaz / Benzina" },
-] as const;
-
-export const VEHICLE_TRANSMISSION_VALUES = [
-  { value: "manual", label: "Manuala" },
-  { value: "automatic", label: "Automata" },
-] as const;
-
-export const VEHICLE_BODY_TYPE_VALUES = [
-  { value: "sedan", label: "Sedan" },
-  { value: "hatchback", label: "Hatchback" },
-  { value: "suv", label: "SUV" },
-  { value: "mpv", label: "Monovolum" },
-  { value: "wagon", label: "Combi" },
-  { value: "coupe", label: "Coupe" },
-  { value: "convertible", label: "Cabrio" },
-  { value: "pickup", label: "Pickup" },
-  { value: "van", label: "Van" },
-  { value: "other", label: "Alta" },
-] as const;
-
-export const VEHICLE_DRIVETRAIN_VALUES = [
-  { value: "fwd", label: "Fata (FWD)" },
-  { value: "rwd", label: "Spate (RWD)" },
-  { value: "awd", label: "Integrala (AWD)" },
-  { value: "4wd", label: "4x4" },
-] as const;
-
-export const VEHICLE_DOOR_VALUES = [
-  { value: "2", label: "2 usi" },
-  { value: "3", label: "3 usi" },
-  { value: "4", label: "4 usi" },
-  { value: "5", label: "5 usi" },
-] as const;
+/** Etichete vehicul: folosiți cheile din messages (ListingForm) și VEHICLE_*_KEYS din listing-form-options. */
 
 export const MOLDOVA_CITIES = [
   "Anenii Noi",

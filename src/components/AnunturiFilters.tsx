@@ -14,18 +14,15 @@ import {
   RE_PROPERTY_TYPE_FILTER,
   RE_ROOM_COUNTS,
   STORAGE_GB_FILTER_VALUES,
+  VEHICLE_BODY_TYPE_KEYS,
   VEHICLE_COLOR_KEYS,
+  VEHICLE_DOOR_KEYS,
+  VEHICLE_DRIVETRAIN_KEYS,
+  VEHICLE_FUEL_KEYS,
   VEHICLE_SEAT_OPTIONS,
+  VEHICLE_TRANSMISSION_KEYS,
 } from "@/lib/listing-form-options";
-import {
-  MOLDOVA_CITIES,
-  VEHICLE_BODY_TYPE_VALUES,
-  VEHICLE_BRANDS,
-  VEHICLE_DOOR_VALUES,
-  VEHICLE_DRIVETRAIN_VALUES,
-  VEHICLE_FUEL_VALUES,
-  VEHICLE_TRANSMISSION_VALUES,
-} from "@/lib/vehicle-taxonomy";
+import { MOLDOVA_CITIES, VEHICLE_BRANDS } from "@/lib/vehicle-taxonomy";
 
 type Props = {
   defaultCity?: string;
@@ -263,9 +260,9 @@ export function AnunturiFilters({
               </label>
               <select id="flt-fuel" name="fuel" defaultValue={defaultFuel} className="field-input mt-1">
                 <option value="">{t("all")}</option>
-                {VEHICLE_FUEL_VALUES.map((o) => (
-                  <option key={o.value} value={o.value}>
-                    {o.label}
+                {VEHICLE_FUEL_KEYS.map((v) => (
+                  <option key={v} value={v}>
+                    {tForm(`fuel.${v}` as never)}
                   </option>
                 ))}
               </select>
@@ -327,9 +324,9 @@ export function AnunturiFilters({
                 </label>
                 <select id="flt-transmission" name="transmission" defaultValue={defaultTransmission} className="field-input mt-1">
                   <option value="">{t("all")}</option>
-                  {VEHICLE_TRANSMISSION_VALUES.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
+                  {VEHICLE_TRANSMISSION_KEYS.map((v) => (
+                    <option key={v} value={v}>
+                      {tForm(`transmission.${v}` as never)}
                     </option>
                   ))}
                 </select>
@@ -340,9 +337,9 @@ export function AnunturiFilters({
                 </label>
                 <select id="flt-body-type" name="bodyType" defaultValue={defaultBodyType} className="field-input mt-1">
                   <option value="">{t("all")}</option>
-                  {VEHICLE_BODY_TYPE_VALUES.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
+                  {VEHICLE_BODY_TYPE_KEYS.map((v) => (
+                    <option key={v} value={v}>
+                      {tForm(`body_type.${v}` as never)}
                     </option>
                   ))}
                 </select>
@@ -353,9 +350,9 @@ export function AnunturiFilters({
                 </label>
                 <select id="flt-drivetrain" name="drivetrain" defaultValue={defaultDrivetrain} className="field-input mt-1">
                   <option value="">{t("all")}</option>
-                  {VEHICLE_DRIVETRAIN_VALUES.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
+                  {VEHICLE_DRIVETRAIN_KEYS.map((v) => (
+                    <option key={v} value={v}>
+                      {tForm(`drivetrain.${v}` as never)}
                     </option>
                   ))}
                 </select>
@@ -366,9 +363,9 @@ export function AnunturiFilters({
                 </label>
                 <select id="flt-doors" name="doors" defaultValue={defaultDoors} className="field-input mt-1">
                   <option value="">{t("all")}</option>
-                  {VEHICLE_DOOR_VALUES.map((o) => (
-                    <option key={o.value} value={o.value}>
-                      {o.label}
+                  {VEHICLE_DOOR_KEYS.map((v) => (
+                    <option key={v} value={v}>
+                      {tForm(`doors.${v}` as never)}
                     </option>
                   ))}
                 </select>
