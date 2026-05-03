@@ -9,11 +9,27 @@ export type ProfileUser = {
   bio: string | null;
   avatarUrl: string | null;
   createdAt: string;
+  updatedAt: string;
   isVerified: boolean;
   listingsCount: number;
   sellerContact: SellerContactPrefs;
 };
 
-export function ProfileSection({ locale, user }: { locale: string; user: ProfileUser }) {
-  return <SellerDetailsView locale={locale} user={user} sellerContact={user.sellerContact} />;
+export function ProfileSection({
+  locale,
+  user,
+  publicProfileUrl,
+}: {
+  locale: string;
+  user: ProfileUser;
+  publicProfileUrl: string;
+}) {
+  return (
+    <SellerDetailsView
+      locale={locale}
+      user={user}
+      sellerContact={user.sellerContact}
+      publicProfileUrl={publicProfileUrl}
+    />
+  );
 }

@@ -7,6 +7,8 @@ import { type UserForAccountPage, userForAccountPageSelect } from "@/lib/prisma-
 import { parseSellerContactFromPreferences } from "@/lib/seller-contact-preferences";
 import { parsePreferences } from "@/lib/user-preferences";
 import { prisma } from "@/lib/prisma";
+import { localizedHref } from "@/lib/paths";
+import { siteUrl } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -22,7 +24,10 @@ export default async function ContSetariPage({ params }: Props) {
     where: { id: session.user.id },
     select: {
       ...userForAccountPageSelect,
+      id: true,
       isVerified: true,
+      accountType: true,
+      businessStatus: true,
       _count: {
         select: {
           listings: { where: { isDeleted: false } },
@@ -30,15 +35,26 @@ export default async function ContSetariPage({ params }: Props) {
       },
     },
   })) as
-    | (UserForAccountPage & { isVerified: boolean; _count: { listings: number } })
+    | (UserForAccountPage & {
+        id: string;
+        isVerified: boolean;
+        accountType: string;
+        businessStatus: string;
+        _count: { listings: number };
+      })
     | null;
 
   if (!me) notFound();
 
   const t = await getTranslations("AccountHub");
 
+  const publicProfileUrl =
+    me.accountType === "business" && me.businessStatus === "approved"
+      ? `${siteUrl()}${localizedHref(locale, `/firm/${me.id}`)}`
+      : `${siteUrl()}${localizedHref(locale, "/anunturi")}`;
+
   return (
-    <div className="app-shell app-section">
+    <div className="app-shell app-section bg-[#f8fafc]">
       <Link
         href="/cont"
         className="mb-6 inline-flex text-sm font-semibold text-emerald-800 hover:underline"
@@ -48,6 +64,7 @@ export default async function ContSetariPage({ params }: Props) {
       <AccountSettingsView
         key={me.updatedAt.toISOString()}
         locale={locale}
+        publicProfileUrl={publicProfileUrl}
         user={{
           email: me.email,
           name: me.name,
@@ -56,6 +73,7 @@ export default async function ContSetariPage({ params }: Props) {
           bio: me.bio,
           avatarUrl: me.avatarUrl,
           createdAt: me.createdAt.toISOString(),
+          updatedAt: me.updatedAt.toISOString(),
           isVerified: me.isVerified,
           listingsCount: me._count.listings,
           sellerContact: parseSellerContactFromPreferences(me.preferences),

@@ -1437,7 +1437,8 @@
     "title": "Мой аккаунт",
     "subtitle": "Профиль, безопасность и настройки в одном месте.",
     "nav": {
-      "profile": "Данные продавца",
+      "profile": "Профиль",
+      "listings": "Мои объявления",
       "security": "Безопасность",
       "notifications": "Уведомления",
       "preferences": "Настройки",
@@ -1493,6 +1494,38 @@
       "premiumCardTitle": "Премиум-объявление",
       "premiumCardLead": "Заполните профиль и каналы связи для максимальной видимости.",
       "premiumProgressLabel": "Заполнение профиля"
+    },
+    "shell": {
+      "activeSellerBadge": "Активный продавец",
+      "memberSinceYear": "Участник с {year} года",
+      "statListings": "{count} активных объявлений",
+      "statQuick": "Быстро отвечает",
+      "profileProgressTitle": "Прогресс профиля",
+      "profileProgressHint": "Заполните данные для большего доверия и видимости.",
+      "profileProgressPct": "Профиль заполнен на {pct}%",
+      "publicProfileTitle": "Публичный профиль",
+      "publicProfileLink": "Ссылка на профиль",
+      "copyAction": "Копировать",
+      "copySuccess": "Ссылка скопирована в буфер обмена.",
+      "previewLabel": "Предпросмотр",
+      "basicInfoTitle": "Основная информация",
+      "basicInfoLead": "Данные, которые видят покупатели и в объявлениях.",
+      "badgeActive": "Недавно активен",
+      "badgeQuick": "Быстро отвечает",
+      "badgeTrusted": "Надёжный аккаунт",
+      "trustInspire": "Полные профили вызывают больше доверия."
+    },
+    "sidebar": {
+      "statsTitle": "Быстрая статистика",
+      "statsViews": "Просмотры",
+      "statsMessages": "Сообщения",
+      "statsResponse": "Ответы",
+      "statsSoon": "Скоро",
+      "statsHint": "Подробная статистика скоро появится в аккаунте.",
+      "benefitsTitle": "Плюсы полного профиля",
+      "benefit1": "Больше сообщений от покупателей",
+      "benefit2": "Больше доверия в переписке",
+      "benefit3": "Лучше видимость объявлений"
     },
     "security": {
       "heading": "Безопасность",

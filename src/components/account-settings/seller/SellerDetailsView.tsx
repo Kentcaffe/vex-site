@@ -6,21 +6,19 @@ import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
   Clock,
+  Copy,
   FileText,
   Mail,
   MapPin,
   MessageCircle,
-  Package,
   Phone,
   Shield,
   Smartphone,
-  Sparkles,
-  Star,
   User,
-  Zap,
 } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { updateProfile, type UpdateProfileState } from "@/app/actions/profile";
+import { useToast } from "@/components/ui/SimpleToast";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import {
   computeSellerProfileCompletionScore,
@@ -28,12 +26,8 @@ import {
   type SellerContactPrefs,
   type SellerContactWindow,
 } from "@/lib/seller-contact-preferences";
-import { SellerDetailsTrustSidebar } from "@/components/account-settings/seller/SellerDetailsTrustSidebar";
-
-const R = "rounded-[14px]";
+const R = "rounded-2xl";
 const GREEN = "#16a34a";
-const DARK = "#0f172a";
-const PAGE_BG = "#f8fafc";
 
 const BUYER_NOTE_MAX = 320;
 
@@ -68,6 +62,7 @@ export type SellerDetailsUser = {
   bio: string | null;
   avatarUrl: string | null;
   createdAt: string;
+  updatedAt: string;
   isVerified: boolean;
   listingsCount: number;
 };
@@ -76,12 +71,14 @@ type Props = {
   locale: string;
   user: SellerDetailsUser;
   sellerContact: SellerContactPrefs;
+  publicProfileUrl: string;
 };
 
-export function SellerDetailsView({ locale, user, sellerContact: initialSeller }: Props) {
+export function SellerDetailsView({ locale, user, sellerContact: initialSeller, publicProfileUrl }: Props) {
   const t = useTranslations("AccountSettings.seller");
+  const tShell = useTranslations("AccountSettings.shell");
   const tAcc = useTranslations("Account");
-  const uiLocale = useLocale();
+  const { toast } = useToast();
   const router = useRouter();
   const [state, action, pending] = useActionState(updateProfile, undefined as UpdateProfileState | undefined);
   const [isRefreshing, startRefresh] = useTransition();
@@ -108,11 +105,6 @@ export function SellerDetailsView({ locale, user, sellerContact: initialSeller }
 
   const avatarResolved = useMemo(() => resolvePublicMediaUrl(avatarPreview || null), [avatarPreview]);
 
-  const memberYear = useMemo(() => {
-    const d = new Date(user.createdAt);
-    return new Intl.DateTimeFormat(uiLocale, { year: "numeric", month: "long" }).format(d);
-  }, [user.createdAt, uiLocale]);
-
   const completion = useMemo(
     () =>
       computeSellerProfileCompletionScore({
@@ -127,6 +119,10 @@ export function SellerDetailsView({ locale, user, sellerContact: initialSeller }
   );
 
   const phoneVerified = Boolean(phoneValue.trim().length >= 8);
+  const progressPct = Math.min(100, Math.round((completion.score / Math.max(completion.max, 1)) * 100));
+  const daysSinceActive =
+    (Date.now() - new Date(user.updatedAt).getTime()) / (1000 * 60 * 60 * 24);
+  const showActiveBadge = daysSinceActive <= 14;
 
   function setWindow(w: SellerContactWindow) {
     setSeller((p) => ({ ...p, contactWindow: w }));
@@ -140,75 +136,8 @@ export function SellerDetailsView({ locale, user, sellerContact: initialSeller }
   }
 
   return (
-    <div className="space-y-8 text-slate-900" style={{ backgroundColor: PAGE_BG }} data-seller-details-root>
-      <div
-        className={`relative overflow-hidden ${R} border border-emerald-900/30 p-6 text-white shadow-[0_24px_60px_-24px_rgb(0_0_0/0.45),0_0_40px_-12px_rgba(22,163,74,0.35)] sm:p-8`}
-        style={{
-          background: `linear-gradient(135deg, rgb(6 78 59) 0%, ${DARK} 45%, rgb(0 0 0) 100%)`,
-        }}
-      >
-        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-[#16a34a]/25 blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-16 -left-10 h-52 w-52 rounded-full bg-emerald-400/10 blur-2xl" />
-
-        <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4 sm:gap-5">
-            <div className="relative">
-              {avatarResolved ? (
-                <Image
-                  src={avatarResolved}
-                  alt=""
-                  width={88}
-                  height={88}
-                  className="h-[5.5rem] w-[5.5rem] rounded-full border-2 border-white/25 object-cover shadow-lg ring-2 ring-[#16a34a]/40"
-                />
-              ) : (
-                <div className="flex h-[5.5rem] w-[5.5rem] items-center justify-center rounded-full border-2 border-white/20 bg-white/10 text-2xl font-semibold text-white/90">
-                  {(nameValue || user.email).slice(0, 1).toUpperCase()}
-                </div>
-              )}
-              <span className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-white/30 bg-[#16a34a] text-white shadow-md">
-                <Sparkles className="h-3.5 w-3.5" aria-hidden />
-              </span>
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{nameValue.trim() || t("fallbackName")}</h2>
-                {(user.isVerified || phoneVerified) && (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/50 bg-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-100">
-                    <BadgeCheck className="h-3.5 w-3.5" style={{ color: "#86efac" }} aria-hidden />
-                    {t("verifiedBadge")}
-                  </span>
-                )}
-              </div>
-              <p className="mt-1 text-sm text-emerald-100/85">{t("memberSince", { date: memberYear })}</p>
-              <div className="mt-4 flex flex-wrap gap-4 text-sm">
-                <div className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 ring-1 ring-white/10">
-                  <Star className="h-4 w-4 text-amber-300" aria-hidden />
-                  <div className="flex flex-col leading-tight">
-                    <span className="font-medium tabular-nums">{t("statRating")}</span>
-                    <span className="text-[10px] font-medium text-emerald-100/75">{t("statRatingHint")}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 ring-1 ring-white/10">
-                  <Package className="h-4 w-4 text-emerald-200" aria-hidden />
-                  <span className="font-medium tabular-nums">{t("statListings", { count: user.listingsCount })}</span>
-                </div>
-                <div className="flex items-center gap-2 rounded-lg bg-white/10 px-3 py-1.5 ring-1 ring-white/10">
-                  <Zap className="h-4 w-4 text-amber-200" aria-hidden />
-                  <span className="font-medium">{t("statQuick")}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
-        <form
-          action={action}
-          encType="multipart/form-data"
-          className="min-w-0 space-y-6"
-        >
+    <div className="space-y-6 text-slate-900 motion-safe:animate-account-section" data-seller-details-root>
+      <form action={action} encType="multipart/form-data" className="min-w-0 space-y-6">
           <input type="hidden" name="locale" value={locale} />
           <input type="hidden" name="channelPhone" value={seller.channels.phone ? "1" : "0"} />
           <input type="hidden" name="channelSite" value={seller.channels.siteMessages ? "1" : "0"} />
@@ -216,10 +145,96 @@ export function SellerDetailsView({ locale, user, sellerContact: initialSeller }
           <input type="hidden" name="channelViber" value={seller.channels.viber ? "1" : "0"} />
           <input type="hidden" name="channelTelegram" value={seller.channels.telegram ? "1" : "0"} />
 
-          <section className={`space-y-5 border border-slate-200/90 bg-white p-5 shadow-sm sm:p-6 ${R}`}>
+          <section
+            className={`space-y-3 border border-slate-200/90 bg-white p-5 shadow-[0_2px_20px_-8px_rgb(15_23_42/0.08)] transition hover:shadow-[0_8px_28px_-10px_rgb(15_23_42/0.1)] sm:p-6 ${R}`}
+          >
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h3 className="text-base font-semibold tracking-tight text-slate-900">{tShell("profileProgressTitle")}</h3>
+                <p className="text-sm text-slate-500">{tShell("profileProgressHint")}</p>
+              </div>
+              <p className="text-lg font-bold tabular-nums text-[#16a34a]">{tShell("profileProgressPct", { pct: progressPct })}</p>
+            </div>
+            <div className="h-2.5 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#16a34a] to-emerald-400 transition-[width] duration-700 ease-out"
+                style={{ width: `${progressPct}%` }}
+              />
+            </div>
+          </section>
+
+          <section
+            className={`space-y-4 border border-slate-200/90 bg-white p-5 shadow-[0_2px_20px_-8px_rgb(15_23_42/0.08)] transition hover:shadow-[0_8px_28px_-10px_rgb(15_23_42/0.1)] sm:p-6 ${R}`}
+          >
+            <h3 className="text-base font-semibold text-slate-900">{tShell("publicProfileTitle")}</h3>
+            <div className="grid gap-4 lg:grid-cols-[1fr_200px]">
+              <div className="flex min-w-0 flex-col gap-2">
+                <label className="text-xs font-semibold uppercase tracking-wide text-slate-500">{tShell("publicProfileLink")}</label>
+                <div className="flex min-w-0 gap-2">
+                  <input
+                    readOnly
+                    value={publicProfileUrl}
+                    className={`min-w-0 flex-1 truncate border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm text-slate-800 outline-none ${R}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void navigator.clipboard.writeText(publicProfileUrl).then(() => {
+                        toast("success", tShell("copySuccess"));
+                      });
+                    }}
+                    className={`inline-flex shrink-0 items-center gap-2 border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-800 transition hover:scale-[1.02] hover:border-[#16a34a]/40 hover:text-[#16a34a] active:scale-[0.98] ${R}`}
+                  >
+                    <Copy className="h-4 w-4" aria-hidden />
+                    {tShell("copyAction")}
+                  </button>
+                </div>
+              </div>
+              <div className={`flex flex-col gap-2 border border-slate-100 bg-slate-50/80 p-4 ${R}`}>
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{tShell("previewLabel")}</p>
+                <div className="flex items-center gap-3">
+                  {avatarResolved ? (
+                    <Image src={avatarResolved} alt="" width={44} height={44} className="h-11 w-11 rounded-xl object-cover ring-1 ring-slate-200/80" />
+                  ) : (
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-sm font-semibold text-slate-500 ring-1 ring-slate-200">
+                      {(nameValue || user.email).slice(0, 1).toUpperCase()}
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900">{nameValue.trim() || t("fallbackName")}</p>
+                    <p className="truncate text-xs text-slate-500">{cityValue.trim() || "—"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section
+            className={`space-y-3 border border-slate-200/80 bg-gradient-to-br from-white to-slate-50/90 p-4 shadow-sm sm:p-5 ${R}`}
+          >
+            <div className="flex flex-wrap gap-2">
+              {showActiveBadge ? (
+                <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 shadow-sm">
+                  {tShell("badgeActive")}
+                </span>
+              ) : null}
+              <span className="inline-flex items-center rounded-full border border-emerald-200/80 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-900">
+                {tShell("badgeQuick")}
+              </span>
+              {user.isVerified || phoneVerified ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-800 shadow-sm">
+                  <BadgeCheck className="h-3.5 w-3.5 text-[#16a34a]" aria-hidden />
+                  {tShell("badgeTrusted")}
+                </span>
+              ) : null}
+            </div>
+            <p className="text-sm leading-relaxed text-slate-600">{tShell("trustInspire")}</p>
+          </section>
+
+          <section className={`space-y-5 border border-slate-200/90 bg-white p-5 shadow-[0_2px_20px_-8px_rgb(15_23_42/0.08)] transition hover:shadow-[0_8px_28px_-10px_rgb(15_23_42/0.1)] sm:p-6 ${R}`}>
             <div>
-              <h3 className="text-base font-semibold tracking-tight text-slate-900">{t("contactCardTitle")}</h3>
-              <p className="mt-1 text-sm text-slate-500">{t("contactCardLead")}</p>
+              <h3 className="text-base font-semibold tracking-tight text-slate-900">{tShell("basicInfoTitle")}</h3>
+              <p className="mt-1 text-sm text-slate-500">{tShell("basicInfoLead")}</p>
             </div>
 
             <div className={inputShell(focusedField === "name")}>
@@ -558,10 +573,7 @@ export function SellerDetailsView({ locale, user, sellerContact: initialSeller }
               {t("deleteAvatar")}
             </button>
           </div>
-        </form>
-
-        <SellerDetailsTrustSidebar score={completion.score} max={completion.max} />
-      </div>
+      </form>
     </div>
   );
 }

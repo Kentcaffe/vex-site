@@ -1507,7 +1507,8 @@
     "title": "My account",
     "subtitle": "Manage your profile, security, and preferences in one place.",
     "nav": {
-      "profile": "Seller details",
+      "profile": "Profile",
+      "listings": "My listings",
       "security": "Security",
       "notifications": "Notifications",
       "preferences": "Preferences",
@@ -1563,6 +1564,38 @@
       "premiumCardTitle": "Premium listing",
       "premiumCardLead": "Complete your profile and contact channels for maximum visibility.",
       "premiumProgressLabel": "Profile completion"
+    },
+    "shell": {
+      "activeSellerBadge": "Active seller",
+      "memberSinceYear": "Member since {year}",
+      "statListings": "{count} active listings",
+      "statQuick": "Quick to respond",
+      "profileProgressTitle": "Profile progress",
+      "profileProgressHint": "Complete your details for more trust and visibility.",
+      "profileProgressPct": "Profile complete: {pct}%",
+      "publicProfileTitle": "Public profile",
+      "publicProfileLink": "Profile link",
+      "copyAction": "Copy",
+      "copySuccess": "Link copied to clipboard.",
+      "previewLabel": "Preview",
+      "basicInfoTitle": "Basic information",
+      "basicInfoLead": "Information shown to buyers and on listings.",
+      "badgeActive": "Recently active",
+      "badgeQuick": "Quick to respond",
+      "badgeTrusted": "Trusted account",
+      "trustInspire": "Complete profiles inspire more confidence."
+    },
+    "sidebar": {
+      "statsTitle": "Quick stats",
+      "statsViews": "Views",
+      "statsMessages": "Messages received",
+      "statsResponse": "Response rate",
+      "statsSoon": "Soon",
+      "statsHint": "Detailed stats will be available in your account soon.",
+      "benefitsTitle": "Benefits of a complete profile",
+      "benefit1": "More messages from buyers",
+      "benefit2": "More trust in conversations",
+      "benefit3": "Better performance in listings"
     },
     "security": {
       "heading": "Security",

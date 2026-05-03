@@ -1,10 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, useActionState } from "react";
-import { Bell, Cog, Eye, Shield, SlidersHorizontal, Sparkles, User } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { Bell, Cog, Eye, LayoutList, Shield, SlidersHorizontal, User } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { usePathname, useRouter } from "@/i18n/navigation";
+import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import {
   type ActionResult,
   changeAccountPassword,
@@ -22,9 +22,12 @@ import { PrivacySection } from "@/components/account-settings/sections/PrivacySe
 import { ProfileSection } from "@/components/account-settings/sections/ProfileSection";
 import type { SellerContactPrefs } from "@/lib/seller-contact-preferences";
 import { SecuritySection } from "@/components/account-settings/sections/SecuritySection";
+import { SettingsProfileHero } from "@/components/account-settings/SettingsProfileHero";
+import { AccountSettingsRightSidebar } from "@/components/account-settings/AccountSettingsRightSidebar";
 
 export type AccountSettingsViewProps = {
   locale: string;
+  publicProfileUrl: string;
   user: {
     email: string;
     name: string | null;
@@ -33,6 +36,7 @@ export type AccountSettingsViewProps = {
     bio: string | null;
     avatarUrl: string | null;
     createdAt: string;
+    updatedAt: string;
     isVerified: boolean;
     listingsCount: number;
     sellerContact: SellerContactPrefs;
@@ -48,12 +52,23 @@ function isSection(s: string | null): s is AccountSection {
   return s !== null && (SECTIONS as readonly string[]).includes(s);
 }
 
-export function AccountSettingsView({ locale, user, hasPassword, preferences: initialPrefs }: AccountSettingsViewProps) {
+const navBtnBase =
+  "flex min-h-[44px] min-w-[9.5rem] shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition duration-200 lg:min-w-0 lg:w-full";
+const navInactive = "text-slate-700 hover:bg-slate-50 hover:shadow-sm";
+const navActive =
+  "bg-emerald-50 text-emerald-950 shadow-sm ring-1 ring-[#16a34a]/35 [box-shadow:0_1px_0_rgba(22,163,74,0.12)]";
+
+export function AccountSettingsView({
+  locale,
+  publicProfileUrl,
+  user,
+  hasPassword,
+  preferences: initialPrefs,
+}: AccountSettingsViewProps) {
   const t = useTranslations("AccountSettings");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const uiLocale = useLocale();
   const { toast } = useToast();
   const visitLogged = useRef(false);
 
@@ -143,23 +158,33 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
     [t],
   );
 
+  const heroUser = useMemo(
+    () => ({
+      email: user.email,
+      name: user.name,
+      avatarUrl: user.avatarUrl,
+      createdAt: user.createdAt,
+      isVerified: user.isVerified,
+      listingsCount: user.listingsCount,
+    }),
+    [user.avatarUrl, user.createdAt, user.email, user.isVerified, user.listingsCount, user.name],
+  );
+
   return (
-    <div className="app-shell app-section">
-      <header className="mb-8 overflow-hidden rounded-3xl border border-emerald-200/70 bg-gradient-to-br from-emerald-50 via-white to-teal-50 p-6 text-zinc-900 shadow-sm lg:mb-10 lg:p-8">
-        <p className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-emerald-800">
-          <Sparkles className="h-3.5 w-3.5" aria-hidden />
-          Premium account
-        </p>
-        <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">{t("title")}</h1>
-        <p className="mt-2 max-w-2xl text-base leading-relaxed text-zinc-600">{t("subtitle")}</p>
-        <p className="mt-3 text-xs font-medium text-zinc-500">
-          {new Date(user.createdAt).toLocaleDateString(uiLocale, { year: "numeric", month: "long", day: "numeric" })}
-        </p>
+    <div className="motion-safe:animate-account-section w-full min-w-0 space-y-6 font-sans lg:space-y-8">
+      <header className="space-y-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{t("title")}</h1>
+        <p className="max-w-2xl text-base leading-relaxed text-slate-600">{t("subtitle")}</p>
       </header>
 
-      <div className="flex flex-col gap-8 lg:flex-row lg:gap-10">
-        <aside className="lg:w-64 lg:shrink-0">
-          <nav className="sticky top-24 z-10 flex gap-1 overflow-x-auto rounded-2xl border border-zinc-200/80 bg-white p-2 shadow-sm [-ms-overflow-style:none] [scrollbar-width:none] lg:flex-col lg:overflow-visible [&::-webkit-scrollbar]:hidden">
+      <SettingsProfileHero user={heroUser} />
+
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,220px)_minmax(0,1fr)_minmax(0,260px)] lg:items-start lg:gap-8">
+        <aside className="min-w-0 lg:sticky lg:top-24">
+          <nav
+            aria-label={t("title")}
+            className="flex gap-1 overflow-x-auto rounded-2xl border border-slate-200/90 bg-white p-2 shadow-[0_2px_20px_-8px_rgb(15_23_42/0.08)] [-ms-overflow-style:none] [scrollbar-width:none] lg:flex-col lg:overflow-visible [&::-webkit-scrollbar]:hidden"
+          >
             {navItems.map(({ id, label, icon: Icon }) => {
               const isActive = active === id;
               return (
@@ -167,23 +192,30 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
                   key={id}
                   type="button"
                   onClick={() => setSection(id)}
-                  className={`interactive-soft interactive-soft-mobile flex min-h-[44px] min-w-[9.5rem] shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold lg:min-w-0 lg:w-full ${
-                    isActive
-                      ? "bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-950 ring-1 ring-emerald-200/90"
-                      : "text-zinc-700 hover:bg-zinc-100/80"
-                  }`}
+                  className={`${navBtnBase} ${isActive ? navActive : navInactive}`}
                 >
-                  <Icon className="h-4 w-4 shrink-0 opacity-80" aria-hidden />
+                  <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-[#16a34a]" : "text-slate-500"}`} aria-hidden />
                   {label}
                 </button>
               );
             })}
+            <Link
+              href="/cont/anunturi"
+              className={`${navBtnBase} ${navInactive} motion-safe:transition-transform motion-safe:hover:scale-[1.01]`}
+            >
+              <LayoutList className="h-4 w-4 shrink-0 text-slate-500" aria-hidden />
+              {t("nav.listings")}
+            </Link>
           </nav>
         </aside>
 
-        <div className="min-w-0 flex-1 rounded-2xl border border-zinc-200/80 bg-white p-3 shadow-sm sm:p-4">
-          <div key={active} className="animate-account-section space-y-6 rounded-xl transition-all duration-300 ease-out">
-            {active === "profile" ? <ProfileSection locale={locale} user={user} /> : null}
+        <main
+          className={`min-w-0 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-[0_2px_24px_-10px_rgb(15_23_42/0.1)] transition duration-300 motion-safe:hover:shadow-[0_8px_32px_-12px_rgb(15_23_42/0.12)] sm:p-6 lg:p-7`}
+        >
+          <div key={active} className="motion-safe:animate-account-section space-y-6">
+            {active === "profile" ? (
+              <ProfileSection locale={locale} user={user} publicProfileUrl={publicProfileUrl} />
+            ) : null}
 
             {active === "security" ? (
               <SecuritySection
@@ -210,7 +242,15 @@ export function AccountSettingsView({ locale, user, hasPassword, preferences: in
 
             {active === "account" ? <AccountSection locale={locale} delAction={delAction} delPending={delPending} /> : null}
           </div>
+        </main>
+
+        <div className="hidden min-w-0 lg:block">
+          <AccountSettingsRightSidebar />
         </div>
+      </div>
+
+      <div className="lg:hidden">
+        <AccountSettingsRightSidebar />
       </div>
     </div>
   );
