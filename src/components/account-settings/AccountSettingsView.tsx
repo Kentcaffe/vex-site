@@ -20,6 +20,7 @@ import { NotificationsSection } from "@/components/account-settings/sections/Not
 import { PreferencesSection } from "@/components/account-settings/sections/PreferencesSection";
 import { PrivacySection } from "@/components/account-settings/sections/PrivacySection";
 import { ProfileSection } from "@/components/account-settings/sections/ProfileSection";
+import type { SellerContactPrefs } from "@/lib/seller-contact-preferences";
 import { SecuritySection } from "@/components/account-settings/sections/SecuritySection";
 
 export type AccountSettingsViewProps = {
@@ -32,6 +33,9 @@ export type AccountSettingsViewProps = {
     bio: string | null;
     avatarUrl: string | null;
     createdAt: string;
+    isVerified: boolean;
+    listingsCount: number;
+    sellerContact: SellerContactPrefs;
   };
   hasPassword: boolean;
   preferences: UserPrefsShape;

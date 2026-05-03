@@ -6,6 +6,10 @@ import { auth } from "@/auth";
 import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import {
+  mergeSellerContactIntoPreferencesJson,
+  normalizeTimeHHMM,
+} from "@/lib/seller-contact-preferences";
 
 export type UpdateProfileState =
   | { ok: true; name: string | null; avatarUrl: string | null; message?: string }
@@ -24,12 +28,22 @@ const profileSchema = z.object({
     .refine((v) => !v || /^https?:\/\//i.test(v), "invalid")
     .optional(),
   intent: z.enum(["save_profile", "delete_avatar"]).default("save_profile"),
+  district: z.string().trim().max(80).optional(),
+  buyerNote: z.string().trim().max(320).optional(),
+  contactWindow: z.enum(["anytime", "hours", "no_calls"]).optional().catch(undefined),
+  contactHourFrom: z.string().trim().max(5).optional(),
+  contactHourTo: z.string().trim().max(5).optional(),
 });
 
 function toNull(v: string | undefined): string | null {
   if (!v) return null;
   const trimmed = v.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function formChannelOn(fd: FormData, key: string): boolean {
+  const v = fd.get(key);
+  return v === "1" || v === "on" || v === "true";
 }
 
 const AVATAR_BUCKET = "avatars";
@@ -85,6 +99,11 @@ export async function updateProfile(
     bio: formData.get("bio") || undefined,
     avatarUrl: formData.get("avatarUrl") || undefined,
     intent: formData.get("intent") || "save_profile",
+    district: formData.get("district") || undefined,
+    buyerNote: formData.get("buyerNote") || undefined,
+    contactWindow: (formData.get("contactWindow") as string) || undefined,
+    contactHourFrom: formData.get("contactHourFrom") || undefined,
+    contactHourTo: formData.get("contactHourTo") || undefined,
   });
 
   if (!parsed.success) {
@@ -111,7 +130,7 @@ export async function updateProfile(
 
     const currentUser = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { avatarUrl: true },
+      select: { avatarUrl: true, preferences: true },
     });
 
     const { data: existingProfileRow, error: existingProfileError } = await supabase
@@ -224,6 +243,22 @@ export async function updateProfile(
       return { ok: false, error: "unknown", message: authUpdateError.message };
     }
 
+    const cw = parsed.data.contactWindow === "hours" || parsed.data.contactWindow === "no_calls" ? parsed.data.contactWindow : "anytime";
+    const nextPreferences = mergeSellerContactIntoPreferencesJson(currentUser?.preferences, {
+      district: parsed.data.district ?? "",
+      buyerNote: parsed.data.buyerNote ?? "",
+      contactWindow: cw,
+      contactHourFrom: normalizeTimeHHMM(parsed.data.contactHourFrom),
+      contactHourTo: normalizeTimeHHMM(parsed.data.contactHourTo),
+      channels: {
+        phone: formChannelOn(formData, "channelPhone"),
+        siteMessages: formChannelOn(formData, "channelSite"),
+        whatsapp: formChannelOn(formData, "channelWhatsapp"),
+        viber: formChannelOn(formData, "channelViber"),
+        telegram: formChannelOn(formData, "channelTelegram"),
+      },
+    });
+
     await prisma.user.update({
       where: { id: session.user.id },
       data: {
@@ -232,6 +267,7 @@ export async function updateProfile(
         city: toNull(parsed.data.city),
         bio: toNull(parsed.data.bio),
         avatarUrl: finalAvatarUrl,
+        preferences: nextPreferences,
       },
     });
     revalidatePath(localizedHref(parsed.data.locale, "/cont"));
