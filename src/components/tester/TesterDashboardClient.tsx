@@ -1,425 +1,203 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
-import { submitBugReport } from "@/app/actions/tester-bugs";
+import { Bug, FlaskConical, LayoutDashboard, Medal, Settings, Trophy } from "lucide-react";
 import type { BugRow } from "@/lib/tester-bugs";
+import type { LeaderboardEntry } from "@/components/tester/dashboard/TesterRightRail";
+import { TesterBugReportForm } from "@/components/tester/dashboard/TesterBugReportForm";
+import type { TesterBugReportFormCopy } from "@/components/tester/dashboard/TesterBugReportForm";
+import { TesterBugsTable } from "@/components/tester/dashboard/TesterBugsTable";
+import type { TesterBugsTableCopy } from "@/components/tester/dashboard/TesterBugsTable";
+import { TesterRightRail } from "@/components/tester/dashboard/TesterRightRail";
+import { TesterSidebar, type TesterSidebarItem } from "@/components/tester/dashboard/TesterSidebar";
+import { TesterWelcomeHero } from "@/components/tester/dashboard/TesterWelcomeHero";
 
-type BugFormValues = {
-  title: string;
-  description: string;
-  stepsToReproduce: string;
-  expectedResult: string;
-  actualResult: string;
-  pageUrl: string;
-  reproducibility: "always" | "sometimes" | "once";
-  browserInfo: string;
-  deviceInfo: string;
-  category: "ui" | "functional" | "security";
-  severity: "low" | "medium" | "high";
-};
-
-const initialBugFormValues: BugFormValues = {
-  title: "",
-  description: "",
-  stepsToReproduce: "",
-  expectedResult: "",
-  actualResult: "",
-  pageUrl: "",
-  reproducibility: "always",
-  browserInfo: "",
-  deviceInfo: "",
-  category: "ui",
-  severity: "medium",
-};
-
-function SubmitButton() {
-  return (
-    <button
-      type="submit"
-      className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-700/30 transition hover:bg-violet-500"
-    >
-      Trimite bug
-    </button>
-  );
-}
-
-function statusMeta(status: string) {
-  if (status === "accepted") {
-    return {
-      label: "Acceptat",
-      classes: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-    };
-  }
-  if (status === "rejected") {
-    return {
-      label: "Respins",
-      classes: "bg-rose-500/20 text-rose-300 border-rose-500/40",
-    };
-  }
-  return {
-    label: "Deschis",
-    classes: "bg-amber-500/20 text-amber-200 border-amber-500/40",
-  };
-}
-
-function categoryLabel(category: string) {
-  if (category === "functional") return "Funcțional";
-  if (category === "security") return "Securitate";
-  return "Interfață (UI)";
-}
-
-function severityLabel(severity: string) {
-  if (severity === "low") return "Mică";
-  if (severity === "high") return "Ridicată";
-  return "Medie";
-}
-
-export function TesterDashboardClient({ bugs }: { bugs: BugRow[] }) {
+export function TesterDashboardClient({
+  bugs,
+  leaderboard,
+}: {
+  bugs: BugRow[];
+  leaderboard: LeaderboardEntry[];
+}) {
+  const t = useTranslations("TesterDashboard");
   const tChat = useTranslations("TesterChat");
   const router = useRouter();
-  const formRef = useRef<HTMLFormElement | null>(null);
-  const initialSubmitState: { ok: boolean; message: string; error?: string } = { ok: false, message: "" };
-  const [state, formAction, pending] = useActionState(submitBugReport, initialSubmitState);
-  const [formValues, setFormValues] = useState<BugFormValues>(initialBugFormValues);
-  const [fileInputKey, setFileInputKey] = useState(0);
-  const [fileCount, setFileCount] = useState(0);
-  const [statusFilter, setStatusFilter] = useState<"all" | "open" | "accepted" | "rejected">("all");
-  const [severityFilter, setSeverityFilter] = useState<"all" | "low" | "medium" | "high">("all");
-  const [searchText, setSearchText] = useState("");
-  const stats = bugs.reduce(
-    (acc, bug) => {
-      acc.total += 1;
-      if (bug.status === "accepted") acc.accepted += 1;
-      else if (bug.status === "rejected") acc.rejected += 1;
-      else acc.open += 1;
-      acc.reward += Number(bug.reward ?? 0);
-      return acc;
-    },
-    { total: 0, open: 0, accepted: 0, rejected: 0, reward: 0 },
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const stats = useMemo(
+    () =>
+      bugs.reduce(
+        (acc, bug) => {
+          acc.total += 1;
+          if (bug.status === "accepted") acc.accepted += 1;
+          else if (bug.status === "rejected") acc.rejected += 1;
+          else acc.open += 1;
+          acc.reward += Number(bug.reward ?? 0);
+          return acc;
+        },
+        { total: 0, open: 0, accepted: 0, rejected: 0, reward: 0 },
+      ),
+    [bugs],
   );
 
-  useEffect(() => {
-    if (state.ok) {
-      queueMicrotask(() => {
-        formRef.current?.reset();
-        setFormValues(initialBugFormValues);
-        setFileInputKey((v) => v + 1);
-        setFileCount(0);
-      });
-      router.refresh();
-    }
-  }, [router, state.ok]);
+  const sidebarItems: TesterSidebarItem[] = useMemo(
+    () => [
+      { id: "dash", href: "/tester", label: t("nav.dashboard"), icon: LayoutDashboard },
+      { id: "test", href: "/tester#report", label: t("nav.test"), icon: FlaskConical },
+      { id: "reports", href: "/tester#reports", label: t("nav.reports"), icon: Bug },
+      { id: "rewards", href: "/tester#rewards", label: t("nav.rewards"), icon: Trophy },
+      { id: "lb", href: "/tester#leaderboard", label: t("nav.leaderboard"), icon: Medal },
+      { id: "settings", href: "/cont", label: t("nav.settings"), icon: Settings },
+    ],
+    [t],
+  );
 
-  const filteredBugs = useMemo(() => {
-    const query = searchText.trim().toLowerCase();
-    return bugs.filter((bug) => {
-      if (statusFilter !== "all" && bug.status !== statusFilter) {
-        return false;
-      }
-      if (severityFilter !== "all" && bug.severity !== severityFilter) {
-        return false;
-      }
-      if (!query) {
-        return true;
-      }
-      return `${bug.title} ${bug.description}`.toLowerCase().includes(query);
-    });
-  }, [bugs, searchText, severityFilter, statusFilter]);
+  const guideSteps = useMemo(
+    () => [t("guide.s1"), t("guide.s2"), t("guide.s3"), t("guide.s4"), t("guide.s5")],
+    [t],
+  );
+
+  const formCopy: TesterBugReportFormCopy = useMemo(
+    () => ({
+      title: t("form.title"),
+      badge: t("form.badge"),
+      tipsTitle: t("form.tipsTitle"),
+      tipsBody: t("form.tipsBody"),
+      fieldTitle: t("form.fieldTitle"),
+      fieldTitlePh: t("form.fieldTitlePh"),
+      fieldDescription: t("form.fieldDescription"),
+      fieldDescriptionPh: t("form.fieldDescriptionPh"),
+      fieldSteps: t("form.fieldSteps"),
+      stepPh: t("form.stepPh"),
+      addStep: t("form.addStep"),
+      removeStepAria: t("form.removeStepAria"),
+      fieldExpected: t("form.fieldExpected"),
+      fieldExpectedPh: t("form.fieldExpectedPh"),
+      fieldActual: t("form.fieldActual"),
+      fieldActualPh: t("form.fieldActualPh"),
+      fieldPageUrl: t("form.fieldPageUrl"),
+      fieldPageUrlPh: t("form.fieldPageUrlPh"),
+      fieldRepro: t("form.fieldRepro"),
+      reproAlways: t("form.reproAlways"),
+      reproSometimes: t("form.reproSometimes"),
+      reproOnce: t("form.reproOnce"),
+      fieldBrowser: t("form.fieldBrowser"),
+      fieldBrowserPh: t("form.fieldBrowserPh"),
+      fieldDevice: t("form.fieldDevice"),
+      fieldDevicePh: t("form.fieldDevicePh"),
+      fieldCategory: t("form.fieldCategory"),
+      catUi: t("form.catUi"),
+      catFunctional: t("form.catFunctional"),
+      catSecurity: t("form.catSecurity"),
+      fieldSeverity: t("form.fieldSeverity"),
+      sevLow: t("form.sevLow"),
+      sevMed: t("form.sevMed"),
+      sevHigh: t("form.sevHigh"),
+      screenshotsLabel: t("form.screenshotsLabel"),
+      screenshotsDrag: t("form.screenshotsDrag"),
+      screenshotsBrowse: t("form.screenshotsBrowse"),
+      screenshotsCount: t("form.screenshotsCount"),
+      termsLabel: t("form.termsLabel"),
+      termsError: t("form.termsError"),
+      submit: t("form.submit"),
+      submitting: t("form.submitting"),
+      footerHint: t("form.footerHint"),
+    }),
+    [t],
+  );
+
+  const tableCopy: TesterBugsTableCopy = useMemo(
+    () => ({
+      title: t("table.title"),
+      searchPh: t("table.searchPh"),
+      statusAll: t("table.statusAll"),
+      statusOpen: t("table.statusOpen"),
+      statusAccepted: t("table.statusAccepted"),
+      statusRejected: t("table.statusRejected"),
+      sevAll: t("table.sevAll"),
+      sevLow: t("table.sevLow"),
+      sevMed: t("table.sevMed"),
+      sevHigh: t("table.sevHigh"),
+      empty: t("table.empty"),
+      colTitle: t("table.colTitle"),
+      colStatus: t("table.colStatus"),
+      colMeta: t("table.colMeta"),
+      rewardSuffix: t("table.rewardSuffix"),
+      statusLabelOpen: t("table.statusLabelOpen"),
+      statusLabelAccepted: t("table.statusLabelAccepted"),
+      statusLabelRejected: t("table.statusLabelRejected"),
+      sevLabelLow: t("table.sevLabelLow"),
+      sevLabelMed: t("table.sevLabelMed"),
+      sevLabelHigh: t("table.sevLabelHigh"),
+      catUi: t("table.catUi"),
+      catFunctional: t("table.catFunctional"),
+      catSecurity: t("table.catSecurity"),
+    }),
+    [t],
+  );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        <Link
-          href="/tester/chat"
-          className="inline-flex items-center justify-center rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-sm font-semibold text-emerald-200 transition hover:border-emerald-400/60 hover:bg-emerald-500/20"
-        >
-          {tChat("dashboardLink")}
-        </Link>
+    <div className="min-h-[calc(100vh-3.5rem)] bg-[#0B0F1A] text-slate-200">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(124,58,237,0.22),transparent)]" />
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(ellipse_60%_40%_at_100%_0%,rgba(56,189,248,0.12),transparent)]" />
+
+      <div className="relative mx-auto max-w-[1200px] px-4 py-8 sm:px-6 lg:py-10">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[220px_minmax(0,1fr)_300px]">
+          <TesterSidebar items={sidebarItems} chatHref="/tester/chat" chatLabel={tChat("dashboardLink")} />
+
+          <div className="flex min-w-0 flex-col gap-8 lg:order-none">
+            <TesterWelcomeHero title={t("hero.title")} subtitle={t("hero.subtitle")} badge={t("hero.badge")} />
+
+            <TesterBugReportForm copy={formCopy} formRef={formRef} onSuccessAction={() => router.refresh()} />
+
+            <TesterBugsTable bugs={bugs} copy={tableCopy} />
+          </div>
+
+          <div className="hidden xl:block">
+            <TesterRightRail
+              guideTitle={t("guide.title")}
+              guideSteps={guideSteps}
+              statsTitle={t("stats.title")}
+              statTotalLabel={t("stats.total")}
+              statOpenLabel={t("stats.open")}
+              statAcceptedLabel={t("stats.accepted")}
+              statRewardsLabel={t("stats.rewards")}
+              total={stats.total}
+              open={stats.open}
+              accepted={stats.accepted}
+              reward={stats.reward}
+              lbTitle={t("lb.title")}
+              lbEmpty={t("lb.empty")}
+              lbAccepted={t("lb.acceptedLabel")}
+              leaderboardFootnote={t("lb.footnote")}
+              leaderboard={leaderboard}
+            />
+          </div>
+        </div>
+
+        <div className="mt-8 xl:hidden">
+          <TesterRightRail
+            guideTitle={t("guide.title")}
+            guideSteps={guideSteps}
+            statsTitle={t("stats.title")}
+            statTotalLabel={t("stats.total")}
+            statOpenLabel={t("stats.open")}
+            statAcceptedLabel={t("stats.accepted")}
+            statRewardsLabel={t("stats.rewards")}
+            total={stats.total}
+            open={stats.open}
+            accepted={stats.accepted}
+            reward={stats.reward}
+            lbTitle={t("lb.title")}
+            lbEmpty={t("lb.empty")}
+            lbAccepted={t("lb.acceptedLabel")}
+            leaderboardFootnote={t("lb.footnote")}
+            leaderboard={leaderboard}
+          />
+        </div>
       </div>
-      <section className="grid gap-3 rounded-2xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl shadow-black/30 sm:grid-cols-2 lg:grid-cols-4">
-        <article className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-4">
-          <p className="text-xs uppercase tracking-wide text-zinc-400">Total raportări</p>
-          <p className="mt-2 text-2xl font-bold text-zinc-100">{stats.total}</p>
-        </article>
-        <article className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4">
-          <p className="text-xs uppercase tracking-wide text-amber-200/80">Deschise</p>
-          <p className="mt-2 text-2xl font-bold text-amber-100">{stats.open}</p>
-        </article>
-        <article className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4">
-          <p className="text-xs uppercase tracking-wide text-emerald-200/80">Acceptate</p>
-          <p className="mt-2 text-2xl font-bold text-emerald-100">{stats.accepted}</p>
-        </article>
-        <article className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-4">
-          <p className="text-xs uppercase tracking-wide text-yellow-200/80">Recompense totale</p>
-          <p className="mt-2 text-2xl font-bold text-yellow-100">{stats.reward} lei</p>
-        </article>
-      </section>
-
-      <section className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl shadow-black/30">
-        <div className="mb-5 flex items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-zinc-100">Raporteaza bug nou</h2>
-          <span className="rounded-full border border-yellow-500/60 bg-yellow-400/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-yellow-200">
-            Tester VEX
-          </span>
-        </div>
-        <div className="mb-5 rounded-xl border border-violet-600/30 bg-violet-950/20 p-4 text-sm text-zinc-200">
-          <p className="font-semibold text-violet-200">Cum trimiți un raport util (obligatoriu)</p>
-          <ul className="mt-2 list-inside list-disc space-y-1 text-zinc-300">
-            <li>Descrie exact pașii, în ordine (ce ai apăsat și unde).</li>
-            <li>Scrie clar diferența dintre rezultatul așteptat și rezultatul actual.</li>
-            <li>Adaugă browser + device + link pagină, ca echipa să poată reproduce rapid.</li>
-            <li>Nu trimite „nu merge” fără detalii; astfel de rapoarte vor fi respinse.</li>
-          </ul>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            <p className="rounded-lg border border-emerald-600/30 bg-emerald-950/20 px-3 py-2 text-xs text-emerald-200">
-              <span className="font-semibold">Exemplu bun:</span> &quot;La publicare anunț, după click pe Salvează, primesc eroare 500.
-              Așteptat: anunț salvat. Actual: blocat. Chrome 135 / Windows 11.&quot;
-            </p>
-            <p className="rounded-lg border border-rose-600/30 bg-rose-950/20 px-3 py-2 text-xs text-rose-200">
-              <span className="font-semibold">Exemplu slab:</span> &quot;Nu merge site-ul!!!&quot;
-                          </p>
-          </div>
-        </div>
-        <form ref={formRef} action={formAction} className="grid gap-4">
-          <p className="text-xs text-zinc-400">Titlu scurt + impact (ex: „Nu se poate publica anunț pe mobil”).</p>
-          <input
-            name="title"
-            required
-            minLength={4}
-            value={formValues.title}
-            onChange={(e) => setFormValues((prev) => ({ ...prev, title: e.target.value }))}
-            placeholder="Titlu bug"
-            className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-          />
-          <p className="text-xs text-zinc-400">Descriere pe scurt: când apare, cât de des apare, ce secțiune e afectată.</p>
-          <textarea
-            name="description"
-            required
-            minLength={10}
-            value={formValues.description}
-            onChange={(e) => setFormValues((prev) => ({ ...prev, description: e.target.value }))}
-            placeholder="Descriere detaliata"
-            rows={5}
-            className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-          />
-          <p className="text-xs text-zinc-400">Pași clari, numerotați (1, 2, 3...). Fără pași exacți, bug-ul nu poate fi validat.</p>
-          <textarea
-            name="stepsToReproduce"
-            required
-            minLength={10}
-            value={formValues.stepsToReproduce}
-            onChange={(e) => setFormValues((prev) => ({ ...prev, stepsToReproduce: e.target.value }))}
-            placeholder="Pași de reproducere (1. ... 2. ... 3. ...)"
-            rows={4}
-            className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-          />
-          <p className="text-xs text-zinc-400">Compară clar: ce trebuia să se întâmple vs ce s-a întâmplat de fapt.</p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <textarea
-              name="expectedResult"
-              required
-              minLength={5}
-              value={formValues.expectedResult}
-              onChange={(e) => setFormValues((prev) => ({ ...prev, expectedResult: e.target.value }))}
-              placeholder="Rezultat așteptat"
-              rows={3}
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-            />
-            <textarea
-              name="actualResult"
-              required
-              minLength={5}
-              value={formValues.actualResult}
-              onChange={(e) => setFormValues((prev) => ({ ...prev, actualResult: e.target.value }))}
-              placeholder="Rezultat actual"
-              rows={3}
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-3 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-            />
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <input
-              name="pageUrl"
-              type="url"
-              value={formValues.pageUrl}
-              onChange={(e) => setFormValues((prev) => ({ ...prev, pageUrl: e.target.value }))}
-              placeholder="URL pagină afectată (https://...)"
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-            />
-            <select
-              name="reproducibility"
-              value={formValues.reproducibility}
-              onChange={(e) =>
-                setFormValues((prev) => ({
-                  ...prev,
-                  reproducibility: e.target.value as BugFormValues["reproducibility"],
-                }))
-              }
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-            >
-              <option value="always">Se reproduce mereu</option>
-              <option value="sometimes">Se reproduce uneori</option>
-              <option value="once">S-a întâmplat o singură dată</option>
-            </select>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <input
-              name="browserInfo"
-              value={formValues.browserInfo}
-              onChange={(e) => setFormValues((prev) => ({ ...prev, browserInfo: e.target.value }))}
-              placeholder="Browser (ex: Chrome 135, Safari 17)"
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-            />
-            <input
-              name="deviceInfo"
-              value={formValues.deviceInfo}
-              onChange={(e) => setFormValues((prev) => ({ ...prev, deviceInfo: e.target.value }))}
-              placeholder="Device/OS (ex: iPhone 13 iOS 18, Windows 11)"
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-            />
-          </div>
-          <p className="text-xs text-zinc-400">Alege categoria și severitatea realist, ca trierea să fie corectă.</p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <select
-              name="category"
-              required
-              value={formValues.category}
-              onChange={(e) =>
-                setFormValues((prev) => ({
-                  ...prev,
-                  category: e.target.value as BugFormValues["category"],
-                }))
-              }
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-            >
-              <option value="ui">Interfață (UI)</option>
-              <option value="functional">Funcțional</option>
-              <option value="security">Securitate</option>
-            </select>
-            <select
-              name="severity"
-              required
-              value={formValues.severity}
-              onChange={(e) =>
-                setFormValues((prev) => ({
-                  ...prev,
-                  severity: e.target.value as BugFormValues["severity"],
-                }))
-              }
-              className="rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-100 outline-none ring-violet-500/40 focus:ring"
-            >
-              <option value="low">Mică</option>
-              <option value="medium">Medie</option>
-              <option value="high">Ridicată</option>
-            </select>
-          </div>
-          <label className="grid gap-2 text-sm text-zinc-300">
-            Screenshot-uri (opțional, max 5)
-            <input
-              key={fileInputKey}
-              type="file"
-              name="images"
-              multiple
-              accept="image/*"
-              onChange={(e) => {
-                const files = e.target.files;
-                const safeCount = files ? Math.min(files.length, 5) : 0;
-                setFileCount(safeCount);
-                if (files && files.length > 5) {
-                  setTimeout(() => {
-                    e.currentTarget.value = "";
-                    setFileCount(0);
-                  }, 0);
-                }
-              }}
-              className="rounded-xl border border-dashed border-zinc-700 bg-zinc-900 px-3 py-2 text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-violet-600 file:px-3 file:py-1.5 file:font-medium file:text-white hover:file:bg-violet-500"
-            />
-            <span className="text-xs text-zinc-400">Selectate: {fileCount}/5</span>
-          </label>
-          {state.error ? (
-            <p className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{state.error}</p>
-          ) : null}
-          {state.ok ? (
-            <p className="rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-200">{state.message}</p>
-          ) : null}
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-zinc-400">Status implicit: open · Reward implicit: 0 · Rapoartele fără detalii suficiente pot fi respinse.</p>
-            <div aria-busy={pending}>
-              <SubmitButton />
-            </div>
-          </div>
-        </form>
-      </section>
-
-      <section className="rounded-2xl border border-violet-700/40 bg-gradient-to-r from-zinc-950 to-violet-950/40 p-6 shadow-2xl shadow-black/30">
-        <h3 className="text-lg font-semibold text-zinc-100">Ghid rapid pentru testeri</h3>
-        <ul className="mt-3 space-y-2 text-sm text-zinc-300">
-          <li>1) Verifică bug-ul de minim 2 ori înainte să raportezi.</li>
-          <li>2) Dacă e posibil, testează și pe alt browser/dispozitiv ca să confirmi.</li>
-          <li>3) Scrie pașii numerotați; evită formulări generale („nu merge”).</li>
-          <li>4) „Ridicată” = blocaj sever / securitate. Pentru bug-uri minore folosește „Mică” sau „Medie”.</li>
-          <li>5) Un screenshot clar + URL exact reduc timpul de analiză și cresc șansele de acceptare.</li>
-        </ul>
-      </section>
-
-      <section className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl shadow-black/30">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h3 className="text-lg font-semibold text-zinc-100">Bug-urile tale</h3>
-          <div className="grid gap-2 sm:grid-cols-3">
-            <input
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Caută titlu/descriere..."
-              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-100"
-            />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as "all" | "open" | "accepted" | "rejected")}
-              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-100"
-            >
-              <option value="all">Toate statusurile</option>
-              <option value="open">Deschis</option>
-              <option value="accepted">Acceptat</option>
-              <option value="rejected">Respins</option>
-            </select>
-            <select
-              value={severityFilter}
-              onChange={(e) => setSeverityFilter(e.target.value as "all" | "low" | "medium" | "high")}
-              className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs text-zinc-100"
-            >
-              <option value="all">Toate severitățile</option>
-              <option value="low">Mică</option>
-              <option value="medium">Medie</option>
-              <option value="high">Ridicată</option>
-            </select>
-          </div>
-        </div>
-        <div className="mt-4 space-y-3">
-          {filteredBugs.length === 0 ? (
-            <p className="rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-sm text-zinc-400">
-              Nu există rezultate pentru filtrele selectate.
-            </p>
-          ) : (
-            filteredBugs.map((bug) => (
-              <article key={bug.id} className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p className="font-semibold text-zinc-100">{bug.title}</p>
-                  <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold uppercase ${statusMeta(bug.status).classes}`}>
-                    {statusMeta(bug.status).label}
-                  </span>
-                </div>
-                <p className="mt-2 text-sm text-zinc-300">{bug.description}</p>
-                <p className="mt-2 text-xs text-zinc-400">
-                  {categoryLabel(bug.category)} · Severitate: {severityLabel(bug.severity)} · Recompensă: {bug.reward} lei
-                </p>
-              </article>
-            ))
-          )}
-        </div>
-      </section>
     </div>
   );
 }
-
