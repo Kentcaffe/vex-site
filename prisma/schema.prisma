@@ -129,6 +129,35 @@ model Category {
   sortOrder Int        @default(0)
   labels    String
   listings  Listing[]
+  /** Marcă / model oficiale pentru marketplace (telefoane, laptopuri etc.). */
+  catalogBrands CatalogBrand[]
+}
+
+/** Marcă per categorie frunză (ex. Apple în „Smartphone-uri”). */
+model CatalogBrand {
+  id         String @id @default(cuid())
+  categoryId String @map("category_id")
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name       String
+  sortOrder  Int    @default(0) @map("sort_order")
+  models     CatalogModel[]
+
+  @@unique([categoryId, name])
+  @@index([categoryId])
+  @@map("catalog_brands")
+}
+
+/** Model legat de marcă (toate variantele listate în seed / admin). */
+model CatalogModel {
+  id        String @id @default(cuid())
+  brandId   String @map("brand_id")
+  brand     CatalogBrand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  name      String
+  sortOrder Int    @default(0) @map("sort_order")
+
+  @@unique([brandId, name])
+  @@index([brandId])
+  @@map("catalog_models")
 }
 
 model Listing {

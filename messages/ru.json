@@ -951,7 +951,14 @@
     "benefitSecTitle": "Безопасность",
     "benefitSecBody": "Антифрод-сигналы и жалобы сообщества.",
     "specsEmpty": "Для этой категории нет дополнительных обязательных полей.",
-    "negotiablePreview": "Торг уместен"
+    "negotiablePreview": "Торг уместен",
+    "modelOther": "Другая модель (вручную)",
+    "modelManualPlaceholder": "Введите точное название модели",
+    "catalogLoadingBrands": "Загрузка марок…",
+    "catalogLoadingModels": "Загрузка моделей…",
+    "catalogBrandInvalid": "Марка не совпадает с каталогом категории.",
+    "catalogModelInvalid": "Выберите модель из списка или введите 2–120 символов.",
+    "catalogModelManualEmpty": "Введите модель или выберите из списка."
   },
   "Admin": {
     "shellTitle": "Администрирование",

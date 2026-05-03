@@ -2,6 +2,7 @@ import "dotenv/config";
 import { hash } from "bcryptjs";
 import { prisma } from "../src/lib/prisma";
 import { CATEGORY_ROOTS, type CatDef } from "./category-tree/index.js";
+import { seedMarketplaceCatalog } from "./catalog-seed/run";
 
 function L(ro: string, ru: string, en: string) {
   return JSON.stringify({ ro, ru, en });
@@ -45,6 +46,7 @@ async function main() {
   });
 
   await seedTree(CATEGORY_ROOTS, null);
+  await seedMarketplaceCatalog();
 
   const leafAuto = await prisma.category.findFirst({ where: { slug: "transport-autoturisme" } });
   const demo = await prisma.user.findFirst({ where: { email: "demo@vex.site" } });

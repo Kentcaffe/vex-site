@@ -951,7 +951,14 @@
     "benefitSecTitle": "Securitate",
     "benefitSecBody": "Semnale anti-fraudă și raportări din comunitate.",
     "specsEmpty": "Pentru categoria selectată nu sunt câmpuri suplimentare obligatorii.",
-    "negotiablePreview": "Preț negociabil"
+    "negotiablePreview": "Preț negociabil",
+    "modelOther": "Alt model (scrie manual)",
+    "modelManualPlaceholder": "Introdu modelul exact",
+    "catalogLoadingBrands": "Se încarcă mărcile…",
+    "catalogLoadingModels": "Se încarcă modelele…",
+    "catalogBrandInvalid": "Marca nu se potrivește cu catalogul categoriei.",
+    "catalogModelInvalid": "Modelul trebuie să fie din listă sau între 2 și 120 caractere.",
+    "catalogModelManualEmpty": "Completează modelul sau alege din listă."
   },
   "Admin": {
     "shellTitle": "Administrare",

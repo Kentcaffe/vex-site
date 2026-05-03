@@ -18,6 +18,8 @@ export type PublishFormValues = {
   phone: string;
   condition: string;
   brand: string;
+  /** Id marcă din `catalog_brands` când formularul folosește catalogul server; gol = listă statică. */
+  catalogBrandId: string;
   modelName: string;
   year: string;
   mileageKm: string;
@@ -38,6 +40,7 @@ export const emptyPublishFormValues = (): PublishFormValues => ({
   phone: "",
   condition: "used",
   brand: "",
+  catalogBrandId: "",
   modelName: "",
   year: "",
   mileageKm: "",
@@ -57,6 +60,7 @@ const KNOWN_VALUE_KEYS = new Set([
   "phone",
   "condition",
   "brand",
+  "catalogBrandId",
   "modelName",
   "year",
   "mileageKm",
@@ -87,6 +91,7 @@ export function publishValuesFromDraftValues(
       ? g("condition", "used")
       : "used",
     brand: g("brand", ""),
+    catalogBrandId: g("catalogBrandId", ""),
     modelName: g("modelName", ""),
     year: g("year", ""),
     mileageKm: g("mileageKm", ""),
@@ -113,6 +118,7 @@ export function listingDraftFromPublishValues(
     phone: values.phone,
     condition: values.condition,
     brand: values.brand,
+    catalogBrandId: values.catalogBrandId,
     modelName: values.modelName,
     year: values.year,
     mileageKm: values.mileageKm,

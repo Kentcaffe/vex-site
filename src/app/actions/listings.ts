@@ -20,11 +20,8 @@ import { devLog, devWarn } from "@/lib/dev-log";
 import { asListingCreateInput } from "@/lib/prisma-listing-casts";
 import { listingUpdateSoftDelete, listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
-import {
-  isBrandAllowedForCategory,
-  isModelAllowedForCategoryBrand,
-  resolveCategoryConfigKey,
-} from "@/lib/listing-category-config";
+import { resolveCategoryConfigKey } from "@/lib/listing-category-config";
+import { assertListingBrandModelAllowed } from "@/lib/listing-catalog-server-validate";
 import { evaluateListingFraudRisk } from "@/lib/listing-fraud";
 
 export type CreateListingState =
@@ -222,24 +219,17 @@ export async function createListing(
 
   const slug = categoryRow.slug;
   const categoryConfigKey = resolveCategoryConfigKey(slug);
-  if (!isBrandAllowedForCategory(categoryConfigKey, parsed.data.brand ?? "")) {
+  const brandModelCheck = await assertListingBrandModelAllowed({
+    categoryId: categoryRow.id,
+    categoryConfigKey,
+    brand: parsed.data.brand,
+    modelName: parsed.data.modelName,
+  });
+  if (!brandModelCheck.ok) {
     return {
       ok: false,
       error: "validation",
-      details: "Marca selectată nu aparține categoriei selectate.",
-    };
-  }
-  if (
-    !isModelAllowedForCategoryBrand(
-      categoryConfigKey,
-      parsed.data.brand ?? "",
-      parsed.data.modelName ?? "",
-    )
-  ) {
-    return {
-      ok: false,
-      error: "validation",
-      details: "Modelul selectat nu aparține mărcii selectate.",
+      details: brandModelCheck.message,
     };
   }
   const cols = sanitizeColumnPayload(slug, {
@@ -442,24 +432,17 @@ export async function updateOwnListing(
 
   const slug = categoryRow.slug;
   const categoryConfigKey = resolveCategoryConfigKey(slug);
-  if (!isBrandAllowedForCategory(categoryConfigKey, parsed.data.brand ?? "")) {
+  const brandModelCheck = await assertListingBrandModelAllowed({
+    categoryId: categoryRow.id,
+    categoryConfigKey,
+    brand: parsed.data.brand,
+    modelName: parsed.data.modelName,
+  });
+  if (!brandModelCheck.ok) {
     return {
       ok: false,
       error: "validation",
-      details: "Marca selectată nu aparține categoriei selectate.",
-    };
-  }
-  if (
-    !isModelAllowedForCategoryBrand(
-      categoryConfigKey,
-      parsed.data.brand ?? "",
-      parsed.data.modelName ?? "",
-    )
-  ) {
-    return {
-      ok: false,
-      error: "validation",
-      details: "Modelul selectat nu aparține mărcii selectate.",
+      details: brandModelCheck.message,
     };
   }
   const cols = sanitizeColumnPayload(slug, {

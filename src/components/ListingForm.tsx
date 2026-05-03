@@ -25,6 +25,7 @@ import {
   isLeafCategoryNode,
   normalizeLeafCategoryId,
 } from "@/lib/category-tree";
+import { useListingCatalogOptions } from "@/hooks/useListingCatalogOptions";
 import { LISTING_MAX_IMAGES, parseImageLines, parseListingImageUrlsStrict } from "@/lib/listing-form-schema";
 import {
   liveValidateField,
@@ -76,6 +77,9 @@ import {
   PublishWizardSidebar,
 } from "@/components/publish/publish-wizard-ui";
 import { Car, FileText, ImageIcon, Megaphone, MessageCircle, Phone, Rocket, ShieldCheck, Sparkles } from "lucide-react";
+
+/** Opțiune „alt model” în catalogul dinamic (valoare internă, nu se salvează ca nume anunț). */
+const MODEL_CATALOG_OTHER = "__catalog_other__";
 
 type Props = {
   locale: string;
@@ -138,6 +142,7 @@ export function ListingForm({
   const [imagesRaw, setImagesRaw] = useState("");
   const [publishValues, setPublishValues] = useState<PublishFormValues>(emptyPublishFormValues);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [modelManualOther, setModelManualOther] = useState(false);
   const [clientErrors, setClientErrors] = useState<Partial<Record<ListingFormFieldId, string>>>({});
   const [liveValidateEnabled, setLiveValidateEnabled] = useState(false);
   /** După eroare server „category”, ascundem mesajul dacă user a schimbat categoria. */
@@ -156,6 +161,17 @@ export function ListingForm({
   const selectedSlug = useMemo(
     () => findLeafSlugById(categoryTree, categoryId) ?? "",
     [categoryId, categoryTree],
+  );
+
+  const {
+    catalogBrands,
+    catalogModels,
+    useServerCatalog,
+    catalogBrandsStale,
+    catalogModelsStale,
+  } = useListingCatalogOptions(
+    categoryId.trim() || undefined,
+    publishValues.catalogBrandId.trim() || undefined,
   );
 
   const { isVeh, isRe, isBrandish } = getListingFormFlags(selectedSlug);
@@ -190,28 +206,70 @@ export function ListingForm({
     () => getDetailFieldsForSlug(selectedSlug, { brand: publishValues.brand, model: publishValues.modelName }),
     [selectedSlug, publishValues.brand, publishValues.modelName],
   );
-  const dynamicBrandOptions = useMemo(
-    () => getCategoryBrands(selectedCategoryKey).map((value) => ({ value, label: value })),
-    [selectedCategoryKey],
+  const modelOtherOption = useMemo(
+    () => ({ value: MODEL_CATALOG_OTHER, label: tW("modelOther") }),
+    [tW],
   );
-  const dynamicModelOptions = useMemo(
-    () =>
-      getModelsForCategoryBrand(selectedCategoryKey, publishValues.brand).map((value) => ({
-        value,
-        label: value,
-      })),
-    [selectedCategoryKey, publishValues.brand],
-  );
+
+  const dynamicBrandOptions = useMemo(() => {
+    if (categoryId.trim() && catalogBrandsStale) {
+      return [];
+    }
+    if (useServerCatalog) {
+      return catalogBrands.map((b) => ({ value: b.id, label: b.name }));
+    }
+    if (!selectedCategoryKey) {
+      return [];
+    }
+    return getCategoryBrands(selectedCategoryKey).map((value) => ({ value, label: value }));
+  }, [categoryId, catalogBrandsStale, useServerCatalog, catalogBrands, selectedCategoryKey]);
+
+  const dynamicModelOptions = useMemo(() => {
+    const bid = publishValues.catalogBrandId.trim();
+    if (useServerCatalog && bid && catalogModelsStale) {
+      return [];
+    }
+    if (useServerCatalog && bid) {
+      const base = catalogModels.map((m) => ({ value: m.name, label: m.name }));
+      return [...base, modelOtherOption];
+    }
+    if (useServerCatalog) {
+      return [];
+    }
+    if (!selectedCategoryKey) {
+      return [];
+    }
+    const base = getModelsForCategoryBrand(selectedCategoryKey, publishValues.brand).map((value) => ({
+      value,
+      label: value,
+    }));
+    return base;
+  }, [
+    useServerCatalog,
+    catalogModels,
+    catalogModelsStale,
+    publishValues.catalogBrandId,
+    publishValues.brand,
+    selectedCategoryKey,
+    modelOtherOption,
+  ]);
   const hasDynamicCategoryConfig = selectedCategoryFields.length > 0;
 
   useEffect(() => {
+    if (useServerCatalog) {
+      return;
+    }
     if (isBrandAllowedForCategory(selectedCategoryKey, publishValues.brand)) {
       return;
     }
-    setPublishValues((prev) => ({ ...prev, brand: "", modelName: "" }));
-  }, [selectedCategoryKey, publishValues.brand]);
+    setPublishValues((prev) => ({ ...prev, brand: "", catalogBrandId: "", modelName: "" }));
+    setModelManualOther(false);
+  }, [useServerCatalog, selectedCategoryKey, publishValues.brand]);
 
   useEffect(() => {
+    if (useServerCatalog) {
+      return;
+    }
     if (
       isModelAllowedForCategoryBrand(
         selectedCategoryKey,
@@ -222,7 +280,8 @@ export function ListingForm({
       return;
     }
     setPublishValues((prev) => ({ ...prev, modelName: "" }));
-  }, [selectedCategoryKey, publishValues.brand, publishValues.modelName]);
+    setModelManualOther(false);
+  }, [useServerCatalog, selectedCategoryKey, publishValues.brand, publishValues.modelName]);
 
   const citySelectOptions = useMemo(() => {
     const base = moldovaCitySelectOptions();
@@ -627,8 +686,18 @@ export function ListingForm({
   }
 
   function getDynamicFieldValue(fieldId: ListingFieldId): string {
-    if (fieldId === "brand") return publishValues.brand;
-    if (fieldId === "modelName") return publishValues.modelName;
+    if (fieldId === "brand") {
+      if (useServerCatalog) {
+        return publishValues.catalogBrandId;
+      }
+      return publishValues.brand;
+    }
+    if (fieldId === "modelName") {
+      if (useServerCatalog && modelManualOther) {
+        return MODEL_CATALOG_OTHER;
+      }
+      return publishValues.modelName;
+    }
     if (fieldId === "year") return publishValues.year;
     if (fieldId === "mileageKm") return publishValues.mileageKm;
     if (fieldId === "rooms") return publishValues.rooms;
@@ -638,9 +707,31 @@ export function ListingForm({
   }
 
   function setDynamicFieldValue(fieldId: ListingFieldId, value: string) {
+    if (fieldId === "brand" && useServerCatalog) {
+      setModelManualOther(false);
+      const row = catalogBrands.find((b) => b.id === value);
+      setPublishValues((prev) => ({
+        ...prev,
+        catalogBrandId: value,
+        brand: row?.name ?? "",
+        modelName: "",
+      }));
+      return;
+    }
+    if (fieldId === "brand" && !useServerCatalog) {
+      setModelManualOther(false);
+    }
+    if (fieldId === "modelName" && useServerCatalog && value === MODEL_CATALOG_OTHER) {
+      setModelManualOther(true);
+      setPublishValues((prev) => ({ ...prev, modelName: "" }));
+      return;
+    }
+    if (fieldId === "modelName" && useServerCatalog) {
+      setModelManualOther(false);
+    }
     setPublishValues((prev) => {
       if (fieldId === "brand") {
-        return { ...prev, brand: value, modelName: "" };
+        return { ...prev, brand: value, catalogBrandId: "", modelName: "" };
       }
       if (fieldId === "modelName") {
         return { ...prev, modelName: value };
@@ -678,18 +769,48 @@ export function ListingForm({
           }));
 
     if (field.input === "select") {
+      const showBrandLoading = isBrandField && Boolean(categoryId.trim()) && catalogBrandsStale;
+      const showModelLoading =
+        isModelField && useServerCatalog && Boolean(publishValues.catalogBrandId.trim()) && catalogModelsStale;
+      const modelManual = isModelField && useServerCatalog && modelManualOther;
+      const brandSelectDisabled = isBrandField && Boolean(categoryId.trim()) && catalogBrandsStale;
+      const modelSelectDisabled =
+        isModelField &&
+        (useServerCatalog
+          ? !publishValues.catalogBrandId.trim() || catalogModelsStale
+          : !publishValues.brand.trim());
       return (
-        <SearchableSelect
-          id={`cfg-${field.id}`}
-          value={value}
-          onValueChangeAction={(nextValue) => setDynamicFieldValue(field.id, nextValue)}
-          options={options}
-          placeholder={t("detailOptional")}
-          emptyLabel={t("detailOptional")}
-          searchPlaceholder={t("searchableSearch")}
-          noResultsLabel={t("searchableEmpty")}
-          disabled={isModelField && !publishValues.brand.trim()}
-        />
+        <div className="space-y-2">
+          {showBrandLoading ? (
+            <p className="text-xs text-slate-500">{tW("catalogLoadingBrands")}</p>
+          ) : null}
+          {showModelLoading ? (
+            <p className="text-xs text-slate-500">{tW("catalogLoadingModels")}</p>
+          ) : null}
+          <SearchableSelect
+            id={`cfg-${field.id}`}
+            value={value}
+            onValueChangeAction={(nextValue) => setDynamicFieldValue(field.id, nextValue)}
+            options={options}
+            placeholder={t("detailOptional")}
+            emptyLabel={t("detailOptional")}
+            searchPlaceholder={t("searchableSearch")}
+            noResultsLabel={t("searchableEmpty")}
+            disabled={brandSelectDisabled || modelSelectDisabled}
+          />
+          {modelManual ? (
+            <input
+              type="text"
+              id={`cfg-${field.id}-manual`}
+              value={publishValues.modelName}
+              onChange={(e) => setPublishValues((p) => ({ ...p, modelName: e.target.value }))}
+              placeholder={tW("modelManualPlaceholder")}
+              className={baseInputClass}
+              maxLength={120}
+              autoComplete="off"
+            />
+          ) : null}
+        </div>
       );
     }
 
@@ -737,19 +858,44 @@ export function ListingForm({
       return;
     }
 
-    if (!isBrandAllowedForCategory(selectedCategoryKey, publishValues.brand)) {
-      toast("error", "Marca selectată nu aparține categoriei curente.");
-      return;
-    }
-    if (
-      !isModelAllowedForCategoryBrand(
-        selectedCategoryKey,
-        publishValues.brand,
-        publishValues.modelName,
-      )
-    ) {
-      toast("error", "Modelul selectat nu aparține mărcii curente.");
-      return;
+    if (useServerCatalog) {
+      const bn = publishValues.brand.trim();
+      if (bn) {
+        const okBrand = catalogBrands.some(
+          (b) => b.id === publishValues.catalogBrandId && b.name === bn,
+        );
+        if (!okBrand) {
+          toast("error", tW("catalogBrandInvalid"));
+          return;
+        }
+      }
+      const mn = publishValues.modelName.trim();
+      if (mn) {
+        const inList = catalogModels.some((m) => m.name === mn);
+        if (!inList && (mn.length < 2 || mn.length > 120)) {
+          toast("error", tW("catalogModelInvalid"));
+          return;
+        }
+      }
+      if (modelManualOther && !publishValues.modelName.trim()) {
+        toast("error", tW("catalogModelManualEmpty"));
+        return;
+      }
+    } else {
+      if (!isBrandAllowedForCategory(selectedCategoryKey, publishValues.brand)) {
+        toast("error", "Marca selectată nu aparține categoriei curente.");
+        return;
+      }
+      if (
+        !isModelAllowedForCategoryBrand(
+          selectedCategoryKey,
+          publishValues.brand,
+          publishValues.modelName,
+        )
+      ) {
+        toast("error", "Modelul selectat nu aparține mărcii curente.");
+        return;
+      }
     }
 
     const fraud = evaluateListingFraudRisk({
@@ -1024,10 +1170,12 @@ export function ListingForm({
                           devLog("Category selected:", nextSelected, "id:", nextId);
                           setCategoryId(nextId);
                           if (nextId !== prevId) {
+                            setModelManualOther(false);
                             setPublishValues((p) => ({
                               ...p,
                               extra: {},
                               brand: "",
+                              catalogBrandId: "",
                               modelName: "",
                               year: "",
                               mileageKm: "",
@@ -1469,10 +1617,12 @@ export function ListingForm({
               devLog("Category selected:", nextSelected, "id:", nextId);
               setCategoryId(nextId);
               if (nextId !== prevId) {
+                setModelManualOther(false);
                 setPublishValues((p) => ({
                   ...p,
                   extra: {},
                   brand: "",
+                  catalogBrandId: "",
                   modelName: "",
                   year: "",
                   mileageKm: "",

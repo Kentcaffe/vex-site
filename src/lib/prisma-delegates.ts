@@ -8,6 +8,8 @@ import { prisma } from "./prisma";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma delegates; see above
 const p = prisma as any;
 
+export const catalogBrand = p.catalogBrand;
+export const catalogModel = p.catalogModel;
 export const otherContentReport = p.otherContentReport;
 export const userNotification = p.userNotification;
 export const passwordResetToken = p.passwordResetToken;

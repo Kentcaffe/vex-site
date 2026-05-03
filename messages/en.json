@@ -951,7 +951,14 @@
     "benefitSecTitle": "Safety",
     "benefitSecBody": "Anti-fraud signals and community reporting.",
     "specsEmpty": "No extra fields are required for this category.",
-    "negotiablePreview": "Price negotiable"
+    "negotiablePreview": "Price negotiable",
+    "modelOther": "Other model (type manually)",
+    "modelManualPlaceholder": "Enter the exact model name",
+    "catalogLoadingBrands": "Loading brands…",
+    "catalogLoadingModels": "Loading models…",
+    "catalogBrandInvalid": "Brand does not match this category’s catalog.",
+    "catalogModelInvalid": "Pick a model from the list or enter 2–120 characters.",
+    "catalogModelManualEmpty": "Enter a model name or pick from the list."
   },
   "Admin": {
     "shellTitle": "Administration",
