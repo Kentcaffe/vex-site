@@ -14,7 +14,7 @@ const ListingForm = dynamic(
   {
     loading: () => (
       <div
-        className="animate-pulse rounded-2xl border border-zinc-200 bg-zinc-50/90 p-12 min-h-[min(70vh,480px)]"
+        className="min-h-[min(72vh,520px)] w-full animate-pulse rounded-2xl border border-slate-200/80 bg-[#f8fafc] p-8 sm:p-12"
         aria-hidden
       />
     ),
@@ -41,11 +41,16 @@ export default async function PublicaPage({ params }: Props) {
   }
 
   return (
-    <div className="app-shell app-section">
+    <div className="app-shell app-section w-full max-w-full min-w-0">
       <h1 className="page-heading text-2xl sm:text-3xl">{t("title")}</h1>
-      <p className="page-subheading mt-2">{t("subtitle")}</p>
-      <div className="mt-8">
-        <ListingForm locale={locale} userId={session.user.id} categoryTree={categoryTree} />
+      <p className="page-subheading mt-2 max-w-2xl text-pretty">{t("subtitle")}</p>
+      <div className="mt-8 w-full min-w-0">
+        <ListingForm
+          locale={locale}
+          userId={session.user.id}
+          categoryTree={categoryTree}
+          publishUX="premium"
+        />
       </div>
     </div>
   );

@@ -134,6 +134,10 @@ export type ListingLiveValues = {
 export type LiveValidateFieldOptions = {
   /** Dacă false, câmpul „Stare” nu e afișat (nu validăm). Dacă true, acceptăm doar new/used. */
   needsCoreCondition?: boolean;
+  /** Limită titlu pentru validare live (implicit 160, ca schema server). */
+  titleMax?: number;
+  /** Limită descriere pentru validare live (implicit foarte mare). */
+  descriptionMax?: number;
 };
 
 export function liveValidateField(
@@ -151,20 +155,22 @@ export function liveValidateField(
     }
     case "title": {
       const t = values.title.trim();
+      const titleMax = options?.titleMax ?? 160;
       if (t.length > 0 && t.length < 5) {
         return msg.errTitle;
       }
-      if (t.length > 160) {
+      if (t.length > titleMax) {
         return msg.errTitle;
       }
       return undefined;
     }
     case "description": {
       const d = values.description.trim();
+      const descMax = options?.descriptionMax ?? 1_000_000;
       if (d.length > 0 && d.length < 20) {
         return msg.errDescription;
       }
-      if (values.description.length > 1_000_000) {
+      if (values.description.length > descMax) {
         return msg.errDescription;
       }
       return undefined;

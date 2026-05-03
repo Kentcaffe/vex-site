@@ -25,7 +25,7 @@ import {
   isLeafCategoryNode,
   normalizeLeafCategoryId,
 } from "@/lib/category-tree";
-import { LISTING_MAX_IMAGES, parseImageLines } from "@/lib/listing-form-schema";
+import { LISTING_MAX_IMAGES, parseImageLines, parseListingImageUrlsStrict } from "@/lib/listing-form-schema";
 import {
   liveValidateField,
   validateListingFormClient,
@@ -67,6 +67,15 @@ import {
   type ListingFieldId,
 } from "@/lib/listing-category-config";
 import { evaluateListingFraudRisk } from "@/lib/listing-fraud";
+import { PUBLISH_WIZARD_DESC_MAX, PUBLISH_WIZARD_TITLE_MAX } from "@/components/publish/publish-wizard-constants";
+import {
+  PublishFormSectionCard,
+  PublishLivePreviewPanel,
+  PublishMobileBenefits,
+  PublishWizardGrid,
+  PublishWizardSidebar,
+} from "@/components/publish/publish-wizard-ui";
+import { Car, FileText, ImageIcon, Megaphone, MessageCircle, Phone, Rocket, ShieldCheck, Sparkles } from "lucide-react";
 
 type Props = {
   locale: string;
@@ -80,6 +89,8 @@ type Props = {
     imagesRaw: string;
     publishValues: PublishFormValues;
   } | null;
+  /** Layout premium cu pași + previzualizare (doar publicare nouă). */
+  publishUX?: "standard" | "premium";
 };
 
 /** Culori explicite — pe mobil (Safari) fără ele, textul poate fi invizibil în input/textarea. */
@@ -88,11 +99,19 @@ const baseInputClass =
 const labelClass = "block text-sm font-medium text-zinc-900";
 const labelClassInline = "flex items-center gap-2 text-sm font-medium text-zinc-900";
 const errBorder = "input-error border-red-500 ring-2 ring-red-500/30";
-export function ListingForm({ locale, userId, categoryTree, editListingId = null, initialEditSnapshot = null }: Props) {
+export function ListingForm({
+  locale,
+  userId,
+  categoryTree,
+  editListingId = null,
+  initialEditSnapshot = null,
+  publishUX = "standard",
+}: Props) {
   const router = useRouter();
   const { toast } = useToast();
   const t = useTranslations("ListingForm");
   const tVal = useTranslations("ListingForm.validation");
+  const tW = useTranslations("PublishWizard");
   const uiLocale = useLocale();
 
   const msg: ListingFormValidationMessages = useMemo(
@@ -114,6 +133,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     undefined as CreateListingState | undefined,
   );
   const isEditMode = Boolean(editListingId);
+  const isPremium = publishUX === "premium" && !isEditMode;
   const [categoryId, setCategoryId] = useState("");
   const [imagesRaw, setImagesRaw] = useState("");
   const [publishValues, setPublishValues] = useState<PublishFormValues>(emptyPublishFormValues);
@@ -127,6 +147,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
   const publishRedirectDoneRef = useRef(false);
   const skipDraftSaveRef = useRef(false);
   const [draftHydrated, setDraftHydrated] = useState(false);
+  const [activeWizardStep, setActiveWizardStep] = useState(1);
   const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const storageKey = useMemo(() => listingDraftStorageKey(locale, userId), [locale, userId]);
   const legacyDraftSessionKey = useMemo(() => legacyListingDraftSessionKey(locale), [locale]);
@@ -156,6 +177,15 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     fields.push("imagesRaw");
     return fields;
   }, [needsCoreCondition]);
+  const liveValidateOpts = useMemo(
+    () => ({
+      needsCoreCondition,
+      ...(isPremium
+        ? { titleMax: PUBLISH_WIZARD_TITLE_MAX, descriptionMax: PUBLISH_WIZARD_DESC_MAX }
+        : {}),
+    }),
+    [needsCoreCondition, isPremium],
+  );
   const detailFields = useMemo(
     () => getDetailFieldsForSlug(selectedSlug, { brand: publishValues.brand, model: publishValues.modelName }),
     [selectedSlug, publishValues.brand, publishValues.modelName],
@@ -205,6 +235,44 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
 
   function ring(field: ListingFormFieldId): string {
     return clientErrors[field] ? errBorder : "";
+  }
+
+  const goodFieldOutline = "border-emerald-500 ring-2 ring-emerald-500/25";
+  const premiumInputClass = `${baseInputClass} border-slate-200 text-slate-900 caret-slate-900 placeholder:text-slate-400 focus:border-[#16a34a] focus:ring-2 focus:ring-[#16a34a]/20 focus:outline-none`;
+
+  function compositeFieldOutline(field: ListingFormFieldId): string {
+    if (clientErrors[field]) {
+      return errBorder;
+    }
+    if (!isPremium || !liveValidateEnabled) {
+      return "";
+    }
+    if (field === "title") {
+      const x = publishValues.title.trim();
+      return x.length >= 5 && publishValues.title.length <= PUBLISH_WIZARD_TITLE_MAX ? goodFieldOutline : "";
+    }
+    if (field === "description") {
+      const x = publishValues.description.trim();
+      return x.length >= 20 && publishValues.description.length <= PUBLISH_WIZARD_DESC_MAX
+        ? goodFieldOutline
+        : "";
+    }
+    if (field === "price") {
+      const p = publishValues.price.trim();
+      if (!p) return "";
+      const n = Number(p);
+      return Number.isFinite(n) && Number.isInteger(n) && n >= 1 ? goodFieldOutline : "";
+    }
+    if (field === "city") {
+      return publishValues.city.trim().length >= 2 ? goodFieldOutline : "";
+    }
+    if (field === "condition") {
+      return needsCoreCondition && ["new", "used"].includes(publishValues.condition) ? goodFieldOutline : "";
+    }
+    if (field === "imagesRaw") {
+      return parseListingImageUrlsStrict(imagesRaw) ? goodFieldOutline : "";
+    }
+    return "";
   }
 
   function clearFieldError(field: ListingFormFieldId) {
@@ -309,28 +377,32 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     setDraftHydrated(true);
   }, [storageKey, legacyDraftSessionKey, draftAdKey, isEditMode, initialEditSnapshot, categoryTree]);
 
+  const flushDraftToStorage = useCallback(() => {
+    if (isEditMode) {
+      return;
+    }
+    if (skipDraftSaveRef.current) {
+      return;
+    }
+    const draft = listingDraftFromPublishValues(categoryId, imagesRaw, publishValues);
+    if (isListingDraftEffectivelyEmpty(draft)) {
+      clearListingDraftStorage(storageKey, legacyDraftSessionKey);
+      clearDraftAdMirror(draftAdKey);
+      return;
+    }
+    saveListingDraftToStorage(storageKey, draft);
+    saveDraftAdMirror(draftAdKey, draft);
+  }, [categoryId, imagesRaw, publishValues, storageKey, legacyDraftSessionKey, draftAdKey, isEditMode]);
+
   const scheduleDraftPersist = useCallback(() => {
     if (saveDraftTimerRef.current) {
       clearTimeout(saveDraftTimerRef.current);
     }
     saveDraftTimerRef.current = setTimeout(() => {
       saveDraftTimerRef.current = null;
-      if (isEditMode) {
-        return;
-      }
-      if (skipDraftSaveRef.current) {
-        return;
-      }
-      const draft = listingDraftFromPublishValues(categoryId, imagesRaw, publishValues);
-      if (isListingDraftEffectivelyEmpty(draft)) {
-        clearListingDraftStorage(storageKey, legacyDraftSessionKey);
-        clearDraftAdMirror(draftAdKey);
-        return;
-      }
-      saveListingDraftToStorage(storageKey, draft);
-      saveDraftAdMirror(draftAdKey, draft);
+      flushDraftToStorage();
     }, 450);
-  }, [categoryId, imagesRaw, publishValues, storageKey, legacyDraftSessionKey, draftAdKey, isEditMode]);
+  }, [flushDraftToStorage]);
 
   useEffect(() => {
     if (!draftHydrated) {
@@ -427,7 +499,7 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       imagesRaw,
     };
     for (const field of liveRequiredFields) {
-      const e = liveValidateField(field, liveValues, msg, { needsCoreCondition });
+      const e = liveValidateField(field, liveValues, msg, liveValidateOpts);
       if (e) {
         nextErrors[field] = e;
       }
@@ -454,7 +526,43 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
     tVal,
     liveRequiredFields,
     needsCoreCondition,
+    liveValidateOpts,
   ]);
+
+  useEffect(() => {
+    if (!isPremium) {
+      return;
+    }
+    const onScroll = () => {
+      const root = formRef.current;
+      if (!root) {
+        return;
+      }
+      const nodes = root.querySelectorAll<HTMLElement>("[data-publish-step]");
+      const anchorY = window.innerHeight * 0.2;
+      let best = 1;
+      let bestScore = Number.POSITIVE_INFINITY;
+      nodes.forEach((el) => {
+        const step = Number(el.dataset.publishStep);
+        if (!Number.isFinite(step)) {
+          return;
+        }
+        const r = el.getBoundingClientRect();
+        if (r.bottom < 96 || r.top > window.innerHeight - 40) {
+          return;
+        }
+        const score = Math.abs(r.top - anchorY);
+        if (score < bestScore) {
+          bestScore = score;
+          best = step;
+        }
+      });
+      setActiveWizardStep(best);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [isPremium]);
 
   function detailLabel(field: DetailField): string {
     return t(`detail.${field.id}.label`);
@@ -755,6 +863,113 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
       ? (state.details ?? t("serverCategory"))
       : null);
 
+  function scrollToWizardStep(step: number) {
+    formRef.current
+      ?.querySelector<HTMLElement>(`[data-publish-step="${step}"]`)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  const previewTags = useMemo(() => {
+    const tags: string[] = [];
+    const y = publishValues.year.trim();
+    if (y) {
+      tags.push(y);
+    }
+    const fuelF = detailFields.find((f) => f.id === "fuel");
+    if (fuelF) {
+      const v = publishValues.extra[getDetailFormName(fuelF)] ?? "";
+      if (v) {
+        tags.push(selectOptionLabel(fuelF, v));
+      }
+    }
+    const trF = detailFields.find((f) => f.id === "transmission");
+    if (trF) {
+      const v = publishValues.extra[getDetailFormName(trF)] ?? "";
+      if (v) {
+        tags.push(selectOptionLabel(trF, v));
+      }
+    }
+    return tags.slice(0, 5);
+  }, [detailFields, publishValues.extra, publishValues.year]); // eslint-disable-line react-hooks/exhaustive-deps -- selectOptionLabel
+
+  const previewImageSrc = useMemo(() => parseImageLines(imagesRaw)[0] ?? null, [imagesRaw]);
+
+  const showCompetitivePriceBadge = useMemo(() => {
+    if (!isPremium) {
+      return false;
+    }
+    const raw = publishValues.price.trim();
+    if (!raw || clientErrors.price) {
+      return false;
+    }
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n < 1) {
+      return false;
+    }
+    const eur = publishValues.priceCurrency === "EUR";
+    const min = eur ? 400 : 8000;
+    const max = eur ? 120_000 : 2_200_000;
+    return n >= min && n <= max;
+  }, [isPremium, publishValues.price, publishValues.priceCurrency, clientErrors.price]);
+
+  const wizardStepsDef = useMemo(
+    () => [
+      { step: 1, icon: FileText, title: tW("step1Title"), description: tW("step1Desc") },
+      { step: 2, icon: Car, title: tW("step2Title"), description: tW("step2Desc") },
+      { step: 3, icon: Phone, title: tW("step3Title"), description: tW("step3Desc") },
+      { step: 4, icon: ImageIcon, title: tW("step4Title"), description: tW("step4Desc") },
+      { step: 5, icon: Rocket, title: tW("step5Title"), description: tW("step5Desc") },
+    ],
+    [tW],
+  );
+
+  const wizardBenefits = useMemo(
+    () => [
+      { icon: Megaphone, title: tW("benefitFreeTitle"), body: tW("benefitFreeBody") },
+      { icon: Sparkles, title: tW("benefitTopTitle"), body: tW("benefitTopBody") },
+      { icon: MessageCircle, title: tW("benefitMsgTitle"), body: tW("benefitMsgBody") },
+      { icon: ShieldCheck, title: tW("benefitSecTitle"), body: tW("benefitSecBody") },
+    ],
+    [tW],
+  );
+
+  function handlePremiumPrimaryAction() {
+    if (activeWizardStep < 5) {
+      scrollToWizardStep(activeWizardStep + 1);
+      return;
+    }
+    handleSubmit();
+  }
+
+  function handleSaveDraftClick() {
+    flushDraftToStorage();
+    toast("success", tW("draftSaved"));
+  }
+
+  const livePreviewProps = {
+    imageSrc: previewImageSrc,
+    title: publishValues.title,
+    priceLine: publishValues.price.trim()
+      ? `${new Intl.NumberFormat(uiLocale, { maximumFractionDigits: 0 }).format(Number(publishValues.price))} ${publishValues.priceCurrency === "EUR" ? "€" : "MDL"}`
+      : "—",
+    tags: previewTags,
+    locationLine: publishValues.city.trim()
+      ? `${publishValues.city}${publishValues.district.trim() ? `, ${publishValues.district.trim()}` : ""}`
+      : tW("previewNoLocation"),
+    timeLabel: tW("previewJustNow"),
+    infoText: tW("previewInfo"),
+    previewLabel: tW("previewLabel"),
+    negotiableLabel: tW("negotiablePreview"),
+    negotiable: publishValues.negotiable,
+  };
+
+  const hasSpecsStep =
+    hasDynamicCategoryConfig || isVeh || isRe || isBrandish || detailFields.length > 0;
+
+  const standardFormClass =
+    "mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200 bg-white p-4 text-zinc-900 shadow-sm [color-scheme:light] md:space-y-8 md:p-8";
+  const premiumFormClass = "w-full max-w-none space-y-0 bg-transparent p-0 text-slate-900 shadow-none [color-scheme:light]";
+
   return (
     <form
       ref={formRef}
@@ -763,8 +978,474 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
         e.preventDefault();
         handleSubmit();
       }}
-      className="mx-auto w-full max-w-3xl space-y-6 rounded-2xl border border-zinc-200 bg-white p-4 text-zinc-900 shadow-sm [color-scheme:light] md:space-y-8 md:p-8"
+      className={isPremium ? premiumFormClass : standardFormClass}
     >
+      {isPremium ? (
+        <div className="rounded-2xl border border-slate-200/80 bg-[#f8fafc] p-4 sm:p-6 lg:p-8">
+          <PublishWizardGrid
+            sidebar={
+              <PublishWizardSidebar
+                steps={wizardStepsDef}
+                activeStep={activeWizardStep}
+                onStepClickAction={scrollToWizardStep}
+                benefitsTitle={tW("benefitsTitle")}
+                benefits={wizardBenefits}
+              />
+            }
+            preview={<PublishLivePreviewPanel {...livePreviewProps} />}
+            main={
+              <div className="flex flex-col gap-6">
+                <PublishMobileBenefits title={tW("benefitsTitle")} benefits={wizardBenefits} />
+                <PublishFormSectionCard
+                  dataStep={1}
+                  title={tW("cardMainTitle")}
+                  subtitle={tW("cardMainSubtitle")}
+                >
+                  <div
+                    id="field-categoryId"
+                    data-error={categoryFieldError ? "true" : undefined}
+                    className={`space-y-3 ${categoryFieldError ? "input-error" : ""}`}
+                  >
+                    <div>
+                      <h3 className="text-sm font-semibold text-slate-800">{t("formSectionCategory")}</h3>
+                    </div>
+                    <div
+                      className={`rounded-xl border border-slate-200 bg-slate-50/80 p-4 ${
+                        categoryFieldError ? "ring-2 ring-red-500/35" : ""
+                      }`}
+                    >
+                      <CategorySelector
+                        tree={categoryTree}
+                        value={categoryId}
+                        onCategoryIdAction={(id) => {
+                          const nextId = id.trim();
+                          const prevId = categoryId.trim();
+                          const nextSelected = nextId ? findCategoryNodeById(categoryTree, nextId) : null;
+                          devLog("Category selected:", nextSelected, "id:", nextId);
+                          setCategoryId(nextId);
+                          if (nextId !== prevId) {
+                            setPublishValues((p) => ({
+                              ...p,
+                              extra: {},
+                              brand: "",
+                              modelName: "",
+                              year: "",
+                              mileageKm: "",
+                              rooms: "",
+                              areaSqm: "",
+                            }));
+                          }
+                          setDismissServerCategoryError(true);
+                          const nextCategoryError =
+                            !nextId
+                              ? msg.errCategory
+                              : isLeafCategoryNode(categoryTree, nextId)
+                                ? undefined
+                                : tVal("errCategoryLeaf");
+                          if (nextCategoryError) {
+                            setClientErrors((prev) => ({ ...prev, categoryId: nextCategoryError }));
+                          } else {
+                            clearFieldError("categoryId");
+                          }
+                        }}
+                        error={categoryFieldError}
+                      />
+                    </div>
+                  </div>
+
+                  <div id="field-title" className="space-y-1.5">
+                    <div className="flex items-end justify-between gap-2">
+                      <label className={labelClass} htmlFor="title">
+                        {t("title")}
+                      </label>
+                      <span className="text-xs tabular-nums text-slate-400">
+                        {publishValues.title.length}/{PUBLISH_WIZARD_TITLE_MAX}
+                      </span>
+                    </div>
+                    <p className="text-xs font-medium text-[#16a34a]">{tW("titleHint")}</p>
+                    <input
+                      id="title"
+                      name="title"
+                      data-error={clientErrors.title ? "true" : undefined}
+                      maxLength={PUBLISH_WIZARD_TITLE_MAX}
+                      value={publishValues.title}
+                      onChange={(e) => {
+                        setPublishValues((p) => ({ ...p, title: e.target.value }));
+                      }}
+                      aria-invalid={Boolean(clientErrors.title)}
+                      className={`${premiumInputClass} ${compositeFieldOutline("title")}`}
+                    />
+                    <p className="text-xs text-slate-500">{tW("titleHelper")}</p>
+                    {clientErrors.title ? <p className="text-sm text-red-600">{clientErrors.title}</p> : null}
+                  </div>
+
+                  <div id="field-description" className="space-y-1.5">
+                    <div className="flex items-end justify-between gap-2">
+                      <label className={labelClass} htmlFor="description">
+                        {t("description")}
+                      </label>
+                      <span className="text-xs tabular-nums text-slate-400">
+                        {publishValues.description.length}/{PUBLISH_WIZARD_DESC_MAX}
+                      </span>
+                    </div>
+                    <textarea
+                      id="description"
+                      name="description"
+                      data-error={clientErrors.description ? "true" : undefined}
+                      rows={6}
+                      maxLength={PUBLISH_WIZARD_DESC_MAX}
+                      value={publishValues.description}
+                      onChange={(e) => {
+                        setPublishValues((p) => ({ ...p, description: e.target.value }));
+                      }}
+                      aria-invalid={Boolean(clientErrors.description)}
+                      className={`${premiumInputClass} ${compositeFieldOutline("description")}`}
+                    />
+                    <p className="text-xs text-slate-500">{tW("descriptionHelper")}</p>
+                    {clientErrors.description ? (
+                      <p className="text-sm text-red-600">{clientErrors.description}</p>
+                    ) : null}
+                  </div>
+
+                  <div className="space-y-3" id="field-price">
+                    <div className="grid gap-4 sm:grid-cols-2 sm:items-end">
+                      <div className="space-y-1.5">
+                        <label className={labelClass} htmlFor="price">
+                          {t("priceAmount")}
+                        </label>
+                        <input
+                          id="price"
+                          name="price"
+                          data-error={clientErrors.price ? "true" : undefined}
+                          type="number"
+                          inputMode="numeric"
+                          min={1}
+                          value={publishValues.price}
+                          onChange={(e) => {
+                            setPublishValues((p) => ({ ...p, price: e.target.value }));
+                          }}
+                          aria-invalid={Boolean(clientErrors.price)}
+                          className={`${premiumInputClass} ${compositeFieldOutline("price")}`}
+                        />
+                        {clientErrors.price ? <p className="text-sm text-red-600">{clientErrors.price}</p> : null}
+                        {showCompetitivePriceBadge ? (
+                          <span className="inline-flex w-fit items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-[#16a34a] ring-1 ring-[#16a34a]/25">
+                            {tW("priceCompetitive")}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className={labelClass} htmlFor="priceCurrency">
+                          {t("priceCurrencyLabel")}
+                        </label>
+                        <select
+                          id="priceCurrency"
+                          name="priceCurrency"
+                          value={publishValues.priceCurrency}
+                          onChange={(e) =>
+                            setPublishValues((p) => ({
+                              ...p,
+                              priceCurrency: e.target.value === "EUR" ? "EUR" : "MDL",
+                            }))
+                          }
+                          className={premiumInputClass}
+                        >
+                          <option value="MDL">{t("priceCurrencyMdl")}</option>
+                          <option value="EUR">{t("priceCurrencyEur")}</option>
+                        </select>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500">{tW("priceHelper")}</p>
+                    <label className={labelClassInline}>
+                      <input
+                        name="negotiable"
+                        type="checkbox"
+                        checked={publishValues.negotiable}
+                        onChange={(e) => setPublishValues((p) => ({ ...p, negotiable: e.target.checked }))}
+                        className="rounded border-slate-400 text-[#16a34a] focus:ring-[#16a34a]/30"
+                      />
+                      {t("negotiable")}
+                    </label>
+                  </div>
+
+                  {needsCoreCondition ? (
+                    <div id="field-condition" className="space-y-1.5">
+                      <label className={labelClass} htmlFor="condition">
+                        {t("condition")}
+                      </label>
+                      <select
+                        id="condition"
+                        name="condition"
+                        data-error={clientErrors.condition ? "true" : undefined}
+                        value={["new", "used"].includes(publishValues.condition) ? publishValues.condition : "used"}
+                        onChange={(e) => {
+                          setPublishValues((p) => ({ ...p, condition: e.target.value }));
+                          clearFieldError("condition");
+                        }}
+                        aria-invalid={Boolean(clientErrors.condition)}
+                        className={`${premiumInputClass} ${compositeFieldOutline("condition")}`}
+                      >
+                        <option value="new">{t("conditionNew")}</option>
+                        <option value="used">{t("conditionUsed")}</option>
+                      </select>
+                      {clientErrors.condition ? (
+                        <p className="text-sm text-red-600">{clientErrors.condition}</p>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </PublishFormSectionCard>
+
+                <PublishFormSectionCard
+                  dataStep={2}
+                  title={tW("cardSpecsTitle")}
+                  subtitle={tW("cardSpecsSubtitle")}
+                >
+                  {hasSpecsStep ? (
+                    <>
+                      {selectedCategoryDynamicConfig ? (
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          {selectedCategoryFields.map((field) => (
+                            <div key={field.id}>
+                              <label className={labelClass} htmlFor={`cfg-${field.id}`}>
+                                {getLocalizedFieldLabel(field.id, uiLocale)}
+                              </label>
+                              {renderDynamicField(field)}
+                            </div>
+                          ))}
+                        </div>
+                      ) : null}
+                      {!selectedCategoryDynamicConfig ? (
+                        <div className="grid gap-4 sm:grid-cols-2">
+                          {detailFields.map((field) => {
+                            const fname = getDetailFormName(field);
+                            const val = publishValues.extra[fname] ?? "";
+                            const searchOpts =
+                              field.selectValues?.map((v) => ({
+                                value: v,
+                                label: selectOptionLabel(field, v),
+                              })) ?? [];
+                            return (
+                              <div key={field.id}>
+                                <label className={labelClass} htmlFor={fname}>
+                                  {detailLabel(field)}
+                                </label>
+                                {field.input === "select" && field.selectValues && field.searchable ? (
+                                  <SearchableSelect
+                                    id={fname}
+                                    value={val}
+                                    onValueChangeAction={(v) => setExtra(fname, v)}
+                                    options={searchOpts}
+                                    placeholder={t("detailOptional")}
+                                    emptyLabel={t("detailOptional")}
+                                    searchPlaceholder={t("searchableSearch")}
+                                    noResultsLabel={t("searchableEmpty")}
+                                  />
+                                ) : null}
+                                {field.input === "select" && field.selectValues && !field.searchable ? (
+                                  <select
+                                    id={fname}
+                                    name={fname}
+                                    value={val}
+                                    onChange={(e) => setExtra(fname, e.target.value)}
+                                    className={premiumInputClass}
+                                  >
+                                    <option value="">{t("detailOptional")}</option>
+                                    {field.selectValues.map((v) => (
+                                      <option key={v} value={v}>
+                                        {selectOptionLabel(field, v)}
+                                      </option>
+                                    ))}
+                                  </select>
+                                ) : null}
+                                {field.input === "text" ? (
+                                  <input
+                                    id={fname}
+                                    name={fname}
+                                    maxLength={field.maxLength ?? 80}
+                                    value={val}
+                                    onChange={(e) => setExtra(fname, e.target.value)}
+                                    className={premiumInputClass}
+                                  />
+                                ) : null}
+                                {field.input === "number" ? (
+                                  <input
+                                    id={fname}
+                                    name={fname}
+                                    type="number"
+                                    inputMode="numeric"
+                                    min={field.min}
+                                    max={field.max}
+                                    value={val}
+                                    onChange={(e) => setExtra(fname, e.target.value)}
+                                    className={premiumInputClass}
+                                  />
+                                ) : null}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : null}
+                    </>
+                  ) : (
+                    <p className="text-sm text-slate-500">{tW("specsEmpty")}</p>
+                  )}
+                </PublishFormSectionCard>
+
+                <PublishFormSectionCard
+                  dataStep={3}
+                  title={tW("cardContactTitle")}
+                  subtitle={tW("cardContactSubtitle")}
+                >
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div id="field-city" data-error={clientErrors.city ? "true" : undefined} className="space-y-1.5">
+                      <label className={labelClass} htmlFor="city">
+                        {t("city")}
+                      </label>
+                      <SearchableSelect
+                        id="city"
+                        value={publishValues.city}
+                        onValueChangeAction={(v) => {
+                          setPublishValues((p) => ({ ...p, city: v }));
+                          clearFieldError("city");
+                        }}
+                        options={citySelectOptions}
+                        placeholder={t("citySelectPlaceholder")}
+                        searchPlaceholder={t("citySearchPlaceholder")}
+                        emptyLabel={t("cityEmptyOption")}
+                        noResultsLabel={t("cityNoResults")}
+                        invalid={Boolean(clientErrors.city)}
+                        aria-label={t("city")}
+                      />
+                      {clientErrors.city ? <p className="text-sm text-red-600">{clientErrors.city}</p> : null}
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className={labelClass} htmlFor="district">
+                        {t("district")}
+                      </label>
+                      <input
+                        id="district"
+                        name="district"
+                        maxLength={80}
+                        value={publishValues.district}
+                        onChange={(e) => setPublishValues((p) => ({ ...p, district: e.target.value }))}
+                        className={premiumInputClass}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className={labelClass} htmlFor="phone">
+                      {t("phone")}
+                    </label>
+                    <input
+                      id="phone"
+                      name="phone"
+                      maxLength={30}
+                      value={publishValues.phone}
+                      onChange={(e) => setPublishValues((p) => ({ ...p, phone: e.target.value }))}
+                      className={premiumInputClass}
+                    />
+                  </div>
+                </PublishFormSectionCard>
+
+                <PublishFormSectionCard dataStep={4} title={tW("cardMediaTitle")} subtitle={tW("cardMediaSubtitle")}>
+                  <div id="field-imagesRaw" className="space-y-1.5">
+                    <label className={labelClass} htmlFor="imagesRaw">
+                      {t("images")}
+                    </label>
+                    <p className="text-xs text-slate-500">{t("imagesHint")}</p>
+                    <textarea
+                      id="imagesRaw"
+                      name="imagesRaw"
+                      data-error={clientErrors.imagesRaw ? "true" : undefined}
+                      value={imagesRaw}
+                      onChange={(e) => {
+                        setImagesRaw(e.target.value);
+                      }}
+                      rows={4}
+                      aria-invalid={Boolean(clientErrors.imagesRaw)}
+                      className={`mt-1 w-full min-h-[52px] rounded-xl border border-slate-200 bg-white px-3 py-3 font-mono text-xs leading-normal text-slate-900 caret-slate-900 placeholder:text-slate-400 [color-scheme:light] focus:border-[#16a34a] focus:ring-2 focus:ring-[#16a34a]/20 md:min-h-[44px] md:py-2.5 ${compositeFieldOutline("imagesRaw")}`}
+                      placeholder="https://..."
+                    />
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <label className="cursor-pointer rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-800 hover:bg-slate-50">
+                        {t("upload")}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          multiple
+                          className="hidden"
+                          onChange={(e) => void onPickImages(e.target.files)}
+                        />
+                      </label>
+                      <span className="text-xs text-slate-500">
+                        {t("imageCount", { count: parseImageLines(imagesRaw).length, max: LISTING_MAX_IMAGES })}
+                      </span>
+                    </div>
+                    {uploadError ? <p className="text-sm text-red-600">{uploadError}</p> : null}
+                    {clientErrors.imagesRaw ? (
+                      <p className="text-sm text-red-600">{clientErrors.imagesRaw}</p>
+                    ) : null}
+                  </div>
+                </PublishFormSectionCard>
+
+                <PublishFormSectionCard
+                  dataStep={5}
+                  title={tW("cardPublishTitle")}
+                  subtitle={tW("cardPublishSubtitle")}
+                >
+                  {serverMsg ? <p className="text-sm font-medium text-red-600">{serverMsg}</p> : null}
+                  <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:justify-end">
+                    <button
+                      type="button"
+                      onClick={handleSaveDraftClick}
+                      className="order-2 inline-flex min-h-[48px] w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 sm:order-1 sm:w-auto"
+                    >
+                      {tW("saveDraft")}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isPending}
+                      onClick={handlePremiumPrimaryAction}
+                      className="order-1 inline-flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#16a34a] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-600 disabled:opacity-60 sm:order-2 sm:min-w-[200px]"
+                    >
+                      {isPending ? (
+                        <>
+                          <svg
+                            className="h-5 w-5 shrink-0 animate-spin text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            aria-hidden
+                          >
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+                          {t("submitting")}
+                        </>
+                      ) : activeWizardStep < 5 ? (
+                        tW("continue")
+                      ) : (
+                        t("submit")
+                      )}
+                    </button>
+                  </div>
+                </PublishFormSectionCard>
+
+                <div className="mt-2 md:hidden">
+                  <PublishLivePreviewPanel {...livePreviewProps} />
+                </div>
+              </div>
+            }
+          />
+        </div>
+      ) : null}
+
+      {!isPremium ? (
+        <>
       <section
         id="field-categoryId"
         data-error={categoryFieldError ? "true" : undefined}
@@ -1157,6 +1838,8 @@ export function ListingForm({ locale, userId, categoryTree, editListingId = null
           t("submit")
         )}
       </button>
+        </>
+      ) : null}
     </form>
   );
 }
