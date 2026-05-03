@@ -27,6 +27,7 @@
     "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
     "db:seed": "npx tsx prisma/seed.ts",
+    "db:seed:catalog": "npx tsx prisma/seed-catalog-only.ts",
     "seed:marketplace": "node seed.js",
     "listings:clear": "node scripts/clear-all-listings.js",
     "env:check": "node scripts/check-env.mjs",
