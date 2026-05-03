@@ -69,9 +69,11 @@ export function TesterChatClient({
   const [draft, setDraft] = useState("");
   const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [levelBySupabaseId, setLevelBySupabaseId] = useState<Record<string, TesterLevel>>(() => ({
-    [supabaseUserId]: myTesterLevel,
-  }));
+  const [levelBySupabaseId, setLevelBySupabaseId] = useState<Record<string, TesterLevel>>({});
+  const levelBySupabaseIdResolved = useMemo(
+    () => ({ ...levelBySupabaseId, [supabaseUserId]: myTesterLevel }),
+    [levelBySupabaseId, supabaseUserId, myTesterLevel],
+  );
   const [onlineByUserId, setOnlineByUserId] = useState<
     Record<
       string,
@@ -93,17 +95,10 @@ export function TesterChatClient({
   const canDeleteOthers = canTesterDeleteChatMessages(myTesterLevel, appRole);
 
   useEffect(() => {
-    setLevelBySupabaseId((prev) => ({ ...prev, [supabaseUserId]: myTesterLevel }));
-  }, [supabaseUserId, myTesterLevel]);
-
-  const levelRef = useRef(levelBySupabaseId);
-  levelRef.current = levelBySupabaseId;
-
-  useEffect(() => {
     const fromMessages = messages.map((m) => m.user_id);
     const fromOnline = Object.keys(onlineByUserId);
     const unique = [...new Set([...fromMessages, ...fromOnline, supabaseUserId])].filter(Boolean);
-    const missing = unique.filter((id) => levelRef.current[id] === undefined);
+    const missing = unique.filter((id) => levelBySupabaseIdResolved[id] === undefined);
     if (missing.length === 0) return;
 
     let cancelled = false;
@@ -134,7 +129,7 @@ export function TesterChatClient({
     return () => {
       cancelled = true;
     };
-  }, [messages, onlineByUserId, supabaseUserId]);
+  }, [messages, onlineByUserId, supabaseUserId, levelBySupabaseIdResolved]);
 
   const scrollToBottom = useCallback(() => {
     const el = listRef.current;
@@ -155,8 +150,10 @@ export function TesterChatClient({
 
   useEffect(() => {
     if (!hasSupabasePublicEnv()) {
-      setLoading(false);
-      setError(t("supabaseMissing"));
+      queueMicrotask(() => {
+        setLoading(false);
+        setError(t("supabaseMissing"));
+      });
       return;
     }
     let cancelled = false;
@@ -355,7 +352,7 @@ export function TesterChatClient({
       const r = onlineByUserId[userId]?.role?.toUpperCase();
       if (r === "ADMIN") return t("roleAdmin");
       if (r === "MODERATOR") return t("roleModerator");
-      const lvl = levelBySupabaseId[userId] ?? TesterProgramLevel.trial;
+      const lvl = levelBySupabaseIdResolved[userId] ?? TesterProgramLevel.trial;
       switch (lvl) {
         case TesterProgramLevel.tester:
           return t("badgeTester");
@@ -367,7 +364,7 @@ export function TesterChatClient({
           return t("badgeTrial");
       }
     },
-    [levelBySupabaseId, onlineByUserId, t],
+    [levelBySupabaseIdResolved, onlineByUserId, t],
   );
 
   const myMessageCount = useMemo(

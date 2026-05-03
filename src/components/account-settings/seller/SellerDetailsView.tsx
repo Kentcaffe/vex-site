@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useActionState, useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
@@ -120,8 +120,18 @@ export function SellerDetailsView({ locale, user, sellerContact: initialSeller, 
 
   const phoneVerified = Boolean(phoneValue.trim().length >= 8);
   const progressPct = Math.min(100, Math.round((completion.score / Math.max(completion.max, 1)) * 100));
+  const updatedAtMs = new Date(user.updatedAt).getTime();
+  const nowMs = useSyncExternalStore(
+    (onStoreChange) => {
+      const id = setInterval(onStoreChange, 60_000);
+      return () => clearInterval(id);
+    },
+    () => Date.now(),
+    () => 0,
+  );
+  const msPerDay = 1000 * 60 * 60 * 24;
   const daysSinceActive =
-    (Date.now() - new Date(user.updatedAt).getTime()) / (1000 * 60 * 60 * 24);
+    nowMs > 0 ? (nowMs - updatedAtMs) / msPerDay : Number.POSITIVE_INFINITY;
   const showActiveBadge = daysSinceActive <= 14;
 
   function setWindow(w: SellerContactWindow) {

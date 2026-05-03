@@ -4,7 +4,10 @@ import { auth } from "@/auth";
 import { ChatRoomView, type ChatBootstrap } from "@/components/chat/ChatRoomView";
 import { ChatServerError } from "@/components/chat/ChatServerError";
 import { CHAT_MESSAGE_MAX } from "@/lib/chat-actions";
+import { getChatInboxItemsForUser } from "@/lib/chat-inbox-server";
+import { getChatOtherProfileHref } from "@/lib/chat-other-profile-href";
 import { listRoomMessages } from "@/lib/chat-realtime-store";
+import { parseStoredListingImages } from "@/lib/listing-form-schema";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { localizedHref } from "@/lib/paths";
 import { publicDisplayName } from "@/lib/public-privacy";
@@ -24,6 +27,7 @@ export default async function ChatRoomPage({ params }: Props) {
   const userId = session.user.id;
   let bootstrap: ChatBootstrap | null = null;
   let roomIdForKey = "";
+  let inboxItems: Awaited<ReturnType<typeof getChatInboxItemsForUser>> = [];
 
   try {
     const me = await prisma.user.findUnique({ where: { id: userId }, select: { avatarUrl: true } });
@@ -45,6 +49,11 @@ export default async function ChatRoomPage({ params }: Props) {
             id: true,
             title: true,
             userId: true,
+            price: true,
+            priceCurrency: true,
+            city: true,
+            condition: true,
+            images: true,
             user: { select: { id: true, name: true, avatarUrl: true } },
           },
         },
@@ -57,7 +66,12 @@ export default async function ChatRoomPage({ params }: Props) {
       notFound();
     }
 
-    const messages = await listRoomMessages(room.id, 200);
+    const [messages, inbox, otherProfileHref] = await Promise.all([
+      listRoomMessages(room.id, 200),
+      getChatInboxItemsForUser(userId),
+      getChatOtherProfileHref(userId === room.buyerId ? room.listing.userId : room.buyer.id),
+    ]);
+    inboxItems = inbox;
     const messageRows = Array.isArray(messages) ? messages : [];
 
     const seller = room.listing.user;
@@ -65,10 +79,19 @@ export default async function ChatRoomPage({ params }: Props) {
     const otherName = isBuyer ? publicDisplayName(seller.name, "Seller") : publicDisplayName(room.buyer.name, "Buyer");
     const readByOther = room.readStates.find((s: { userId: string }) => s.userId !== userId);
     const myRead = room.readStates.find((s: { userId: string }) => s.userId === userId);
+    const cover = parseStoredListingImages(room.listing.images)[0] ?? null;
 
     bootstrap = {
       roomId: room.id,
-      listing: { id: room.listing.id, title: room.listing.title },
+      listing: {
+        id: room.listing.id,
+        title: room.listing.title,
+        imageUrl: resolvePublicMediaUrl(cover),
+        price: room.listing.price,
+        priceCurrency: room.listing.priceCurrency,
+        city: room.listing.city,
+        condition: room.listing.condition,
+      },
       seller: {
         id: seller.id,
         name: publicDisplayName(seller.name, "Seller"),
@@ -80,6 +103,8 @@ export default async function ChatRoomPage({ params }: Props) {
         avatarUrl: resolvePublicMediaUrl(room.buyer.avatarUrl ?? null),
       },
       meIsBuyer: isBuyer,
+      otherUserId: isBuyer ? seller.id : room.buyer.id,
+      otherProfileHref,
       otherUserName: otherName,
       otherUserAvatarUrl: resolvePublicMediaUrl(
         isBuyer ? seller.avatarUrl ?? null : room.buyer.avatarUrl ?? null,
@@ -105,8 +130,6 @@ export default async function ChatRoomPage({ params }: Props) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col px-3 pb-0 pt-2 sm:mx-auto sm:max-w-6xl sm:px-6 sm:py-6">
-      <ChatRoomView key={roomIdForKey} bootstrap={bootstrap} currentUserId={userId} />
-    </div>
+    <ChatRoomView key={roomIdForKey} bootstrap={bootstrap} currentUserId={userId} inboxItems={inboxItems} />
   );
 }

@@ -70,6 +70,7 @@ model User {
   testerLevel   TesterProgramLevel @default(trial) @map("tester_level")
   listings      Listing[]
   buyerChatRooms ChatRoom[]    @relation("BuyerRooms")
+  chatRoomFavorites ChatRoomFavorite[]
   chatMessages  ChatMessage[]
   chatReadStates ChatReadState[]
   listingReports ListingReport[] @relation("ReportAuthor")
@@ -320,8 +321,22 @@ model ChatRoom {
   sellerId  String?
   messages  ChatMessage[]
   readStates ChatReadState[]
+  favorites ChatRoomFavorite[]
 
   @@unique([listingId, buyerId])
+}
+
+/** Conversații marcate favorite (per utilizator, persistat în DB). */
+model ChatRoomFavorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roomId    String
+  room      ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, roomId])
+  @@index([userId])
 }
 
 model ChatMessage {

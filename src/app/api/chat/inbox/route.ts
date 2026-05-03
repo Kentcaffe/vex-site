@@ -32,6 +32,16 @@ export async function GET() {
       take: 50,
     });
 
+    const roomIds = rooms.map((r) => r.id);
+    const favRows =
+      roomIds.length === 0
+        ? []
+        : await prisma.chatRoomFavorite.findMany({
+            where: { userId, roomId: { in: roomIds } },
+            select: { roomId: true },
+          });
+    const favoriteRoomIds = new Set(favRows.map((f) => f.roomId));
+
     const out = await Promise.all(rooms.map(async (r) => {
       const last = await getLastRoomMessage(r.id);
       const seller = r.listing.user;
@@ -58,6 +68,7 @@ export async function GET() {
         lastMessageBody: last?.content ?? null,
         lastMessageAt: last?.createdAt.toISOString() ?? null,
         unread,
+        isFavorite: favoriteRoomIds.has(r.id),
       };
     }));
 

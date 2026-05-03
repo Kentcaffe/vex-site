@@ -28,9 +28,10 @@ function omitIsDeletedFromWhere(
   if (!where) {
     return undefined;
   }
-  const { isDeleted: _ignored, ...rest } = where as Prisma.ListingWhereInput & {
+  const { isDeleted, ...rest } = where as Prisma.ListingWhereInput & {
     isDeleted?: unknown;
   };
+  void isDeleted;
   return rest as Prisma.ListingWhereInput;
 }
 

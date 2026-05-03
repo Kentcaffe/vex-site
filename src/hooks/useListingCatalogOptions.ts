@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export type CatalogOptionRow = { id: string; name: string };
 
@@ -22,21 +22,27 @@ export function useListingCatalogOptions(categoryId: string | undefined, catalog
   useEffect(() => {
     const cid = categoryId?.trim();
     if (!cid) {
-      setBrands([]);
-      setBrandsResolvedForCategoryId(null);
-      setLoadingBrands(false);
+      queueMicrotask(() => {
+        setBrands([]);
+        setBrandsResolvedForCategoryId(null);
+        setLoadingBrands(false);
+      });
       return;
     }
     const hit = brandsCache.get(cid);
     if (hit) {
-      setBrands(hit);
-      setBrandsResolvedForCategoryId(cid);
-      setLoadingBrands(false);
+      queueMicrotask(() => {
+        setBrands(hit);
+        setBrandsResolvedForCategoryId(cid);
+        setLoadingBrands(false);
+      });
       return;
     }
     const ac = new AbortController();
-    setBrandsResolvedForCategoryId(null);
-    setLoadingBrands(true);
+    queueMicrotask(() => {
+      setBrandsResolvedForCategoryId(null);
+      setLoadingBrands(true);
+    });
     void fetch(`/api/catalog/brands?categoryId=${encodeURIComponent(cid)}`, { signal: ac.signal })
       .then((r) => r.json())
       .then((d: { brands?: CatalogOptionRow[] }) => {
@@ -61,21 +67,27 @@ export function useListingCatalogOptions(categoryId: string | undefined, catalog
   useEffect(() => {
     const bid = catalogBrandId?.trim();
     if (!bid) {
-      setModels([]);
-      setModelsResolvedForBrandId(null);
-      setLoadingModels(false);
+      queueMicrotask(() => {
+        setModels([]);
+        setModelsResolvedForBrandId(null);
+        setLoadingModels(false);
+      });
       return;
     }
     const hit = modelsCache.get(bid);
     if (hit) {
-      setModels(hit);
-      setModelsResolvedForBrandId(bid);
-      setLoadingModels(false);
+      queueMicrotask(() => {
+        setModels(hit);
+        setModelsResolvedForBrandId(bid);
+        setLoadingModels(false);
+      });
       return;
     }
     const ac = new AbortController();
-    setModelsResolvedForBrandId(null);
-    setLoadingModels(true);
+    queueMicrotask(() => {
+      setModelsResolvedForBrandId(null);
+      setLoadingModels(true);
+    });
     void fetch(`/api/catalog/models?brandId=${encodeURIComponent(bid)}`, { signal: ac.signal })
       .then((r) => r.json())
       .then((d: { models?: CatalogOptionRow[] }) => {

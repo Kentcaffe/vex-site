@@ -1,19 +1,7 @@
 "use client";
 
 import type { LucideIcon } from "lucide-react";
-import {
-  Car,
-  FileText,
-  ImageIcon,
-  MapPin,
-  Megaphone,
-  MessageCircle,
-  Phone,
-  Rocket,
-  ShieldCheck,
-  Sparkles,
-  TrendingUp,
-} from "lucide-react";
+import { ImageIcon, MapPin, TrendingUp } from "lucide-react";
 import type { ReactNode } from "react";
 
 const GREEN = "#16a34a";
