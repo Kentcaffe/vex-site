@@ -1203,6 +1203,10 @@ export function ListingForm({
                               rooms: "",
                               areaSqm: "",
                             }));
+                            if (!isEditMode) {
+                              setImagesRaw("");
+                              clearFieldError("imagesRaw");
+                            }
                           }
                           setDismissServerCategoryError(true);
                           const nextCategoryError =
@@ -1367,7 +1371,7 @@ export function ListingForm({
                 <PublishFormSectionCard
                   dataStep={2}
                   title={tW("cardSpecsTitle")}
-                  subtitle={tW("cardSpecsSubtitle")}
+                  subtitle={hasSpecsStep ? tW("cardSpecsSubtitle") : tW("cardSpecsSubtitleWhenEmpty")}
                 >
                   {hasSpecsStep ? (
                     <>
@@ -1650,6 +1654,10 @@ export function ListingForm({
                   rooms: "",
                   areaSqm: "",
                 }));
+                if (!isEditMode) {
+                  setImagesRaw("");
+                  clearFieldError("imagesRaw");
+                }
               }
               setDismissServerCategoryError(true);
               const nextCategoryError =
