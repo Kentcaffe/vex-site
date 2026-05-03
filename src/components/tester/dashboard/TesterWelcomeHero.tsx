@@ -17,7 +17,7 @@ export function TesterWelcomeHero({ title, subtitle, badge }: Props) {
       <div className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-emerald-400/20 blur-3xl" aria-hidden />
       <div className="relative">
         <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-white/95 backdrop-blur-sm">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400 shadow-[0_0_10px_#4ade80]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(74,222,128,0.65)]" />
           {badge}
         </span>
         <h1 className="mt-4 text-2xl font-bold tracking-tight text-white sm:text-3xl">{title}</h1>

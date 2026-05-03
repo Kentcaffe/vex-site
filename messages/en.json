@@ -828,7 +828,7 @@
     },
     "hero": {
       "title": "Welcome to the VEX testing program",
-      "subtitle": "Report bugs with clear steps, track status, and help the platform grow. Chat stays one click away — same simple experience as before.",
+      "subtitle": "Log defects with reproducible steps, track outcomes in your report list, and help improve product quality. The tester chat is available from the side menu.",
       "badge": "Active tester"
     },
     "form": {

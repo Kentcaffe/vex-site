@@ -144,7 +144,7 @@ export function TesterDashboardClient({
             <TesterBugsTable bugs={bugs} copy={tableCopy} />
           </div>
 
-          <div className="hidden xl:block">
+          <div className="col-span-full lg:col-span-2 xl:col-span-1 xl:col-start-3 xl:row-start-1">
             <TesterRightRail
               guideTitle={t("guide.title")}
               guideSteps={guideSteps}
@@ -164,27 +164,6 @@ export function TesterDashboardClient({
               leaderboard={leaderboard}
             />
           </div>
-        </div>
-
-        <div className="mt-8 xl:hidden">
-          <TesterRightRail
-            guideTitle={t("guide.title")}
-            guideSteps={guideSteps}
-            statsTitle={t("stats.title")}
-            statTotalLabel={t("stats.total")}
-            statOpenLabel={t("stats.open")}
-            statAcceptedLabel={t("stats.accepted")}
-            statRewardsLabel={t("stats.rewards")}
-            total={stats.total}
-            open={stats.open}
-            accepted={stats.accepted}
-            reward={stats.reward}
-            lbTitle={t("lb.title")}
-            lbEmpty={t("lb.empty")}
-            lbAccepted={t("lb.acceptedLabel")}
-            leaderboardFootnote={t("lb.footnote")}
-            leaderboard={leaderboard}
-          />
         </div>
       </div>
     </div>

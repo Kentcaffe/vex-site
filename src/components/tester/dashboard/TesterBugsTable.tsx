@@ -93,7 +93,7 @@ export function TesterBugsTable({ bugs, copy }: Props) {
   return (
     <div
       id="reports"
-      className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-5 shadow-xl shadow-black/40 backdrop-blur-xl sm:p-6"
+      className="scroll-mt-28 rounded-2xl border border-white/[0.08] bg-white/[0.04] p-5 shadow-xl shadow-black/40 backdrop-blur-xl sm:p-6"
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <h2 className="text-lg font-bold text-white">{copy.title}</h2>

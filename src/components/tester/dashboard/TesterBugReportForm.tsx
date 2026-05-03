@@ -163,7 +163,7 @@ export function TesterBugReportForm({ copy, formRef, onSuccessAction }: Props) {
   }
 
   return (
-    <div id="report">
+    <div id="report" className="scroll-mt-28">
       <GlassPanel>
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>

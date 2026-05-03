@@ -58,7 +58,7 @@ export function TesterRightRail({
 }: Props) {
   return (
     <div className="flex flex-col gap-5 lg:sticky lg:top-24">
-      <div id="rewards">
+      <div id="rewards" className="scroll-mt-28">
         <GlassCard>
         <div className="flex items-center gap-2 text-violet-200">
           <Sparkles className="h-4 w-4 shrink-0" aria-hidden />
@@ -104,7 +104,7 @@ export function TesterRightRail({
         </ol>
       </GlassCard>
 
-      <div id="leaderboard">
+      <div id="leaderboard" className="scroll-mt-28">
         <GlassCard>
         <div className="flex items-center gap-2 text-amber-200">
           <Trophy className="h-4 w-4 shrink-0" aria-hidden />

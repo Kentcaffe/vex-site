@@ -828,7 +828,7 @@
     },
     "hero": {
       "title": "Bine ai venit în programul de testare VEX",
-      "subtitle": "Raportează bug-uri cu pași clari, urmărește statusul și ajută platforma să devină mai stabilă. Chatul rămâne accesibil din meniu — același flux simplu ca înainte.",
+      "subtitle": "Documentează defectele cu pași de reproducere, urmărește deciziile în lista de rapoarte și contribuie la calitatea produsului. Chatul dedicat testerilor este în meniul lateral.",
       "badge": "Tester activ"
     },
     "form": {

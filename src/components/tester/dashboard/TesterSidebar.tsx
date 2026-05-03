@@ -46,8 +46,14 @@ export function TesterSidebar({ items, chatLabel, chatHref }: Props) {
   function renderItem(item: TesterSidebarItem) {
     const Icon = item.icon;
     const on = isActive(item);
+    const hashLink = item.href.includes("#");
     return (
-      <Link key={item.id} href={item.href} className={`${linkBase} ${on ? active : inactive}`}>
+      <Link
+        key={item.id}
+        href={item.href}
+        scroll={hashLink ? false : undefined}
+        className={`${linkBase} ${on ? active : inactive}`}
+      >
         <span
           className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition ${
             on ? "bg-emerald-500/20 text-emerald-200" : "bg-white/[0.06] text-slate-300 group-hover:bg-violet-500/20 group-hover:text-violet-200"
@@ -92,6 +98,7 @@ export function TesterSidebar({ items, chatLabel, chatHref }: Props) {
             <Link
               key={item.id}
               href={item.href}
+              scroll={item.href.includes("#") ? false : undefined}
               className={`inline-flex shrink-0 items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition ${
                 on ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-100" : "border-white/10 bg-white/[0.06] text-slate-300"
               }`}
