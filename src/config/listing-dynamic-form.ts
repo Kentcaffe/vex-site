@@ -1,12 +1,14 @@
 /**
- * Formulare dinamice pe categorie (config în cod, ușor de versionat în Git).
+ * Formulare dinamice pe categorie.
  *
- * - Schema câmpurilor: `getDetailFieldsForSlug` din `@/lib/listing-detail-config`
- * - Opțiuni comune (ani, etaje, culori…): `@/lib/listing-form-options`
- * - Auto: `@/lib/vehicle-taxonomy`, `@/lib/vehicle-models-by-brand`, `@/lib/vehicle-generations`
- * - Electronice: `@/lib/electronics-taxonomy`
+ * - **Câmpuri publicare (UI principal / cfg_)**: `src/config/listing-dynamic-fields.json` → `publish.*`,
+ *   materializate în `@/lib/listing-category-config` (`materializePublishFields`).
+ * - **Detalii extra (detailsJson / d_)**: același JSON → `extraDetail.templates` + `extraDetail.rules`,
+ *   materializate în `@/lib/listing-detail-config` (`getDetailFieldsForSlug`).
+ * - Opțiuni comune: `@/lib/listing-form-options`, marcă/model auto: `@/lib/vehicle-taxonomy` etc.
+ *
+ * Regenerare JSON (opțional): `node scripts/gen-listing-dynamic-fields.mjs`
  *
  * Datele se salvează în `Listing.detailsJson` (+ coloane `brand`, `modelName`, `year`, `mileageKm`, `rooms`, `areaSqm` unde e cazul).
- * Filtre listă: `src/app/[locale]/anunturi/page.tsx` + `AnunturiFilters` (query params aliniate cu aceleași chei).
  */
 export { getDetailFieldsForSlug, type DetailField, type SpecRow } from "@/lib/listing-detail-config";

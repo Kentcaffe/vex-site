@@ -1,0 +1,939 @@
+{
+  "version": 1,
+  "description": "publish.* = câmpuri UI principale (camelCase / cfg_) per ListingCategoryKey. extraDetail = detalii JSON (snake_case / d_) pentru categorii fără publish config.",
+  "publish": {
+    "auto": [
+      {
+        "name": "brand",
+        "type": "select"
+      },
+      {
+        "name": "modelName",
+        "type": "select"
+      },
+      {
+        "name": "year",
+        "type": "number",
+        "min": 1950,
+        "max": 2030
+      },
+      {
+        "name": "mileageKm",
+        "type": "number",
+        "min": 0,
+        "max": 9999999
+      },
+      {
+        "name": "fuel",
+        "type": "select",
+        "optionsRef": "FUEL_OPTIONS"
+      },
+      {
+        "name": "transmission",
+        "type": "select",
+        "optionsRef": "TRANSMISSION_OPTIONS"
+      },
+      {
+        "name": "bodyType",
+        "type": "select",
+        "optionsRef": "BODY_TYPES"
+      },
+      {
+        "name": "doors",
+        "type": "select",
+        "optionsRef": "DOORS_OPTIONS"
+      },
+      {
+        "name": "seats",
+        "type": "select",
+        "optionsRef": "SEATS_OPTIONS"
+      },
+      {
+        "name": "color",
+        "type": "select",
+        "optionsRef": "COLOR_OPTIONS"
+      },
+      {
+        "name": "powerHp",
+        "type": "number",
+        "min": 30,
+        "max": 2000
+      },
+      {
+        "name": "engineCc",
+        "type": "number",
+        "min": 600,
+        "max": 8000
+      },
+      {
+        "name": "registrationCountry",
+        "type": "select",
+        "optionsRef": "REGISTRATION_COUNTRIES"
+      },
+      {
+        "name": "serviceHistory",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      },
+      {
+        "name": "accidentFree",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      },
+      {
+        "name": "numberOfOwners",
+        "type": "number",
+        "min": 1,
+        "max": 20
+      },
+      {
+        "name": "emissionClass",
+        "type": "select",
+        "optionsRef": "EMISSION_CLASSES"
+      },
+      {
+        "name": "batteryCapacityKwh",
+        "type": "number",
+        "min": 5,
+        "max": 250,
+        "appliesTo": [
+          "transport-electrice"
+        ]
+      },
+      {
+        "name": "rangeKm",
+        "type": "number",
+        "min": 50,
+        "max": 1200,
+        "appliesTo": [
+          "transport-electrice"
+        ]
+      },
+      {
+        "name": "fastCharge",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN",
+        "appliesTo": [
+          "transport-electrice"
+        ]
+      },
+      {
+        "name": "payloadKg",
+        "type": "number",
+        "min": 100,
+        "max": 50000,
+        "appliesTo": [
+          "transport-(camioane|microbuze|autobuze|remorci-auto|rulote)"
+        ]
+      },
+      {
+        "name": "axlesCount",
+        "type": "number",
+        "min": 1,
+        "max": 10,
+        "appliesTo": [
+          "transport-(camioane|autobuze|remorci-auto|rulote)"
+        ]
+      },
+      {
+        "name": "cargoVolumeM3",
+        "type": "number",
+        "min": 1,
+        "max": 300,
+        "appliesTo": [
+          "transport-(camioane|microbuze|autobuze|remorci-auto|rulote)"
+        ]
+      }
+    ],
+    "moto": [
+      {
+        "name": "brand",
+        "type": "select"
+      },
+      {
+        "name": "modelName",
+        "type": "select"
+      },
+      {
+        "name": "year",
+        "type": "number",
+        "min": 1950,
+        "max": 2030
+      },
+      {
+        "name": "engineCc",
+        "type": "number",
+        "min": 50,
+        "max": 3000
+      },
+      {
+        "name": "mileageKm",
+        "type": "number",
+        "min": 0,
+        "max": 9999999
+      },
+      {
+        "name": "engineType",
+        "type": "select",
+        "optionsRef": "ENGINE_TYPES"
+      },
+      {
+        "name": "fuel",
+        "type": "select",
+        "optionsRef": "FUEL_OPTIONS"
+      },
+      {
+        "name": "transmission",
+        "type": "select",
+        "optionsRef": "TRANSMISSION_OPTIONS"
+      },
+      {
+        "name": "powerHp",
+        "type": "number",
+        "min": 5,
+        "max": 500
+      },
+      {
+        "name": "color",
+        "type": "select",
+        "optionsRef": "COLOR_OPTIONS"
+      },
+      {
+        "name": "serviceHistory",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      },
+      {
+        "name": "accidentFree",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      },
+      {
+        "name": "numberOfOwners",
+        "type": "number",
+        "min": 1,
+        "max": 20
+      },
+      {
+        "name": "emissionClass",
+        "type": "select",
+        "optionsRef": "EMISSION_CLASSES"
+      },
+      {
+        "name": "batteryCapacityKwh",
+        "type": "number",
+        "min": 1,
+        "max": 40
+      },
+      {
+        "name": "rangeKm",
+        "type": "number",
+        "min": 20,
+        "max": 500
+      },
+      {
+        "name": "cargoVolumeM3",
+        "type": "number",
+        "min": 0,
+        "max": 5
+      }
+    ],
+    "imobiliare": [
+      {
+        "name": "propertyType",
+        "type": "select",
+        "optionsRef": "PROPERTY_TYPES"
+      },
+      {
+        "name": "areaSqm",
+        "type": "number",
+        "min": 1,
+        "max": 999999999
+      },
+      {
+        "name": "rooms",
+        "type": "number",
+        "min": 1,
+        "max": 100,
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|case|camere)"
+        ]
+      },
+      {
+        "name": "floor",
+        "type": "select",
+        "optionsRef": "FLOOR_OPTIONS",
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|camere|birouri|spatii-comerciale|hoteluri)"
+        ]
+      },
+      {
+        "name": "furnished",
+        "type": "select",
+        "optionsRef": "YES_NO_PARTIAL",
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|case|camere|birouri|spatii-comerciale)"
+        ]
+      },
+      {
+        "name": "buildYear",
+        "type": "number",
+        "min": 1800,
+        "max": 2030
+      },
+      {
+        "name": "landAreaSqm",
+        "type": "number",
+        "min": 1,
+        "max": 999999999,
+        "appliesTo": [
+          "imobiliare-(teren|case|case-tara|hale-productie|depozite|hoteluri)"
+        ]
+      },
+      {
+        "name": "totalFloors",
+        "type": "number",
+        "min": 1,
+        "max": 200,
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|camere|case|birouri|spatii-comerciale|depozite|hoteluri|hale-productie)"
+        ]
+      },
+      {
+        "name": "balconies",
+        "type": "number",
+        "min": 0,
+        "max": 20,
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|case|camere)"
+        ]
+      },
+      {
+        "name": "bathrooms",
+        "type": "number",
+        "min": 1,
+        "max": 30,
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|case|camere|hoteluri)"
+        ]
+      },
+      {
+        "name": "heatingType",
+        "type": "select",
+        "optionsRef": "HEATING_OPTIONS"
+      },
+      {
+        "name": "parkingType",
+        "type": "select",
+        "optionsRef": "PARKING_OPTIONS"
+      },
+      {
+        "name": "energyClass",
+        "type": "select",
+        "optionsRef": "ENERGY_CLASS_OPTIONS"
+      },
+      {
+        "name": "livingAreaSqm",
+        "type": "number",
+        "min": 1,
+        "max": 999999999,
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|case|camere|case-tara)"
+        ]
+      },
+      {
+        "name": "kitchenAreaSqm",
+        "type": "number",
+        "min": 1,
+        "max": 999999999,
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|case|camere|case-tara)"
+        ]
+      },
+      {
+        "name": "renovationType",
+        "type": "select",
+        "optionsRef": "RENOVATION_TYPES",
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|case|camere|birouri|spatii-comerciale|depozite|hoteluri|hale-productie)"
+        ]
+      },
+      {
+        "name": "availableFrom",
+        "type": "select",
+        "optionsRef": "DATE_OPTIONS"
+      },
+      {
+        "name": "petsAllowed",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      },
+      {
+        "name": "elevator",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN",
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|camere|birouri|spatii-comerciale|hoteluri)"
+        ]
+      },
+      {
+        "name": "internet",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN",
+        "appliesTo": [
+          "imobiliare-(apartamente|garsoniere|case|camere|birouri|spatii-comerciale|hoteluri)"
+        ]
+      }
+    ],
+    "electronice": [
+      {
+        "name": "brand",
+        "type": "select"
+      },
+      {
+        "name": "modelName",
+        "type": "select"
+      },
+      {
+        "name": "condition",
+        "type": "select",
+        "optionsRef": "PRODUCT_CONDITION"
+      },
+      {
+        "name": "warranty",
+        "type": "select",
+        "optionsRef": "WARRANTY_OPTIONS"
+      },
+      {
+        "name": "productType",
+        "type": "select",
+        "optionsRef": "PRODUCT_TYPES"
+      },
+      {
+        "name": "storageGb",
+        "type": "select",
+        "optionsRef": "STORAGE_OPTIONS"
+      },
+      {
+        "name": "ramGb",
+        "type": "select",
+        "optionsRef": "RAM_OPTIONS"
+      },
+      {
+        "name": "screenInch",
+        "type": "select",
+        "optionsRef": "SCREEN_OPTIONS"
+      },
+      {
+        "name": "batteryHealth",
+        "type": "number",
+        "min": 1,
+        "max": 100
+      },
+      {
+        "name": "processorType",
+        "type": "select",
+        "optionsRef": "PROCESSOR_OPTIONS"
+      },
+      {
+        "name": "videoCard",
+        "type": "select",
+        "optionsRef": "VIDEO_CARD_OPTIONS"
+      },
+      {
+        "name": "color",
+        "type": "select",
+        "optionsRef": "COLOR_OPTIONS"
+      },
+      {
+        "name": "smartFeatures",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      },
+      {
+        "name": "refreshRateHz",
+        "type": "number",
+        "min": 30,
+        "max": 360
+      },
+      {
+        "name": "cameraMp",
+        "type": "number",
+        "min": 1,
+        "max": 300
+      },
+      {
+        "name": "simType",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      },
+      {
+        "name": "osType",
+        "type": "select",
+        "optionsRef": "OS_OPTIONS"
+      },
+      {
+        "name": "connectivity",
+        "type": "select",
+        "optionsRef": "CONNECTIVITY_OPTIONS"
+      },
+      {
+        "name": "originalBox",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      },
+      {
+        "name": "waterResistance",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      }
+    ],
+    "haine": [
+      {
+        "name": "sizeLabel",
+        "type": "select",
+        "optionsRef": "CLOTHES_SIZE"
+      },
+      {
+        "name": "brand",
+        "type": "select"
+      },
+      {
+        "name": "condition",
+        "type": "select",
+        "optionsRef": "PRODUCT_CONDITION"
+      },
+      {
+        "name": "material",
+        "type": "select",
+        "optionsRef": "MATERIAL_OPTIONS"
+      },
+      {
+        "name": "forGender",
+        "type": "select",
+        "optionsRef": "GENDER_OPTIONS"
+      },
+      {
+        "name": "season",
+        "type": "select",
+        "optionsRef": "SEASON_OPTIONS"
+      },
+      {
+        "name": "colorway",
+        "type": "select",
+        "optionsRef": "COLOR_OPTIONS"
+      },
+      {
+        "name": "warranty",
+        "type": "select",
+        "optionsRef": "WARRANTY_OPTIONS"
+      },
+      {
+        "name": "fitType",
+        "type": "select",
+        "optionsRef": "FIT_OPTIONS"
+      },
+      {
+        "name": "waistCm",
+        "type": "number",
+        "min": 30,
+        "max": 220
+      },
+      {
+        "name": "lengthCm",
+        "type": "number",
+        "min": 30,
+        "max": 250
+      },
+      {
+        "name": "shoeSizeEu",
+        "type": "number",
+        "min": 15,
+        "max": 55
+      }
+    ],
+    "joburi": [
+      {
+        "name": "salary",
+        "type": "number",
+        "min": 0,
+        "max": 999999999
+      },
+      {
+        "name": "jobType",
+        "type": "select",
+        "optionsRef": "JOB_TYPES"
+      },
+      {
+        "name": "experienceYears",
+        "type": "number",
+        "min": 0,
+        "max": 60
+      },
+      {
+        "name": "workSchedule",
+        "type": "select",
+        "optionsRef": "WORK_SCHEDULE_OPTIONS"
+      },
+      {
+        "name": "educationLevel",
+        "type": "select",
+        "optionsRef": "EDUCATION_LEVELS"
+      },
+      {
+        "name": "languageLevel",
+        "type": "select",
+        "optionsRef": "LANGUAGE_LEVELS"
+      },
+      {
+        "name": "contractDurationMonths",
+        "type": "number",
+        "min": 1,
+        "max": 120
+      },
+      {
+        "name": "remotePolicy",
+        "type": "select",
+        "optionsRef": "REMOTE_POLICY"
+      },
+      {
+        "name": "companyType",
+        "type": "select",
+        "optionsRef": "COMPANY_TYPES"
+      },
+      {
+        "name": "industry",
+        "type": "select",
+        "optionsRef": "INDUSTRY_OPTIONS"
+      },
+      {
+        "name": "positionsOpen",
+        "type": "number",
+        "min": 1,
+        "max": 999
+      },
+      {
+        "name": "benefits",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      },
+      {
+        "name": "driverLicenseRequired",
+        "type": "select",
+        "optionsRef": "YES_NO_UNKNOWN"
+      }
+    ]
+  },
+  "extraDetail": {
+    "templates": {
+      "vehicle_moto": [
+        {
+          "name": "fuel",
+          "type": "select",
+          "optionsRef": "VEHICLE_FUEL_KEYS",
+          "selectGroup": "fuel"
+        },
+        {
+          "name": "transmission",
+          "type": "select",
+          "optionsRef": "VEHICLE_TRANSMISSION_KEYS",
+          "selectGroup": "transmission"
+        },
+        {
+          "name": "color",
+          "type": "select",
+          "optionsRef": "VEHICLE_COLOR_KEYS",
+          "searchable": true
+        },
+        {
+          "name": "engine_cc",
+          "type": "number",
+          "min": 50,
+          "max": 3000
+        }
+      ],
+      "vehicle_car": [
+        {
+          "name": "generation",
+          "type": "select",
+          "dynamic": "vehicle_generations"
+        },
+        {
+          "name": "fuel",
+          "type": "select",
+          "optionsRef": "VEHICLE_FUEL_KEYS",
+          "selectGroup": "fuel"
+        },
+        {
+          "name": "engine_l",
+          "type": "select",
+          "optionsRef": "ENGINE_LITER_OPTIONS"
+        },
+        {
+          "name": "transmission",
+          "type": "select",
+          "optionsRef": "VEHICLE_TRANSMISSION_KEYS",
+          "selectGroup": "transmission"
+        },
+        {
+          "name": "body_type",
+          "type": "select",
+          "optionsRef": "VEHICLE_BODY_TYPE_KEYS",
+          "searchable": true
+        },
+        {
+          "name": "drivetrain",
+          "type": "select",
+          "optionsRef": "VEHICLE_DRIVETRAIN_KEYS"
+        },
+        {
+          "name": "doors",
+          "type": "select",
+          "optionsRef": "VEHICLE_DOOR_KEYS"
+        },
+        {
+          "name": "seats",
+          "type": "select",
+          "optionsRef": "VEHICLE_SEAT_OPTIONS"
+        },
+        {
+          "name": "color",
+          "type": "select",
+          "optionsRef": "VEHICLE_COLOR_KEYS",
+          "searchable": true
+        }
+      ],
+      "parts_accessory": [
+        {
+          "name": "part_number",
+          "type": "text",
+          "maxLength": 80
+        },
+        {
+          "name": "compatibility",
+          "type": "text",
+          "maxLength": 160
+        }
+      ],
+      "real_estate_land": [
+        {
+          "name": "property_type",
+          "type": "select",
+          "optionsInline": [
+            "land",
+            "forest",
+            "agricultural"
+          ]
+        },
+        {
+          "name": "land_area_sqm",
+          "type": "number",
+          "min": 1,
+          "max": 999999999
+        }
+      ],
+      "real_estate_building": [
+        {
+          "name": "property_type",
+          "type": "select",
+          "optionsRef": "RE_PROPERTY_TYPES"
+        },
+        {
+          "name": "floor",
+          "type": "select",
+          "optionsRef": "RE_FLOOR_OPTIONS"
+        },
+        {
+          "name": "total_floors",
+          "type": "select",
+          "optionsRef": "RE_TOTAL_FLOORS"
+        },
+        {
+          "name": "property_condition",
+          "type": "select",
+          "optionsRef": "RE_PROPERTY_CONDITION"
+        },
+        {
+          "name": "furnished",
+          "type": "select",
+          "optionsRef": "FURNISHED"
+        },
+        {
+          "name": "building_type",
+          "type": "select",
+          "optionsRef": "BUILDING",
+          "appliesToSlug": "(apartament|garsonier|case-)|^apartamente$|^case$"
+        }
+      ],
+      "electronics_phone": [
+        {
+          "name": "product_type",
+          "type": "select",
+          "optionsRef": "ELECTRONICS_PRODUCT_PHONE"
+        },
+        {
+          "name": "electronics_condition",
+          "type": "select",
+          "optionsRef": "ELECTRONICS_CONDITION"
+        },
+        {
+          "name": "storage_gb",
+          "type": "select",
+          "optionsRef": "STORAGE_GB_PHONE",
+          "searchable": true
+        },
+        {
+          "name": "ram_gb",
+          "type": "select",
+          "optionsRef": "RAM_GB_PHONE",
+          "searchable": true
+        },
+        {
+          "name": "color",
+          "type": "select",
+          "optionsRef": "VEHICLE_COLOR_KEYS",
+          "searchable": true
+        }
+      ],
+      "electronics_pc": [
+        {
+          "name": "product_type",
+          "type": "select",
+          "optionsRef": "ELECTRONICS_PRODUCT_PC"
+        },
+        {
+          "name": "electronics_condition",
+          "type": "select",
+          "optionsRef": "ELECTRONICS_CONDITION"
+        },
+        {
+          "name": "storage_gb",
+          "type": "select",
+          "optionsRef": "STORAGE_GB_LAPTOP",
+          "searchable": true
+        },
+        {
+          "name": "ram_gb",
+          "type": "select",
+          "optionsRef": "RAM_GB_LAPTOP",
+          "searchable": true
+        },
+        {
+          "name": "screen_inch",
+          "type": "select",
+          "optionsRef": "SCREEN_INCH_BUCKETS"
+        },
+        {
+          "name": "color",
+          "type": "select",
+          "optionsRef": "VEHICLE_COLOR_KEYS",
+          "searchable": true
+        }
+      ],
+      "service_default": [
+        {
+          "name": "experience_years",
+          "type": "number",
+          "min": 0,
+          "max": 60
+        },
+        {
+          "name": "service_radius_km",
+          "type": "number",
+          "min": 1,
+          "max": 500
+        }
+      ],
+      "job_default": [
+        {
+          "name": "employment_type",
+          "type": "select",
+          "optionsRef": "EMPLOYMENT"
+        },
+        {
+          "name": "salary_from",
+          "type": "number",
+          "min": 0,
+          "max": 999999999
+        },
+        {
+          "name": "salary_to",
+          "type": "number",
+          "min": 0,
+          "max": 999999999
+        }
+      ],
+      "fashion_default": [
+        {
+          "name": "size_label",
+          "type": "text",
+          "maxLength": 24
+        },
+        {
+          "name": "color",
+          "type": "text",
+          "maxLength": 40
+        }
+      ],
+      "animal_default": [
+        {
+          "name": "age_months",
+          "type": "number",
+          "min": 0,
+          "max": 360
+        },
+        {
+          "name": "vaccinated",
+          "type": "select",
+          "optionsRef": "VACC"
+        }
+      ]
+    },
+    "rules": [
+      {
+        "template": "vehicle_moto",
+        "predicate": "moto_vehicle"
+      },
+      {
+        "template": "vehicle_car",
+        "predicate": "vehicle_car"
+      },
+      {
+        "template": "parts_accessory",
+        "predicate": "transport_parts"
+      },
+      {
+        "template": "real_estate_land",
+        "predicate": "real_estate_land"
+      },
+      {
+        "template": "real_estate_building",
+        "predicate": "real_estate_building"
+      },
+      {
+        "template": "electronics_phone",
+        "predicate": "electronics_phone"
+      },
+      {
+        "template": "electronics_pc",
+        "predicate": "electronics_pc"
+      },
+      {
+        "template": "service_default",
+        "predicate": "service_leaf"
+      },
+      {
+        "template": "job_default",
+        "predicate": "job"
+      },
+      {
+        "template": "fashion_default",
+        "predicate": "fashion"
+      },
+      {
+        "template": "animal_default",
+        "predicate": "animal"
+      }
+    ]
+  }
+}

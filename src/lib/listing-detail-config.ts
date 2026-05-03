@@ -34,6 +34,7 @@ import {
   isVehicleWithOdometer,
 } from "@/lib/listing-profiles";
 import { getGenerationOptions } from "@/lib/vehicle-generations";
+import listingDynamicFields from "@/config/listing-dynamic-fields.json";
 
 const KNOWN_DETAIL_KEYS: Record<string, string> = {
   fuel: "specExtra.fuel",
@@ -114,109 +115,121 @@ const BUILDING = ["block", "house", "new_build", "other"] as const;
 const EMPLOYMENT = ["full_time", "part_time", "contract", "remote", "internship"] as const;
 const VACC = ["yes", "no", "unknown"] as const;
 
-function vehicleDetailsForSlug(slug: string, ctx?: { brand?: string; model?: string }): DetailField[] {
-  const moto = isMotoLikeSlug(slug);
-  if (moto) {
-    return [
-      { id: "fuel", input: "select", selectGroup: "fuel", selectValues: [...VEHICLE_FUEL_KEYS] },
-      { id: "transmission", input: "select", selectGroup: "transmission", selectValues: [...VEHICLE_TRANSMISSION_KEYS] },
-      { id: "color", input: "select", selectValues: [...VEHICLE_COLOR_KEYS], searchable: true },
-      { id: "engine_cc", input: "number", min: 50, max: 3000 },
-    ];
+const DETAIL_OPTION_REGISTRY: Record<string, readonly string[]> = {
+  VEHICLE_FUEL_KEYS: [...VEHICLE_FUEL_KEYS],
+  VEHICLE_TRANSMISSION_KEYS: [...VEHICLE_TRANSMISSION_KEYS],
+  VEHICLE_COLOR_KEYS: [...VEHICLE_COLOR_KEYS],
+  ENGINE_LITER_OPTIONS: [...ENGINE_LITER_OPTIONS],
+  VEHICLE_BODY_TYPE_KEYS: [...VEHICLE_BODY_TYPE_KEYS],
+  VEHICLE_DRIVETRAIN_KEYS: [...VEHICLE_DRIVETRAIN_KEYS],
+  VEHICLE_DOOR_KEYS: [...VEHICLE_DOOR_KEYS],
+  VEHICLE_SEAT_OPTIONS: [...VEHICLE_SEAT_OPTIONS],
+  RE_PROPERTY_TYPES: [...RE_PROPERTY_TYPES],
+  RE_FLOOR_OPTIONS: [...RE_FLOOR_OPTIONS],
+  RE_TOTAL_FLOORS: [...RE_TOTAL_FLOORS],
+  RE_PROPERTY_CONDITION: [...RE_PROPERTY_CONDITION],
+  FURNISHED: [...FURNISHED],
+  BUILDING: [...BUILDING],
+  ELECTRONICS_PRODUCT_PHONE: [...ELECTRONICS_PRODUCT_PHONE],
+  ELECTRONICS_PRODUCT_PC: [...ELECTRONICS_PRODUCT_PC],
+  ELECTRONICS_CONDITION: [...ELECTRONICS_CONDITION],
+  STORAGE_GB_PHONE: [...STORAGE_GB_PHONE],
+  STORAGE_GB_LAPTOP: [...STORAGE_GB_LAPTOP],
+  RAM_GB_PHONE: [...RAM_GB_PHONE],
+  RAM_GB_LAPTOP: [...RAM_GB_LAPTOP],
+  SCREEN_INCH_BUCKETS: [...SCREEN_INCH_BUCKETS],
+  EMPLOYMENT: [...EMPLOYMENT],
+  VACC: [...VACC],
+};
+
+type JsonExtraDetailRow = {
+  name: string;
+  type: "select" | "number" | "text";
+  optionsRef?: string;
+  optionsInline?: string[];
+  dynamic?: string;
+  selectGroup?: string;
+  searchable?: boolean;
+  min?: number;
+  max?: number;
+  maxLength?: number;
+  appliesToSlug?: string;
+};
+
+const EXTRA_DETAIL_PREDICATES: Record<string, (slug: string) => boolean> = {
+  moto_vehicle: (s) => isVehicleWithOdometer(s) && isMotoLikeSlug(s),
+  vehicle_car: (s) => isVehicleWithOdometer(s) && !isMotoLikeSlug(s),
+  transport_parts: (s) => /^transport-(piese|accesorii|scule)-/.test(s),
+  real_estate_land: (s) => isRealEstateSlug(s) && /teren|padure|agricol/.test(s),
+  real_estate_building: (s) => isRealEstateSlug(s) && !/teren|padure|agricol/.test(s),
+  electronics_phone: (s) => isPhoneTabletSlug(s),
+  electronics_pc: (s) => isLaptopPcSlug(s),
+  service_leaf: (s) => isServiceJobLeafSlug(s),
+  job: (s) => isJobSlug(s),
+  fashion: (s) => isFashionSlug(s),
+  animal: (s) => isAnimalSlug(s),
+};
+
+function resolveExtraDetailTemplateKey(slug: string): string | null {
+  const rules = (
+    listingDynamicFields as {
+      extraDetail: { rules: { template: string; predicate: string }[] };
+    }
+  ).extraDetail.rules;
+  for (const r of rules) {
+    const fn = EXTRA_DETAIL_PREDICATES[r.predicate];
+    if (fn?.(slug)) {
+      return r.template;
+    }
   }
-  const brand = ctx?.brand ?? "";
-  const model = ctx?.model ?? "";
-  const gens = getGenerationOptions(brand, model).filter((g) => g !== "n_a");
-  const genValues = gens.length ? gens : ["n_a"];
-  return [
-    { id: "generation", input: "select", selectValues: genValues },
-    { id: "fuel", input: "select", selectGroup: "fuel", selectValues: [...VEHICLE_FUEL_KEYS] },
-    { id: "engine_l", input: "select", selectValues: [...ENGINE_LITER_OPTIONS] },
-    { id: "transmission", input: "select", selectGroup: "transmission", selectValues: [...VEHICLE_TRANSMISSION_KEYS] },
-    { id: "body_type", input: "select", selectValues: [...VEHICLE_BODY_TYPE_KEYS], searchable: true },
-    { id: "drivetrain", input: "select", selectValues: [...VEHICLE_DRIVETRAIN_KEYS] },
-    { id: "doors", input: "select", selectValues: [...VEHICLE_DOOR_KEYS] },
-    { id: "seats", input: "select", selectValues: [...VEHICLE_SEAT_OPTIONS] },
-    { id: "color", input: "select", selectValues: [...VEHICLE_COLOR_KEYS], searchable: true },
-  ];
+  return null;
 }
 
-function partsAccessoryDetails(): DetailField[] {
-  return [
-    { id: "part_number", input: "text", maxLength: 80 },
-    { id: "compatibility", input: "text", maxLength: 160 },
-  ];
-}
-
-function realEstateDetails(slug: string): DetailField[] {
-  if (/teren|padure|agricol/.test(slug)) {
-    return [
-      { id: "property_type", input: "select", selectValues: ["land", "forest", "agricultural"] },
-      { id: "land_area_sqm", input: "number", min: 1, max: 999_999_999 },
-    ];
+function materializeExtraDetailFields(
+  templateKey: string,
+  slug: string,
+  ctx?: { brand?: string; model?: string },
+): DetailField[] {
+  const rows = (
+    listingDynamicFields as {
+      extraDetail: { templates: Record<string, JsonExtraDetailRow[]> };
+    }
+  ).extraDetail.templates[templateKey];
+  if (!rows?.length) {
+    return [];
   }
-  const out: DetailField[] = [
-    { id: "property_type", input: "select", selectValues: [...RE_PROPERTY_TYPES] },
-    { id: "floor", input: "select", selectValues: [...RE_FLOOR_OPTIONS] },
-    { id: "total_floors", input: "select", selectValues: [...RE_TOTAL_FLOORS] },
-    { id: "property_condition", input: "select", selectValues: [...RE_PROPERTY_CONDITION] },
-    { id: "furnished", input: "select", selectValues: [...FURNISHED] },
-  ];
-  if (/apartament|garsonier|case-/.test(slug) || slug === "apartamente" || slug === "case") {
-    out.push({ id: "building_type", input: "select", selectValues: [...BUILDING] });
+  const out: DetailField[] = [];
+  for (const row of rows) {
+    if (row.appliesToSlug && !new RegExp(row.appliesToSlug).test(slug)) {
+      continue;
+    }
+    let selectValues: string[] | undefined;
+    if (row.dynamic === "vehicle_generations") {
+      const brand = ctx?.brand ?? "";
+      const model = ctx?.model ?? "";
+      const gens = getGenerationOptions(brand, model).filter((g) => g !== "n_a");
+      selectValues = [...(gens.length ? gens : ["n_a"])];
+    } else if (row.optionsRef) {
+      const src = DETAIL_OPTION_REGISTRY[row.optionsRef];
+      if (src) {
+        selectValues = [...src];
+      }
+    } else if (row.optionsInline?.length) {
+      selectValues = [...row.optionsInline];
+    }
+    const input: DetailField["input"] = row.type === "text" ? "text" : row.type === "number" ? "number" : "select";
+    out.push({
+      id: row.name,
+      input,
+      ...(selectValues ? { selectValues } : {}),
+      ...(row.selectGroup ? { selectGroup: row.selectGroup } : {}),
+      ...(row.searchable ? { searchable: true } : {}),
+      ...(typeof row.min === "number" ? { min: row.min } : {}),
+      ...(typeof row.max === "number" ? { max: row.max } : {}),
+      ...(typeof row.maxLength === "number" ? { maxLength: row.maxLength } : {}),
+    });
   }
   return out;
-}
-
-function electronicsDetails(slug: string): DetailField[] {
-  const phone = isPhoneTabletSlug(slug);
-  const products = phone ? [...ELECTRONICS_PRODUCT_PHONE] : [...ELECTRONICS_PRODUCT_PC];
-  const storageOpts = phone ? [...STORAGE_GB_PHONE] : [...STORAGE_GB_LAPTOP];
-  const ramOpts = phone ? [...RAM_GB_PHONE] : [...RAM_GB_LAPTOP];
-  const base: DetailField[] = [
-    { id: "product_type", input: "select", selectValues: products },
-    { id: "electronics_condition", input: "select", selectValues: [...ELECTRONICS_CONDITION] },
-    { id: "storage_gb", input: "select", selectValues: storageOpts, searchable: true },
-  ];
-  if (!phone) {
-    base.push(
-      { id: "ram_gb", input: "select", selectValues: ramOpts, searchable: true },
-      { id: "screen_inch", input: "select", selectValues: [...SCREEN_INCH_BUCKETS] },
-    );
-  } else {
-    base.push({ id: "ram_gb", input: "select", selectValues: ramOpts, searchable: true });
-  }
-  base.push({ id: "color", input: "select", selectValues: [...VEHICLE_COLOR_KEYS], searchable: true });
-  return base;
-}
-
-function serviceDetails(): DetailField[] {
-  return [
-    { id: "experience_years", input: "number", min: 0, max: 60 },
-    { id: "service_radius_km", input: "number", min: 1, max: 500 },
-  ];
-}
-
-function jobDetails(): DetailField[] {
-  return [
-    { id: "employment_type", input: "select", selectValues: [...EMPLOYMENT] },
-    { id: "salary_from", input: "number", min: 0, max: 999_999_999 },
-    { id: "salary_to", input: "number", min: 0, max: 999_999_999 },
-  ];
-}
-
-function fashionDetails(): DetailField[] {
-  return [
-    { id: "size_label", input: "text", maxLength: 24 },
-    { id: "color", input: "text", maxLength: 40 },
-  ];
-}
-
-function animalDetails(): DetailField[] {
-  return [
-    { id: "age_months", input: "number", min: 0, max: 360 },
-    { id: "vaccinated", input: "select", selectValues: [...VACC] },
-  ];
 }
 
 export function getListingFormFlags(slug: string): {
@@ -232,31 +245,11 @@ export function getListingFormFlags(slug: string): {
 }
 
 export function getDetailFieldsForSlug(slug: string, ctx?: { brand?: string; model?: string }): DetailField[] {
-  if (isVehicleWithOdometer(slug)) {
-    return vehicleDetailsForSlug(slug, ctx);
+  const templateKey = resolveExtraDetailTemplateKey(slug);
+  if (!templateKey) {
+    return [];
   }
-  if (/^transport-(piese|accesorii|scule)-/.test(slug)) {
-    return partsAccessoryDetails();
-  }
-  if (isRealEstateSlug(slug)) {
-    return realEstateDetails(slug);
-  }
-  if (isPhoneTabletSlug(slug) || isLaptopPcSlug(slug)) {
-    return electronicsDetails(slug);
-  }
-  if (isServiceJobLeafSlug(slug)) {
-    return serviceDetails();
-  }
-  if (isJobSlug(slug)) {
-    return jobDetails();
-  }
-  if (isFashionSlug(slug)) {
-    return fashionDetails();
-  }
-  if (isAnimalSlug(slug)) {
-    return animalDetails();
-  }
-  return [];
+  return materializeExtraDetailFields(templateKey, slug, ctx);
 }
 
 export function parseDetailsJsonFromForm(

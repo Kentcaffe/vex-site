@@ -8,6 +8,7 @@ import {
 } from "@/lib/listing-profiles";
 import { getModelsForBrand } from "@/lib/vehicle-models-by-brand";
 import { VEHICLE_BRANDS } from "@/lib/vehicle-taxonomy";
+import listingDynamicFields from "@/config/listing-dynamic-fields.json";
 
 export type ListingCategoryKey = "auto" | "moto" | "imobiliare" | "electronice" | "haine" | "joburi";
 
@@ -186,57 +187,99 @@ const INDUSTRY_OPTIONS = [
   "other",
 ] as const;
 
+type JsonPublishRow = {
+  name: string;
+  type: "select" | "number";
+  optionsRef?: string;
+  min?: number;
+  max?: number;
+  appliesTo?: string[];
+};
+
+function humanizeFieldId(fieldId: string): string {
+  return fieldId
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (m) => m.toUpperCase());
+}
+
+const PUBLISH_OPTION_REGISTRY: Record<string, readonly string[]> = {
+  FUEL_OPTIONS,
+  TRANSMISSION_OPTIONS,
+  BODY_TYPES,
+  DOORS_OPTIONS,
+  SEATS_OPTIONS,
+  COLOR_OPTIONS,
+  REGISTRATION_COUNTRIES,
+  YES_NO_UNKNOWN,
+  EMISSION_CLASSES,
+  ENGINE_TYPES,
+  PROPERTY_TYPES,
+  FLOOR_OPTIONS,
+  YES_NO_PARTIAL,
+  HEATING_OPTIONS,
+  PARKING_OPTIONS,
+  ENERGY_CLASS_OPTIONS,
+  RENOVATION_TYPES,
+  DATE_OPTIONS,
+  PRODUCT_CONDITION,
+  WARRANTY_OPTIONS,
+  PRODUCT_TYPES,
+  STORAGE_OPTIONS,
+  RAM_OPTIONS,
+  SCREEN_OPTIONS,
+  PROCESSOR_OPTIONS,
+  VIDEO_CARD_OPTIONS,
+  CLOTHES_SIZE,
+  MATERIAL_OPTIONS,
+  GENDER_OPTIONS,
+  SEASON_OPTIONS,
+  FIT_OPTIONS,
+  JOB_TYPES,
+  WORK_SCHEDULE_OPTIONS,
+  EDUCATION_LEVELS,
+  LANGUAGE_LEVELS,
+  REMOTE_POLICY,
+  COMPANY_TYPES,
+  INDUSTRY_OPTIONS,
+  OS_OPTIONS,
+  CONNECTIVITY_OPTIONS,
+};
+
+function materializePublishFields(key: ListingCategoryKey): ListingFieldConfig[] {
+  const rows = (listingDynamicFields as { publish: Record<string, JsonPublishRow[]> }).publish[key];
+  if (!rows?.length) {
+    return [];
+  }
+  return rows.map((row) => {
+    const opts = row.optionsRef ? PUBLISH_OPTION_REGISTRY[row.optionsRef] : undefined;
+    const appliesTo = row.appliesTo?.map((s) => new RegExp(s));
+    const base: ListingFieldConfig = {
+      id: row.name as ListingFieldId,
+      label: humanizeFieldId(row.name),
+      input: row.type,
+    };
+    if (opts) {
+      return { ...base, options: [...opts], ...(typeof row.min === "number" ? { min: row.min } : {}), ...(typeof row.max === "number" ? { max: row.max } : {}), ...(appliesTo?.length ? { appliesTo } : {}) };
+    }
+    return {
+      ...base,
+      ...(typeof row.min === "number" ? { min: row.min } : {}),
+      ...(typeof row.max === "number" ? { max: row.max } : {}),
+      ...(appliesTo?.length ? { appliesTo } : {}),
+    };
+  });
+}
+
 export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
   auto: {
-    fields: [
-      { id: "brand", label: "Brand", input: "select" },
-      { id: "modelName", label: "Model", input: "select" },
-      { id: "year", label: "Year", input: "number", min: 1950, max: 2030 },
-      { id: "mileageKm", label: "Mileage (km)", input: "number", min: 0, max: 9_999_999 },
-      { id: "fuel", label: "Fuel type", input: "select", options: FUEL_OPTIONS },
-      { id: "transmission", label: "Transmission", input: "select", options: TRANSMISSION_OPTIONS },
-      { id: "bodyType", label: "Body type", input: "select", options: BODY_TYPES },
-      { id: "doors", label: "Doors", input: "select", options: DOORS_OPTIONS },
-      { id: "seats", label: "Seats", input: "select", options: SEATS_OPTIONS },
-      { id: "color", label: "Color", input: "select", options: COLOR_OPTIONS },
-      { id: "powerHp", label: "Power (HP)", input: "number", min: 30, max: 2000 },
-      { id: "engineCc", label: "Engine capacity (cc)", input: "number", min: 600, max: 8000 },
-      { id: "registrationCountry", label: "Registration country", input: "select", options: REGISTRATION_COUNTRIES },
-      { id: "serviceHistory", label: "Service history", input: "select", options: YES_NO_UNKNOWN },
-      { id: "accidentFree", label: "Accident free", input: "select", options: YES_NO_UNKNOWN },
-      { id: "numberOfOwners", label: "Number of owners", input: "number", min: 1, max: 20 },
-      { id: "emissionClass", label: "Emission class", input: "select", options: EMISSION_CLASSES },
-      { id: "batteryCapacityKwh", label: "Battery capacity (kWh)", input: "number", min: 5, max: 250, appliesTo: [/transport-electrice/] },
-      { id: "rangeKm", label: "Range (km)", input: "number", min: 50, max: 1200, appliesTo: [/transport-electrice/] },
-      { id: "fastCharge", label: "Fast charging", input: "select", options: YES_NO_UNKNOWN, appliesTo: [/transport-electrice/] },
-      { id: "payloadKg", label: "Payload (kg)", input: "number", min: 100, max: 50_000, appliesTo: [/transport-(camioane|microbuze|autobuze|remorci-auto|rulote)/] },
-      { id: "axlesCount", label: "Axles", input: "number", min: 1, max: 10, appliesTo: [/transport-(camioane|autobuze|remorci-auto|rulote)/] },
-      { id: "cargoVolumeM3", label: "Cargo volume (m3)", input: "number", min: 1, max: 300, appliesTo: [/transport-(camioane|microbuze|autobuze|remorci-auto|rulote)/] },
-    ],
+    fields: materializePublishFields("auto"),
     subcategories: {
       auto: ["autovehicule", "camioane", "electrice"],
     },
   },
   moto: {
-    fields: [
-      { id: "brand", label: "Brand", input: "select" },
-      { id: "modelName", label: "Model", input: "select" },
-      { id: "year", label: "Year", input: "number", min: 1950, max: 2030 },
-      { id: "engineCc", label: "Engine capacity (cc)", input: "number", min: 50, max: 3000 },
-      { id: "mileageKm", label: "Mileage (km)", input: "number", min: 0, max: 9_999_999 },
-      { id: "engineType", label: "Engine type", input: "select", options: ENGINE_TYPES },
-      { id: "fuel", label: "Fuel type", input: "select", options: FUEL_OPTIONS },
-      { id: "transmission", label: "Transmission", input: "select", options: TRANSMISSION_OPTIONS },
-      { id: "powerHp", label: "Power (HP)", input: "number", min: 5, max: 500 },
-      { id: "color", label: "Color", input: "select", options: COLOR_OPTIONS },
-      { id: "serviceHistory", label: "Service history", input: "select", options: YES_NO_UNKNOWN },
-      { id: "accidentFree", label: "Accident free", input: "select", options: YES_NO_UNKNOWN },
-      { id: "numberOfOwners", label: "Number of owners", input: "number", min: 1, max: 20 },
-      { id: "emissionClass", label: "Emission class", input: "select", options: EMISSION_CLASSES },
-      { id: "batteryCapacityKwh", label: "Battery capacity (kWh)", input: "number", min: 1, max: 40 },
-      { id: "rangeKm", label: "Range (km)", input: "number", min: 20, max: 500 },
-      { id: "cargoVolumeM3", label: "Cargo volume (m3)", input: "number", min: 0, max: 5 },
-    ],
+    fields: materializePublishFields("moto"),
     brands: {
       BMW: ["S1000RR", "R1250GS"],
       Yamaha: ["R1", "MT-07"],
@@ -244,52 +287,10 @@ export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
     },
   },
   imobiliare: {
-    fields: [
-      { id: "propertyType", label: "Property type", input: "select", options: PROPERTY_TYPES },
-      { id: "areaSqm", label: "Area (sqm)", input: "number", min: 1, max: 999_999_999 },
-      { id: "rooms", label: "Rooms", input: "number", min: 1, max: 100, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere)/] },
-      { id: "floor", label: "Floor", input: "select", options: FLOOR_OPTIONS, appliesTo: [/imobiliare-(apartamente|garsoniere|camere|birouri|spatii-comerciale|hoteluri)/] },
-      { id: "furnished", label: "Furnished", input: "select", options: YES_NO_PARTIAL, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|birouri|spatii-comerciale)/] },
-      { id: "buildYear", label: "Build year", input: "number", min: 1800, max: 2030 },
-      { id: "landAreaSqm", label: "Land area (sqm)", input: "number", min: 1, max: 999_999_999, appliesTo: [/imobiliare-(teren|case|case-tara|hale-productie|depozite|hoteluri)/] },
-      { id: "totalFloors", label: "Total floors", input: "number", min: 1, max: 200, appliesTo: [/imobiliare-(apartamente|garsoniere|camere|case|birouri|spatii-comerciale|depozite|hoteluri|hale-productie)/] },
-      { id: "balconies", label: "Balconies", input: "number", min: 0, max: 20, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere)/] },
-      { id: "bathrooms", label: "Bathrooms", input: "number", min: 1, max: 30, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|hoteluri)/] },
-      { id: "heatingType", label: "Heating type", input: "select", options: HEATING_OPTIONS },
-      { id: "parkingType", label: "Parking", input: "select", options: PARKING_OPTIONS },
-      { id: "energyClass", label: "Energy class", input: "select", options: ENERGY_CLASS_OPTIONS },
-      { id: "livingAreaSqm", label: "Living area (sqm)", input: "number", min: 1, max: 999_999_999, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|case-tara)/] },
-      { id: "kitchenAreaSqm", label: "Kitchen area (sqm)", input: "number", min: 1, max: 999_999_999, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|case-tara)/] },
-      { id: "renovationType", label: "Renovation level", input: "select", options: RENOVATION_TYPES, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|birouri|spatii-comerciale|depozite|hoteluri|hale-productie)/] },
-      { id: "availableFrom", label: "Available from", input: "select", options: DATE_OPTIONS },
-      { id: "petsAllowed", label: "Pets allowed", input: "select", options: YES_NO_UNKNOWN },
-      { id: "elevator", label: "Elevator", input: "select", options: YES_NO_UNKNOWN, appliesTo: [/imobiliare-(apartamente|garsoniere|camere|birouri|spatii-comerciale|hoteluri)/] },
-      { id: "internet", label: "Internet included", input: "select", options: YES_NO_UNKNOWN, appliesTo: [/imobiliare-(apartamente|garsoniere|case|camere|birouri|spatii-comerciale|hoteluri)/] },
-    ],
+    fields: materializePublishFields("imobiliare"),
   },
   electronice: {
-    fields: [
-      { id: "brand", label: "Brand", input: "select" },
-      { id: "modelName", label: "Model", input: "select" },
-      { id: "condition", label: "Condition", input: "select", options: PRODUCT_CONDITION },
-      { id: "warranty", label: "Warranty", input: "select", options: WARRANTY_OPTIONS },
-      { id: "productType", label: "Product type", input: "select", options: PRODUCT_TYPES },
-      { id: "storageGb", label: "Storage (GB)", input: "select", options: STORAGE_OPTIONS },
-      { id: "ramGb", label: "RAM (GB)", input: "select", options: RAM_OPTIONS },
-      { id: "screenInch", label: "Screen size", input: "select", options: SCREEN_OPTIONS },
-      { id: "batteryHealth", label: "Battery health (%)", input: "number", min: 1, max: 100 },
-      { id: "processorType", label: "Processor", input: "select", options: PROCESSOR_OPTIONS },
-      { id: "videoCard", label: "Graphics card", input: "select", options: VIDEO_CARD_OPTIONS },
-      { id: "color", label: "Color", input: "select", options: COLOR_OPTIONS },
-      { id: "smartFeatures", label: "Smart features", input: "select", options: YES_NO_UNKNOWN },
-      { id: "refreshRateHz", label: "Refresh rate (Hz)", input: "number", min: 30, max: 360 },
-      { id: "cameraMp", label: "Camera (MP)", input: "number", min: 1, max: 300 },
-      { id: "simType", label: "Dual SIM", input: "select", options: YES_NO_UNKNOWN },
-      { id: "osType", label: "Sistem operare", input: "select", options: OS_OPTIONS },
-      { id: "connectivity", label: "Connectivity", input: "select", options: CONNECTIVITY_OPTIONS },
-      { id: "originalBox", label: "Original box", input: "select", options: YES_NO_UNKNOWN },
-      { id: "waterResistance", label: "Water resistance", input: "select", options: YES_NO_UNKNOWN },
-    ],
+    fields: materializePublishFields("electronice"),
     brands: {
       Apple: ["iPhone 14", "iPhone 15", "MacBook Air"],
       Samsung: ["Galaxy S23", "Galaxy S24", "Galaxy Book"],
@@ -297,20 +298,7 @@ export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
     },
   },
   haine: {
-    fields: [
-      { id: "sizeLabel", label: "Size", input: "select", options: CLOTHES_SIZE },
-      { id: "brand", label: "Brand", input: "select" },
-      { id: "condition", label: "Condition", input: "select", options: PRODUCT_CONDITION },
-      { id: "material", label: "Material", input: "select", options: MATERIAL_OPTIONS },
-      { id: "forGender", label: "For", input: "select", options: GENDER_OPTIONS },
-      { id: "season", label: "Season", input: "select", options: SEASON_OPTIONS },
-      { id: "colorway", label: "Primary color", input: "select", options: COLOR_OPTIONS },
-      { id: "warranty", label: "Warranty", input: "select", options: WARRANTY_OPTIONS },
-      { id: "fitType", label: "Fit", input: "select", options: FIT_OPTIONS },
-      { id: "waistCm", label: "Waist (cm)", input: "number", min: 30, max: 220 },
-      { id: "lengthCm", label: "Length (cm)", input: "number", min: 30, max: 250 },
-      { id: "shoeSizeEu", label: "EU shoe size", input: "number", min: 15, max: 55 },
-    ],
+    fields: materializePublishFields("haine"),
     brands: {
       Nike: ["Air Max", "Tech Fleece"],
       Adidas: ["Originals", "Terrex"],
@@ -318,21 +306,7 @@ export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
     },
   },
   joburi: {
-    fields: [
-      { id: "salary", label: "Salary", input: "number", min: 0, max: 999_999_999 },
-      { id: "jobType", label: "Job type", input: "select", options: JOB_TYPES },
-      { id: "experienceYears", label: "Experience", input: "number", min: 0, max: 60 },
-      { id: "workSchedule", label: "Work schedule", input: "select", options: WORK_SCHEDULE_OPTIONS },
-      { id: "educationLevel", label: "Education level", input: "select", options: EDUCATION_LEVELS },
-      { id: "languageLevel", label: "Language level", input: "select", options: LANGUAGE_LEVELS },
-      { id: "contractDurationMonths", label: "Contract duration (months)", input: "number", min: 1, max: 120 },
-      { id: "remotePolicy", label: "Remote policy", input: "select", options: REMOTE_POLICY },
-      { id: "companyType", label: "Company type", input: "select", options: COMPANY_TYPES },
-      { id: "industry", label: "Industry", input: "select", options: INDUSTRY_OPTIONS },
-      { id: "positionsOpen", label: "Open positions", input: "number", min: 1, max: 999 },
-      { id: "benefits", label: "Benefits", input: "select", options: YES_NO_UNKNOWN },
-      { id: "driverLicenseRequired", label: "Driver license required", input: "select", options: YES_NO_UNKNOWN },
-    ],
+    fields: materializePublishFields("joburi"),
   },
 };
 
@@ -421,13 +395,6 @@ const OPTION_LABELS: Record<string, Record<ListingUiLocale, string>> = {
   refurbished: { ro: "Recondiționat", ru: "Восстановленный", en: "Refurbished" },
   none: { ro: "Fără", ru: "Нет", en: "None" },
 };
-
-function humanizeFieldId(fieldId: string): string {
-  return fieldId
-    .replace(/([a-z])([A-Z])/g, "$1 $2")
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (m) => m.toUpperCase());
-}
 
 export function resolveListingUiLocale(locale: string): ListingUiLocale {
   const l = locale.toLowerCase();
