@@ -1,9 +1,9 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Trash2, Upload } from "lucide-react";
-import { submitBugReport } from "@/app/actions/tester-bugs";
+import type { TesterBugSubmitState } from "@/lib/tester-bug-report-submit";
 
 type BugFormValues = {
   title: string;
@@ -103,9 +103,11 @@ type Props = {
   onSuccessAction?: () => void;
 };
 
+const initialSubmitState: TesterBugSubmitState = { ok: false, message: "", error: undefined };
+
 export function TesterBugReportForm({ copy, formRef, onSuccessAction }: Props) {
-  const initialSubmitState = { ok: false, message: "", error: "" as string | undefined };
-  const [state, formAction, pending] = useActionState(submitBugReport, initialSubmitState);
+  const [state, setState] = useState<TesterBugSubmitState>(initialSubmitState);
+  const [pending, setPending] = useState(false);
   const [formValues, setFormValues] = useState<BugFormValues>(initialBugFormValues);
   const [stepLines, setStepLines] = useState<string[]>([""]);
   const [fileInputKey, setFileInputKey] = useState(0);
@@ -146,6 +148,47 @@ export function TesterBugReportForm({ copy, formRef, onSuccessAction }: Props) {
     setStepLines((s) => s.map((line, i) => (i === index ? value : line)));
   }
 
+  async function submitViaApi(form: HTMLFormElement) {
+    setPending(true);
+    setState({ ok: false, message: "", error: undefined });
+    try {
+      const fd = new FormData(form);
+      const res = await fetch("/api/tester/bugs", {
+        method: "POST",
+        body: fd,
+        credentials: "include",
+      });
+      let data: TesterBugSubmitState = {
+        ok: false,
+        message: "",
+        error: "Răspuns invalid de la server.",
+      };
+      try {
+        data = (await res.json()) as TesterBugSubmitState;
+      } catch {
+        /* ignore */
+      }
+      if (!res.ok && !data.error) {
+        data = {
+          ...data,
+          error:
+            res.status >= 500
+              ? "Eroare temporară la server. Încearcă din nou."
+              : "Nu am putut trimite raportul.",
+        };
+      }
+      setState(data);
+    } catch {
+      setState({
+        ok: false,
+        message: "",
+        error: "Conexiune întreruptă. Verifică rețeaua și încearcă din nou.",
+      });
+    } finally {
+      setPending(false);
+    }
+  }
+
   function onDropFiles(e: React.DragEvent) {
     e.preventDefault();
     e.stopPropagation();
@@ -181,14 +224,14 @@ export function TesterBugReportForm({ copy, formRef, onSuccessAction }: Props) {
 
       <form
         ref={formRef}
-        action={formAction}
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
+          e.preventDefault();
           if (!termsAccepted) {
-            e.preventDefault();
             setTermsError(true);
             return;
           }
           setTermsError(false);
+          await submitViaApi(e.currentTarget);
         }}
         className="space-y-6"
       >
