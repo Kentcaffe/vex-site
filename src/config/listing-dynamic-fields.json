@@ -422,23 +422,40 @@
       {
         "name": "screenInch",
         "type": "select",
-        "optionsRef": "SCREEN_OPTIONS"
+        "optionsRef": "SCREEN_OPTIONS",
+        "appliesTo": [
+          "electronice-(smartphone|telefoane-clasice|tablete|smartwatch|laptop|pc-birou|monitor|componente|periferice)",
+          "^telefoane$",
+          "^laptop$"
+        ]
       },
       {
         "name": "batteryHealth",
         "type": "number",
         "min": 1,
-        "max": 100
+        "max": 100,
+        "appliesTo": [
+          "electronice-(smartphone|telefoane-clasice|tablete|smartwatch)",
+          "^telefoane$"
+        ]
       },
       {
         "name": "processorType",
         "type": "select",
-        "optionsRef": "PROCESSOR_OPTIONS"
+        "optionsRef": "PROCESSOR_OPTIONS",
+        "appliesTo": [
+          "electronice-(laptop|pc-birou|monitor|componente|periferice|retea|imprimante)",
+          "^laptop$"
+        ]
       },
       {
         "name": "videoCard",
         "type": "select",
-        "optionsRef": "VIDEO_CARD_OPTIONS"
+        "optionsRef": "VIDEO_CARD_OPTIONS",
+        "appliesTo": [
+          "electronice-(laptop|pc-birou|monitor|componente|periferice|retea|imprimante)",
+          "^laptop$"
+        ]
       },
       {
         "name": "color",
@@ -448,24 +465,40 @@
       {
         "name": "smartFeatures",
         "type": "select",
-        "optionsRef": "YES_NO_UNKNOWN"
+        "optionsRef": "YES_NO_UNKNOWN",
+        "appliesTo": [
+          "electronice-(smartphone|telefoane-clasice|tablete|smartwatch)",
+          "^telefoane$"
+        ]
       },
       {
         "name": "refreshRateHz",
         "type": "number",
         "min": 30,
-        "max": 360
+        "max": 360,
+        "appliesTo": [
+          "electronice-(laptop|pc-birou|monitor|componente|periferice|retea|imprimante)",
+          "^laptop$"
+        ]
       },
       {
         "name": "cameraMp",
         "type": "number",
         "min": 1,
-        "max": 300
+        "max": 300,
+        "appliesTo": [
+          "electronice-(smartphone|telefoane-clasice|tablete|smartwatch)",
+          "^telefoane$"
+        ]
       },
       {
         "name": "simType",
         "type": "select",
-        "optionsRef": "YES_NO_UNKNOWN"
+        "optionsRef": "YES_NO_UNKNOWN",
+        "appliesTo": [
+          "electronice-(smartphone|telefoane-clasice|tablete)",
+          "^telefoane$"
+        ]
       },
       {
         "name": "osType",
@@ -485,7 +518,11 @@
       {
         "name": "waterResistance",
         "type": "select",
-        "optionsRef": "YES_NO_UNKNOWN"
+        "optionsRef": "YES_NO_UNKNOWN",
+        "appliesTo": [
+          "electronice-(smartphone|telefoane-clasice|tablete|smartwatch)",
+          "^telefoane$"
+        ]
       }
     ],
     "haine": [

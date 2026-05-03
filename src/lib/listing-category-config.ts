@@ -11,6 +11,7 @@ import {
 import { getModelsForBrand } from "@/lib/vehicle-models-by-brand";
 import { VEHICLE_BRANDS } from "@/lib/vehicle-taxonomy";
 import listingDynamicFields from "@/config/listing-dynamic-fields.json";
+import { allSamsungPhoneModels, APPLE_IPHONE_MODELS } from "@/lib/marketplace-phone-model-lists";
 
 export type ListingCategoryKey = "auto" | "moto" | "imobiliare" | "electronice" | "haine" | "joburi";
 
@@ -275,8 +276,8 @@ function materializePublishFields(key: ListingCategoryKey): ListingFieldConfig[]
 
 /** Fallback static (fără catalog DB): modele separate — nu amesteca telefon cu laptop. */
 const ELECTRONICS_PHONE_MODELS: Record<string, readonly string[]> = {
-  Apple: ["iPhone 12", "iPhone 13", "iPhone 14", "iPhone 15", "iPhone 16", "iPhone SE (3rd gen)"],
-  Samsung: ["Galaxy S23", "Galaxy S24", "Galaxy S24 Ultra", "Galaxy A54", "Galaxy Z Flip 5", "Galaxy Z Fold 5"],
+  Apple: [...APPLE_IPHONE_MODELS],
+  Samsung: [...allSamsungPhoneModels()],
   Google: ["Pixel 7", "Pixel 8", "Pixel 9"],
   Xiaomi: ["Redmi Note 13", "Xiaomi 14"],
   OnePlus: ["OnePlus 11", "OnePlus 12"],
