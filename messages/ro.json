@@ -911,8 +911,8 @@
   "PublishWizard": {
     "step1Title": "Detalii principale",
     "step1Desc": "Categorie, titlu, descriere și preț",
-    "step2Title": "Detalii vehicul",
-    "step2Desc": "Specificații pentru categoria aleasă",
+    "step2Title": "Detalii specifice categoriei",
+    "step2Desc": "Marcă, model și câmpuri suplimentare în funcție de categoria aleasă",
     "step3Title": "Contact",
     "step3Desc": "Locație și telefon",
     "step4Title": "Imagini",

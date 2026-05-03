@@ -911,8 +911,8 @@
   "PublishWizard": {
     "step1Title": "Main details",
     "step1Desc": "Category, title, description and price",
-    "step2Title": "Vehicle details",
-    "step2Desc": "Specs for your selected category",
+    "step2Title": "Category-specific details",
+    "step2Desc": "Brand, model and extra fields based on your listing category",
     "step3Title": "Contact",
     "step3Desc": "Location and phone",
     "step4Title": "Photos",

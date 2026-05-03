@@ -239,7 +239,11 @@ export function ListingForm({
     if (!selectedCategoryKey) {
       return [];
     }
-    const base = getModelsForCategoryBrand(selectedCategoryKey, publishValues.brand).map((value) => ({
+    const base = getModelsForCategoryBrand(
+      selectedCategoryKey,
+      publishValues.brand,
+      selectedSlug,
+    ).map((value) => ({
       value,
       label: value,
     }));
@@ -251,6 +255,7 @@ export function ListingForm({
     publishValues.catalogBrandId,
     publishValues.brand,
     selectedCategoryKey,
+    selectedSlug,
     modelOtherOption,
   ]);
   const hasDynamicCategoryConfig = selectedCategoryFields.length > 0;
@@ -275,13 +280,14 @@ export function ListingForm({
         selectedCategoryKey,
         publishValues.brand,
         publishValues.modelName,
+        selectedSlug,
       )
     ) {
       return;
     }
     setPublishValues((prev) => ({ ...prev, modelName: "" }));
     setModelManualOther(false);
-  }, [useServerCatalog, selectedCategoryKey, publishValues.brand, publishValues.modelName]);
+  }, [useServerCatalog, selectedCategoryKey, selectedSlug, publishValues.brand, publishValues.modelName]);
 
   const citySelectOptions = useMemo(() => {
     const base = moldovaCitySelectOptions();
@@ -891,6 +897,7 @@ export function ListingForm({
           selectedCategoryKey,
           publishValues.brand,
           publishValues.modelName,
+          selectedSlug,
         )
       ) {
         toast("error", "Modelul selectat nu aparține mărcii curente.");

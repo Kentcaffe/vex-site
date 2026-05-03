@@ -2,7 +2,9 @@ import {
   isElectronicsBrandSlug,
   isFashionSlug,
   isJobSlug,
+  isLaptopPcSlug,
   isMotoLikeSlug,
+  isPhoneTabletSlug,
   isRealEstateSlug,
   isVehicleWithOdometer,
 } from "@/lib/listing-profiles";
@@ -271,6 +273,32 @@ function materializePublishFields(key: ListingCategoryKey): ListingFieldConfig[]
   });
 }
 
+/** Fallback static (fără catalog DB): modele separate — nu amesteca telefon cu laptop. */
+const ELECTRONICS_PHONE_MODELS: Record<string, readonly string[]> = {
+  Apple: ["iPhone 12", "iPhone 13", "iPhone 14", "iPhone 15", "iPhone 16", "iPhone SE (3rd gen)"],
+  Samsung: ["Galaxy S23", "Galaxy S24", "Galaxy S24 Ultra", "Galaxy A54", "Galaxy Z Flip 5", "Galaxy Z Fold 5"],
+  Google: ["Pixel 7", "Pixel 8", "Pixel 9"],
+  Xiaomi: ["Redmi Note 13", "Xiaomi 14"],
+  OnePlus: ["OnePlus 11", "OnePlus 12"],
+  Huawei: ["P60 Pro", "Mate 50"],
+  Lenovo: ["Legion Phone Duel", "Legion Y90"],
+};
+
+const ELECTRONICS_LAPTOP_MODELS: Record<string, readonly string[]> = {
+  Apple: ["MacBook Air M2", "MacBook Air M3", "MacBook Pro 14\"", "MacBook Pro 16\""],
+  Samsung: ["Galaxy Book3", "Galaxy Book4"],
+  Lenovo: ["ThinkPad X1 Carbon", "ThinkPad T14", "Legion 5", "IdeaPad 5"],
+  ASUS: ["VivoBook 15", "ZenBook 14", "ROG Strix G16"],
+  Dell: ["XPS 13", "XPS 15", "Latitude 7430", "G15"],
+  HP: ["Pavilion 15", "Envy 16", "Spectre x360 14", "OMEN 16"],
+};
+
+const ELECTRONICS_STATIC_BRANDS = Array.from(
+  new Set([...Object.keys(ELECTRONICS_PHONE_MODELS), ...Object.keys(ELECTRONICS_LAPTOP_MODELS)]),
+).sort((a, b) => a.localeCompare(b));
+
+const ELECTRONICS_STATIC_BRAND_SET = new Set(ELECTRONICS_STATIC_BRANDS);
+
 export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
   auto: {
     fields: materializePublishFields("auto"),
@@ -291,11 +319,6 @@ export const categoryConfig: Record<ListingCategoryKey, CategoryConfig> = {
   },
   electronice: {
     fields: materializePublishFields("electronice"),
-    brands: {
-      Apple: ["iPhone 14", "iPhone 15", "MacBook Air"],
-      Samsung: ["Galaxy S23", "Galaxy S24", "Galaxy Book"],
-      Lenovo: ["ThinkPad X1", "Legion 5", "IdeaPad 5"],
-    },
   },
   haine: {
     fields: materializePublishFields("haine"),
@@ -467,15 +490,34 @@ export function getCategoryBrands(key: ListingCategoryKey | null): string[] {
   if (key === "auto") {
     return [...VEHICLE_BRANDS];
   }
+  if (key === "electronice") {
+    return [...ELECTRONICS_STATIC_BRANDS];
+  }
   return Object.keys(categoryConfig[key].brands ?? {});
 }
 
-export function getModelsForCategoryBrand(key: ListingCategoryKey | null, brand: string): string[] {
+export function getModelsForCategoryBrand(
+  key: ListingCategoryKey | null,
+  brand: string,
+  categorySlug?: string,
+): string[] {
   if (!key || !brand.trim()) {
     return [];
   }
   if (key === "auto") {
     return [...getModelsForBrand(brand)];
+  }
+  if (key === "electronice") {
+    const slug = categorySlug?.trim() ?? "";
+    if (slug && isPhoneTabletSlug(slug)) {
+      const models = ELECTRONICS_PHONE_MODELS[brand];
+      return models ? [...models] : [];
+    }
+    if (slug && isLaptopPcSlug(slug)) {
+      const models = ELECTRONICS_LAPTOP_MODELS[brand];
+      return models ? [...models] : [];
+    }
+    return [];
   }
   const models = categoryConfig[key].brands?.[brand];
   return models ? [...models] : [];
@@ -492,6 +534,9 @@ export function isBrandAllowedForCategory(key: ListingCategoryKey | null, brand:
   if (key === "auto") {
     return VEHICLE_BRANDS.includes(normalizedBrand as (typeof VEHICLE_BRANDS)[number]);
   }
+  if (key === "electronice") {
+    return ELECTRONICS_STATIC_BRAND_SET.has(normalizedBrand);
+  }
   const brands = categoryConfig[key].brands;
   if (!brands) {
     return false;
@@ -503,6 +548,7 @@ export function isModelAllowedForCategoryBrand(
   key: ListingCategoryKey | null,
   brand: string,
   model: string,
+  categorySlug?: string,
 ): boolean {
   const normalizedModel = model.trim();
   if (!normalizedModel) {
@@ -514,6 +560,6 @@ export function isModelAllowedForCategoryBrand(
   if (key === "auto") {
     return getModelsForBrand(brand).includes(normalizedModel);
   }
-  const allowedModels = getModelsForCategoryBrand(key, brand);
+  const allowedModels = getModelsForCategoryBrand(key, brand, categorySlug);
   return allowedModels.includes(normalizedModel);
 }

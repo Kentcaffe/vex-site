@@ -222,6 +222,7 @@ export async function createListing(
   const brandModelCheck = await assertListingBrandModelAllowed({
     categoryId: categoryRow.id,
     categoryConfigKey,
+    categorySlug: slug,
     brand: parsed.data.brand,
     modelName: parsed.data.modelName,
   });
@@ -435,6 +436,7 @@ export async function updateOwnListing(
   const brandModelCheck = await assertListingBrandModelAllowed({
     categoryId: categoryRow.id,
     categoryConfigKey,
+    categorySlug: slug,
     brand: parsed.data.brand,
     modelName: parsed.data.modelName,
   });

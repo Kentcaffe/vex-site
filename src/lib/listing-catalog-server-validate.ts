@@ -12,6 +12,8 @@ import { catalogBrand, catalogModel } from "@/lib/prisma-delegates";
 export async function assertListingBrandModelAllowed(params: {
   categoryId: string;
   categoryConfigKey: ListingCategoryKey | null;
+  /** Slug frunză categorie (necesar pentru reguli statice electronice telefon vs laptop). */
+  categorySlug: string;
   brand: string | null | undefined;
   modelName: string | null | undefined;
 }): Promise<{ ok: true } | { ok: false; message: string }> {
@@ -24,7 +26,12 @@ export async function assertListingBrandModelAllowed(params: {
       return { ok: false, message: "Marca selectată nu aparține categoriei curente." };
     }
     if (
-      !isModelAllowedForCategoryBrand(params.categoryConfigKey, brandTrim, modelTrim)
+      !isModelAllowedForCategoryBrand(
+        params.categoryConfigKey,
+        brandTrim,
+        modelTrim,
+        params.categorySlug,
+      )
     ) {
       return { ok: false, message: "Modelul selectat nu aparține mărcii curente." };
     }
