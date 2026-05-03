@@ -11,6 +11,7 @@ import {
 import { getModelsForBrand } from "@/lib/vehicle-models-by-brand";
 import { VEHICLE_BRANDS } from "@/lib/vehicle-taxonomy";
 import listingDynamicFields from "@/config/listing-dynamic-fields.json";
+import { SIM_TYPE_OPTIONS } from "@/lib/listing-form-options";
 import { allSamsungPhoneModels, APPLE_IPHONE_MODELS } from "@/lib/marketplace-phone-model-lists";
 
 export type ListingCategoryKey = "auto" | "moto" | "imobiliare" | "electronice" | "haine" | "joburi";
@@ -247,6 +248,7 @@ const PUBLISH_OPTION_REGISTRY: Record<string, readonly string[]> = {
   INDUSTRY_OPTIONS,
   OS_OPTIONS,
   CONNECTIVITY_OPTIONS,
+  SIM_TYPE_OPTIONS: [...SIM_TYPE_OPTIONS],
 };
 
 function materializePublishFields(key: ListingCategoryKey): ListingFieldConfig[] {
@@ -383,6 +385,15 @@ const FIELD_LABELS: Partial<Record<ListingFieldId, Record<ListingUiLocale, strin
   screenInch: { ro: "Diagonală ecran", ru: "Диагональ экрана", en: "Screen size" },
   processorType: { ro: "Procesor", ru: "Процессор", en: "Processor" },
   videoCard: { ro: "Placă video", ru: "Видеокарта", en: "Graphics card" },
+  batteryHealth: { ro: "Sănătate baterie", ru: "Состояние батареи", en: "Battery health" },
+  smartFeatures: { ro: "Funcții inteligente", ru: "Умные функции", en: "Smart features" },
+  refreshRateHz: { ro: "Rată refresh (Hz)", ru: "Частота обновления (Гц)", en: "Refresh rate (Hz)" },
+  cameraMp: { ro: "Cameră (MP)", ru: "Камера (Мп)", en: "Camera (MP)" },
+  simType: { ro: "Tip SIM", ru: "Тип SIM", en: "SIM type" },
+  osType: { ro: "Sistem de operare", ru: "Операционная система", en: "Operating system" },
+  connectivity: { ro: "Conectivitate", ru: "Подключение", en: "Connectivity" },
+  originalBox: { ro: "Cutie originală", ru: "Оригинальная коробка", en: "Original box" },
+  waterResistance: { ro: "Rezistență la apă", ru: "Влагозащита", en: "Water resistance" },
   salary: { ro: "Salariu", ru: "Зарплата", en: "Salary" },
   jobType: { ro: "Tip job", ru: "Тип занятости", en: "Job type" },
 };
@@ -418,6 +429,39 @@ const OPTION_LABELS: Record<string, Record<ListingUiLocale, string>> = {
   used: { ro: "Folosit", ru: "Б/у", en: "Used" },
   refurbished: { ro: "Recondiționat", ru: "Восстановленный", en: "Refurbished" },
   none: { ro: "Fără", ru: "Нет", en: "None" },
+  phone: { ro: "Telefon mobil", ru: "Смартфон", en: "Phone" },
+  smartphone: { ro: "Smartphone", ru: "Смартфон", en: "Smartphone" },
+  classic_phone: { ro: "Telefon clasic", ru: "Кнопочный телефон", en: "Classic phone" },
+  smartwatch: { ro: "Smartwatch", ru: "Смарт-часы", en: "Smartwatch" },
+  desktop: { ro: "Unitate PC", ru: "Системный блок", en: "Desktop" },
+  peripherals: { ro: "Periferice", ru: "Периферия", en: "Peripherals" },
+  retea: { ro: "Rețea", ru: "Сеть", en: "Networking" },
+  imprimante: { ro: "Imprimante", ru: "Принтеры", en: "Printers" },
+  other: { ro: "Altul", ru: "Другое", en: "Other" },
+  laptop: { ro: "Laptop", ru: "Ноутбук", en: "Laptop" },
+  pc: { ro: "PC / sistem", ru: "ПК / системный блок", en: "PC / desktop" },
+  tablet: { ro: "Tabletă", ru: "Планшет", en: "Tablet" },
+  monitor: { ro: "Monitor", ru: "Монитор", en: "Monitor" },
+  tv: { ro: "Televizor", ru: "Телевизор", en: "TV" },
+  components: { ro: "Componente", ru: "Комплектующие", en: "Components" },
+  accessories: { ro: "Accesorii", ru: "Аксессуары", en: "Accessories" },
+  nano_sim: { ro: "Nano-SIM", ru: "Nano-SIM", en: "Nano-SIM" },
+  esim: { ro: "eSIM", ru: "eSIM", en: "eSIM" },
+  dual_sim: { ro: "Dual SIM", ru: "Dual SIM", en: "Dual SIM" },
+  hybrid_slot: { ro: "Slot hibrid (SIM + card)", ru: "Гибридный слот", en: "Hybrid slot" },
+  no_sim: { ro: "Fără SIM (Wi‑Fi only)", ru: "Без SIM (только Wi‑Fi)", en: "No SIM (Wi‑Fi only)" },
+  ios: { ro: "iOS", ru: "iOS", en: "iOS" },
+  android: { ro: "Android", ru: "Android", en: "Android" },
+  windows: { ro: "Windows", ru: "Windows", en: "Windows" },
+  macos: { ro: "macOS", ru: "macOS", en: "macOS" },
+  linux: { ro: "Linux", ru: "Linux", en: "Linux" },
+  altul: { ro: "Altul", ru: "Другое", en: "Other" },
+  wifi: { ro: "Wi‑Fi", ru: "Wi‑Fi", en: "Wi‑Fi" },
+  "4g": { ro: "4G", ru: "4G", en: "4G" },
+  "5g": { ro: "5G", ru: "5G", en: "5G" },
+  bluetooth: { ro: "Bluetooth", ru: "Bluetooth", en: "Bluetooth" },
+  nfc: { ro: "NFC", ru: "NFC", en: "NFC" },
+  gps: { ro: "GPS", ru: "GPS", en: "GPS" },
 };
 
 export function resolveListingUiLocale(locale: string): ListingUiLocale {

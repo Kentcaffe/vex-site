@@ -407,7 +407,11 @@
       {
         "name": "productType",
         "type": "select",
-        "optionsRef": "PRODUCT_TYPES"
+        "optionsRef": "PRODUCT_TYPES",
+        "appliesTo": [
+          "electronice-(tablete|smartwatch|laptop|pc-birou|monitor|componente|periferice|retea|imprimante)",
+          "^laptop$"
+        ]
       },
       {
         "name": "storageGb",
@@ -424,8 +428,7 @@
         "type": "select",
         "optionsRef": "SCREEN_OPTIONS",
         "appliesTo": [
-          "electronice-(smartphone|telefoane-clasice|tablete|smartwatch|laptop|pc-birou|monitor|componente|periferice)",
-          "^telefoane$",
+          "electronice-(tablete|smartwatch|laptop|pc-birou|monitor|componente|periferice|retea|imprimante)",
           "^laptop$"
         ]
       },
@@ -494,9 +497,9 @@
       {
         "name": "simType",
         "type": "select",
-        "optionsRef": "YES_NO_UNKNOWN",
+        "optionsRef": "SIM_TYPE_OPTIONS",
         "appliesTo": [
-          "electronice-(smartphone|telefoane-clasice|tablete)",
+          "electronice-(smartphone|telefoane-clasice)",
           "^telefoane$"
         ]
       },
@@ -508,12 +511,21 @@
       {
         "name": "connectivity",
         "type": "select",
-        "optionsRef": "CONNECTIVITY_OPTIONS"
+        "optionsRef": "CONNECTIVITY_OPTIONS",
+        "appliesTo": [
+          "electronice-(smartphone|telefoane-clasice|tablete|smartwatch|laptop|pc-birou|monitor|componente|periferice|retea|imprimante)",
+          "^telefoane$",
+          "^laptop$"
+        ]
       },
       {
         "name": "originalBox",
         "type": "select",
-        "optionsRef": "YES_NO_UNKNOWN"
+        "optionsRef": "YES_NO_UNKNOWN",
+        "appliesTo": [
+          "electronice-(smartphone|telefoane-clasice|tablete|smartwatch)",
+          "^telefoane$"
+        ]
       },
       {
         "name": "waterResistance",

@@ -152,6 +152,15 @@ export const RE_FURNISHED_VALUES = ["yes", "no", "partial"] as const;
 
 export const ELECTRONICS_PRODUCT_ALL = [...ELECTRONICS_PRODUCT_PHONE, ...ELECTRONICS_PRODUCT_PC] as const;
 
+/** Tip SIM (publicare telefon) — valori stabile + etichete în `OPTION_LABELS` / i18n. */
+export const SIM_TYPE_OPTIONS = [
+  "nano_sim",
+  "esim",
+  "dual_sim",
+  "hybrid_slot",
+  "no_sim",
+] as const;
+
 /** Opțiuni stocare pentru filtre (telefon + laptop). */
 export const STORAGE_GB_FILTER_VALUES: readonly string[] = Array.from(
   new Set([...STORAGE_GB_PHONE, ...STORAGE_GB_LAPTOP]),

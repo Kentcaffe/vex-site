@@ -230,8 +230,19 @@ export function ListingForm({
       return [];
     }
     if (useServerCatalog && bid) {
-      const base = catalogModels.map((m) => ({ value: m.name, label: m.name }));
-      return [...base, modelOtherOption];
+      const fromDb = catalogModels.map((m) => ({ value: m.name, label: m.name }));
+      if (fromDb.length > 0) {
+        return [...fromDb, modelOtherOption];
+      }
+      const staticFallback = getModelsForCategoryBrand(
+        selectedCategoryKey,
+        publishValues.brand,
+        selectedSlug,
+      ).map((value) => ({ value, label: value }));
+      if (staticFallback.length > 0) {
+        return [...staticFallback, modelOtherOption];
+      }
+      return [modelOtherOption];
     }
     if (useServerCatalog) {
       return [];
@@ -247,6 +258,9 @@ export function ListingForm({
       value,
       label: value,
     }));
+    if (selectedCategoryKey === "electronice" && base.length > 0) {
+      return [...base, modelOtherOption];
+    }
     return base;
   }, [
     useServerCatalog,
@@ -699,7 +713,7 @@ export function ListingForm({
       return publishValues.brand;
     }
     if (fieldId === "modelName") {
-      if (useServerCatalog && modelManualOther) {
+      if (modelManualOther) {
         return MODEL_CATALOG_OTHER;
       }
       return publishValues.modelName;
@@ -727,12 +741,12 @@ export function ListingForm({
     if (fieldId === "brand" && !useServerCatalog) {
       setModelManualOther(false);
     }
-    if (fieldId === "modelName" && useServerCatalog && value === MODEL_CATALOG_OTHER) {
+    if (fieldId === "modelName" && value === MODEL_CATALOG_OTHER) {
       setModelManualOther(true);
       setPublishValues((prev) => ({ ...prev, modelName: "" }));
       return;
     }
-    if (fieldId === "modelName" && useServerCatalog) {
+    if (fieldId === "modelName") {
       setModelManualOther(false);
     }
     setPublishValues((prev) => {
@@ -778,7 +792,7 @@ export function ListingForm({
       const showBrandLoading = isBrandField && Boolean(categoryId.trim()) && catalogBrandsStale;
       const showModelLoading =
         isModelField && useServerCatalog && Boolean(publishValues.catalogBrandId.trim()) && catalogModelsStale;
-      const modelManual = isModelField && useServerCatalog && modelManualOther;
+      const modelManual = isModelField && modelManualOther;
       const brandSelectDisabled = isBrandField && Boolean(categoryId.trim()) && catalogBrandsStale;
       const modelSelectDisabled =
         isModelField &&
