@@ -29,7 +29,10 @@ export default async function LoginPage({ params, searchParams }: Props) {
   const changePasswordPath = localizedHref(locale, "/change-password");
 
   return (
-    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#030712] px-4 py-12 text-white">
+    <main
+      data-tester-login-page="true"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#030712] px-4 py-12 text-white"
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -43,6 +46,13 @@ export default async function LoginPage({ params, searchParams }: Props) {
         changePasswordPath={changePasswordPath}
         maintenancePath="/maintenance"
       />
+      <style>{`
+        body:has([data-tester-login-page="true"]) header.sticky,
+        body:has([data-tester-login-page="true"]) footer.mt-12,
+        body:has([data-tester-login-page="true"]) nav.fixed.bottom-0 {
+          display: none !important;
+        }
+      `}</style>
     </main>
   );
 }

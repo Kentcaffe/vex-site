@@ -18,8 +18,26 @@ export default async function ChangePasswordPage({ params }: Props) {
   }
 
   return (
-    <div className="app-shell app-section">
+    <main
+      data-tester-auth-page="true"
+      className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#030712] px-4 py-12 text-white"
+    >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(38rem 24rem at 50% -6%, rgba(56,189,248,0.3), transparent 70%), radial-gradient(28rem 20rem at 90% 16%, rgba(59,130,246,0.24), transparent 72%), linear-gradient(to bottom, #030712 0%, #020617 50%, #01040f 100%)",
+        }}
+      />
       <ChangePasswordForm />
-    </div>
+      <style>{`
+        body:has([data-tester-auth-page="true"]) header.sticky,
+        body:has([data-tester-auth-page="true"]) footer.mt-12,
+        body:has([data-tester-auth-page="true"]) nav.fixed.bottom-0 {
+          display: none !important;
+        }
+      `}</style>
+    </main>
   );
 }
