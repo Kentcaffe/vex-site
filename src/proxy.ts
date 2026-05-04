@@ -1,4 +1,3 @@
-import { createServerClient } from "@supabase/ssr";
 import createMiddleware from "next-intl/middleware";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
@@ -10,6 +9,10 @@ import {
   MAINTENANCE_BYPASS_COOKIE,
 } from "./lib/maintenance";
 import {
+  isMandatoryPasswordChangeAllowedApi,
+  isMandatoryPasswordChangePageExempt,
+} from "./lib/must-change-password-paths";
+import {
   canBypassMaintenanceWithSessionUser,
   refreshSupabaseSession,
   userMustChangePasswordFromSession,
@@ -18,16 +21,21 @@ import { stripLocalePrefix } from "./lib/i18n-path";
 import { routing } from "./i18n/routing";
 
 /**
- * Edge middleware (Next.js 16: fișierul se numește `proxy.ts`).
- * Mentenanță + i18n + Supabase session refresh + redirect schimbare parolă obligatorie.
+ * Edge middleware (Next.js 16: fișierul se numește `proxy.ts`, echivalent `middleware.ts`).
+ * Mentenanță + i18n + Supabase session + redirect strict când `must_change_password` în metadata.
+ * Flag-ul e sincronizat din Prisma în `user_metadata` (Edge nu poate folosi Prisma direct).
  */
 const intlMiddleware = createMiddleware(routing);
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
 async function attachSupabaseSession(request: NextRequest, response: NextResponse): Promise<void> {
   await refreshSupabaseSession(request, response);
+}
+
+function jsonMustChangePassword(): NextResponse {
+  return NextResponse.json(
+    { ok: false, error: "must_change_password", code: "MUST_CHANGE_PASSWORD" },
+    { status: 403 },
+  );
 }
 
 /** Rute accesibile fără login în timpul mentenanței (login, health, confirm). */
@@ -61,20 +69,6 @@ function changePasswordRedirectUrl(request: NextRequest): URL {
   }
   url.pathname = "/change-password";
   return url;
-}
-
-function mustChangePasswordExemptBasePath(basePath: string): boolean {
-  if (basePath === "/change-password") return true;
-  if (basePath === "/login" || basePath.startsWith("/login/")) return true;
-  if (basePath === "/confirm" || basePath.startsWith("/confirm/")) return true;
-  if (basePath === "/maintenance" || basePath.startsWith("/maintenance/")) return true;
-  for (const loc of routing.locales) {
-    if (basePath === `/${loc}/login` || basePath.startsWith(`/${loc}/login/`)) return true;
-    if (basePath === `/${loc}/change-password` || basePath.startsWith(`/${loc}/change-password/`)) return true;
-    if (basePath === `/${loc}/confirm` || basePath.startsWith(`/${loc}/confirm/`)) return true;
-    if (basePath === `/${loc}/maintenance` || basePath.startsWith(`/${loc}/maintenance/`)) return true;
-  }
-  return false;
 }
 
 /**
@@ -120,7 +114,10 @@ export default async function proxy(request: NextRequest) {
     if (hasMaintenanceBypass) {
       if (pathname.startsWith("/api/")) {
         const response = NextResponse.next();
-        await attachSupabaseSession(request, response);
+        const user = await refreshSupabaseSession(request, response);
+        if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangeAllowedApi(request)) {
+          return jsonMustChangePassword();
+        }
         return response;
       }
       if (pathname === "/confirm" || pathname.startsWith("/confirm/")) {
@@ -129,7 +126,11 @@ export default async function proxy(request: NextRequest) {
         return response;
       }
       const response = await Promise.resolve(intlMiddleware(request));
-      await attachSupabaseSession(request, response);
+      const user = await refreshSupabaseSession(request, response);
+      const basePath = stripLocalePrefix(pathname);
+      if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangePageExempt(basePath)) {
+        return NextResponse.redirect(changePasswordRedirectUrl(request), 307);
+      }
       return response;
     }
 
@@ -146,11 +147,17 @@ export default async function proxy(request: NextRequest) {
     if (pathname.startsWith("/api/")) {
       if (isAuthApiPath(pathname)) {
         const response = NextResponse.next();
-        await attachSupabaseSession(request, response);
+        const user = await refreshSupabaseSession(request, response);
+        if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangeAllowedApi(request)) {
+          return jsonMustChangePassword();
+        }
         return response;
       }
       const response = NextResponse.next();
       const user = await refreshSupabaseSession(request, response);
+      if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangeAllowedApi(request)) {
+        return jsonMustChangePassword();
+      }
       if (user && canBypassMaintenanceWithSessionUser(user)) {
         return response;
       }
@@ -168,6 +175,10 @@ export default async function proxy(request: NextRequest) {
     const response = await Promise.resolve(intlMiddleware(request));
     const user = await refreshSupabaseSession(request, response);
     const basePath = stripLocalePrefix(pathname);
+
+    if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangePageExempt(basePath)) {
+      return NextResponse.redirect(changePasswordRedirectUrl(request), 307);
+    }
 
     if (isMaintenancePublicPath(basePath)) {
       return response;
@@ -192,7 +203,10 @@ export default async function proxy(request: NextRequest) {
 
   if (pathname.startsWith("/api/")) {
     const response = NextResponse.next();
-    await attachSupabaseSession(request, response);
+    const user = await refreshSupabaseSession(request, response);
+    if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangeAllowedApi(request)) {
+      return jsonMustChangePassword();
+    }
     return response;
   }
 
@@ -206,12 +220,7 @@ export default async function proxy(request: NextRequest) {
   const user = await refreshSupabaseSession(request, response);
   const basePath = stripLocalePrefix(pathname);
 
-  if (
-    user &&
-    userMustChangePasswordFromSession(user) &&
-    !mustChangePasswordExemptBasePath(basePath) &&
-    !pathname.startsWith("/api/")
-  ) {
+  if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangePageExempt(basePath)) {
     return NextResponse.redirect(changePasswordRedirectUrl(request), 307);
   }
 
