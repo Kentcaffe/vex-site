@@ -50,16 +50,17 @@ export default function MaintenancePage() {
       <section className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center">
         <header className="mx-auto max-w-3xl text-center">
           <div className="mb-5 inline-flex flex-col items-center justify-center">
-            <div className="relative mb-4">
-              <div className="h-14 w-14 rounded-full bg-gradient-to-b from-sky-300 via-sky-500 to-blue-700 shadow-[0_0_36px_rgba(56,189,248,0.65)]" />
-              <div className="absolute inset-[12%] rounded-full border border-sky-100/50" />
-              <div className="absolute inset-[27%] rounded-full border border-sky-100/60" />
-              <div className="absolute inset-[42%] rounded-full border border-sky-100/70" />
+            <div className="relative mb-4 h-[6.2rem] w-[6.2rem]">
+              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_35%_28%,#c7f4ff_0%,#5bc9ff_35%,#1f7cff_68%,#0c3fa3_100%)] shadow-[0_0_44px_rgba(56,189,248,0.75)]" />
+              <div className="absolute left-[10%] right-[10%] top-[18%] h-[15%] rounded-full bg-[#c5f2ff]/80" />
+              <div className="absolute left-[6%] right-[6%] top-[34%] h-[15%] rounded-full bg-[#98deff]/70" />
+              <div className="absolute left-[9%] right-[9%] top-[50%] h-[15%] rounded-full bg-[#69beff]/65" />
+              <div className="absolute left-[15%] right-[15%] top-[66%] h-[13%] rounded-full bg-[#2f95ff]/65" />
             </div>
-            <span className="bg-gradient-to-b from-sky-200 to-blue-500 bg-clip-text text-[2rem] font-extrabold tracking-tight text-transparent drop-shadow-[0_0_18px_rgba(37,99,235,0.6)] sm:text-[2.15rem]">
+            <span className="bg-gradient-to-b from-sky-200 via-sky-400 to-blue-600 bg-clip-text text-[2.25rem] font-black tracking-tight text-transparent drop-shadow-[0_0_18px_rgba(37,99,235,0.72)] sm:text-[2.5rem]">
               VEX.MD
             </span>
-            <span className="mt-2 h-px w-20 bg-gradient-to-r from-transparent via-sky-300/80 to-transparent" />
+            <span className="mt-2 h-[2px] w-24 bg-gradient-to-r from-transparent via-sky-300/85 to-transparent shadow-[0_0_12px_rgba(56,189,248,0.9)]" />
           </div>
 
           <h1 className="text-balance text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl md:text-[3.45rem]">
