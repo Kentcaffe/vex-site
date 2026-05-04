@@ -10,7 +10,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 /** Roluri care pot folosi site-ul în timpul mentenanței (fără cookie bypass). */
-export const MAINTENANCE_LOGGED_SITE_ROLES = new Set(["TESTER"]);
+export const MAINTENANCE_LOGGED_SITE_ROLES = new Set(["TESTER", "ADMIN", "MODERATOR"]);
 
 export async function refreshSupabaseSession(request: NextRequest, response: NextResponse): Promise<User | null> {
   if (!supabaseUrl?.trim() || !supabaseAnonKey?.trim()) {
