@@ -11,7 +11,7 @@ export default async function ChangePasswordPage({ params }: Props) {
   setRequestLocale(locale);
   const session = await auth();
   if (!session?.user?.id) {
-    redirect(localizedHref(locale, "/cont"));
+    redirect(localizedHref(locale, "/login"));
   }
   if (!session.user.mustChangePassword) {
     redirect(localizedHref(locale, "/"));

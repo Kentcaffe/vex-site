@@ -33,7 +33,7 @@ async function attachSupabaseSession(request: NextRequest, response: NextRespons
 /** Rute accesibile fără login în timpul mentenanței (login, health, confirm). */
 function isMaintenancePublicPath(basePath: string): boolean {
   if (basePath === "/maintenance" || basePath.startsWith("/maintenance/")) return true;
-  if (basePath === "/cont" || basePath.startsWith("/cont/")) return true;
+  if (basePath === "/login" || basePath.startsWith("/login/")) return true;
   if (basePath === "/change-password") return true;
   if (basePath === "/confirm" || basePath.startsWith("/confirm/")) return true;
   return false;
@@ -60,7 +60,7 @@ function changePasswordRedirectUrl(request: NextRequest): URL {
 
 function mustChangePasswordExemptBasePath(basePath: string): boolean {
   if (basePath === "/change-password") return true;
-  if (basePath === "/cont" || basePath.startsWith("/cont/")) return true;
+  if (basePath === "/login" || basePath.startsWith("/login/")) return true;
   if (basePath === "/confirm" || basePath.startsWith("/confirm/")) return true;
   if (basePath === "/maintenance" || basePath.startsWith("/maintenance/")) return true;
   return false;

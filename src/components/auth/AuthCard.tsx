@@ -11,6 +11,7 @@ import type { OauthAvailability } from "@/components/auth/types";
 type Props = {
   oauth?: OauthAvailability;
   callbackError?: string;
+  callbackUrl?: string;
 };
 
 const CALLBACK_ERROR_KEYS: Record<string, "callbackError_missing_code" | "callbackError_oauth" | "callbackError_supabase_env"> = {
@@ -19,11 +20,11 @@ const CALLBACK_ERROR_KEYS: Record<string, "callbackError_missing_code" | "callba
   supabase_env_missing: "callbackError_supabase_env",
 };
 
-export function AuthCard({ oauth, callbackError }: Props) {
+export function AuthCard({ oauth, callbackError, callbackUrl }: Props) {
   const t = useTranslations("Auth");
   const locale = useLocale();
   const [tab, setTab] = useState<"login" | "register">("login");
-  const callbackUrl = locale === routing.defaultLocale ? "/" : `/${locale}`;
+  const nextUrl = callbackUrl ?? (locale === routing.defaultLocale ? "/" : `/${locale}`);
 
   const callbackMessageKey = useMemo(() => {
     if (!callbackError?.trim()) {
@@ -103,7 +104,7 @@ export function AuthCard({ oauth, callbackError }: Props) {
             role="tabpanel"
             id={`auth-panel-${tab}`}
           >
-            {tab === "login" ? <LoginTab callbackUrl={callbackUrl} oauth={oauth} /> : null}
+            {tab === "login" ? <LoginTab callbackUrl={nextUrl} oauth={oauth} /> : null}
             {tab === "register" ? <RegisterTab oauth={oauth} /> : null}
           </div>
         </div>
