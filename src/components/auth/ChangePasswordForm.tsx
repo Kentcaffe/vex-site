@@ -22,7 +22,7 @@ export function ChangePasswordForm() {
     const fd = new FormData(e.currentTarget);
     const p1 = String(fd.get("password") ?? "");
     const p2 = String(fd.get("password2") ?? "");
-    if (p1.length < 10) {
+    if (p1.length < 8) {
       setError(t("weak"));
       return;
     }
@@ -59,10 +59,10 @@ export function ChangePasswordForm() {
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{t("subtitle")}</p>
       </div>
       <IconField id="cp1" label={t("newLabel")} icon={Lock}>
-        <input id="cp1" name="password" type="password" autoComplete="new-password" className={authInputClass} required minLength={10} />
+        <input id="cp1" name="password" type="password" autoComplete="new-password" className={authInputClass} required minLength={8} />
       </IconField>
       <IconField id="cp2" label={t("repeatLabel")} icon={Lock}>
-        <input id="cp2" name="password2" type="password" autoComplete="new-password" className={authInputClass} required minLength={10} />
+        <input id="cp2" name="password2" type="password" autoComplete="new-password" className={authInputClass} required minLength={8} />
       </IconField>
       {error ? (
         <p className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:bg-red-950/40 dark:text-red-300" role="alert">

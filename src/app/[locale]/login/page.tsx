@@ -2,9 +2,8 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { UserRole } from "@prisma/client";
 import { auth } from "@/auth";
-import { AuthForms } from "@/components/AuthForms";
-import { getOAuthAvailability } from "@/lib/oauth-env";
 import { localizedHref } from "@/lib/paths";
+import TesterLoginClient from "./TesterLoginClient";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -13,7 +12,7 @@ type Props = {
 
 export default async function LoginPage({ params, searchParams }: Props) {
   const { locale } = await params;
-  const sp = await searchParams;
+  await searchParams;
   setRequestLocale(locale);
 
   const session = await auth();
@@ -24,15 +23,27 @@ export default async function LoginPage({ params, searchParams }: Props) {
     if (session.user.role === UserRole.TESTER) {
       redirect(localizedHref(locale, "/tester/dashboard"));
     }
+    redirect("/maintenance");
   }
 
-  const callbackError = typeof sp.error === "string" && sp.error.length > 0 ? sp.error : undefined;
-  const oauth = getOAuthAvailability();
-  const callbackUrl = localizedHref(locale, "/tester/dashboard");
+  const dashboardPath = localizedHref(locale, "/tester/dashboard");
+  const changePasswordPath = localizedHref(locale, "/change-password");
 
   return (
-    <div className="app-shell flex min-h-[calc(100vh-10rem)] flex-col items-center justify-center px-4 py-12 sm:px-6">
-      <AuthForms oauth={oauth} callbackError={callbackError} callbackUrl={callbackUrl} />
-    </div>
+    <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#030712] px-4 py-12 text-white">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage:
+            "radial-gradient(38rem 24rem at 50% -6%, rgba(56,189,248,0.3), transparent 70%), radial-gradient(28rem 20rem at 90% 16%, rgba(59,130,246,0.24), transparent 72%), linear-gradient(to bottom, #030712 0%, #020617 50%, #01040f 100%)",
+        }}
+      />
+      <TesterLoginClient
+        dashboardPath={dashboardPath}
+        changePasswordPath={changePasswordPath}
+        maintenancePath="/maintenance"
+      />
+    </main>
   );
 }
