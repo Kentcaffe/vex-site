@@ -36,6 +36,11 @@ function isMaintenancePublicPath(basePath: string): boolean {
   if (basePath === "/login" || basePath.startsWith("/login/")) return true;
   if (basePath === "/change-password") return true;
   if (basePath === "/confirm" || basePath.startsWith("/confirm/")) return true;
+  for (const loc of routing.locales) {
+    if (basePath === `/${loc}/login` || basePath.startsWith(`/${loc}/login/`)) return true;
+    if (basePath === `/${loc}/change-password` || basePath.startsWith(`/${loc}/change-password/`)) return true;
+    if (basePath === `/${loc}/confirm` || basePath.startsWith(`/${loc}/confirm/`)) return true;
+  }
   return false;
 }
 
@@ -63,6 +68,12 @@ function mustChangePasswordExemptBasePath(basePath: string): boolean {
   if (basePath === "/login" || basePath.startsWith("/login/")) return true;
   if (basePath === "/confirm" || basePath.startsWith("/confirm/")) return true;
   if (basePath === "/maintenance" || basePath.startsWith("/maintenance/")) return true;
+  for (const loc of routing.locales) {
+    if (basePath === `/${loc}/login` || basePath.startsWith(`/${loc}/login/`)) return true;
+    if (basePath === `/${loc}/change-password` || basePath.startsWith(`/${loc}/change-password/`)) return true;
+    if (basePath === `/${loc}/confirm` || basePath.startsWith(`/${loc}/confirm/`)) return true;
+    if (basePath === `/${loc}/maintenance` || basePath.startsWith(`/${loc}/maintenance/`)) return true;
+  }
   return false;
 }
 
