@@ -8,13 +8,13 @@ import {
   isMiddlewareStaticBypass,
   isValidMaintenanceBypassCookie,
   MAINTENANCE_BYPASS_COOKIE,
-} from "@/lib/maintenance";
+} from "./lib/maintenance";
 import {
   canBypassMaintenanceWithSessionUser,
   refreshSupabaseSession,
   userMustChangePasswordFromSession,
-} from "@/lib/proxy-auth";
-import { stripLocalePrefix } from "@/lib/i18n-path";
+} from "./lib/proxy-auth";
+import { stripLocalePrefix } from "./lib/i18n-path";
 import { routing } from "./i18n/routing";
 
 /**
