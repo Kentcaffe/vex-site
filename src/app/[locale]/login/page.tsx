@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { UserRole } from "@prisma/client";
 import { auth } from "@/auth";
 import { AuthForms } from "@/components/AuthForms";
 import { getOAuthAvailability } from "@/lib/oauth-env";
@@ -20,7 +21,9 @@ export default async function LoginPage({ params, searchParams }: Props) {
     if (session.user.mustChangePassword) {
       redirect(localizedHref(locale, "/change-password"));
     }
-    redirect(localizedHref(locale, "/"));
+    if (session.user.role === UserRole.TESTER) {
+      redirect(localizedHref(locale, "/tester/dashboard"));
+    }
   }
 
   const callbackError = typeof sp.error === "string" && sp.error.length > 0 ? sp.error : undefined;
