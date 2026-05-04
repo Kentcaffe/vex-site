@@ -23,7 +23,6 @@ export default async function LoginPage({ params, searchParams }: Props) {
     if (session.user.role === UserRole.TESTER) {
       redirect(localizedHref(locale, "/tester/dashboard"));
     }
-    redirect("/maintenance");
   }
 
   const dashboardPath = localizedHref(locale, "/tester/dashboard");
