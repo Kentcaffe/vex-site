@@ -3,7 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
-import { Headphones, Loader2, Send, Shield } from "lucide-react";
+import { Headphones, Loader2, Paperclip, Send, Shield } from "lucide-react";
+import { ChatRichBody } from "@/components/chat/messages/ChatRichBody";
+import { assertMarkdownImagesTrusted, formatChatImageMarkdown } from "@/lib/chat-attachment-markdown";
 import {
   playIncomingChatSound,
   requestChatNotificationPermission,
@@ -57,6 +59,8 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
   const [scheduleOpen, setScheduleOpen] = useState(true);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const channelReadyRef = useRef(false);
@@ -290,6 +294,10 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
   async function send() {
     const body = draft.trim();
     if (!body || sending) return;
+    if (!assertMarkdownImagesTrusted(body)) {
+      setError(t("imageUploadFailed"));
+      return;
+    }
     if (variant === "user" && !scheduleOpen) {
       setError(`Live chat este disponibil în programul ${liveSupportScheduleLabel()}. Ne poți scrie la ${SUPPORT_EMAIL}.`);
       return;
@@ -329,6 +337,32 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
       setError(msg);
     } finally {
       setSending(false);
+    }
+  }
+
+  async function onPickChatImages(files: FileList | null) {
+    if (!files?.length || uploadingImage) {
+      return;
+    }
+    setError(null);
+    setUploadingImage(true);
+    try {
+      const fd = new FormData();
+      for (const f of Array.from(files).slice(0, 4)) {
+        fd.append("files", f);
+      }
+      const res = await fetch("/api/chat/upload-image", { method: "POST", credentials: "include", body: fd });
+      const data = (await res.json().catch(() => ({}))) as { urls?: string[] };
+      if (!res.ok || !Array.isArray(data.urls) || data.urls.length === 0) {
+        setError(t("imageUploadFailed"));
+        return;
+      }
+      const block = data.urls.map((u) => formatChatImageMarkdown(u)).join("\n\n");
+      setDraft((d) => (d.trim() ? `${d.trim()}\n\n${block}` : block));
+    } catch {
+      setError(t("imageUploadFailed"));
+    } finally {
+      setUploadingImage(false);
     }
   }
 
@@ -407,9 +441,9 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
                       <p className="mb-2 inline-flex items-center justify-center gap-1 rounded-full bg-zinc-200/80 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300">
                         {t("systemBadge")}
                       </p>
-                      <p className="whitespace-pre-wrap break-words text-sm italic leading-relaxed text-zinc-600 dark:text-zinc-300">
-                        {resolveMessageBody(m, t)}
-                      </p>
+                      <div className="text-sm italic leading-relaxed text-zinc-600 dark:text-zinc-300">
+                        <ChatRichBody body={resolveMessageBody(m, t)} variant="supportSystem" />
+                      </div>
                       <p className="mt-2 text-[10px] text-zinc-400">{formatTime(m.createdAt, locale)}</p>
                     </div>
                   </div>
@@ -451,7 +485,18 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
                     {variant === "staff" && isStaffMsg ? (
                       <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-orange-100/90">{t("youStaffBadge")}</p>
                     ) : null}
-                    <p className="whitespace-pre-wrap break-words">{resolveMessageBody(m, t)}</p>
+                    <ChatRichBody
+                      body={m.body}
+                      variant={
+                        variant === "user"
+                          ? isMine
+                            ? "supportStaff"
+                            : "supportUser"
+                          : isMine
+                            ? "supportStaff"
+                            : "supportUser"
+                      }
+                    />
                     <p className={`mt-1.5 text-[10px] ${timeMuted}`}>{formatTime(m.createdAt, locale)}</p>
                   </div>
                 </div>
@@ -480,6 +525,29 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
           </p>
         ) : null}
         <div className="flex gap-2">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            className="hidden"
+            aria-hidden
+            tabIndex={-1}
+            onChange={(e) => {
+              const list = e.target.files;
+              e.target.value = "";
+              void onPickChatImages(list);
+            }}
+          />
+          <button
+            type="button"
+            disabled={uploadingImage || sending || (variant === "user" && !scheduleOpen)}
+            onClick={() => fileRef.current?.click()}
+            className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-zinc-500 transition hover:border-orange-300 hover:text-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
+            aria-label={t("attachImageAria")}
+          >
+            {uploadingImage ? <Loader2 className="h-5 w-5 animate-spin" /> : <Paperclip className="h-5 w-5" />}
+          </button>
           <label htmlFor="support-chat-input" className="sr-only">
             {t("inputLabel")}
           </label>
@@ -501,7 +569,7 @@ export function SupportLiveChat({ variant, ticketId, userEmail, onThreadHasMessa
           <button
             type="button"
             onClick={() => void send()}
-            disabled={sending || !draft.trim() || (variant === "user" && !scheduleOpen)}
+            disabled={sending || uploadingImage || !draft.trim() || (variant === "user" && !scheduleOpen)}
             className="inline-flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-md transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
             aria-label={t("send")}
           >

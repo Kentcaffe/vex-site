@@ -1,6 +1,7 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
+import { ChatRichBody } from "@/components/chat/messages/ChatRichBody";
 import { initials, bubbleColor, formatChatTime } from "./tester-chat-utils";
 
 export type ChatMessageModel = {
@@ -83,7 +84,7 @@ export function TesterChatMessageRow({
                 : "border-white/10 bg-white/[0.06] text-slate-100 backdrop-blur-sm"
             }`}
           >
-            <p className="whitespace-pre-wrap break-words">{message.text}</p>
+            <ChatRichBody body={message.text} variant={mine ? "testerMine" : "testerOther"} />
           </div>
           <div className={`flex flex-wrap gap-1.5 ${mine ? "justify-end" : "justify-start"}`}>
             {REACTION_EMOJIS.map((emoji) => {

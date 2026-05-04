@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Paperclip, Send, Smile } from "lucide-react";
+import { Loader2, Paperclip, Send, Smile } from "lucide-react";
 
 const QUICK_EMOJIS = ["👍", "🔥", "✅", "🐛", "💡", "🙏"];
 
@@ -15,6 +15,8 @@ type Props = {
   placeholder: string;
   emojiPickerAria: string;
   attachAria: string;
+  onAttachFilesAction?: (files: FileList) => void | Promise<void>;
+  uploading?: boolean;
 };
 
 export function TesterChatInput({
@@ -26,6 +28,8 @@ export function TesterChatInput({
   placeholder,
   emojiPickerAria,
   attachAria,
+  onAttachFilesAction,
+  uploading,
 }: Props) {
   const [emojiOpen, setEmojiOpen] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -38,15 +42,30 @@ export function TesterChatInput({
   return (
     <div className="shrink-0 border-t border-white/[0.08] bg-[#070b14]/90 p-4 backdrop-blur-md sm:p-5">
       <div className="mx-auto flex max-w-4xl items-end gap-2">
-        <input ref={fileRef} type="file" className="hidden" multiple aria-hidden tabIndex={-1} />
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          className="hidden"
+          multiple
+          aria-hidden
+          tabIndex={-1}
+          onChange={(e) => {
+            const list = e.target.files;
+            e.target.value = "";
+            if (list?.length && onAttachFilesAction) {
+              void onAttachFilesAction(list);
+            }
+          }}
+        />
         <button
           type="button"
-          disabled={disabled}
+          disabled={disabled || uploading || !onAttachFilesAction}
           aria-label={attachAria}
           onClick={() => fileRef.current?.click()}
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-slate-300 transition hover:border-violet-500/30 hover:bg-violet-500/10 hover:text-white disabled:opacity-40"
         >
-          <Paperclip className="h-5 w-5" />
+          {uploading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Paperclip className="h-5 w-5" />}
         </button>
         <div className="relative min-w-0 flex-1">
           {emojiOpen ? (
@@ -89,7 +108,7 @@ export function TesterChatInput({
         </div>
         <button
           type="button"
-          disabled={disabled || sending || !value.trim()}
+          disabled={disabled || sending || uploading || !value.trim()}
           onClick={onSubmitAction}
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-emerald-700 text-white shadow-lg shadow-emerald-900/40 transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
         >

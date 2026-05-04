@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+import { formatChatImageMarkdown } from "@/lib/chat-attachment-markdown";
 import { normalizeRealtimeInsert } from "@/lib/chat-message-payload";
 import {
   playIncomingChatSound,
@@ -19,7 +20,13 @@ export function useMarketplaceChatRoom(bootstrap: ChatBootstrap, currentUserId: 
     sortChatMessages(Array.isArray(bootstrap.messages) ? bootstrap.messages : []),
   );
   const [otherLastReadAt, setOtherLastReadAt] = useState<string | null>(bootstrap.otherLastReadAt);
-  const [draft, setDraft] = useState("");
+  const [attachmentBusy, setAttachmentBusy] = useState(false);
+  const [attachmentError, setAttachmentError] = useState<string | null>(null);
+  const [draft, setDraftRaw] = useState("");
+  const setDraft = useCallback((v: string | ((prev: string) => string)) => {
+    setAttachmentError(null);
+    setDraftRaw(v);
+  }, []);
   const [showNewMessagesBanner, setShowNewMessagesBanner] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -179,6 +186,35 @@ export function useMarketplaceChatRoom(bootstrap: ChatBootstrap, currentUserId: 
     };
   }, [roomId]);
 
+  const attachFiles = useCallback(
+    async (list: FileList | null) => {
+      if (!list?.length) {
+        return;
+      }
+      setAttachmentError(null);
+      setAttachmentBusy(true);
+      try {
+        const fd = new FormData();
+        for (const f of Array.from(list).slice(0, 4)) {
+          fd.append("files", f);
+        }
+        const res = await fetch("/api/chat/upload-image", { method: "POST", credentials: "include", body: fd });
+        const data = (await res.json().catch(() => ({}))) as { urls?: string[] };
+        if (!res.ok || !Array.isArray(data.urls) || data.urls.length === 0) {
+          setAttachmentError(t("imageUploadFailed"));
+          return;
+        }
+        const block = data.urls.map((u) => formatChatImageMarkdown(u)).join("\n\n");
+        setDraftRaw((d) => (d.trim() ? `${d.trim()}\n\n${block}` : block));
+      } catch {
+        setAttachmentError(t("imageUploadFailed"));
+      } finally {
+        setAttachmentBusy(false);
+      }
+    },
+    [t],
+  );
+
   const send = useCallback(async () => {
     const text = draft.trim();
     if (!text) return;
@@ -201,7 +237,7 @@ export function useMarketplaceChatRoom(bootstrap: ChatBootstrap, currentUserId: 
       });
     }
     setDraft("");
-  }, [draft, roomId, scrollToBottom]);
+  }, [draft, roomId, scrollToBottom, setDraft]);
 
   const lastOwn = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -231,6 +267,9 @@ export function useMarketplaceChatRoom(bootstrap: ChatBootstrap, currentUserId: 
     draft,
     setDraft,
     send,
+    attachFiles,
+    attachmentBusy,
+    attachmentError,
     scrollRef,
     bottomRef,
     updateNearBottom,

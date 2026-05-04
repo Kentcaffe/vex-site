@@ -84,6 +84,9 @@ export function MarketplaceMessagesRoom({ bootstrap, currentUserId, inboxItems }
           onDraftChangeAction={hook.setDraft}
           onSubmitAction={() => void hook.send()}
           maxLength={bootstrap.maxBodyLength}
+          onAttachFilesAction={(files) => void hook.attachFiles(files)}
+          attachmentBusy={hook.attachmentBusy}
+          attachmentError={hook.attachmentError}
         />
       </div>
       <div className="shrink-0 md:hidden" style={{ minHeight: "calc(var(--chat-composer-stack) + 2.25rem)" }} aria-hidden />

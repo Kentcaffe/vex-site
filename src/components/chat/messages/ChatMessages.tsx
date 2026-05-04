@@ -3,6 +3,7 @@
 import { Fragment, type RefObject } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ChatAvatar } from "@/components/chat/ChatAvatar";
+import { ChatRichBody } from "@/components/chat/messages/ChatRichBody";
 import { sameCalendarDay } from "@/lib/chat-ui";
 import type { ChatMessageRow } from "@/lib/chat-merge-messages";
 
@@ -90,7 +91,10 @@ export function ChatMessages({
                             : "rounded-bl-md border border-slate-200 bg-white text-slate-800"
                         }`}
                       >
-                        <p className="whitespace-pre-wrap break-words">{m.body}</p>
+                        <ChatRichBody
+                          body={m.body}
+                          variant={mine ? "marketplaceMine" : "marketplaceOther"}
+                        />
                       </div>
                       <time
                         dateTime={m.createdAt}

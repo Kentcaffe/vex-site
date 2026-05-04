@@ -27,3 +27,8 @@ export function listingsStorageBucket(): string {
 export function listingsObjectKey(filename: string): string {
   return `listings/${filename}`;
 }
+
+/** Imagini atașate în chat (marketplace / suport / tester) — servite prin `/api/chat/image/:name`. */
+export function chatImageObjectKey(filename: string): string {
+  return `chat/${filename}`;
+}

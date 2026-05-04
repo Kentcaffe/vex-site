@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { ApiErrorCode, jsonServiceUnavailable } from "@/lib/api-error";
+import { assertMarkdownImagesTrusted } from "@/lib/chat-attachment-markdown";
 import { CHAT_MESSAGE_MAX, getRoomAccess } from "@/lib/chat-actions";
 import { insertRoomMessage } from "@/lib/chat-realtime-store";
 import { prisma } from "@/lib/prisma";
@@ -34,6 +35,9 @@ export async function POST(req: Request, { params }: Props) {
     const text = typeof body === "object" && body !== null && "body" in body ? String((body as { body: unknown }).body) : "";
     const trimmed = text.trim();
     if (!trimmed || trimmed.length > CHAT_MESSAGE_MAX) {
+      return NextResponse.json({ ok: false, error: "validation" }, { status: 400 });
+    }
+    if (!assertMarkdownImagesTrusted(trimmed)) {
       return NextResponse.json({ ok: false, error: "validation" }, { status: 400 });
     }
 

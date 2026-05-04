@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Paperclip, Send, Smile } from "lucide-react";
+import { useRef, useState } from "react";
+import { Loader2, Paperclip, Send, Smile } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 const QUICK = ["👍", "😊", "📍", "✅", "🙏"];
@@ -12,24 +12,55 @@ type Props = {
   onSubmitAction: () => void;
   maxLength: number;
   disabled?: boolean;
+  onAttachFilesAction?: (files: FileList) => void | Promise<void>;
+  attachmentBusy?: boolean;
+  attachmentError?: string | null;
 };
 
-export function ChatInput({ draft, onDraftChangeAction, onSubmitAction, maxLength, disabled }: Props) {
+export function ChatInput({
+  draft,
+  onDraftChangeAction,
+  onSubmitAction,
+  maxLength,
+  disabled,
+  onAttachFilesAction,
+  attachmentBusy,
+  attachmentError,
+}: Props) {
   const t = useTranslations("Chat");
   const [emojiOpen, setEmojiOpen] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const remaining = maxLength - draft.length;
+  const canAttach = Boolean(onAttachFilesAction) && !attachmentBusy && !disabled;
 
   return (
     <div className="border-t border-slate-200 bg-white p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(15,23,42,0.06)]">
       <div className="mx-auto flex max-w-3xl items-end gap-2">
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          multiple
+          className="hidden"
+          aria-hidden
+          tabIndex={-1}
+          onChange={(e) => {
+            const list = e.target.files;
+            e.target.value = "";
+            if (list?.length && onAttachFilesAction) {
+              void onAttachFilesAction(list);
+            }
+          }}
+        />
         <button
           type="button"
-          disabled={disabled}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 transition hover:border-emerald-300 hover:text-emerald-700 disabled:opacity-40"
+          disabled={!canAttach}
+          onClick={() => fileRef.current?.click()}
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 transition hover:border-emerald-300 hover:text-emerald-700 disabled:cursor-not-allowed disabled:opacity-40"
           aria-label={t("attachAria")}
-          title={t("attachSoon")}
+          title={onAttachFilesAction ? t("attachAria") : t("attachSoon")}
         >
-          <Paperclip className="h-5 w-5" />
+          {attachmentBusy ? <Loader2 className="h-5 w-5 animate-spin" /> : <Paperclip className="h-5 w-5" />}
         </button>
         <div className="relative min-w-0 flex-1">
           {emojiOpen ? (
@@ -85,7 +116,12 @@ export function ChatInput({ draft, onDraftChangeAction, onSubmitAction, maxLengt
           <Send className="h-5 w-5" />
         </button>
       </div>
-      <div className="mx-auto mt-1 flex max-w-3xl justify-end text-[11px] tabular-nums text-slate-400">
+      <div className="mx-auto mt-1 flex max-w-3xl flex-col items-end gap-0.5 text-[11px] tabular-nums text-slate-400">
+        {attachmentError ? (
+          <span className="w-full text-left font-medium text-red-600" role="alert">
+            {attachmentError}
+          </span>
+        ) : null}
         <span className={remaining < 120 ? "font-medium text-amber-600" : ""}>
           {remaining} {t("charsLeft")}
         </span>

@@ -66,6 +66,16 @@ export async function POST(req: Request) {
     const text = parsed.data.body;
     const norm = normalizeSupportBody(text);
     if (!norm.ok) {
+      if (norm.error === "invalid_attachment") {
+        return NextResponse.json(
+          {
+            ok: false,
+            error: norm.error,
+            message: "Linkurile din imagine nu sunt permise. Folosește butonul de atașare din chat.",
+          },
+          { status: 400 },
+        );
+      }
       return NextResponse.json({ ok: false, error: norm.error }, { status: 400 });
     }
 

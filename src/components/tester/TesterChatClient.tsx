@@ -25,6 +25,7 @@ import {
 import { TesterChatInput } from "@/components/tester/chat/TesterChatInput";
 import { TesterChatRightPanel } from "@/components/tester/chat/TesterChatRightPanel";
 import { dayKey } from "@/components/tester/chat/tester-chat-utils";
+import { assertMarkdownImagesTrusted, formatChatImageMarkdown } from "@/lib/chat-attachment-markdown";
 
 export type TesterChatMessage = ChatMessageModel;
 
@@ -66,6 +67,7 @@ export function TesterChatClient({
   const [messages, setMessages] = useState<TesterChatMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [draft, setDraft] = useState("");
   const [search, setSearch] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -430,10 +432,40 @@ export function TesterChatClient({
     });
   }
 
+  async function onAttachFiles(files: FileList) {
+    if (!canSend || uploadingImage) {
+      return;
+    }
+    setError(null);
+    setUploadingImage(true);
+    try {
+      const fd = new FormData();
+      for (const f of Array.from(files).slice(0, 4)) {
+        fd.append("files", f);
+      }
+      const res = await fetch("/api/chat/upload-image", { method: "POST", credentials: "include", body: fd });
+      const data = (await res.json().catch(() => ({}))) as { urls?: string[] };
+      if (!res.ok || !Array.isArray(data.urls) || data.urls.length === 0) {
+        setError(t("imageUploadFailed"));
+        return;
+      }
+      const block = data.urls.map((u) => formatChatImageMarkdown(u)).join("\n\n");
+      setDraft((d) => (d.trim() ? `${d.trim()}\n\n${block}` : block));
+    } catch {
+      setError(t("imageUploadFailed"));
+    } finally {
+      setUploadingImage(false);
+    }
+  }
+
   async function submitMessage() {
     if (!canSend) return;
     const text = draft.trim();
     if (!text || sending) return;
+    if (!assertMarkdownImagesTrusted(text)) {
+      setError(t("imageUploadFailed"));
+      return;
+    }
 
     const supabase = tryCreateSupabaseBrowserClient();
     if (!supabase) {
@@ -583,6 +615,8 @@ export function TesterChatClient({
                 onSubmitAction={() => void submitMessage()}
                 sending={sending}
                 disabled={sending}
+                uploading={uploadingImage}
+                onAttachFilesAction={(files) => void onAttachFiles(files)}
                 placeholder={t("placeholder")}
                 emojiPickerAria={t("emojiPickerAria")}
                 attachAria={t("attachAria")}

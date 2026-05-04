@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { supportMessage, supportTicket } from "@/lib/prisma-delegates";
 import { logSupportDbFailure } from "@/lib/support-db-log";
+import { assertMarkdownImagesTrusted } from "@/lib/chat-attachment-markdown";
 import {
   SUPPORT_SYSTEM_BODY_TICKET_REGISTERED,
   type SupportMessageDTO,
@@ -15,6 +16,7 @@ export function normalizeSupportBody(raw: string): { ok: true; body: string } | 
   const body = raw.trim();
   if (!body) return { ok: false, error: "empty" };
   if (body.length > BODY_MAX) return { ok: false, error: "too_long" };
+  if (!assertMarkdownImagesTrusted(body)) return { ok: false, error: "invalid_attachment" };
   return { ok: true, body };
 }
 
