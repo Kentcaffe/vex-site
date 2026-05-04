@@ -66,6 +66,19 @@ function mustChangePasswordExemptBasePath(basePath: string): boolean {
   return false;
 }
 
+/**
+ * Pagina de mentenanță e în `app/maintenance`, nu în `app/[locale]/…`.
+ * next-intl rescrie `/maintenance` către `/ro/maintenance` → Next caută `[locale]/maintenance` → 404.
+ */
+function isMaintenancePagePath(pathname: string): boolean {
+  if (pathname === "/maintenance" || pathname.startsWith("/maintenance/")) return true;
+  const base = stripLocalePrefix(pathname);
+  if (base === "/maintenance" || base.startsWith("/maintenance/")) return true;
+  const dl = routing.defaultLocale;
+  if (pathname === `/${dl}/maintenance` || pathname.startsWith(`/${dl}/maintenance/`)) return true;
+  return false;
+}
+
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
@@ -79,6 +92,18 @@ export default async function proxy(request: NextRequest) {
   if (isMaintenanceMode()) {
     if (isMiddlewareStaticBypass(pathname)) {
       return NextResponse.next();
+    }
+
+    if (isMaintenancePagePath(pathname)) {
+      if (pathname !== "/maintenance" && !pathname.startsWith("/maintenance/")) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/maintenance";
+        url.search = "";
+        return NextResponse.redirect(url, 307);
+      }
+      const response = NextResponse.next();
+      await attachSupabaseSession(request, response);
+      return response;
     }
 
     if (hasMaintenanceBypass) {
