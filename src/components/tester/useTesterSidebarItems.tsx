@@ -9,12 +9,12 @@ export function useTesterSidebarItems(): TesterSidebarItem[] {
   const t = useTranslations("TesterDashboard.nav");
   return useMemo(
     () => [
-      { id: "dash", href: "/tester", label: t("dashboard"), icon: LayoutDashboard },
-      { id: "test", href: "/tester#report", label: t("test"), icon: FlaskConical },
-      { id: "reports", href: "/tester#reports", label: t("reports"), icon: Bug },
-      { id: "rewards", href: "/tester#rewards", label: t("rewards"), icon: Trophy },
-      { id: "lb", href: "/tester#leaderboard", label: t("leaderboard"), icon: Medal },
-      { id: "settings", href: "/cont", label: t("settings"), icon: Settings },
+      { id: "dash", href: "/tester/dashboard", label: t("dashboard"), icon: LayoutDashboard },
+      { id: "test", href: "/tester/test", label: t("test"), icon: FlaskConical },
+      { id: "reports", href: "/tester/reports", label: t("reports"), icon: Bug },
+      { id: "rewards", href: "/tester/rewards", label: t("rewards"), icon: Trophy },
+      { id: "lb", href: "/tester/leaderboard", label: t("leaderboard"), icon: Medal },
+      { id: "settings", href: "/cont/setari", label: t("settings"), icon: Settings },
     ],
     [t],
   );

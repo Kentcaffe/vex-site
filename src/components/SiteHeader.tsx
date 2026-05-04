@@ -69,7 +69,7 @@ export async function SiteHeader() {
                 <LanguageSwitcher />
               </div>
               {canAccessTester ? (
-                <Link href="/tester" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
+                <Link href="/tester/dashboard" className="block rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-900 hover:bg-zinc-50">
                   {t("tester")}
                 </Link>
               ) : null}
@@ -199,7 +199,7 @@ export async function SiteHeader() {
               </>
             ) : null}
             {canAccessTester ? (
-              <Link href="/tester" className="font-medium text-zinc-500 transition hover:text-[#22c55e]">
+              <Link href="/tester/dashboard" className="font-medium text-zinc-500 transition hover:text-[#22c55e]">
                 {t("tester")}
               </Link>
             ) : null}

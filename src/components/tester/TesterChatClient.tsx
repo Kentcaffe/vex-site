@@ -537,7 +537,7 @@ export function TesterChatClient({
           <div className="flex min-h-[min(100dvh,880px)] min-w-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] shadow-2xl shadow-black/50 backdrop-blur-xl lg:min-h-[calc(100dvh-10rem)]">
             <TesterChatHeader
               backLabel={t("backToDashboard")}
-              backHref="/tester"
+              backHref="/tester/dashboard"
               title={t("title")}
               subtitle={t("subtitle")}
               onlineBadge={t("onlineNow", { count: onlineCount })}

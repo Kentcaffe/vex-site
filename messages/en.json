@@ -864,6 +864,22 @@
       "subtitle": "Log defects with reproducible steps, track outcomes in your report list, and help improve product quality. The tester chat is available from the side menu.",
       "badge": "Active tester"
     },
+    "subpages": {
+      "reportTitle": "Report a bug",
+      "reportSubtitle": "Fill in the form with clear steps and screenshots.",
+      "backToReports": "View my reports",
+      "reportsTitle": "My reports",
+      "reportsSubtitle": "Filter by status and severity.",
+      "newReport": "New report",
+      "backToDashboard": "Back to dashboard",
+      "rewardsTitle": "Rewards",
+      "rewardsSubtitle": "Summary of accepted bugs in the program.",
+      "rewardsAccepted": "Accepted bugs",
+      "rewardsTotalLei": "Total rewards (MDL)",
+      "rewardsRailHint": "The full leaderboard is in the right column on large screens.",
+      "leaderboardTitle": "Leaderboard",
+      "leaderboardSubtitle": "Top reporters — details in the right-hand panel."
+    },
     "form": {
       "title": "Report a bug",
       "badge": "Form",

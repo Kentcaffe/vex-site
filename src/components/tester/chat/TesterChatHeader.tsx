@@ -29,7 +29,7 @@ export function TesterChatHeader({
     <header className="shrink-0 space-y-4 border-b border-white/[0.08] px-4 py-4 sm:px-5">
       <Link
         href={backHref}
-        className="inline-flex items-center gap-2 text-xs font-semibold text-emerald-400/90 transition hover:text-emerald-300"
+        className="inline-flex cursor-pointer items-center gap-2 text-xs font-semibold text-emerald-400/90 outline-none transition hover:text-emerald-300 focus-visible:ring-2 focus-visible:ring-emerald-500/40"
       >
         <ArrowLeft className="h-3.5 w-3.5" aria-hidden />
         {backLabel}

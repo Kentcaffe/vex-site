@@ -195,7 +195,7 @@ export async function submitTesterBugReport(formData: FormData): Promise<TesterB
   }
 
   for (const loc of routing.locales) {
-    revalidatePath(localizedHref(loc, "/tester"));
+    revalidatePath(localizedHref(loc, "/tester"), "layout");
     revalidatePath(localizedHref(loc, "/cont"));
   }
   revalidatePath("/admin/bugs");

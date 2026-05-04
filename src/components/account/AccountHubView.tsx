@@ -158,7 +158,7 @@ export function AccountHubView({ user }: Props) {
         </div>
         {canAccessTester ? (
           <div className="[&>*]:animate-account-section">
-            <HubRow href="/tester" icon={BadgeCheck} label={t("testerDashboard")} />
+            <HubRow href="/tester/dashboard" icon={BadgeCheck} label={t("testerDashboard")} />
           </div>
         ) : null}
         <div className="[&>*]:animate-account-section">
