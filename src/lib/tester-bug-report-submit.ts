@@ -5,6 +5,7 @@ import { routing } from "@/i18n/routing";
 import { checkRateLimit } from "@/lib/request-rate-limit";
 import { localizedHref } from "@/lib/paths";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { getSupabaseServiceClient } from "@/lib/supabase-service-role";
 import { type BugCategory, type BugSeverity } from "@/lib/tester-bugs";
 
 export type TesterBugSubmitState = {
@@ -15,6 +16,56 @@ export type TesterBugSubmitState = {
 
 const VALID_CATEGORIES = new Set<BugCategory>(["ui", "functional", "security"]);
 const VALID_SEVERITIES = new Set<BugSeverity>(["low", "medium", "high"]);
+
+/** Fișierele din FormData în Route Handler / Server Action sunt Blob (inclusiv File); `instanceof File` poate eșua. */
+function collectImageBlobs(entries: FormDataEntryValue[]): Blob[] {
+  const blobs: Blob[] = [];
+  for (const entry of entries) {
+    if (typeof Blob !== "undefined" && entry instanceof Blob && entry.size > 0) {
+      blobs.push(entry);
+    }
+  }
+  return blobs;
+}
+
+function extForImageBlob(blob: Blob): string {
+  const t = (blob.type ?? "").toLowerCase();
+  if (t === "image/jpeg" || t === "image/jpg") {
+    return "jpg";
+  }
+  if (t === "image/png") {
+    return "png";
+  }
+  if (t === "image/webp") {
+    return "webp";
+  }
+  if (t === "image/gif") {
+    return "gif";
+  }
+  return "png";
+}
+
+function contentTypeForBlob(blob: Blob): string {
+  const t = blob.type?.trim() ?? "";
+  if (/^image\/(jpeg|jpg|png|webp|gif)$/i.test(t)) {
+    return t.replace(/^image\/jpg$/i, "image/jpeg");
+  }
+  return "image/png";
+}
+
+function uploadErrorHint(message: string): string {
+  const m = message.toLowerCase();
+  if (m.includes("mime") || m.includes("type") || m.includes("invalid")) {
+    return "Format neacceptat sau bucket neconfigurat. Folosește PNG, JPEG, WebP sau GIF (max. 5 MB). Verifică în Supabase că bucketul `bugs` permite aceste tipuri.";
+  }
+  if (m.includes("size") || m.includes("large") || m.includes("exceeded")) {
+    return "Fișier prea mare (max. 5 MB per imagine).";
+  }
+  if (m.includes("row-level security") || m.includes("policy") || m.includes("unauthorized") || m.includes("403")) {
+    return "Permisiuni Storage: rulează scriptul SQL pentru bucket `bugs` sau setează SUPABASE_SERVICE_ROLE_KEY pe server.";
+  }
+  return "Upload imagini eșuat. Încearcă din nou.";
+}
 
 /**
  * Logică partajată: Server Action + POST /api/tester/bugs (evită UnrecognizedActionError la deploy).
@@ -51,6 +102,18 @@ export async function submitTesterBugReport(formData: FormData): Promise<TesterB
   const category = String(formData.get("category") ?? "").toLowerCase() as BugCategory;
   const severity = String(formData.get("severity") ?? "").toLowerCase() as BugSeverity;
   const imagesRaw = formData.getAll("images");
+  const imageBlobs = collectImageBlobs(imagesRaw);
+
+  if (imageBlobs.length === 0) {
+    return {
+      ok: false,
+      message: "",
+      error: "Adaugă cel puțin o captură de ecran (obligatoriu, până la 5 imagini).",
+    };
+  }
+  if (imageBlobs.length > 5) {
+    return { ok: false, message: "", error: "Poți încărca maximum 5 imagini." };
+  }
 
   if (title.length < 4 || description.length < 10 || stepsToReproduce.length < 10) {
     return { ok: false, message: "", error: "Completeaza titlu, descriere si pasii de reproducere (minim 10 caractere)." };
@@ -67,31 +130,40 @@ export async function submitTesterBugReport(formData: FormData): Promise<TesterB
   }
 
   const supabase = await createSupabaseServerClient();
+  /** Upload cu service role evită eșecul RLS pe Storage când sesiunea Supabase din cookie nu e aliniată; calea rămâne sub `userId/…`. */
+  const storageClient = getSupabaseServiceClient() ?? supabase;
 
-  let imageUrl: string | null = null;
   const imageUrls: string[] = [];
-  const canUseFile = typeof File !== "undefined";
-  if (canUseFile) {
-    const images = imagesRaw.filter((entry): entry is File => entry instanceof File && entry.size > 0);
-    if (images.length > 5) {
-      return { ok: false, message: "", error: "Poți încărca maximum 5 imagini." };
+  for (let i = 0; i < imageBlobs.length; i += 1) {
+    const blob = imageBlobs[i]!;
+    if (blob.size > 5 * 1024 * 1024) {
+      return { ok: false, message: "", error: "Fiecare imagine trebuie să aibă cel mult 5 MB." };
     }
-    for (const image of images) {
-      const ext = image.name.includes(".") ? image.name.split(".").pop() : "png";
-      const fileName = `${supabaseUserId}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
-      const upload = await supabase.storage.from("bugs").upload(fileName, image, {
-        cacheControl: "3600",
-        upsert: false,
-        contentType: image.type || "image/png",
+    const ext = extForImageBlob(blob);
+    const fileName = `${supabaseUserId}/${Date.now()}-${i}-${crypto.randomUUID()}.${ext}`;
+    const contentType = contentTypeForBlob(blob);
+    const upload = await storageClient.storage.from("bugs").upload(fileName, blob, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType,
+    });
+    if (upload.error) {
+      console.error("[tester-bugs] storage upload failed", {
+        userId: supabaseUserId,
+        fileName,
+        message: upload.error.message,
       });
-      if (upload.error) {
-        return { ok: false, message: "", error: "Upload imagini eșuat. Încearcă din nou." };
-      }
-      const publicUrlRes = supabase.storage.from("bugs").getPublicUrl(fileName);
-      imageUrls.push(publicUrlRes.data.publicUrl);
+      return {
+        ok: false,
+        message: "",
+        error: uploadErrorHint(upload.error.message ?? ""),
+      };
     }
-    imageUrl = imageUrls[0] ?? null;
+    const publicUrlRes = storageClient.storage.from("bugs").getPublicUrl(fileName);
+    imageUrls.push(publicUrlRes.data.publicUrl);
   }
+
+  const imageUrl = imageUrls[0] ?? null;
 
   const insert = await supabase.from("bugs").insert({
     user_id: supabaseUserId,

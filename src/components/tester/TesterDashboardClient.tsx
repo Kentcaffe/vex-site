@@ -93,6 +93,7 @@ export function TesterDashboardClient({
       submit: t("form.submit"),
       submitting: t("form.submitting"),
       footerHint: t("form.footerHint"),
+      imagesRequired: t("form.imagesRequired"),
     }),
     [t],
   );

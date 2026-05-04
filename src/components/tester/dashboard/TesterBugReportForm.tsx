@@ -95,6 +95,7 @@ export type TesterBugReportFormCopy = {
   submit: string;
   submitting: string;
   footerHint: string;
+  imagesRequired: string;
 };
 
 type Props = {
@@ -149,6 +150,11 @@ export function TesterBugReportForm({ copy, formRef, onSuccessAction }: Props) {
   }
 
   async function submitViaApi(form: HTMLFormElement) {
+    const files = fileInputRef.current?.files;
+    if (!files?.length) {
+      setState({ ok: false, message: "", error: copy.imagesRequired });
+      return;
+    }
     setPending(true);
     setState({ ok: false, message: "", error: undefined });
     try {
@@ -452,7 +458,8 @@ export function TesterBugReportForm({ copy, formRef, onSuccessAction }: Props) {
               type="file"
               name="images"
               multiple
-              accept="image/*"
+              required
+              accept="image/jpeg,image/png,image/webp,image/gif"
               className="sr-only"
               onChange={(e) => {
                 const files = e.target.files;

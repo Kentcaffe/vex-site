@@ -131,8 +131,13 @@ with check (
 -- 3) Storage: bucket public + politici (upload imagini rapoarte)
 -- -----------------------------------------------------------------------------
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('bugs', 'bugs', true, 5242880, array['image/png', 'image/jpeg', 'image/webp'])
+values ('bugs', 'bugs', true, 5242880, array['image/png', 'image/jpeg', 'image/webp', 'image/gif'])
 on conflict (id) do nothing;
+
+-- Dacă bucketul exista deja fără GIF, actualizează tipurile permise:
+update storage.buckets
+set allowed_mime_types = array['image/png', 'image/jpeg', 'image/webp', 'image/gif']
+where id = 'bugs';
 
 drop policy if exists "bugs_bucket_read_public" on storage.objects;
 create policy "bugs_bucket_read_public"
