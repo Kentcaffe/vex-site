@@ -14,11 +14,11 @@ export function isTesterRole(role: unknown): boolean {
 }
 
 /**
- * Panoul principal tester (rapoarte, dashboard) — doar rolul `TESTER`.
- * Staff folosește `/admin/bugs` etc.
+ * Panoul `/tester/*` (workspace): testeri + staff (ADMIN, MODERATOR) au acces complet fără pași extra.
  */
 export function canAccessTesterDashboard(role: unknown): boolean {
-  return isTesterRole(role);
+  const v = String(role ?? "").toUpperCase() as UserRole;
+  return isTesterRole(v) || isStaff(v);
 }
 
 /** Chat tester + unele API-uri: testeri și personal moderare. */

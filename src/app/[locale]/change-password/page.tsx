@@ -1,8 +1,8 @@
-import { UserRole } from "@prisma/client";
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
+import { canAccessTesterDashboard } from "@/lib/auth-roles";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -14,10 +14,10 @@ export default async function ChangePasswordPage({ params }: Props) {
     redirect("/maintenance");
   }
   if (!session.user.mustChangePassword) {
-    redirect(session.user.role === UserRole.TESTER ? "/tester/dashboard" : "/");
+    redirect(canAccessTesterDashboard(session.user.role) ? "/tester/dashboard" : "/");
   }
 
-  const redirectPath = session.user.role === UserRole.TESTER ? "/tester/dashboard" : "/";
+  const redirectPath = canAccessTesterDashboard(session.user.role) ? "/tester/dashboard" : "/";
 
   return (
     <main

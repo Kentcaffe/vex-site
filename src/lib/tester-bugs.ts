@@ -32,7 +32,7 @@ export type BugAdminRow = BugRow & {
   user_email: string;
 };
 
-/** Badge cont etc.; accesul la panoul `/tester/*` (rapoarte) e doar rol `TESTER` — vezi `canAccessTesterDashboard`. Chat: `canAccessTesterChat`. */
+/** Badge cont etc.; accesul la panoul `/tester/*` — vezi `canAccessTesterDashboard` în `auth-roles`. Chat: `canAccessTesterChat`. */
 export function isTesterRole(role: unknown): boolean {
   return String(role ?? "").toUpperCase() === "TESTER";
 }
