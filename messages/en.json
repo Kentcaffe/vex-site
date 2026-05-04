@@ -716,17 +716,19 @@
     }
   },
   "ChangePassword": {
-    "title": "Change password",
-    "subtitle": "Your administrator created this account with a temporary password. Choose a new secure password before continuing.",
+    "title": "Set your permanent password",
+    "subtitle": "This will be your final password. Make sure it is strong and do not share it with anyone.",
     "newLabel": "New password",
     "repeatLabel": "Confirm password",
-    "submit": "Save and continue",
+    "submit": "Save password",
     "saving": "Saving…",
-    "weak": "Use at least 10 characters.",
+    "weak": "Password must be at least 8 characters.",
     "mismatch": "Passwords do not match.",
     "noClient": "Sign-in client is not configured.",
-    "failed": "Could not update password.",
-    "syncFailed": "Password updated but profile sync failed. Try signing out and in again."
+    "failed": "Could not update password. Please try again.",
+    "syncFailed": "Password changed in your account, but profile sync failed. Try again or sign out and sign in.",
+    "success": "Your password was updated successfully. You can now use your account.",
+    "redirecting": "Redirecting…"
   },
   "Auth": {
     "cardTitle": "Your account",

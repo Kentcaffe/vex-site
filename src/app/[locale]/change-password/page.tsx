@@ -1,8 +1,8 @@
+import { UserRole } from "@prisma/client";
 import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
-import { localizedHref } from "@/lib/paths";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -14,8 +14,10 @@ export default async function ChangePasswordPage({ params }: Props) {
     redirect("/maintenance");
   }
   if (!session.user.mustChangePassword) {
-    redirect(localizedHref(locale, "/"));
+    redirect(session.user.role === UserRole.TESTER ? "/tester/dashboard" : "/");
   }
+
+  const redirectPath = session.user.role === UserRole.TESTER ? "/tester/dashboard" : "/";
 
   return (
     <main
@@ -30,7 +32,7 @@ export default async function ChangePasswordPage({ params }: Props) {
             "radial-gradient(38rem 24rem at 50% -6%, rgba(56,189,248,0.3), transparent 70%), radial-gradient(28rem 20rem at 90% 16%, rgba(59,130,246,0.24), transparent 72%), linear-gradient(to bottom, #030712 0%, #020617 50%, #01040f 100%)",
         }}
       />
-      <ChangePasswordForm />
+      <ChangePasswordForm redirectPath={redirectPath} />
       <style>{`
         body:has([data-tester-auth-page="true"]) header.sticky,
         body:has([data-tester-auth-page="true"]) footer.mt-12,

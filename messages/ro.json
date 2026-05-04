@@ -716,17 +716,19 @@
     }
   },
   "ChangePassword": {
-    "title": "Schimbă parola",
-    "subtitle": "Contul a fost creat cu o parolă temporară. Alege o parolă nouă înainte de a continua.",
+    "title": "Setează parola ta permanentă",
+    "subtitle": "Aceasta va fi parola ta finală. Asigură-te că este sigură și nu o partaja cu nimeni.",
     "newLabel": "Parolă nouă",
     "repeatLabel": "Confirmă parola",
-    "submit": "Salvează și continuă",
+    "submit": "Salvează parola",
     "saving": "Se salvează…",
-    "weak": "Folosește cel puțin 10 caractere.",
+    "weak": "Parola trebuie să aibă cel puțin 8 caractere.",
     "mismatch": "Parolele nu coincid.",
     "noClient": "Clientul de autentificare nu e configurat.",
-    "failed": "Nu s-a putut actualiza parola.",
-    "syncFailed": "Parola s-a schimbat, dar sincronizarea profilului a eșuat. Încearcă delogare și logare din nou."
+    "failed": "Nu s-a putut actualiza parola. Încearcă din nou.",
+    "syncFailed": "Parola s-a schimbat în cont, dar actualizarea profilului a eșuat. Încearcă din nou sau delogare și logare.",
+    "success": "Parola a fost actualizată cu succes. Acum poți folosi contul tău.",
+    "redirecting": "Te redirecționăm…"
   },
   "Auth": {
     "cardTitle": "Contul tău",
