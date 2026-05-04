@@ -1,5 +1,7 @@
 generator client {
   provider = "prisma-client-js"
+  /** În `src/` ca TypeScript / VS Code să rezolve mereu același client ca schema (evită tipuri Prisma „învechite” în Problems). */
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -65,6 +67,8 @@ model User {
   city          String?
   bio           String?
   passwordHash  String?
+  /** După creare cont de admin: utilizatorul trebuie să schimbe parola (Supabase), apoi flag-ul devine false. */
+  mustChangePassword Boolean    @default(false) @map("must_change_password")
   role          UserRole       @default(USER)
   /** Nivel în programul de testare (chat tester) — tip enum în Postgres = dropdown în Supabase. */
   testerLevel   TesterProgramLevel @default(trial) @map("tester_level")
@@ -86,12 +90,32 @@ model User {
   feedbacks     Feedback[]
   feedbackRepliesAsAdmin FeedbackReply[] @relation("FeedbackReplyAdmin")
   adminLogs     AdminLog[]
+  testerActivity TesterActivity?
   /** JSON: theme, notifications, privacy toggles, activity log snippets, etc. */
   preferences   Json?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @default(now()) @updatedAt
 
   @@map("users")
+}
+
+/** Agregate activitate program testare (sesiuni, timp, ultimele rute). */
+model TesterActivity {
+  id             String    @id @default(cuid())
+  userId         String    @unique @map("user_id")
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lastLogin      DateTime? @map("last_login")
+  sessionsCount  Int       @default(0) @map("sessions_count")
+  /** Timp total petrecut în app (secunde), incrementat din heartbeat / session_end. */
+  totalTimeSpent Int       @default(0) @map("total_time_spent")
+  lastActive     DateTime? @map("last_active")
+  lastPath       String?   @map("last_path")
+  /** Ultimele căi vizitate (JSON string[] max ~20). */
+  recentPaths    Json?     @map("recent_paths")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  @@map("tester_activity")
 }
 
 model Message {

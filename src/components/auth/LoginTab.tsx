@@ -71,7 +71,17 @@ export function LoginTab({ callbackUrl, oauth }: Props) {
       return;
     }
     clearLoginFields();
-    router.push(callbackUrl);
+    let nextPath = callbackUrl;
+    try {
+      const s = await fetch("/api/auth/session", { credentials: "include" });
+      const payload = (await s.json()) as { session?: { user?: { mustChangePassword?: boolean } } | null };
+      if (payload.session?.user?.mustChangePassword) {
+        nextPath = "/change-password";
+      }
+    } catch {
+      /* ignore */
+    }
+    router.push(nextPath);
     router.refresh();
   }
 

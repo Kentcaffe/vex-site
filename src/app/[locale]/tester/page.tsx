@@ -22,6 +22,9 @@ export default async function TesterIndexPage({ params }: Props) {
   if (!canAccessTesterDashboard(role)) {
     redirect(localizedHref(locale, "/"));
   }
+  if (session.user.mustChangePassword) {
+    redirect(localizedHref(locale, "/change-password"));
+  }
 
   redirect(localizedHref(locale, "/tester/dashboard"));
 }

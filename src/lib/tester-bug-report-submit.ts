@@ -77,6 +77,9 @@ export async function submitTesterBugReport(formData: FormData): Promise<TesterB
   if (!session?.user?.id || !supabaseUserId || !canAccessTesterDashboard(role)) {
     return { ok: false, message: "", error: "Nu ai acces la tester dashboard." };
   }
+  if (session.user.mustChangePassword) {
+    return { ok: false, message: "", error: "Schimbă parola temporară înainte de a trimite rapoarte." };
+  }
   const rl = checkRateLimit({
     key: `tester_bug_submit:${session.user.id}`,
     limit: 6,

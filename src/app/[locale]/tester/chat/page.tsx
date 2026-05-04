@@ -3,7 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { TesterChatClient } from "@/components/tester/TesterChatClient";
-import { canAccessTesterDashboard } from "@/lib/auth-roles";
+import { canAccessTesterChat } from "@/lib/auth-roles";
 import { normalizeTesterLevel } from "@/lib/tester-level";
 import { localizedHref } from "@/lib/paths";
 import { prisma } from "@/lib/prisma";
@@ -22,7 +22,7 @@ export default async function TesterChatPage({ params }: Props) {
   if (!session?.user?.id || !supabaseUserId) {
     redirect(localizedHref(locale, "/cont"));
   }
-  if (!canAccessTesterDashboard(role)) {
+  if (!canAccessTesterChat(role)) {
     redirect(localizedHref(locale, "/"));
   }
 

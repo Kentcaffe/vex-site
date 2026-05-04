@@ -8,9 +8,21 @@ export function isAdmin(role: UserRole | undefined): boolean {
   return role === "ADMIN";
 }
 
-/** Pagina /tester și raportarea: testeri + staff (`isStaff`: moderator, admin). */
+/** Rol strict TESTER (program /tester/dashboard etc.). */
+export function isTesterRole(role: unknown): boolean {
+  return String(role ?? "").toUpperCase() === "TESTER";
+}
+
+/**
+ * Panoul principal tester (rapoarte, dashboard) — doar rolul `TESTER`.
+ * Staff folosește `/admin/bugs` etc.
+ */
 export function canAccessTesterDashboard(role: unknown): boolean {
-  const v = String(role ?? "").toUpperCase();
-  if (v === "TESTER") return true;
-  return isStaff(v as UserRole);
+  return isTesterRole(role);
+}
+
+/** Chat tester + unele API-uri: testeri și personal moderare. */
+export function canAccessTesterChat(role: unknown): boolean {
+  const v = String(role ?? "").toUpperCase() as UserRole;
+  return isTesterRole(v) || isStaff(v);
 }

@@ -1,4 +1,6 @@
 /node_modules
+# Client Prisma generat în src (regenerat la `prisma generate` / `npm install`)
+/src/generated/prisma
 /.next
 /out
 .env

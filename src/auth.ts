@@ -1,6 +1,7 @@
 import type { UserRole } from "@prisma/client";
 import { isMissingListingColumnError } from "@/lib/prisma-listing-queries";
 import { prisma } from "@/lib/prisma";
+import { pushAuthUserMetadataToSupabase } from "@/lib/supabase-auth-metadata";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 
 export type AppSession = {
@@ -11,6 +12,7 @@ export type AppSession = {
     image?: string | null;
     role: UserRole;
     supabaseUserId: string;
+    mustChangePassword: boolean;
   };
 };
 
@@ -20,6 +22,16 @@ type SyncInput = {
   name?: string | null;
   avatarUrl?: string | null;
 };
+
+const sessionUserSelect = {
+  id: true,
+  email: true,
+  name: true,
+  avatarUrl: true,
+  role: true,
+  mustChangePassword: true,
+  supabaseAuthId: true,
+} as const;
 
 function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
@@ -55,9 +67,9 @@ async function upsertPrismaUserFromSupabase(input: SyncInput) {
         data.avatarUrl = input.avatarUrl.trim();
       }
       if (Object.keys(data).length === 0) {
-        return prisma.user.findUniqueOrThrow({ where: { email } });
+        return prisma.user.findUniqueOrThrow({ where: { email }, select: sessionUserSelect });
       }
-      return prisma.user.update({ where: { email }, data });
+      return prisma.user.update({ where: { email }, data, select: sessionUserSelect });
     }
 
     return prisma.user.create({
@@ -67,6 +79,7 @@ async function upsertPrismaUserFromSupabase(input: SyncInput) {
         avatarUrl: input.avatarUrl ?? null,
         ...(includeSupabaseAuthId ? { supabaseAuthId: input.supabaseUserId } : {}),
       },
+      select: sessionUserSelect,
     });
   }
 
@@ -120,6 +133,12 @@ export async function syncAuthenticatedUserToPrisma(): Promise<AppSession | null
       avatarUrl: metadataAvatar(authUser.user_metadata as Record<string, unknown> | undefined),
     });
 
+    void pushAuthUserMetadataToSupabase({
+      supabaseAuthId: authUser.id,
+      prismaRole: dbUser.role,
+      mustChangePassword: dbUser.mustChangePassword,
+    });
+
     return {
       user: {
         id: dbUser.id,
@@ -128,6 +147,7 @@ export async function syncAuthenticatedUserToPrisma(): Promise<AppSession | null
         image: dbUser.avatarUrl,
         role: dbUser.role,
         supabaseUserId: authUser.id,
+        mustChangePassword: dbUser.mustChangePassword,
       },
     };
   } catch (error) {

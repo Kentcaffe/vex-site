@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { canAccessTesterDashboard } from "@/lib/auth-roles";
+import { canAccessTesterChat } from "@/lib/auth-roles";
 import { normalizeTesterLevel, testerLevelLabelRo, type TesterLevel } from "@/lib/tester-level";
 import { prisma } from "@/lib/prisma";
 
@@ -19,7 +19,7 @@ type LevelPayload = {
  */
 export async function GET(req: Request) {
   const session = await auth();
-  if (!session?.user?.id || !canAccessTesterDashboard(session.user.role)) {
+  if (!session?.user?.id || !canAccessTesterChat(session.user.role)) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 

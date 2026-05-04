@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { canAccessTesterDashboard } from "@/lib/auth-roles";
+import { canAccessTesterChat } from "@/lib/auth-roles";
 import { canTesterDeleteChatMessages, normalizeTesterLevel } from "@/lib/tester-level";
 import { prisma } from "@/lib/prisma";
 
@@ -14,7 +14,7 @@ const UUID_RE =
  */
 export async function DELETE(req: Request) {
   const session = await auth();
-  if (!session?.user?.id || !canAccessTesterDashboard(session.user.role)) {
+  if (!session?.user?.id || !canAccessTesterChat(session.user.role)) {
     return NextResponse.json({ message: "unauthorized" }, { status: 401 });
   }
 

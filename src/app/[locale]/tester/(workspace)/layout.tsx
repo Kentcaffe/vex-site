@@ -5,6 +5,7 @@ import { TesterWorkspaceShell } from "@/components/tester/TesterWorkspaceShell";
 import { TesterWorkspaceProvider } from "@/contexts/tester-workspace-context";
 import { canAccessTesterDashboard } from "@/lib/auth-roles";
 import { localizedHref } from "@/lib/paths";
+import { TesterSessionTracker } from "@/components/tester/TesterSessionTracker";
 import { listLeaderboard, listOwnBugs } from "@/lib/tester-bugs";
 
 type Props = {
@@ -25,12 +26,16 @@ export default async function TesterWorkspaceLayout({ children, params }: Props)
   if (!canAccessTesterDashboard(role)) {
     redirect(localizedHref(locale, "/"));
   }
+  if (session.user.mustChangePassword) {
+    redirect(localizedHref(locale, "/change-password"));
+  }
 
   const bugs = await listOwnBugs(supabaseUserId);
   const leaderboard = await listLeaderboard(5);
 
   return (
     <TesterWorkspaceProvider bugs={bugs} leaderboard={leaderboard}>
+      <TesterSessionTracker />
       <TesterWorkspaceShell>{children}</TesterWorkspaceShell>
     </TesterWorkspaceProvider>
   );

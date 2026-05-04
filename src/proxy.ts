@@ -9,11 +9,17 @@ import {
   isValidMaintenanceBypassCookie,
   MAINTENANCE_BYPASS_COOKIE,
 } from "@/lib/maintenance";
+import {
+  canBypassMaintenanceWithSessionUser,
+  refreshSupabaseSession,
+  userMustChangePasswordFromSession,
+} from "@/lib/proxy-auth";
+import { stripLocalePrefix } from "@/lib/i18n-path";
 import { routing } from "./i18n/routing";
 
 /**
  * Edge middleware (Next.js 16: fișierul se numește `proxy.ts`).
- * Logica este echivalentă cu „middleware” clasic: mentenanță + i18n + Supabase session refresh.
+ * Mentenanță + i18n + Supabase session refresh + redirect schimbare parolă obligatorie.
  */
 const intlMiddleware = createMiddleware(routing);
 
@@ -21,26 +27,43 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 async function attachSupabaseSession(request: NextRequest, response: NextResponse): Promise<void> {
-  if (!supabaseUrl?.trim() || !supabaseAnonKey?.trim()) {
-    return;
+  await refreshSupabaseSession(request, response);
+}
+
+/** Rute accesibile fără login în timpul mentenanței (login, health, confirm). */
+function isMaintenancePublicPath(basePath: string): boolean {
+  if (basePath === "/maintenance" || basePath.startsWith("/maintenance/")) return true;
+  if (basePath === "/cont" || basePath.startsWith("/cont/")) return true;
+  if (basePath === "/change-password") return true;
+  if (basePath === "/confirm" || basePath.startsWith("/confirm/")) return true;
+  return false;
+}
+
+function isAuthApiPath(pathname: string): boolean {
+  return pathname === "/api/auth" || pathname.startsWith("/api/auth/");
+}
+
+function changePasswordRedirectUrl(request: NextRequest): URL {
+  const url = request.nextUrl.clone();
+  const path = request.nextUrl.pathname;
+  for (const loc of routing.locales) {
+    if (loc === routing.defaultLocale) continue;
+    const prefix = `/${loc}`;
+    if (path === prefix || path.startsWith(`${prefix}/`)) {
+      url.pathname = `${prefix}/change-password`;
+      return url;
+    }
   }
-  try {
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
-      },
-    });
-    await supabase.auth.getUser();
-  } catch (err) {
-    console.error("[proxy] Supabase session refresh failed:", err);
-  }
+  url.pathname = "/change-password";
+  return url;
+}
+
+function mustChangePasswordExemptBasePath(basePath: string): boolean {
+  if (basePath === "/change-password") return true;
+  if (basePath === "/cont" || basePath.startsWith("/cont/")) return true;
+  if (basePath === "/confirm" || basePath.startsWith("/confirm/")) return true;
+  if (basePath === "/maintenance" || basePath.startsWith("/maintenance/")) return true;
+  return false;
 }
 
 export default async function proxy(request: NextRequest) {
@@ -58,7 +81,6 @@ export default async function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
-    /** Utilizatori cu cookie valid: acces complet (inclusiv API + rute localizate). */
     if (hasMaintenanceBypass) {
       if (pathname.startsWith("/api/")) {
         const response = NextResponse.next();
@@ -86,6 +108,16 @@ export default async function proxy(request: NextRequest) {
     }
 
     if (pathname.startsWith("/api/")) {
+      if (isAuthApiPath(pathname)) {
+        const response = NextResponse.next();
+        await attachSupabaseSession(request, response);
+        return response;
+      }
+      const response = NextResponse.next();
+      const user = await refreshSupabaseSession(request, response);
+      if (user && canBypassMaintenanceWithSessionUser(user)) {
+        return response;
+      }
       return NextResponse.json(
         {
           ok: false,
@@ -97,10 +129,16 @@ export default async function proxy(request: NextRequest) {
       );
     }
 
-    if (pathname === "/maintenance" || pathname.startsWith("/maintenance/")) {
-      const res = NextResponse.next();
-      await attachSupabaseSession(request, res);
-      return res;
+    const response = await Promise.resolve(intlMiddleware(request));
+    const user = await refreshSupabaseSession(request, response);
+    const basePath = stripLocalePrefix(pathname);
+
+    if (isMaintenancePublicPath(basePath)) {
+      return response;
+    }
+
+    if (user && canBypassMaintenanceWithSessionUser(user)) {
+      return response;
     }
 
     const url = request.nextUrl.clone();
@@ -129,12 +167,21 @@ export default async function proxy(request: NextRequest) {
   }
 
   const response = await Promise.resolve(intlMiddleware(request));
-  await attachSupabaseSession(request, response);
+  const user = await refreshSupabaseSession(request, response);
+  const basePath = stripLocalePrefix(pathname);
+
+  if (
+    user &&
+    userMustChangePasswordFromSession(user) &&
+    !mustChangePasswordExemptBasePath(basePath) &&
+    !pathname.startsWith("/api/")
+  ) {
+    return NextResponse.redirect(changePasswordRedirectUrl(request), 307);
+  }
+
   return response;
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],
 };
