@@ -26,7 +26,7 @@ export async function createSupabaseServerClient() {
             }
           } catch {
             // În Server Components, Next.js nu permite scrierea cookie-urilor; reîmprospătarea
-            // sesiei se face în `src/middleware.ts`. Vezi Supabase SSR + Next.js App Router.
+            // Reîmprospătarea sesiei se face în `src/proxy.ts` (edge middleware, Next.js 16). Vezi Supabase SSR + App Router.
           }
         },
       },

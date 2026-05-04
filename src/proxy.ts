@@ -2,9 +2,19 @@ import { createServerClient } from "@supabase/ssr";
 import createMiddleware from "next-intl/middleware";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { isMaintenanceMode, isMiddlewareStaticBypass } from "@/lib/maintenance";
+import {
+  isBetaAccessApiPath,
+  isMaintenanceMode,
+  isMiddlewareStaticBypass,
+  isValidMaintenanceBypassCookie,
+  MAINTENANCE_BYPASS_COOKIE,
+} from "@/lib/maintenance";
 import { routing } from "./i18n/routing";
 
+/**
+ * Edge middleware (Next.js 16: fișierul se numește `proxy.ts`).
+ * Logica este echivalentă cu „middleware” clasic: mentenanță + i18n + Supabase session refresh.
+ */
 const intlMiddleware = createMiddleware(routing);
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -36,18 +46,45 @@ async function attachSupabaseSession(request: NextRequest, response: NextRespons
 export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
-  /* Chunk-uri, HMR, internals Vercel/Render — fără intl */
   if (pathname.startsWith("/_next") || pathname.startsWith("/_vercel")) {
     return NextResponse.next();
   }
+
+  const bypassCookie = request.cookies.get(MAINTENANCE_BYPASS_COOKIE)?.value;
+  const hasMaintenanceBypass = await isValidMaintenanceBypassCookie(bypassCookie);
 
   if (isMaintenanceMode()) {
     if (isMiddlewareStaticBypass(pathname)) {
       return NextResponse.next();
     }
+
+    /** Utilizatori cu cookie valid: acces complet (inclusiv API + rute localizate). */
+    if (hasMaintenanceBypass) {
+      if (pathname.startsWith("/api/")) {
+        const response = NextResponse.next();
+        await attachSupabaseSession(request, response);
+        return response;
+      }
+      if (pathname === "/confirm" || pathname.startsWith("/confirm/")) {
+        const response = NextResponse.next();
+        await attachSupabaseSession(request, response);
+        return response;
+      }
+      const response = await Promise.resolve(intlMiddleware(request));
+      await attachSupabaseSession(request, response);
+      return response;
+    }
+
     if (pathname === "/api/health") {
       return NextResponse.next();
     }
+
+    if (isBetaAccessApiPath(pathname)) {
+      const response = NextResponse.next();
+      await attachSupabaseSession(request, response);
+      return response;
+    }
+
     if (pathname.startsWith("/api/")) {
       return NextResponse.json(
         {
@@ -59,11 +96,13 @@ export default async function proxy(request: NextRequest) {
         { status: 503, headers: { "Retry-After": "120" } },
       );
     }
+
     if (pathname === "/maintenance" || pathname.startsWith("/maintenance/")) {
       const res = NextResponse.next();
       await attachSupabaseSession(request, res);
       return res;
     }
+
     const url = request.nextUrl.clone();
     url.pathname = "/maintenance";
     url.search = "";
@@ -83,7 +122,6 @@ export default async function proxy(request: NextRequest) {
     return response;
   }
 
-  // Keep /confirm outside locale middleware to prevent i18n rewrites/404.
   if (pathname === "/confirm" || pathname.startsWith("/confirm/")) {
     const response = NextResponse.next();
     await attachSupabaseSession(request, response);
@@ -97,9 +135,6 @@ export default async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Include /api pentru mentenanță; exclude asset-uri statice și fișiere publice cu extensie.
-     */
     "/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)",
   ],
 };
