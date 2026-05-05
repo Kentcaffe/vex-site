@@ -112,6 +112,21 @@ const links = [
     ),
   },
   {
+    href: "/admin/tester-support",
+    adminOnly: true,
+    labelKey: "navTesterSupport" as const,
+    icon: (
+      <svg className="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={1.75}
+          d="M8 10h.01M12 10h.01M16 10h.01M7 16h10l3 3V7a2 2 0 00-2-2H6a2 2 0 00-2 2v12l3-3z"
+        />
+      </svg>
+    ),
+  },
+  {
     href: "/admin/support",
     adminOnly: false,
     labelKey: "navSupport" as const,
