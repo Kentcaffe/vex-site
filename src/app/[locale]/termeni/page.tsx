@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LegalDocumentShell } from "@/components/legal/LegalDocumentShell";
 import { TermeniContentRo } from "@/components/legal/content/TermeniContentRo";
+import { explicitPageCanonicalMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -9,10 +10,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Legal.termeni" });
   const title = `${t("pageTitle")} | VEX`;
+  const { alternates, openGraph } = explicitPageCanonicalMetadata(locale, "/termeni");
   return {
     title,
     description: "Termeni și condiții pentru platforma VEX (vex.md) — marketplace și anunțuri.",
-    openGraph: { title, type: "article" },
+    alternates,
+    openGraph: { title, type: "article", url: openGraph.url },
   };
 }
 

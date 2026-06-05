@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ListingDetailPage, { generateMetadata as generateLegacyListingMetadata } from "@/app/[locale]/anunturi/[id]/page";
-import { absoluteCanonicalUrl, listingIdFromSeoSlug } from "@/lib/seo";
-import { localizedHref } from "@/lib/paths";
+import { explicitPageCanonicalMetadata, listingIdFromSeoSlug } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -12,13 +11,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { locale, slug } = await params;
     const id = listingIdFromSeoSlug(slug);
-    const canonicalUrl = absoluteCanonicalUrl(localizedHref(locale, `/anunt/${slug}`));
+    const { alternates, openGraph } = explicitPageCanonicalMetadata(locale, `/anunt/${slug}`);
     if (!id) {
       return {
         title: "Anunț indisponibil",
         description: "Acest anunț nu mai este disponibil pe VEX.",
-        alternates: { canonical: canonicalUrl },
-        openGraph: { url: canonicalUrl },
+        alternates,
+        openGraph,
       };
     }
     const legacy = await generateLegacyListingMetadata({
@@ -26,10 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     });
     return {
       ...legacy,
-      alternates: { canonical: canonicalUrl },
+      alternates,
       openGraph: {
         ...legacy.openGraph,
-        url: canonicalUrl,
+        url: openGraph.url,
       },
     };
   } catch (error) {

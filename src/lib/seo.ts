@@ -58,6 +58,21 @@ export function pageCanonicalMetadata(pathname: string): {
   };
 }
 
+/** Canonical explicit per rută — nu depinde de x-pathname (Render returnează `/`). */
+export function explicitPageCanonicalMetadata(
+  locale: string,
+  path: string,
+): {
+  alternates: { canonical: string };
+  openGraph: { url: string };
+} {
+  const absolute = absoluteCanonicalUrl(localizedHref(locale, path));
+  return {
+    alternates: { canonical: absolute },
+    openGraph: { url: absolute },
+  };
+}
+
 /** Canonical localizat: `/anunturi` (ro) sau `/en/anunturi`. */
 export function localePageCanonicalMetadata(
   locale: string,
@@ -66,7 +81,7 @@ export function localePageCanonicalMetadata(
   alternates: { canonical: string };
   openGraph: { url: string };
 } {
-  return pageCanonicalMetadata(localizedHref(locale, path));
+  return explicitPageCanonicalMetadata(locale, path);
 }
 
 export function listingIdFromSeoSlug(slug: string): string | null {

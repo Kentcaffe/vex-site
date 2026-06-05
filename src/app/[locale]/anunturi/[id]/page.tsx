@@ -20,9 +20,8 @@ import { findFirstListingResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
-import { absoluteCanonicalUrl, listingSeoPath } from "@/lib/seo";
+import { explicitPageCanonicalMetadata, listingSeoPath } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
-import { localizedHref } from "@/lib/paths";
 import { OwnListingDeleteButton } from "@/components/account/OwnListingDeleteButton";
 import { UserBadges } from "@/components/business/UserBadges";
 import { canShowPublicEmail, canShowPublicPhone } from "@/lib/public-privacy";
@@ -89,23 +88,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const image = resolvePublicMediaUrl(parseStoredListingImages(listing.images)[0] ?? null) ?? "/marketplace-image-fallback.svg";
     const description = `${listing.title} de vânzare în ${listing.city} pe VEX. Vezi poze și detalii complete.`;
-    const canonicalPath = localizedHref(
+    const { alternates, openGraph } = explicitPageCanonicalMetadata(
       locale,
       listingSeoPath({ id: listing.id, title: listing.title, city: listing.city }),
     );
-    const canonicalUrl = absoluteCanonicalUrl(canonicalPath);
 
     return {
       title: `${listing.title} de vânzare în ${listing.city}`,
       description,
-      alternates: {
-        canonical: canonicalUrl,
-      },
+      alternates,
       openGraph: {
         title: listing.title,
         description,
         type: "article",
-        url: canonicalUrl,
+        url: openGraph.url,
         images: [{ url: image, alt: listing.title }],
       },
       twitter: {

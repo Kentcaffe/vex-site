@@ -1,20 +1,25 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { explicitPageCanonicalMetadata } from "@/lib/seo";
 
 type Props = { params: Promise<{ locale: string }> };
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
   const title = "Privacy Policy | VEX";
   const description =
     "How vex.md collects and uses account data from Google or Facebook login. We do not sell your data. Contact: contact@vex.md.";
+  const { alternates, openGraph } = explicitPageCanonicalMetadata(locale, "/privacy");
   return {
     title,
     description,
+    alternates,
     openGraph: {
       title,
       description,
       type: "article",
+      url: openGraph.url,
     },
     twitter: {
       card: "summary",

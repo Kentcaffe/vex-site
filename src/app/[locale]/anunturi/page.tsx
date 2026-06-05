@@ -18,7 +18,7 @@ import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { AUTOTURISME_CATEGORY_SLUG } from "@/lib/category-slugs";
 import { CheckCircle } from "lucide-react";
 import { UserBadges } from "@/components/business/UserBadges";
-import { listingSeoPath, localePageCanonicalMetadata } from "@/lib/seo";
+import { explicitPageCanonicalMetadata, listingSeoPath } from "@/lib/seo";
 import {
   ELECTRONICS_CONDITION,
   ELECTRONICS_PRODUCT_ALL,
@@ -80,15 +80,15 @@ type Props = {
 export async function generateMetadata({ params }: Pick<Props, "params">): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Listings" });
-  const { alternates, openGraph } = localePageCanonicalMetadata(locale, "/anunturi");
+  const canonicalUrl = explicitPageCanonicalMetadata(locale, "/anunturi");
   return {
     title: `${t("title")} | VEX`,
     description: t("subtitle"),
-    alternates,
+    alternates: { canonical: canonicalUrl.alternates.canonical },
     openGraph: {
       title: `${t("title")} | VEX`,
       description: t("subtitle"),
-      url: openGraph.url,
+      url: canonicalUrl.openGraph.url,
       type: "website",
     },
   };

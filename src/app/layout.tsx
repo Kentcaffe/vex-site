@@ -2,8 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import { ThemeScript } from "@/components/theme/ThemeScript";
-import { currentRequestPathname } from "@/lib/request-pathname";
-import { pageCanonicalMetadata, siteUrl } from "@/lib/seo";
+import { siteUrl } from "@/lib/seo";
 import "./globals.css";
 
 const SEO_TITLE = "VEX - Anunțuri gratuite în Moldova";
@@ -18,15 +17,11 @@ const SEO_KEYWORDS = [
 ];
 
 export async function generateMetadata(): Promise<Metadata> {
-  const pathname = await currentRequestPathname();
-  const { alternates, openGraph: canonicalOg } = pageCanonicalMetadata(pathname);
-
   return {
     metadataBase: new URL(siteUrl()),
     title: SEO_TITLE,
     description: SEO_DESCRIPTION,
     keywords: SEO_KEYWORDS,
-    alternates,
     manifest: "/site.webmanifest",
     icons: {
       icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
@@ -37,7 +32,6 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "VEX - Anunțuri gratuite în Moldova",
       description: "Cumpără și vinde rapid pe VEX.",
       type: "website",
-      url: canonicalOg.url,
       siteName: "VEX",
       locale: "ro_MD",
       images: [

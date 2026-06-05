@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { InfoHubView } from "@/components/info/InfoHubView";
+import { explicitPageCanonicalMetadata } from "@/lib/seo";
 
 const HELP_LINKS = [
   { href: "/cum-functioneaza", labelKey: "linkHowItWorks" },
@@ -15,9 +16,12 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "InfoArticle" });
+  const { alternates, openGraph } = explicitPageCanonicalMetadata(locale, "/ajutor");
   return {
     title: `${t("hubHelpTitle")} | VEX`,
     description: t("hubHelpIntro"),
+    alternates,
+    openGraph: { ...openGraph, type: "website" },
   };
 }
 
