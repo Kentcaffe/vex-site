@@ -50,13 +50,13 @@ export function FavoriteButton({ listingId, initialFavorited, variant = "default
           title={err ?? (favorited ? t("saved") : t("save"))}
           aria-label={favorited ? t("saved") : t("save")}
           aria-pressed={favorited}
-          className={`inline-flex h-9 w-9 min-h-[36px] min-w-[36px] shrink-0 touch-manipulation items-center justify-center rounded-lg border border-[#e2e8f0] bg-white transition disabled:opacity-60 ${
-            favorited
-              ? "border-[#1a56db]/30 text-[#1a56db] hover:bg-[#f1f5f9]"
-              : "text-[#64748b] hover:border-[#1a56db]/30 hover:text-[#1a56db]"
-          }`}
+          className="inline-flex h-9 w-9 min-h-[36px] min-w-[36px] shrink-0 touch-manipulation items-center justify-center rounded-lg border border-[#e2e8f0] bg-white transition hover:bg-[#f8fafc] disabled:opacity-60"
         >
-          <Heart className={`h-4 w-4 ${favorited ? "fill-current" : ""}`} strokeWidth={1.75} aria-hidden />
+          <Heart
+            className={`h-5 w-5 ${favorited ? "fill-red-500 text-red-500" : "text-gray-400"}`}
+            strokeWidth={1.75}
+            aria-hidden
+          />
         </button>
       </div>
     );
@@ -74,8 +74,9 @@ export function FavoriteButton({ listingId, initialFavorited, variant = "default
             : "border-zinc-300 bg-white text-zinc-800 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
         }`}
         aria-pressed={favorited}
+        aria-label={favorited ? t("saved") : t("save")}
       >
-        <span aria-hidden>{favorited ? "♥" : "♡"}</span>
+        <Heart className={`h-5 w-5 shrink-0 ${favorited ? "fill-red-500 text-red-500" : "text-gray-400"}`} strokeWidth={1.75} aria-hidden />
         {favorited ? t("saved") : t("save")}
       </button>
       {err ? <p className="mt-1 text-xs text-red-600">{err}</p> : null}

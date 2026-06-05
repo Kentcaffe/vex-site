@@ -38,6 +38,18 @@ export function listingSeoPath(input: {
   return `/anunt/${slug}-${input.id}`;
 }
 
+/** Canonical + og:url relative la metadataBase (ex. `/anunturi`, `/ro/ajutor`). */
+export function pageCanonicalMetadata(pathname: string): {
+  alternates: { canonical: string };
+  openGraph: { url: string };
+} {
+  const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  return {
+    alternates: { canonical: path },
+    openGraph: { url: path },
+  };
+}
+
 export function listingIdFromSeoSlug(slug: string): string | null {
   const raw = slug.trim();
   if (!raw) return null;

@@ -18,6 +18,7 @@ import {
   userMustChangePasswordFromSession,
 } from "./lib/proxy-auth";
 import { stripLocalePrefix } from "./lib/i18n-path";
+import { attachPathnameHeader } from "./lib/request-pathname";
 import { routing } from "./i18n/routing";
 
 /**
@@ -29,6 +30,19 @@ const intlMiddleware = createMiddleware(routing);
 
 async function attachSupabaseSession(request: NextRequest, response: NextResponse): Promise<void> {
   await refreshSupabaseSession(request, response);
+}
+
+function nextWithPathname(request: NextRequest, init?: ResponseInit): NextResponse {
+  return NextResponse.next({
+    ...init,
+    request: { headers: attachPathnameHeader(request) },
+  });
+}
+
+function intlWithPathname(request: NextRequest): NextResponse | Promise<NextResponse> {
+  const headers = attachPathnameHeader(request);
+  const req = new NextRequest(request.url, { headers });
+  return intlMiddleware(req);
 }
 
 function jsonMustChangePassword(): NextResponse {
@@ -88,7 +102,7 @@ export default async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   if (pathname.startsWith("/_next") || pathname.startsWith("/_vercel")) {
-    return NextResponse.next();
+    return nextWithPathname(request);
   }
 
   const bypassCookie = request.cookies.get(MAINTENANCE_BYPASS_COOKIE)?.value;
@@ -96,7 +110,7 @@ export default async function proxy(request: NextRequest) {
 
   if (isMaintenanceMode()) {
     if (isMiddlewareStaticBypass(pathname)) {
-      return NextResponse.next();
+      return nextWithPathname(request);
     }
 
     if (isMaintenancePagePath(pathname)) {
@@ -106,14 +120,14 @@ export default async function proxy(request: NextRequest) {
         url.search = "";
         return NextResponse.redirect(url, 307);
       }
-      const response = NextResponse.next();
+      const response = nextWithPathname(request);
       await attachSupabaseSession(request, response);
       return response;
     }
 
     if (hasMaintenanceBypass) {
       if (pathname.startsWith("/api/")) {
-        const response = NextResponse.next();
+        const response = nextWithPathname(request);
         const user = await refreshSupabaseSession(request, response);
         if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangeAllowedApi(request)) {
           return jsonMustChangePassword();
@@ -121,11 +135,11 @@ export default async function proxy(request: NextRequest) {
         return response;
       }
       if (pathname === "/confirm" || pathname.startsWith("/confirm/")) {
-        const response = NextResponse.next();
+        const response = nextWithPathname(request);
         await attachSupabaseSession(request, response);
         return response;
       }
-      const response = await Promise.resolve(intlMiddleware(request));
+      const response = await Promise.resolve(intlWithPathname(request));
       const user = await refreshSupabaseSession(request, response);
       const basePath = stripLocalePrefix(pathname);
       if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangePageExempt(basePath)) {
@@ -135,25 +149,25 @@ export default async function proxy(request: NextRequest) {
     }
 
     if (pathname === "/api/health") {
-      return NextResponse.next();
+      return nextWithPathname(request);
     }
 
     if (isBetaAccessApiPath(pathname)) {
-      const response = NextResponse.next();
+      const response = nextWithPathname(request);
       await attachSupabaseSession(request, response);
       return response;
     }
 
     if (pathname.startsWith("/api/")) {
       if (isAuthApiPath(pathname)) {
-        const response = NextResponse.next();
+        const response = nextWithPathname(request);
         const user = await refreshSupabaseSession(request, response);
         if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangeAllowedApi(request)) {
           return jsonMustChangePassword();
         }
         return response;
       }
-      const response = NextResponse.next();
+      const response = nextWithPathname(request);
       const user = await refreshSupabaseSession(request, response);
       if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangeAllowedApi(request)) {
         return jsonMustChangePassword();
@@ -172,7 +186,7 @@ export default async function proxy(request: NextRequest) {
       );
     }
 
-    const response = await Promise.resolve(intlMiddleware(request));
+    const response = await Promise.resolve(intlWithPathname(request));
     const user = await refreshSupabaseSession(request, response);
     const basePath = stripLocalePrefix(pathname);
 
@@ -202,7 +216,7 @@ export default async function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith("/api/")) {
-    const response = NextResponse.next();
+    const response = nextWithPathname(request);
     const user = await refreshSupabaseSession(request, response);
     if (user && userMustChangePasswordFromSession(user) && !isMandatoryPasswordChangeAllowedApi(request)) {
       return jsonMustChangePassword();
@@ -211,12 +225,12 @@ export default async function proxy(request: NextRequest) {
   }
 
   if (pathname === "/confirm" || pathname.startsWith("/confirm/")) {
-    const response = NextResponse.next();
+    const response = nextWithPathname(request);
     await attachSupabaseSession(request, response);
     return response;
   }
 
-  const response = await Promise.resolve(intlMiddleware(request));
+  const response = await Promise.resolve(intlWithPathname(request));
   const user = await refreshSupabaseSession(request, response);
   const basePath = stripLocalePrefix(pathname);
 

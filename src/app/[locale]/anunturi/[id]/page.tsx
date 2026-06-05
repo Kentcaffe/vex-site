@@ -89,17 +89,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const image = resolvePublicMediaUrl(parseStoredListingImages(listing.images)[0] ?? null) ?? "/marketplace-image-fallback.svg";
     const description = `${listing.title} de vânzare în ${listing.city} pe VEX. Vezi poze și detalii complete.`;
+    const canonicalPath = listingSeoPath({ id: listing.id, title: listing.title, city: listing.city });
 
     return {
       title: `${listing.title} de vânzare în ${listing.city}`,
       description,
       alternates: {
-        canonical: listingSeoPath({ id: listing.id, title: listing.title, city: listing.city }),
+        canonical: canonicalPath,
       },
       openGraph: {
         title: listing.title,
         description,
         type: "article",
+        url: canonicalPath,
         images: [{ url: image, alt: listing.title }],
       },
       twitter: {
