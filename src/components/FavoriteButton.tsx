@@ -1,5 +1,6 @@
 "use client";
 
+import { Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState, useTransition, type MouseEvent } from "react";
 import { toggleListingFavorite } from "@/app/actions/favorites";
@@ -49,13 +50,13 @@ export function FavoriteButton({ listingId, initialFavorited, variant = "default
           title={err ?? (favorited ? t("saved") : t("save"))}
           aria-label={favorited ? t("saved") : t("save")}
           aria-pressed={favorited}
-          className={`inline-flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 touch-manipulation items-center justify-center rounded-full border-2 text-base shadow-[var(--mp-shadow)] transition disabled:opacity-60 ${
+          className={`inline-flex h-9 w-9 min-h-[36px] min-w-[36px] shrink-0 touch-manipulation items-center justify-center rounded-lg border border-[#e2e8f0] bg-white transition disabled:opacity-60 ${
             favorited
-              ? "border-rose-400 bg-white text-rose-600 hover:bg-rose-50 dark:border-rose-500 dark:bg-[#1f2937] dark:text-rose-400"
-              : "border-zinc-300 bg-white text-[#374151] hover:border-zinc-400 hover:text-[#111827] dark:border-zinc-600 dark:bg-[#1f2937] dark:text-[#e5e7eb] dark:hover:border-zinc-500"
+              ? "border-[#1a56db]/30 text-[#1a56db] hover:bg-[#f1f5f9]"
+              : "text-[#64748b] hover:border-[#1a56db]/30 hover:text-[#1a56db]"
           }`}
         >
-          <span aria-hidden>{favorited ? "♥" : "♡"}</span>
+          <Heart className={`h-4 w-4 ${favorited ? "fill-current" : ""}`} strokeWidth={1.75} aria-hidden />
         </button>
       </div>
     );

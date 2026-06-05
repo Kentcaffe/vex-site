@@ -16,7 +16,7 @@ html {
 @layer base {
   :root {
     color-scheme: light;
-    --mp-page: #f1f5f9;
+    --mp-page: #ffffff;
     --mp-surface: #ffffff;
     --mp-surface-elevated: #ffffff;
     --mp-surface-muted: #f8fafc;
