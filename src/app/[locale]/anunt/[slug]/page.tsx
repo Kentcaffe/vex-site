@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import ListingDetailPage, { generateMetadata as generateLegacyListingMetadata } from "@/app/[locale]/anunturi/[id]/page";
-import { explicitPageCanonicalMetadata, listingIdFromSeoSlug } from "@/lib/seo";
+import { listingIdFromSeoSlug } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ locale: string; slug: string }>;
@@ -11,13 +11,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const { locale, slug } = await params;
     const id = listingIdFromSeoSlug(slug);
-    const { alternates, openGraph } = explicitPageCanonicalMetadata(locale, `/anunt/${slug}`);
+    const canonicalUrl = `https://vex.md/anunt/${slug}`;
     if (!id) {
       return {
         title: "Anunț indisponibil",
         description: "Acest anunț nu mai este disponibil pe VEX.",
-        alternates,
-        openGraph,
+        alternates: { canonical: canonicalUrl },
+        openGraph: { url: canonicalUrl },
       };
     }
     const legacy = await generateLegacyListingMetadata({
@@ -25,10 +25,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     });
     return {
       ...legacy,
-      alternates,
+      alternates: { canonical: canonicalUrl },
       openGraph: {
         ...legacy.openGraph,
-        url: openGraph.url,
+        url: canonicalUrl,
       },
     };
   } catch (error) {
