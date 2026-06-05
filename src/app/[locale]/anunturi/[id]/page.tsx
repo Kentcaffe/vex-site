@@ -22,6 +22,7 @@ import { prisma } from "@/lib/prisma";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
 import { explicitPageCanonicalMetadata, listingSeoPath } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
+import { localizedHref } from "@/lib/paths";
 import { OwnListingDeleteButton } from "@/components/account/OwnListingDeleteButton";
 import { UserBadges } from "@/components/business/UserBadges";
 import { canShowPublicEmail, canShowPublicPhone } from "@/lib/public-privacy";
