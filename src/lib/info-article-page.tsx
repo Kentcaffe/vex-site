@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import { getInfoArticle } from "@/content/info-articles/registry";
 import { InfoArticleView } from "@/components/info/InfoArticleView";
+import { localePageCanonicalMetadata } from "@/lib/seo";
 
 type PageParams = Promise<{ locale: string }>;
 
@@ -19,9 +20,17 @@ export function createInfoArticlePage(slug: string): InfoArticlePageExports {
     const { locale } = await params;
     const article = getInfoArticle(slug, locale);
     if (!article) return { title: "VEX" };
+    const { alternates, openGraph } = localePageCanonicalMetadata(locale, `/${slug}`);
     return {
       title: `${article.metaTitle} | VEX`,
       description: article.metaDescription,
+      alternates,
+      openGraph: {
+        title: `${article.metaTitle} | VEX`,
+        description: article.metaDescription,
+        url: openGraph.url,
+        type: "article",
+      },
     };
   }
 

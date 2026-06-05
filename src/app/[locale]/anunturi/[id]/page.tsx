@@ -20,7 +20,7 @@ import { findFirstListingResilient } from "@/lib/prisma-listing-queries";
 import { listingWhereActive } from "@/lib/prisma-listing-soft-delete-filter";
 import { prisma } from "@/lib/prisma";
 import { resolvePublicMediaUrl } from "@/lib/media-url";
-import { listingSeoPath } from "@/lib/seo";
+import { absoluteCanonicalUrl, listingSeoPath } from "@/lib/seo";
 import { Link } from "@/i18n/navigation";
 import { localizedHref } from "@/lib/paths";
 import { OwnListingDeleteButton } from "@/components/account/OwnListingDeleteButton";
@@ -69,7 +69,7 @@ type ListingDetailRow = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    const { id } = await params;
+    const { id, locale } = await params;
     const listing = await findFirstListingResilient({
       where: { id, ...listingWhereActive() },
       select: {
@@ -89,19 +89,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const image = resolvePublicMediaUrl(parseStoredListingImages(listing.images)[0] ?? null) ?? "/marketplace-image-fallback.svg";
     const description = `${listing.title} de vânzare în ${listing.city} pe VEX. Vezi poze și detalii complete.`;
-    const canonicalPath = listingSeoPath({ id: listing.id, title: listing.title, city: listing.city });
+    const canonicalPath = localizedHref(
+      locale,
+      listingSeoPath({ id: listing.id, title: listing.title, city: listing.city }),
+    );
+    const canonicalUrl = absoluteCanonicalUrl(canonicalPath);
 
     return {
       title: `${listing.title} de vânzare în ${listing.city}`,
       description,
       alternates: {
-        canonical: canonicalPath,
+        canonical: canonicalUrl,
       },
       openGraph: {
         title: listing.title,
         description,
         type: "article",
-        url: canonicalPath,
+        url: canonicalUrl,
         images: [{ url: image, alt: listing.title }],
       },
       twitter: {

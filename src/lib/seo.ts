@@ -1,3 +1,5 @@
+import { localizedHref } from "@/lib/paths";
+
 const SITE_URL_FALLBACK = "https://vex.md";
 
 function normalizeSiteUrl(raw: string | undefined): string {
@@ -15,6 +17,12 @@ const SITE_URL = normalizeSiteUrl(process.env.NEXT_PUBLIC_APP_URL);
 
 export function siteUrl(): string {
   return SITE_URL;
+}
+
+/** URL absolut canonical (ex. `https://vex.md/anunturi`). */
+export function absoluteCanonicalUrl(pathname: string): string {
+  const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  return `${SITE_URL}${path === "/" ? "" : path}`;
 }
 
 export function slugifyForSeo(value: string): string {
@@ -38,16 +46,27 @@ export function listingSeoPath(input: {
   return `/anunt/${slug}-${input.id}`;
 }
 
-/** Canonical + og:url relative la metadataBase (ex. `/anunturi`, `/ro/ajutor`). */
+/** Canonical + og:url absolute din pathname (ex. `/anunturi` → `https://vex.md/anunturi`). */
 export function pageCanonicalMetadata(pathname: string): {
   alternates: { canonical: string };
   openGraph: { url: string };
 } {
-  const path = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  const absolute = absoluteCanonicalUrl(pathname);
   return {
-    alternates: { canonical: path },
-    openGraph: { url: path },
+    alternates: { canonical: absolute },
+    openGraph: { url: absolute },
   };
+}
+
+/** Canonical localizat: `/anunturi` (ro) sau `/en/anunturi`. */
+export function localePageCanonicalMetadata(
+  locale: string,
+  path: string,
+): {
+  alternates: { canonical: string };
+  openGraph: { url: string };
+} {
+  return pageCanonicalMetadata(localizedHref(locale, path));
 }
 
 export function listingIdFromSeoSlug(slug: string): string | null {

@@ -4,6 +4,7 @@ import { setRequestLocale } from "next-intl/server";
 import { CategoryExplorer } from "@/components/categories/CategoryExplorer";
 import { CategoryPageSkeleton } from "@/components/categories/CategoryPageSkeleton";
 import { getRootCategories } from "@/lib/category-queries";
+import { localePageCanonicalMetadata } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -28,9 +29,17 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const selectedLabel = selected ? labelFromJson(selected.labels, locale) : "Categorii";
   const isTransport = selected?.slug?.includes("transport");
   const titleTail = isTransport ? "Anunțuri auto Moldova" : "Anunțuri gratuite Moldova";
+  const { alternates, openGraph } = localePageCanonicalMetadata(locale, "/categorii");
   return {
     title: `${selectedLabel} - ${titleTail}`,
     description: `Descoperă subcategorii și anunțuri pentru ${selectedLabel} pe VEX Moldova.`,
+    alternates,
+    openGraph: {
+      title: `${selectedLabel} - ${titleTail}`,
+      description: `Descoperă subcategorii și anunțuri pentru ${selectedLabel} pe VEX Moldova.`,
+      url: openGraph.url,
+      type: "website",
+    },
   };
 }
 

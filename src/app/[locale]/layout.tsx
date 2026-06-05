@@ -1,8 +1,11 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { currentRequestPathname } from "@/lib/request-pathname";
+import { pageCanonicalMetadata } from "@/lib/seo";
 import { Providers } from "@/components/Providers";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { FooterVisibility } from "@/components/FooterVisibility";
@@ -20,6 +23,12 @@ export function generateStaticParams() {
 
 /** Env-based UI (OAuth buttons) must see runtime secrets — avoid baking empty env at build. */
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const pathname = await currentRequestPathname();
+  const { alternates, openGraph } = pageCanonicalMetadata(pathname);
+  return { alternates, openGraph: { url: openGraph.url } };
+}
 
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
