@@ -90,6 +90,7 @@ export async function generateMetadata({ params }: Pick<Props, "params">): Promi
       url: "https://vex.md/anunturi",
       type: "website",
     },
+    robots: { index: true, follow: true },
   };
 }
 
