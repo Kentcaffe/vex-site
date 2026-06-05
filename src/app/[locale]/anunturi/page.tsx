@@ -83,7 +83,14 @@ export async function generateMetadata({ params }: Pick<Props, "params">): Promi
   return {
     title: `${t("title")} | VEX`,
     description: t("subtitle"),
-    alternates: { canonical: "https://vex.md/anunturi" },
+    alternates: {
+      canonical: "https://vex.md/anunturi",
+      languages: {
+        ro: "https://vex.md/anunturi",
+        ru: "https://vex.md/ru/anunturi",
+        en: "https://vex.md/en/anunturi",
+      },
+    },
     openGraph: {
       title: `${t("title")} | VEX`,
       description: t("subtitle"),

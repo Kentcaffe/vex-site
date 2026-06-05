@@ -12,11 +12,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { locale, slug } = await params;
     const id = listingIdFromSeoSlug(slug);
     const canonicalUrl = `https://vex.md/anunt/${slug}`;
+    const alternates = {
+      canonical: canonicalUrl,
+      languages: {
+        ro: canonicalUrl,
+        ru: `https://vex.md/ru/anunt/${slug}`,
+        en: `https://vex.md/en/anunt/${slug}`,
+      },
+    };
     if (!id) {
       return {
         title: "Anunț indisponibil",
         description: "Acest anunț nu mai este disponibil pe VEX.",
-        alternates: { canonical: canonicalUrl },
+        alternates,
         openGraph: { url: canonicalUrl },
       };
     }
@@ -25,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     });
     return {
       ...legacy,
-      alternates: { canonical: canonicalUrl },
+      alternates,
       openGraph: {
         ...legacy.openGraph,
         url: canonicalUrl,

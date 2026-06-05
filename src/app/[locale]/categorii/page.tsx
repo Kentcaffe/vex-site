@@ -30,7 +30,14 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   return {
     title: `${selectedLabel} - ${titleTail}`,
     description: `Descoperă subcategorii și anunțuri pentru ${selectedLabel} pe VEX Moldova.`,
-    alternates: { canonical: "https://vex.md/categorii" },
+    alternates: {
+      canonical: "https://vex.md/categorii",
+      languages: {
+        ro: "https://vex.md/categorii",
+        ru: "https://vex.md/ru/categorii",
+        en: "https://vex.md/en/categorii",
+      },
+    },
     openGraph: {
       title: `${selectedLabel} - ${titleTail}`,
       description: `Descoperă subcategorii și anunțuri pentru ${selectedLabel} pe VEX Moldova.`,

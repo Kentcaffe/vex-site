@@ -5,7 +5,14 @@ const CANONICAL_URL = "https://vex.md/anunturi";
 
 /** Canonical la nivel de segment /anunturi — reforță page.tsx pe Render. */
 export const metadata: Metadata = {
-  alternates: { canonical: CANONICAL_URL },
+  alternates: {
+    canonical: CANONICAL_URL,
+    languages: {
+      ro: CANONICAL_URL,
+      ru: "https://vex.md/ru/anunturi",
+      en: "https://vex.md/en/anunturi",
+    },
+  },
   openGraph: { url: CANONICAL_URL },
   robots: { index: true, follow: true },
 };
