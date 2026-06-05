@@ -17,49 +17,51 @@ const SEO_KEYWORDS = [
   "anunțuri gratuite",
 ];
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl()),
-  title: SEO_TITLE,
-  description: SEO_DESCRIPTION,
-  keywords: SEO_KEYWORDS,
-  manifest: "/site.webmanifest",
-  icons: {
-    icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
-    shortcut: "/favicon.ico",
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-  },
-  openGraph: {
-    title: "VEX - Anunțuri gratuite în Moldova",
-    description: "Cumpără și vinde rapid pe VEX.",
-    type: "website",
-    siteName: "VEX",
-    locale: "ro_MD",
-    images: [
-      {
-        url: "/logo.png",
-        width: 512,
-        height: 512,
-        alt: "VEX - anunțuri gratuite Moldova",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "VEX - Anunțuri Moldova",
-    description: "Platformă de anunțuri gratuite",
-    images: ["/logo.png"],
-  },
-  other: {
-    "og:logo": `${siteUrl()}/logo.png`,
-  },
-  verification: {
-    google: "c8RdLZCq_i84jUUQXIatmo8Uoc37kRmu2_fv_t-IQS8",
-  },
-};
-
 export async function generateMetadata(): Promise<Metadata> {
   const pathname = await currentRequestPathname();
-  return pageCanonicalMetadata(pathname);
+  const { alternates, openGraph: canonicalOg } = pageCanonicalMetadata(pathname);
+
+  return {
+    metadataBase: new URL(siteUrl()),
+    title: SEO_TITLE,
+    description: SEO_DESCRIPTION,
+    keywords: SEO_KEYWORDS,
+    alternates,
+    manifest: "/site.webmanifest",
+    icons: {
+      icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
+      shortcut: "/favicon.ico",
+      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+    },
+    openGraph: {
+      title: "VEX - Anunțuri gratuite în Moldova",
+      description: "Cumpără și vinde rapid pe VEX.",
+      type: "website",
+      url: canonicalOg.url,
+      siteName: "VEX",
+      locale: "ro_MD",
+      images: [
+        {
+          url: "/logo.png",
+          width: 512,
+          height: 512,
+          alt: "VEX - anunțuri gratuite Moldova",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "VEX - Anunțuri Moldova",
+      description: "Platformă de anunțuri gratuite",
+      images: ["/logo.png"],
+    },
+    other: {
+      "og:logo": `${siteUrl()}/logo.png`,
+    },
+    verification: {
+      google: "c8RdLZCq_i84jUUQXIatmo8Uoc37kRmu2_fv_t-IQS8",
+    },
+  };
 }
 
 export const viewport: Viewport = {
