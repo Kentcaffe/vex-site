@@ -22,6 +22,9 @@ export async function generateMetadata(): Promise<Metadata> {
     title: SEO_TITLE,
     description: SEO_DESCRIPTION,
     keywords: SEO_KEYWORDS,
+    alternates: {
+      canonical: "https://vex.md",
+    },
     manifest: "/site.webmanifest",
     icons: {
       icon: [{ url: "/favicon.ico", type: "image/x-icon" }],
@@ -31,6 +34,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title: "VEX - Anunțuri gratuite în Moldova",
       description: "Cumpără și vinde rapid pe VEX.",
+      url: "https://vex.md",
       type: "website",
       siteName: "VEX",
       locale: "ro_MD",
